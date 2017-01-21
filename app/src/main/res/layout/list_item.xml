@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:id="@+id/Codigo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/Nombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:textColor="@color/colorAccent"
+        android:layout_below="@id/Codigo"
+      />
+
+    <TextView
+        android:id="@+id/PrecioSuper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:layout_below="@id/Nombre"
+      />
+    <TextView
+        android:id="@+id/PrecioDetalle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:layout_below="@id/Nombre"
+        android:layout_toRightOf="@id/PrecioSuper"
+        android:layout_marginLeft="27dp"
+        android:paddingLeft="28dp"
+      />
+
+    <TextView
+        android:id="@+id/PrecioForaneo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:layout_below="@id/PrecioSuper"
+        />
+
+    <TextView
+        android:id="@+id/PrecioMayorista"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:layout_below="@id/PrecioSuper"
+        android:layout_toRightOf="@id/PrecioForaneo"
+        android:layout_marginLeft="20dp"
+        android:paddingLeft="20dp"
+        />
+
+</RelativeLayout>

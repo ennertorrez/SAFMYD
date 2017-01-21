@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/btnMaestroProductos"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Maestro Productos" />
+        <item
+            android:id="@+id/btnPedidos"
+            android:icon="@drawable/ic_menu_plussign"
+            android:title="Pedidos" />
+        <item
+            android:id="@+id/btnClientes"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Clientes" />
+        <item
+            android:id="@+id/btnDevoluciones"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Devoluciones" />
+    </group>
+
+    <item android:title="Reportes">
+        <menu>
+            <item
+                android:id="@+id/btnReporteVentasAlDia"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Pre ventas del dia" />
+            <item
+                android:id="@+id/btnReporteTermometroCumplimiento"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Termometro de cumplimiento" />
+        </menu>
+    </item>
+
+</menu>
