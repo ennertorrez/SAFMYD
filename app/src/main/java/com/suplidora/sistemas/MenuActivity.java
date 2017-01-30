@@ -84,6 +84,11 @@ public class MenuActivity extends AppCompatActivity
                         .replace(R.id.content_frame, new MaestroProductoFragment())
                         .commit();
                 break;
+            case R.id.btnMapa:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, new MapViewFragment())
+                        .commit();
+                break;
         }
 
 

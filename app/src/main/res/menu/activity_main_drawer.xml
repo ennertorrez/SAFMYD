@@ -18,6 +18,11 @@
             android:id="@+id/btnDevoluciones"
             android:icon="@drawable/ic_menu_manage"
             android:title="Devoluciones" />
+
+        <item
+            android:id="@+id/btnMapa"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Mapa" />
     </group>
 
     <item android:title="Reportes">
