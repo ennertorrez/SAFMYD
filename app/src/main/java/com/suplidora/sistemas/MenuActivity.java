@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.app.Fragment;
 
 import com.suplidora.sistemas.R;
 
@@ -37,6 +38,7 @@ public class MenuActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -65,7 +67,7 @@ public class MenuActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+           // finish();//return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -77,6 +79,7 @@ public class MenuActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         FragmentManager fragmentManager = getFragmentManager();
+
         switch (id) {
 
             case R.id.btnMaestroProductos:
@@ -89,23 +92,10 @@ public class MenuActivity extends AppCompatActivity
                         .replace(R.id.content_frame, new MapViewFragment())
                         .commit();
                 break;
+            case R.id.btnClientes:
+                fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
+                break;
         }
-
-
-     /*   if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }*/
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

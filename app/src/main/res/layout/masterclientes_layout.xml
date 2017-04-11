@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:name = "com.suplidora.sistemas.PopupListFragment"
+   >
+
+
+    <RadioGroup
+        android:id="@+id/rgGrupo"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:checkedButton="@+id/rbCodigo"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbCodigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Codigo" />
+
+        <RadioButton
+            android:id="@+id/rbNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre" />
+
+
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/txtBusqueda"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/rgGrupo"
+        android:layout_toLeftOf="@+id/btnBuscar"
+        android:hint="Ingrese su busqueda" />
+
+    <TextView
+        android:background="@color/colorPrimary"
+        android:textColor="@color/White"
+        android:id="@+id/lblFooter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Clientes encontrados: 0" />
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lblFooter"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtBusqueda"
+        />
+
+    <Button
+
+        android:id="@+id/btnBuscar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/list"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_weight="1"
+        android:text="Buscar" />
+
+</RelativeLayout>

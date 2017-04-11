@@ -80,8 +80,8 @@ public class MaestroProductoFragment extends Fragment {
     }
 
     // URL to get contacts JSON
-    private static String url = "http://186.1.18.75:8080/ServiciosSisa.svc/BuscarArticulo/";
-
+   // private static String url = "http://186.1.18.75:8080/ServiciosSisa.svc/BuscarArticulo/";
+    private static String url = "http://186.1.18.75:8080/ServicioPedidos.svc/BuscarArticulo/";
     ArrayList<HashMap<String, String>> listaArticulos;
 
 

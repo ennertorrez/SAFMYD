@@ -5,4 +5,39 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="menu_remove">Remove</string>
+    <string name="content_open_popup">Open Popup Menu</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_iniciosesion">Iniciar sesiòn</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Usuario</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="action_sign_in">Iniciar</string>
+    <string name="action_sign_in_short">Iniciar sesiòn</string>
+    <string name="error_invalid_email">Usuario invalido</string>
+    <string name="error_invalid_password">Contraseña invalida</string>
+    <string name="error_incorrect_password">Esta contraseña es incorrecta</string>
+    <string name="error_field_required">Este campo es requerido</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_cliente_opciones">ClienteOpciones</string>
+    <string name="button_Articulos">Consultar Artículos</string>
+    <string name="title_activity_controlador_articulo">Consultar Artículos</string>
+    <string name="lArticulosDescripcion">Descripción:</string>
+    <string name="lArticulosFamilia">Familia:</string>
+    <string name="lArticulosTemporada">Temporada:</string>
+    <string name="lArticulosPrecio">Precio:</string>
+    <string name="lArticulosPvpr">PVPR:</string>
+    <string name="lArticulosTieneTallas">Tiene Tallas:</string>
+    <string name="lArticulosTallas">Tallas:</string>
+    <string name="lArticulosObservaciones">Observaciones:</string>
+    <string name="msgArticuloSeleccionado">Ha seleccionado el artículo:</string>
+    <string name="labButArticulo">Artículo</string>
+    <string name="msgArticuloNoSeleccionado">No se ha seleccionado ningún artículo.</string>
+    <string name="msgArticuloNoExiste">El artículo no existe. No se grabará la linea de pedido.</string>
+    <string name="labRecibirArticulos">Artículos</string>
+    <string name="msgArticulosRecibir">Articulos a Recibir</string>
+    <string name="msgRecibiendoArticulos">Recibiendo Articulos ...</string>
 </resources>

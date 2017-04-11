@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   Usuario:"
+            android:textColor="#151414"
+            android:textSize="20dp"
+            android:typeface="monospace"
+            android:textStyle="bold"
+            android:shadowColor="#FFFFFF"
+            android:shadowRadius="1.5"
+            android:shadowDx="1"
+            android:shadowDy="2" />
+
+        <EditText
+            android:id="@+id/txtUsuario"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:textSize="17dp" />
+
+        <TextView android:id="@+id/TextView02"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#151414"
+            android:textSize="20dp"
+            android:typeface="monospace"
+            android:text="   Contraseña:"
+            android:textStyle="bold"
+            android:shadowColor="#FFFFFF"
+            android:shadowRadius="1.5"
+            android:shadowDx="1"
+            android:shadowDy="2" />
+
+        <EditText android:id="@+id/txtPassword"
+            android:layout_height="wrap_content"
+            android:layout_width="300dp"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip"
+            android:textSize="17dp"
+            android:password="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnIngresar"
+            android:text="Ingresar"
+            android:typeface="serif"
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:paddingLeft="20dip"
+            android:paddingRight="20dip"
+            android:background="#0099CC"
+            android:textColor="#FFFFFF"
+            android:shadowColor="#FF8800"
+            android:shadowRadius="1.5"
+            android:shadowDx="1"
+            android:shadowDy="2"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
