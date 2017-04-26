@@ -1,5 +1,6 @@
 package com.suplidora.sistemas;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,8 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.app.Fragment;
+import android.widget.TextView;
 
 import com.suplidora.sistemas.R;
+/*import com.suplidora.sistemas.app.ControladorArticulo;
+import com.suplidora.sistemas.app.ControladorSincronizacion;*/
+
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,7 +34,6 @@ public class MenuActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -39,6 +43,9 @@ public class MenuActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+       TextView lblUsuarioHeader = (TextView) findViewById(R.id.UsuarioHeader);
+        String Userheader = variables_publicas.UsarioLogin;
     }
 
     @Override
@@ -66,10 +73,13 @@ public class MenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-           // finish();//return true;
+        if (id == R.id.Salir) {
+            finish();//return true;
         }
-
+        if (id == R.id.CerrarSesion) {
+            Intent newAct = new Intent(getApplicationContext(), Login.class);
+            startActivity(newAct);//return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -94,6 +104,19 @@ public class MenuActivity extends AppCompatActivity
                 break;
             case R.id.btnClientes:
                 fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
+                break;
+            case R.id.btnDevoluciones:
+                /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
+                startActivity(newAct);*/
+                Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);
+                startActivity(newAct);
+                break;
+            case R.id.btnPedidos:
+                /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
+                startActivity(newAct);*/
+//                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
+//                startActivity(newActi);
+                fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

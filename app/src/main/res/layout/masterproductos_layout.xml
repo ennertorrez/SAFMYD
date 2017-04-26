@@ -40,6 +40,7 @@
         android:layout_toLeftOf="@+id/btnBuscar"
         android:hint="Ingrese su busqueda" />
 
+
     <TextView
         android:background="@color/colorPrimary"
         android:textColor="@color/White"
@@ -59,7 +60,6 @@
         android:layout_below="@+id/txtBusqueda" />
 
     <Button
-
         android:id="@+id/btnBuscar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,5 +68,13 @@
         android:layout_alignParentRight="true"
         android:layout_weight="1"
         android:text="Buscar" />
+    <!--<Button-->
+        <!--android:id="@+id/btnConsulta"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_weight="2"-->
+        <!--android:text="Consulta" />-->
 
 </RelativeLayout>

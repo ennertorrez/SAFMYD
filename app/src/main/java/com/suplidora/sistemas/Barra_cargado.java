@@ -2,6 +2,8 @@ package com.suplidora.sistemas;
 
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -29,8 +31,6 @@ public class Barra_cargado extends Activity {
 	
 	        
 	}
-
-	
 	  //Clase interna que extiende de AsyncTask
  public class TareaSegundoPlano extends AsyncTask<Void, Void, Void>{
 
@@ -46,7 +46,7 @@ public class Barra_cargado extends Activity {
          for(int progreso = 1;progreso<=10;progreso++){//Creamos un for de 1 a 10 que ir� contando los segundos.
          	
              try {
-                     Thread.sleep(500);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
+                     Thread.sleep(300);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
                     
              } catch (InterruptedException e) {}
             
@@ -63,14 +63,23 @@ public class Barra_cargado extends Activity {
              
       	   //Toast.makeText(getBaseContext(), "Tarea Finalizada", Toast.LENGTH_LONG).show();//Nos muestra una notificaci�n informando de que la tarea en segundo plano ha finalizado
       	 // ENVIA Al otro activity
+             if(variables_publicas.LoginOk)
+             {
 				Intent intent=new Intent("android.intent.action.MenuActivity");
 				startActivity(intent);
 				finish();
-         } 
-	
+             }
+             else
+             {
+//                 Intent intent=new Intent("android.intent.action.Login");
+//                 startActivity(intent);
+                 mensajeAviso("Usuario o contraseña invalidos");
+                 Intent newAct = new Intent(getApplicationContext(), Login.class);
+                 startActivity(newAct);
+                 finish();
+             }
+         }
  }
-	
- 
  //Definimos que para cuando se presione la tecla BACK no volvamos para atras  	 
 	 @Override
 	 public boolean onKeyDown(int keyCode, KeyEvent event)  {
@@ -88,5 +97,15 @@ public class Barra_cargado extends Activity {
 		getMenuInflater().inflate(R.menu.barra_cargado, menu);
 		return true;
 	}
+    public void mensajeAviso(String texto){
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar,new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
 
 }

@@ -43,6 +43,8 @@ public class MaestroProductoFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
+    private ArticulosHelper databaseHelper;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,12 +52,20 @@ public class MaestroProductoFragment extends Fragment {
        getActivity().setTitle("Maestro Productos");
         lv = (ListView) myView.findViewById(R.id.list);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
+
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
         listaArticulos = new ArrayList<>();
 
 /*prueba*/
+//        btnConsulta.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getActivity(),.class);
+//               startActivity(intent);
+//            }
+//        });
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,37 +91,15 @@ public class MaestroProductoFragment extends Fragment {
 
     // URL to get contacts JSON
    // private static String url = "http://186.1.18.75:8080/ServiciosSisa.svc/BuscarArticulo/";
-    private static String url = "http://186.1.18.75:8080/ServicioPedidos.svc/BuscarArticulo/";
+    private static String url = "http://186.1.18.75:8080/ServicioTotalArticulos.svc/BuscarArticulo/";
     ArrayList<HashMap<String, String>> listaArticulos;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //new GetArticulos().execute();
     }
-
-/*    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-
-        Bundle viewHierarchy = savedInstanceState
-                .getBundle("android:viewHierarchyState");
-        if (viewHierarchy != null) {
-            SparseArray views = viewHierarchy.getSparseParcelableArray("android:views");
-            if (views != null) {
-                for (int i = 0; i < views.size(); i++) {
-                    Log.v(TAG, "key -->" + views.get(i));
-                    Log.v(TAG, "value --> " + views.valueAt(i));
-                }
-            }
-        } else {
-            Log.v(TAG, "no view data");
-        }
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.v(TAG, "Inside of onRestoreInstanceState");
-    }*/
-
-
     private class GetArticulos extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -122,7 +110,6 @@ public class MaestroProductoFragment extends Fragment {
             pDialog.setMessage("Please wait...");
             pDialog.setCancelable(false);
             pDialog.show();
-
         }
 
         @Override
@@ -130,7 +117,7 @@ public class MaestroProductoFragment extends Fragment {
             HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
-            String urlString = url + busqueda + "/" + tipoBusqueda;
+            String urlString = url + busqueda.replace(" ","%20") + "/" + tipoBusqueda;
             String jsonStr = sh.makeServiceCall(urlString);
 
             Log.e(TAG, "Response from url: " + jsonStr);
@@ -146,6 +133,7 @@ public class MaestroProductoFragment extends Fragment {
                     for (int i = 0; i < articulos.length(); i++) {
                         JSONObject c = articulos.getJSONObject(i);
 
+                        //String Id = c.getString("Id");
                         String Codigo = c.getString("CODIGO_ARTICULO");
                         String Nombre = c.getString("NOMBRE");
                         String PrecioSuper = c.getString("PrecioSuper");
@@ -153,16 +141,12 @@ public class MaestroProductoFragment extends Fragment {
                         String PrecioForaneo = c.getString("PrecioForaneo");
                         String PrecioMayorista = c.getString("PrecioMayorista");
 
-//                        // Phone node is JSON Object
-//                        JSONObject phone = c.getJSONObject("phone");
-//                        String mobile = phone.getString("mobile");
-//                        String home = phone.getString("home");
-//                        String office = phone.getString("office");
-
+                        //databaseHelper.GuardarTotalArticulos(Codigo,Nombre,PrecioSuper,PrecioDetalle,PrecioForaneo,PrecioMayorista);
 
                         HashMap<String, String> articulo = new HashMap<>();
 
                         // adding each child node to HashMap key => value
+                        articulo.put("Codigo", Codigo);
                         articulo.put("Codigo", Codigo);
                         articulo.put("Nombre", Nombre);
                         articulo.put("PrecioSuper","Super: "+ PrecioSuper);
@@ -220,6 +204,5 @@ public class MaestroProductoFragment extends Fragment {
             lv.setAdapter(adapter);
             lblFooter.setText("Articulos encontrados: " + String.valueOf(listaArticulos.size()));
         }
-
     }
 }

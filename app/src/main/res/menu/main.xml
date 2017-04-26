@@ -2,8 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/Ayuda"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Ayuda"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/Acerca"
+        android:orderInCategory="100"
+        android:title="Acerca de"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/CerrarSesion"
+        android:orderInCategory="100"
+        android:title="Cerrar sesiòn"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/Salir"
+        android:orderInCategory="100"
+        android:title="Salir"
         app:showAsAction="never" />
 </menu>

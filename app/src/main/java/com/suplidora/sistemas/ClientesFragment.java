@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.PopupMenu;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -30,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -68,6 +70,8 @@ public class ClientesFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
+    private RadioButton rbCodigo;
+    private   RadioButton rbDescripcion;
 
 
     @Nullable
@@ -82,6 +86,7 @@ public class ClientesFragment extends Fragment {
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
         listaClientes = new ArrayList<>();
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -106,13 +111,30 @@ public class ClientesFragment extends Fragment {
                     txtBusqueda.setError("Ingrese un valor");
                     return;
                 }
-
                 new GetClientes().execute();
                 lblFooter.setText("Clientes encontrados: " + String.valueOf(listaClientes.size()));
             }
         });
         return myView;
     }
+//    public void onRadioButtonClicked(View view) {
+//        // Is the button now checked?
+//        boolean checked = ((RadioButton) view).isChecked();
+//
+//        // Check which radio button was clicked
+//        switch(view.getId()) {
+//            case R.id.rbCodigo:
+//                if (checked)
+//                    // Pirates are the best
+//                    txtBusqueda.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                    break;
+//            case R.id.rbDescripcion:
+//                if (checked)
+//                    // Ninjas rule
+//                    txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
+//                    break;
+//        }
+//    }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.list) {
@@ -178,16 +200,29 @@ public class ClientesFragment extends Fragment {
                     for (int i = 0; i < clientes.length(); i++) {
                         JSONObject c = clientes.getJSONObject(i);
 
-                        String Nombre = c.getString("NOMBRE");
-                        String Codigo = c.getString("CODIGO");
-                        String Direccion = c.getString("DIRECCION");
+                        String IdCliente = c.getString("IdCliente");
+                        String CodCv = c.getString("CodCv");
+                        String Cliente = c.getString("Cliente");
+                        String Nombre = c.getString("Nombre");
+                        String FechaIngreso = c.getString("FechaIngreso");
+                        String ClienteNuevo = c.getString("ClienteNuevo");
+                        String Ruta = c.getString("Ruta");
+                        String Direccion = c.getString("Direccion");
+                        String Cedula = c.getString("Cedula");
+                        String IdVendedor = c.getString("IdVendedor");
+                        String Vendedor = c.getString("Vendedor");
+                        String IdSupervisor = c.getString("IdSupervisor");
+                        String Supervisor = c.getString("Supervisor");
+                        String Subruta = c.getString("Subruta");
+                        String FechaUltimaCompra = c.getString("FechaUltimaCompra");
 
                         HashMap<String, String> cliente = new HashMap<>();
 
-                        // adding each child node to HashMap key => value
+                        cliente.put("IdCliente",IdCliente);
+                        cliente.put("CodCv",CodCv);
                         cliente.put("Nombre",Nombre);
-                        cliente.put("Codigo",Codigo);
                         cliente.put("Direccion",Direccion);
+
                         listaClientes.add(cliente);
                     }
 
@@ -230,7 +265,7 @@ public class ClientesFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{"Codigo", "Nombre", "Direccion"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.layout.list_cliente, new String[]{"IdCliente", "Nombre", "Direccion"}, new int[]{R.id.IdCliente, R.id.Nombre,
                     R.id.Direccion});
 
             lv.setAdapter(adapter);

@@ -47,10 +47,14 @@ public class Login extends Activity {
     private String Usuario= "";
     private String Contrasenia = "";
     private ProgressDialog pDialog;
+    private String tipoBusqueda = "3";
 
     // URL to get contacts JSON
-    variables_publicas VarPublicas = new variables_publicas();
-    final String url=VarPublicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
+
+    final String url=variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
+    final String urlClientes=variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes/";
+
+    private ClientesHelper databaseHelper;
 
     ArrayList<HashMap<String, String>> listaUsers;
     @Override
@@ -88,10 +92,17 @@ public class Login extends Activity {
         });
     }
     private class GetUser extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            Intent intent = new Intent("android.intent.action.Barra_cargado");
+            startActivity(intent);
+            finish();
+        }
 
         @Override
         protected Void doInBackground(Void... arg0) {
-
             HttpHandler sh = new HttpHandler();
             // Making a request to url and getting response
             String urlString = url + Usuario + "/" + Contrasenia;
@@ -100,7 +111,9 @@ public class Login extends Activity {
             Log.e(TAG, "Response from url: " + jsonStr);
 
             if (jsonStr != null) {
+
                 try {
+                    /***********************OBTENER USUARIOS*********************/
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     listaUsers = new ArrayList<>();
                     // Getting JSON Array node
@@ -110,29 +123,33 @@ public class Login extends Activity {
                     for (int i = 0; i < Usuarios.length(); i++) {
                         JSONObject c = Usuarios.getJSONObject(i);
 
-                        String User = c.getString("Usuario");
-                        String Pass = c.getString("Contrasenia");
+                        variables_publicas.CodigoVendedor = c.getString("Codigo");
+                        variables_publicas.NombreVendedor = c.getString("Nombre");
+                        variables_publicas.UsarioLogin = c.getString("Usuario");
+                        String Contrasenia = c.getString("Contrasenia");
+                        String Tipo = c.getString("Tipo");
+                        variables_publicas.RutaCliente = c.getString("Ruta");
+                        variables_publicas.Canal = c.getString("Canal");
+                        String TasaCambio = c.getString("TasaCambio");
+                        //databaseHelper.EliminaClientes();
 
                         HashMap<String, String> user = new HashMap<>();
 
-                        // adding each child node to HashMap key => value
-                        user.put("Usuario",User);
-                        user.put("Contrasenia",Pass);
+//                        // adding each child node to HashMap key => value
                         listaUsers.add(user);
-                        if(Usuario.equals(User) && Contrasenia.equals(Pass)) {
-                           // Intent nuevoform = new Intent(Login.this, MenuActivity.class);
-                            //startActivity(nuevoform);
-                            Intent intent=new Intent("android.intent.action.Barra_cargado");
-                            startActivity(intent);
-                            finish();
-                            //AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        }
-                        else  {
-                            //Logger.d("Successfull image received.");
-                            //Logger.getLogger("dasdasdas");
-                            //Toast.makeText(getApplicationContext(),"Usuario Invalido",Toast.LENGTH_SHORT).show();
-                            //Log.e("Log", "Failed..");
-                        }
+                        variables_publicas.LoginOk = true;
+//                        if(Usuario.equals(User) && Contrasenia.equals(Pass)) {
+////                            Intent intent=new Intent("android.intent.action.Barra_cargado");
+////                            startActivity(intent);
+////                            finish();
+//
+//                        }
+//                        else  {
+//                            //Logger.d("Successfull image received.");
+//                            //Logger.getLogger("dasdasdas");
+//                            //Toast.makeText(getApplicationContext(),"suario Invalido",Toast.LENGTH_SHORT).show();
+//                            //Log.e("Log", "Failed..");
+//                        }
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -147,6 +164,7 @@ public class Login extends Activity {
                     });
                 }
             } else {
+
                 Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
                     @Override
@@ -157,12 +175,10 @@ public class Login extends Activity {
                                 .show();
                     }
                 });
+
             }
-            /*Intent intent=new Intent("android.intent.action.Barra_cargado");
-            startActivity(intent);
-            finish();*/
             return  null;
         }
     }
-    ArrayList<HashMap<String, String>> listaUser;
+
 }
