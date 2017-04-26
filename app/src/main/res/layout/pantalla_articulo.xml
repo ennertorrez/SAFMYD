@@ -1,0 +1,231 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".app.ControladorArticulo" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:gravity="top"
+        android:orientation="vertical"
+        tools:ignore="UselessParent" >
+
+        <TextView
+            android:id="@+id/lTituloArticulos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:text="Consultar Articulo"
+            android:textColor="#000000"
+            android:textSize="@dimen/tamano_texto_titulo"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#0000FF" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" >
+
+                <TextView
+                    android:id="@+id/lDescripcionArticulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Descripción:"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="@dimen/tamano_texto_etiqueta" />
+
+                <EditText
+                    android:id="@+id/descripcionBuscarArticulo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:ems="10"
+                    android:inputType="text"
+                    tools:ignore="NestedWeights" >
+
+                    <requestFocus />
+
+                    <requestFocus />
+
+                </EditText>
+
+                <Button
+                    android:id="@+id/botArticuloBuscar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="buscar"
+                    android:text="Buscar" />
+            </LinearLayout>
+        </LinearLayout>
+            <ListView
+                android:id="@+id/articulos_list"
+                android:layout_width="match_parent"
+                android:layout_height="267dp" >
+
+        </ListView>
+       
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#0000FF" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <TableRow
+                    android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/lbCODIGO_ARTICULO"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Codigo:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                        <EditText
+                            android:id="@+id/CODIGO_ARTICULO"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:ems="10"
+                            android:inputType="text" />
+                    </LinearLayout>
+
+                </TableRow>
+                <TableRow android:id="@+id/tableRow8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+                        <EditText
+                            android:id="@+id/NOMBRE"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:ems="10"
+                            android:inputType="number" >
+                        </EditText>
+                        </LinearLayout>
+                </TableRow>
+                <TableRow
+                    android:id="@+id/tableRow4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/lbPrecioSuper"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="P.Super:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <EditText
+                            android:id="@+id/PrecioSuper"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:ems="10"
+                            android:inputType="numberDecimal" />
+
+                        <TextView
+                            android:id="@+id/lbPrecioDetalle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="P.Detalle:"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <EditText
+                            android:id="@+id/PrecioDetalle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="6"
+                            android:ems="10"
+                            android:inputType="numberDecimal" />
+
+                    </LinearLayout>
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/lbPrecioForaneo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="P.Foraneo"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <EditText
+                            android:id="@+id/PrecioForaneo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:ems="10"
+                            android:inputType="text" />
+
+                        <TextView
+                            android:id="@+id/lbPrecioMayorista"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="P.Mayorista"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                       <EditText
+                            android:id="@+id/PrecioMayorista"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:ems="10"
+                            android:inputType="text" />
+                    </LinearLayout>
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+  
+    </LinearLayout>
+
+</RelativeLayout>
