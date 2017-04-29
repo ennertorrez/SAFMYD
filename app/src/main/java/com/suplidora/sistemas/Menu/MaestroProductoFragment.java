@@ -1,4 +1,4 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Menu;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -20,6 +20,10 @@ import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.HttpHandler;
+import com.suplidora.sistemas.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

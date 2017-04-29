@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
+
 public class ConsultaArticuloActivity extends Activity {
 
     private EditText txtCodigo;
@@ -24,6 +28,9 @@ public class ConsultaArticuloActivity extends Activity {
     private Button btnConsultar;
 
     private SQLiteDatabase db;
+    private UsuariosHelper UsuarioH;
+    private DataBaseOpenHelper DbOpenHelper ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,29 +47,30 @@ public class ConsultaArticuloActivity extends Activity {
         btnEliminar = (Button)findViewById(R.id.btnEliminar);
         btnConsultar = (Button)findViewById(R.id.btnConsultar);
 
-        final ArticulosHelper usdbh = new ArticulosHelper(ConsultaArticuloActivity.this);
+        DbOpenHelper = new DataBaseOpenHelper(ConsultaArticuloActivity.this);
 
         btnConsultar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                String Codigo = "001";
-                Cursor c = usdbh.getTimeRecordList(Codigo);
+                String Codigo = "001",Usuario = "9741",Contrasenia ="9741";
+                Cursor c = UsuarioH.BuscarUsuarios(Usuario,Contrasenia);
+
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtResultado.setText("");
                 if (c.moveToFirst()) {
-                    //Recorremos el cursor hasta que no haya más registros
+//                    //Recorremos el cursor hasta que no haya más registros
                     do {
                         String cod = c.getString(0);
-                        String nom = c.getString(1);
-                        txtResultado.append(" " + cod + " - " + nom + "\n");
+                       String nom = c.getString(1);
+                        txtResultado.append(" " + cod + nom +  "\n");
                     } while(c.moveToNext());
                 }
             }
         });
-        btnEliminar.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                    usdbh.EliminaArticulos();
-            }
-        });
+//        btnEliminar.setOnClickListener(new OnClickListener() {
+//            public void onClick(View v) {
+//                    usdbh.EliminaArticulos();
+//            }
+//        });
     }
 
     @Override

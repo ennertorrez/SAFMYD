@@ -1,20 +1,11 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Menu;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.PopupMenu;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -28,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -37,21 +27,16 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 //import android.widget.Toolbar;
-import android.support.v7.widget.Toolbar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import com.suplidora.sistemas.HttpHandler;
+import com.suplidora.sistemas.R;
 
 /**
  * Created by usuario on 20/3/2017.
@@ -59,8 +44,6 @@ import android.view.View;
 
 public class ClientesFragment extends Fragment {
     View myView;
-    String [] result;
-    int [] imageId;
     private String TAG = ClientesFragment.class.getSimpleName();
     private String busqueda = "1";
     private String tipoBusqueda = "1";
@@ -70,9 +53,6 @@ public class ClientesFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-    private RadioButton rbCodigo;
-    private   RadioButton rbDescripcion;
-
 
     @Nullable
     @Override
@@ -91,8 +71,7 @@ public class ClientesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //               Toast.makeText(getActivity().getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                getFragmentManager().beginTransaction().replace(R.id.content_frame,new MaestroProductoFragment()).commit();
-
+                //getFragmentManager().beginTransaction().replace(R.id.content_frame,new MaestroProductoFragment()).commit();
 //               Intent intent = new Intent(getActivity(),MenuActivity.class);
 //               startActivity(intent);
             }
@@ -117,50 +96,8 @@ public class ClientesFragment extends Fragment {
         });
         return myView;
     }
-//    public void onRadioButtonClicked(View view) {
-//        // Is the button now checked?
-//        boolean checked = ((RadioButton) view).isChecked();
-//
-//        // Check which radio button was clicked
-//        switch(view.getId()) {
-//            case R.id.rbCodigo:
-//                if (checked)
-//                    // Pirates are the best
-//                    txtBusqueda.setInputType(InputType.TYPE_CLASS_NUMBER);
-//                    break;
-//            case R.id.rbDescripcion:
-//                if (checked)
-//                    // Ninjas rule
-//                    txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
-//                    break;
-//        }
-//    }
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        if (v.getId() == R.id.list) {
-            /*ListView lv = (ListView) v;
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(acmi.position);
-
-            menu.add("One");
-            menu.add("Two");
-            menu.add("Three");
-            menu.add(obj.get("Codigo"));*/
-            super.onCreateContextMenu(menu, v, menuInfo);
-            MenuInflater inflater = getActivity().getMenuInflater();
-            EditText et ;
-            inflater.inflate(R.menu.clientes_opciones, menu);
-
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
-            long itemID = info.position;
-            menu.setHeaderTitle(obj.get("Nombre"));
-            //menu.add(obj.getClass(MaestroProductoFragment.))
-        }
-    }
     // URL to get contacts JSON
     private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
-
     public static ArrayList<HashMap<String, String>> listaClientes;
 
     @Override
@@ -225,7 +162,6 @@ public class ClientesFragment extends Fragment {
 
                         listaClientes.add(cliente);
                     }
-
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     getActivity().runOnUiThread(new Runnable() {
@@ -289,7 +225,6 @@ public class ClientesFragment extends Fragment {
         if (id == R.id.action_settings) {
              //finish();//return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

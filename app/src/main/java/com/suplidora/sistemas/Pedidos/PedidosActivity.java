@@ -1,13 +1,10 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Pedidos;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +17,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ public class PedidosActivity extends Activity {
         btnAgregar = (Button)findViewById(R.id.btnAgregar);
         btnBuscar = (Button)findViewById(R.id.btnBuscar);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
+        Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
 //        listView = (ListView) findViewById(R.id.listPedido);
 //        listItems = new ArrayList<String>();
@@ -101,7 +103,7 @@ public class PedidosActivity extends Activity {
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
-                Cursor c = usdbh.getTimeRecordList(CodigoArticulo);
+                Cursor c = usdbh.BuscarArticulo(CodigoArticulo);
 
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtCodigoArticulo.setText("");

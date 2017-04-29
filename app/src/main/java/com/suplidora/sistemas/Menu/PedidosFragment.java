@@ -1,4 +1,4 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Menu;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -20,9 +20,14 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.HttpHandler;
+import com.suplidora.sistemas.Pedidos.PedidosActivity;
+import com.suplidora.sistemas.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +53,6 @@ public class PedidosFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-
 
     @Nullable
     @Override
@@ -120,18 +124,6 @@ public class PedidosFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        myView= inflater.inflate(R.layout.masterclientes_layout,container,false);
-//        getActivity().setTitle("Maestro Clientes");
-//        lv = (ListView) myView.findViewById(R.id.list);
-//        databaseHelper=new ArticulosHelper(getActivity());
-//        new GetClientesPedidos().execute();
-//
-//
-//        return myView;
-//    }
 
     private class GetClientesPedidos extends AsyncTask<Void, Void, Void> {
         @Override

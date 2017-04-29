@@ -1,4 +1,4 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.AccesoDatos;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
 
 public class PedidosHelper {
 

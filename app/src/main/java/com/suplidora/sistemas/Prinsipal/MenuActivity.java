@@ -1,13 +1,9 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Prinsipal;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,11 +11,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.app.Fragment;
 import android.widget.TextView;
 
+import com.suplidora.sistemas.AndroidJSONParsingActivity;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.ConsultaArticuloActivity;
+import com.suplidora.sistemas.Menu.MapViewFragment;
+import com.suplidora.sistemas.Menu.PedidosFragment;
 import com.suplidora.sistemas.R;
+import com.suplidora.sistemas.Menu.ClientesFragment;
+import com.suplidora.sistemas.Menu.MaestroProductoFragment;
 /*import com.suplidora.sistemas.app.ControladorArticulo;
 import com.suplidora.sistemas.app.ControladorSincronizacion;*/
 
@@ -45,7 +46,7 @@ public class MenuActivity extends AppCompatActivity
 
 
        TextView lblUsuarioHeader = (TextView) findViewById(R.id.UsuarioHeader);
-        String Userheader = variables_publicas.UsarioLogin;
+        String Userheader = variables_publicas.UsuarioLogin;
     }
 
     @Override
@@ -114,9 +115,10 @@ public class MenuActivity extends AppCompatActivity
             case R.id.btnPedidos:
                 /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
                 startActivity(newAct);*/
-//                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
-//                startActivity(newActi);
-                fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
+                //Para pruebas
+                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
+              startActivity(newActi);
+               // fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -1,4 +1,4 @@
-package com.suplidora.sistemas;
+package com.suplidora.sistemas.Prinsipal;
 
 
 
@@ -12,6 +12,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.suplidora.sistemas.R;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
 
 public class Barra_cargado extends Activity {
 

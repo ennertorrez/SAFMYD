@@ -23,6 +23,9 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
+
 public class AndroidJSONParsingActivity extends ListActivity {
 
     private String busqueda = "001";
@@ -112,8 +115,15 @@ public class AndroidJSONParsingActivity extends ListActivity {
                         String PrecioDetalle = c.getString("PrecioDetalle");
                         String PrecioForaneo = c.getString("PrecioForaneo");
                         String PrecioMayorista = c.getString("PrecioMayorista");
+                        String Bonificable = c.getString("Bonificable");
+                        String AplicaPrecioDetalle = c.getString("AplicaPrecioDetalle");
+                        String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
+                        String detallista = c.getString("detallista");
 
-                        databaseHelper.GuardarTotalArticulos(Codigo, Nombre, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista);
+                        databaseHelper.GuardarTotalArticulos(Codigo, Nombre, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista,Bonificable,
+                                AplicaPrecioDetalle,
+                                DESCUENTO_MAXIMO,
+                                detallista);
 
                         HashMap<String, String> articulo = new HashMap<>();
 
