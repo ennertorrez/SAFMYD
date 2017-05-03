@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.Prinsipal;
+package com.suplidora.sistemas.Principal;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,7 +27,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 /**
@@ -93,11 +98,10 @@ public class Login extends Activity {
 //                {
 //                    mensajeAviso("Esta offline");
 //                }
-//                if (isOnlineNet()==true)
-//                {
+                //if (isOnlineNet()==true && getDatePhone() =="")
                    //mensajeAviso("Esta online");
                     new GetUser().execute();
-//                }
+               // }
 
                 //AlertDialog.Builder builder = new AlertDialog.Builder(this);
             }
@@ -181,7 +185,7 @@ public class Login extends Activity {
             Log.e(TAG, "Response from url: " + jsonStrC);
 
             if (jsonStrC != null) {
-                ClientesH.EliminaClientes();
+                //ClientesH.EliminaClientes();
                 try {
                     JSONObject jsonObjC = new JSONObject(jsonStrC);
                     // Getting JSON Array node
@@ -207,7 +211,7 @@ public class Login extends Activity {
                         String Subruta = c.getString("Subruta");
                         String FechaUltimaCompra = c.getString("FechaUltimaCompra");
                         String Frecuencia = c.getString("Frecuencia");
-                        ClientesH.GuardarTotalClientes(IdCliente,CodCv,Cliente,Nombre,FechaIngreso,ClienteNuevo,Ruta,Direccion,Cedula,IdVendedor,Vendedor,IdSupervisor,Supervisor,Subruta,FechaUltimaCompra,Frecuencia);
+                       // ClientesH.GuardarTotalClientes(IdCliente,CodCv,Cliente,Nombre,FechaIngreso,ClienteNuevo,Ruta,Direccion,Cedula,IdVendedor,Vendedor,IdSupervisor,Supervisor,Subruta,FechaUltimaCompra,Frecuencia);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -260,5 +264,19 @@ public class Login extends Activity {
         });
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
+    }
+    private String getDatePhone()
+    {
+        Calendar cal = new GregorianCalendar();
+        Date date = cal.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formatteDate = df.format(date);
+        return formatteDate;
+    }
+    public static String getHourPhone() {
+        Date dt = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        String formatteHour = df.format(dt.getTime());
+        return formatteHour;
     }
 }

@@ -1,79 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:background="#5fb0c9"
+    android:orientation="vertical"
+    android:scrollbarAlwaysDrawVerticalTrack="true">
 
-    <LinearLayout
-        android:id="@+id/linearLayout2"
+    <TextView
+        android:id="@+id/login_title"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="22dp"
+        android:gravity="center_horizontal"
+        android:text="Inicio de sesiòn"
+        android:textColor="#fff"
+        android:textSize="26sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/login_title"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="70dp"
+        android:background="#fff"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="   Usuario:"
-            android:textColor="#151414"
-            android:textSize="20dp"
-            android:typeface="monospace"
-            android:textStyle="bold"
-            android:shadowColor="#FFFFFF"
-            android:shadowRadius="1.5"
-            android:shadowDx="1"
-            android:shadowDy="2" />
+            android:orientation="vertical"
+            android:paddingTop="30dp">
 
-        <EditText
-            android:id="@+id/txtUsuario"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:textSize="17dp" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <TextView android:id="@+id/TextView02"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#151414"
-            android:textSize="20dp"
-            android:typeface="monospace"
-            android:text="   Contraseña:"
-            android:textStyle="bold"
-            android:shadowColor="#FFFFFF"
-            android:shadowRadius="1.5"
-            android:shadowDx="1"
-            android:shadowDy="2" />
+                <EditText
+                    android:id="@+id/txtUsuario"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@mipmap/ic_perm_identity_black_24dp"
+                    android:drawableTint="#0d00ff"
+                    android:singleLine="true"
+                    android:hint="Nombre de usuario"
+                    android:inputType="textEmailAddress" />
+            </android.support.design.widget.TextInputLayout>
 
-        <EditText android:id="@+id/txtPassword"
-            android:layout_height="wrap_content"
-            android:layout_width="300dp"
-            android:layout_gravity="center_horizontal"
-            android:paddingLeft="10dip"
-            android:paddingRight="10dip"
-            android:textSize="17dp"
-            android:password="true" />
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnIngresar"
-            android:text="Ingresar"
-            android:typeface="serif"
-            android:textStyle="bold"
-            android:textSize="18dp"
-            android:paddingLeft="20dip"
-            android:paddingRight="20dip"
-            android:background="#0099CC"
-            android:textColor="#FFFFFF"
-            android:shadowColor="#FF8800"
-            android:shadowRadius="1.5"
-            android:shadowDx="1"
-            android:shadowDy="2"
-            android:layout_gravity="center_horizontal" />
+                <EditText
+                    android:id="@+id/txtPassword"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:singleLine="true"
+                    android:drawableLeft="@mipmap/ic_https_black_24dp"
+                    android:drawableTint="#0d00ff"
+                    android:hint="Contraseña" />
+            </android.support.design.widget.TextInputLayout>
+            <Button
+                android:id="@+id/btnIngresar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="22dp"
+                android:background="#585aff"
+                android:text="Iniciar"
+                android:textAllCaps="false"
+                android:textColor="#fff"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </RelativeLayout>
 
-    </LinearLayout>
-
-
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/user_profile_photo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/login_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/user_profile_image_background"
+        android:elevation="4dp"
+        android:src="@mipmap/logosuplidora145x148" />
+</RelativeLayout>

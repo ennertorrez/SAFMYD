@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.suplidora.sistemas.Prinsipal.MenuActivity"
+    tools:context="com.suplidora.sistemas.Principal.MenuActivity"
     tools:showIn="@layout/app_bar_main">
 
     <FrameLayout

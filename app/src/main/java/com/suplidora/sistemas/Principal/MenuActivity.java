@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.Prinsipal;
+package com.suplidora.sistemas.Principal;
 
 import android.app.FragmentManager;
 import android.content.Intent;
@@ -17,7 +17,6 @@ import com.suplidora.sistemas.AndroidJSONParsingActivity;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.ConsultaArticuloActivity;
 import com.suplidora.sistemas.Menu.MapViewFragment;
-import com.suplidora.sistemas.Menu.PedidosFragment;
 import com.suplidora.sistemas.R;
 import com.suplidora.sistemas.Menu.ClientesFragment;
 import com.suplidora.sistemas.Menu.MaestroProductoFragment;

@@ -34,10 +34,10 @@ public class UsuariosHelper {
         database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
     }
     public Cursor BuscarUsuarios(String Usuario,String Contrasenia) {
-        return database.rawQuery("select * from " + variables_publicas.TABLE_USUARIOS +" where "+variables_publicas.USUARIOS_COLUMN_Usuario+" = '"+Usuario+"' and "+variables_publicas.USUARIOS_COLUMN_Contrasenia+" = '"+Contrasenia+"'", null);
+        return database.rawQuery("select Usuario, Contrasenia from " + variables_publicas.TABLE_USUARIOS +" where "+variables_publicas.USUARIOS_COLUMN_Usuario+" = '"+Usuario+"' and "+variables_publicas.USUARIOS_COLUMN_Contrasenia+" = '"+Contrasenia+"'", null);
     }
     public Cursor BuscarUsuariosCount() {
-         return database.rawQuery("select * from " + variables_publicas.TABLE_USUARIOS + "", null);
+         return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_USUARIOS + "", null);
     }
     public  void EliminaUsuarios() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_USUARIOS+";");

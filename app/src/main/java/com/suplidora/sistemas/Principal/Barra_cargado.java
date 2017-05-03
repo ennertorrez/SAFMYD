@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.Prinsipal;
+package com.suplidora.sistemas.Principal;
 
 
 

@@ -32,6 +32,7 @@ public class ConsultaArticuloActivity extends Activity {
     private DataBaseOpenHelper DbOpenHelper ;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +49,13 @@ public class ConsultaArticuloActivity extends Activity {
         btnConsultar = (Button)findViewById(R.id.btnConsultar);
 
         DbOpenHelper = new DataBaseOpenHelper(ConsultaArticuloActivity.this);
+        UsuarioH = new UsuariosHelper(DbOpenHelper.database);
+
 
         btnConsultar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                String Codigo = "001",Usuario = "9741",Contrasenia ="9741";
-                Cursor c = UsuarioH.BuscarUsuarios(Usuario,Contrasenia);
+                String Codigo = "001",Usuario = "rm",Contrasenia ="aa";
+                Cursor c = UsuarioH.BuscarUsuariosCount();
 
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtResultado.setText("");
@@ -60,8 +63,8 @@ public class ConsultaArticuloActivity extends Activity {
 //                    //Recorremos el cursor hasta que no haya más registros
                     do {
                         String cod = c.getString(0);
-                       String nom = c.getString(1);
-                        txtResultado.append(" " + cod + nom +  "\n");
+                       //String nom = c.getString(1);
+                        txtResultado.append(" " + cod + "\n");
                     } while(c.moveToNext());
                 }
             }
