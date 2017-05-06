@@ -15,7 +15,8 @@ public class CartillasBcDetalleHelper {
     public CartillasBcDetalleHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarCartillasBcDetalle(String itemV ,
+    public void GuardarCartillasBcDetalle(String id ,
+                                            String itemV ,
                                           String descripcionV ,
                                           String cantidad ,
                                           String itemB ,
@@ -27,6 +28,7 @@ public class CartillasBcDetalleHelper {
 
         long rows =0;
         ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_id, id);
          contentValues.put(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV, itemV);
          contentValues.put(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionV, descripcionV);
          contentValues.put(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad, cantidad);

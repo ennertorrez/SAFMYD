@@ -34,7 +34,7 @@ public class variables_publicas {
 	public static final String TABLE_CARTILLAS_BC = "CartillasBC";
 	public static final String TABLE_DETALLE_CARTILLAS_BC = "DetalleCartillasBC";
 	public static final String TABLE_PRECIO_ESPECIAL = "ListaPrecioEspeciales";
-	public static final String TABLE_Configuraciones = "Configuraciones";
+	public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
 
 	//Variables CamposTbArticulos
 	//public static final String ARTICULO_COLUMN_Id= "Id";
@@ -117,12 +117,14 @@ public class variables_publicas {
 	public static final String FORMA_PAGO_COLUMN_DIAS = "DIAS" ;
 	public static final String FORMA_PAGO_COLUMN_EMPRESA = "EMPRESA" ;
 
+	public static final String CARTILLAS_BC_COLUMN_id = "id";
 	public static final String CARTILLAS_BC_COLUMN_codigo = "codigo";
 	public static final String CARTILLAS_BC_COLUMN_fechaini = "fechaini";
 	public static final String CARTILLAS_BC_COLUMN_fechafinal = "fechafinal";
 	public static final String CARTILLAS_BC_COLUMN_tipo = "tipo";
 	public static final String CARTILLAS_BC_COLUMN_aprobado = "aprobado";
 
+	public static final String CARTILLAS_BC_DETALLE_COLUMN_id = "id";
 	public static final String CARTILLAS_BC_DETALLE_COLUMN_itemV = "itemV";
 	public static final String CARTILLAS_BC_DETALLE_COLUMN_descripcionV = "descripcionV";
 	public static final String CARTILLAS_BC_DETALLE_COLUMN_cantidad = "cantidad";
@@ -138,5 +140,13 @@ public class variables_publicas {
 	public static final String PRECIO_ESPECIAL_COLUMN_IdCliente = "IdCliente";
 	public static final String PRECIO_ESPECIAL_COLUMN_Descuento = "Descuento";
 	public static final String PRECIO_ESPECIAL_COLUMN_Precio = "Precio";
+
+	public static final String CONFIGURACION_SISTEMA_COLUMN_Id = "Id";
+	public static final String CONFIGURACION_SISTEMA_COLUMN_Sistema = "Sistema";
+	public static final String CONFIGURACION_SISTEMA_COLUMN_Configuracion = "Configuracion";
+	public static final String CONFIGURACION_SISTEMA_COLUMN_Valor = "Valor";
+	public static final String CONFIGURACION_SISTEMA_COLUMN_Activo = "Activo";
+
+
 
 }

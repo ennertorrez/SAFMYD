@@ -16,8 +16,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
+import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
@@ -64,6 +68,11 @@ public class Login extends Activity {
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
 
+    private CartillasBcHelper CartillasBcH;
+    private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private FormaPagoHelper FormaPagoH;
+    private PrecioEspecialHelper PrecioEspecialH;
+
     private SincronizarDatos sd;
 
 
@@ -80,7 +89,15 @@ public class Login extends Activity {
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper,ClientesH);
+        CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
+        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
+        FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
+        PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
+
+        sd = new SincronizarDatos(DbOpenHelper,ClientesH,VendedoresH,CartillasBcH,
+                CartillasBcDetalleH,
+                FormaPagoH,
+                PrecioEspecialH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -162,7 +179,6 @@ public class Login extends Activity {
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
                                 variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio);
 
-
                         variables_publicas.LoginOk = true;
                     }
                 } catch (final JSONException e) {
@@ -190,7 +206,7 @@ public class Login extends Activity {
                     }
                 });
             }
-            //SINCRONIZAR CLIENTES
+            //SINCRONIZAR DATOS
             try {
                 sd.SincronizarTodo();
             } catch (final JSONException e) {
@@ -205,67 +221,7 @@ public class Login extends Activity {
                     }
                 });
             }
-            /*******************************VENDEDORES******************************/
-            //************VENDEDORES
-            HttpHandler shV = new HttpHandler();
-            String urlStringV = urlVendedores;
-            String jsonStrV = shV.makeServiceCall(urlStringV);
-            Log.e(TAG, "Response from url: " + jsonStrV);
 
-            if (jsonStrV != null) {
-                VendedoresH.EliminaVendedores();
-                try {
-                    JSONObject jsonObjV = new JSONObject(jsonStrV);
-                    // Getting JSON Array node
-                    JSONArray vendedores = jsonObjV.getJSONArray("ListaVendedoresResult");
-
-                    // looping through All Contacts
-                    for (int i = 0; i < vendedores.length(); i++) {
-                        JSONObject c = vendedores.getJSONObject(i);
-
-                        String CODIGO = c.getString("CODIGO");
-                        String NOMBRE = c.getString("NOMBRE");
-                        String DEPARTAMENTO = c.getString("DEPARTAMENTO");
-                        String MUNICIPIO = c.getString("MUNICIPIO");
-                        String CIUDAD = c.getString("CIUDAD");
-                        String TELEFONO = c.getString("TELEFONO");
-                        String CELULAR = c.getString("CELULAR");
-                        String CORREO = c.getString("CORREO");
-                        String COD_ZONA = c.getString("COD_ZONA");
-                        String RUTA = c.getString("RUTA");
-                        String codsuper = c.getString("codsuper");
-                        String Status = c.getString("Status");
-                        String detalle = c.getString("detalle");
-                        String horeca = c.getString("horeca");
-                        String mayorista = c.getString("mayorista");
-                        String Super = c.getString("super");
-
-                        VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper, Status, detalle, horeca, mayorista, Super);
-                    }
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
-                }
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
-            }
             return null;
         }
     }

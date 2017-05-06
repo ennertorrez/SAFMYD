@@ -39,6 +39,7 @@ public class ClientesHelper {
                                       String PrecioEspecial ,
                                       String FechaUltimaCompra) {
         long rows =0;
+
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(variables_publicas.CLIENTES_COLUMN_IdCliente ,IdCliente );

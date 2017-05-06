@@ -15,7 +15,8 @@ public class CartillasBcHelper {
     public CartillasBcHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarCartillasBc(String codigo ,
+    public void GuardarCartillasBc(String id,
+                                String codigo ,
                                String fechaini ,
                                String fechafinal ,
                                String tipo ,
@@ -23,6 +24,7 @@ public class CartillasBcHelper {
 
         long rows =0;
         ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.CARTILLAS_BC_COLUMN_id, id);
          contentValues.put(variables_publicas.CARTILLAS_BC_COLUMN_codigo, codigo);
          contentValues.put(variables_publicas.CARTILLAS_BC_COLUMN_fechaini, fechaini);
          contentValues.put(variables_publicas.CARTILLAS_BC_COLUMN_fechafinal, fechafinal);

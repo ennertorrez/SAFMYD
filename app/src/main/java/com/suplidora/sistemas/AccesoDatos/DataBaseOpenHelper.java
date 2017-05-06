@@ -84,13 +84,13 @@ public class DataBaseOpenHelper {
                     + variables_publicas.VENDEDORES_COLUMN_Super + " TEXT ) " );
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CLIENTES_SUCURSALES + "( "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodSuc + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Ciudad + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_DeptoID + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Direccion + " TEXT , "
-           + variables_publicas.CLIENTES_SUCURSALES_COLUMN_FormaPagoID + " TEXT ) " );
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodSuc + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Ciudad + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_DeptoID + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Direccion + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_FormaPagoID + " TEXT ) " );
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FORMA_PAGO + "( "
                     + variables_publicas.FORMA_PAGO_COLUMN_CODIGO + " TEXT , "
@@ -99,6 +99,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.FORMA_PAGO_COLUMN_EMPRESA + " TEXT ) " );
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CARTILLAS_BC + "( "
+                    + variables_publicas.CARTILLAS_BC_COLUMN_id + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_COLUMN_codigo + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_COLUMN_fechaini + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_COLUMN_fechafinal + " TEXT , "
@@ -106,6 +107,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CARTILLAS_BC_COLUMN_aprobado + " TEXT ) " );
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DETALLE_CARTILLAS_BC + "( "
+                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_id + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionV + " TEXT , "
                     + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad + " TEXT , "
@@ -123,6 +125,13 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PRECIO_ESPECIAL_COLUMN_Descuento + " TEXT , "
                     + variables_publicas.PRECIO_ESPECIAL_COLUMN_Precio + " TEXT ) " );
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONFIGURACION_SISTEMA + "( "
+                    + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id + " TEXT , "
+                    + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Sistema + " TEXT , "
+                    + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion + " TEXT , "
+                    + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor + " TEXT , "
+                    + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo + " TEXT ) " );
+
         }
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -136,6 +145,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_CARTILLAS_BC);
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_DETALLE_CARTILLAS_BC);
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_PRECIO_ESPECIAL);
+            db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_CONFIGURACION_SISTEMA);
 
             onCreate(db);
         }
