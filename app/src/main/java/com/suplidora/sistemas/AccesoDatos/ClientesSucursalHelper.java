@@ -26,15 +26,8 @@ public class ClientesSucursalHelper {
                                      String Ciudad ,
                                      String DeptoID ,
                                      String Direccion ,
-                                     String FormaPagoID ,
-                                     String Contacto ,
-                                     String ContactoTel ,
-                                     String VendedorID ,
-                                     String codigo2 ,
-                                     String Status ,
-                                     String detalle ,
-                                     String horeca ,
-                                     String mayorista )
+                                     String FormaPagoID
+                                     )
     {
         long rows =0;
         ContentValues contentValues = new ContentValues();

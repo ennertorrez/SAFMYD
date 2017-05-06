@@ -30,10 +30,10 @@ public class ConfiguracionSistemaHelper {
 
         database.insert(variables_publicas.TABLE_CONFIGURACION_SISTEMA, null, contentValues);
     }
-    public Cursor BuscarPrecioEspecial() {
+    public Cursor BuscarConfigSistema() {
         return database.rawQuery("select * from " + variables_publicas.TABLE_CONFIGURACION_SISTEMA +" ", null);
     }
-    public  void EliminaPrecioEspecial() {
+    public  void EliminaConfigSistema() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CONFIGURACION_SISTEMA+";");
         Log.d("PrecioEspecial_elimina", "Datos eliminados");
     }

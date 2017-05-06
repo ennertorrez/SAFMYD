@@ -54,7 +54,8 @@ public class SincronizarDatos {
     public SincronizarDatos(DataBaseOpenHelper dbh , ClientesHelper Clientesh,
                             VendedoresHelper Vendedoresh,CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh,FormaPagoHelper FormaPagoh,
-                            PrecioEspecialHelper PrecioEspecialh) {
+                            PrecioEspecialHelper PrecioEspecialh,ConfiguracionSistemaHelper ConfigSistemah,
+                            ClientesSucursalHelper ClientesSuch) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -62,8 +63,8 @@ public class SincronizarDatos {
         CartillasBcDetalleH = CartillasBcDetalleh;
         FormaPagoH = FormaPagoh;
         PrecioEspecialH = PrecioEspecialh;
-//        ConfigSistemasH = ConfigSistemah;
-//        ClientesSucH = ClientesSuch;
+        ConfigSistemasH = ConfigSistemah;
+        ClientesSucH = ClientesSuch;
     }
 
     //Clientes
@@ -294,13 +295,13 @@ public class SincronizarDatos {
         PrecioEspecialH.EliminaPrecioEspecial();
         JSONObject jsonObjPrecioEspecial = new JSONObject(jsonStrPrecioEspecial);
         // Getting JSON Array node
-        JSONArray FormaPago = jsonObjPrecioEspecial.getJSONArray("ListPrecioEspecialResult");
+        JSONArray PrecioEspecial = jsonObjPrecioEspecial.getJSONArray("ListPrecioEspecialResult");
 
         DbOpenHelper.database.beginTransaction();
         try {
             // looping through All Contacts
-            for (int i = 0; i < FormaPago.length(); i++) {
-                JSONObject c = FormaPago.getJSONObject(i);
+            for (int i = 0; i < PrecioEspecial.length(); i++) {
+                JSONObject c = PrecioEspecial.getJSONObject(i);
 
                 String Id = c.getString("Id");
                 String CodigoArticulo = c.getString("CodigoArticulo");
@@ -318,6 +319,80 @@ public class SincronizarDatos {
         return  jsonStrPrecioEspecial;
     }
 
+    //ConfiguracionSistema
+    public String SincronizarConfiguracionSistema()throws JSONException {
+        HttpHandler shConfiguracionSistema = new HttpHandler();
+        String urlStringConfiguracionSistema = urlGetConfiguraciones;
+        String jsonStrConfiguracionSistema = shConfiguracionSistema.makeServiceCall(urlStringConfiguracionSistema);
+
+        if (jsonStrConfiguracionSistema == null)
+            return null;
+
+        ConfigSistemasH.EliminaConfigSistema();
+        JSONObject jsonObjConfiguracionSistema = new JSONObject(jsonStrConfiguracionSistema);
+        // Getting JSON Array node
+        JSONArray FormaPago = jsonObjConfiguracionSistema.getJSONArray("GetConfiguracionesResult");
+
+        DbOpenHelper.database.beginTransaction();
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < FormaPago.length(); i++) {
+                JSONObject c = FormaPago.getJSONObject(i);
+
+                String Id = c.getString("Id");
+                String Sistema = c.getString("Sistema");
+                String Configuracion = c.getString("Configuracion");
+                String Valor = c.getString("Valor");
+                String Activo = c.getString("Activo");
+
+                ConfigSistemasH.GuardarConfiguracionSistema(Id,Sistema,Configuracion,Valor,Activo);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+        }
+        finally {
+            DbOpenHelper.database.endTransaction();
+        }
+        return  jsonStrConfiguracionSistema;
+    }
+
+    //ClientesSucursal
+    public String SincronizarClientesSucursal()throws JSONException {
+        HttpHandler shClientesSucursal = new HttpHandler();
+        String urlStringClientesSucursal = urlGetClienteSucursales;
+        String jsonStrClientesSucursal = shClientesSucursal.makeServiceCall(urlStringClientesSucursal);
+
+        if (jsonStrClientesSucursal == null)
+            return null;
+
+        ClientesSucH.EliminaClientesSucursales();
+        JSONObject jsonObjClientesSucursal = new JSONObject(jsonStrClientesSucursal);
+        // Getting JSON Array node
+        JSONArray PrecioEspecial = jsonObjClientesSucursal.getJSONArray("GetClienteSucursalesResult");
+
+        DbOpenHelper.database.beginTransaction();
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < PrecioEspecial.length(); i++) {
+                JSONObject c = PrecioEspecial.getJSONObject(i);
+
+                String CodSuc = c.getString("CodSuc");
+                String CodCliente = c.getString("CodCliente");
+                String Sucursal = c.getString("Sucursal");
+                String Ciudad = c.getString("Ciudad");
+                String DeptoID = c.getString("DeptoID");
+                String Direccion = c.getString("Direccion");
+                String FormaPagoID = c.getString("FormaPagoID");
+
+              ClientesSucH.GuardarTotalClientesSucursal(CodSuc,CodCliente,Sucursal,Ciudad,DeptoID,Direccion,FormaPagoID);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+        }
+        finally {
+            DbOpenHelper.database.endTransaction();
+        }
+        return  jsonStrClientesSucursal;
+    }
+
     public void SincronizarTodo()throws JSONException {
 
         SincronizarClientes();
@@ -326,5 +401,6 @@ public class SincronizarDatos {
         SincronizarCartillasBcDetalle();
         SincronizarFormaPago();
         SincronizarPrecioEspecial();
+        SincronizarConfiguracionSistema();
     }
 }
