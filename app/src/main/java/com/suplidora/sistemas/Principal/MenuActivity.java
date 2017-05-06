@@ -116,9 +116,9 @@ public class MenuActivity extends AppCompatActivity
                 /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
                 startActivity(newAct);*/
                 //Para pruebas
-//                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
-//              startActivity(newActi);
-                fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
+                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
+              startActivity(newActi);
+                //fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

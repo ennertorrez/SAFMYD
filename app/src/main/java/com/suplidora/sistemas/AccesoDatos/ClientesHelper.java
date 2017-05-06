@@ -70,6 +70,9 @@ public class ClientesHelper {
     public Cursor ObtenerListaClientesNombre(String Busqueda) {
         return database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES, null);
     }
+    public Cursor BuscarClientesCount() {
+        return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_CLIENTES + "", null);
+    }
     public  void EliminaClientes() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CLIENTES+";");
         Log.d("clientes_elimina", "Datos eliminados");

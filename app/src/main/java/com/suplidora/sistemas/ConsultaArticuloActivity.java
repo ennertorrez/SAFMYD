@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 
@@ -27,10 +28,9 @@ public class ConsultaArticuloActivity extends Activity {
     private Button btnEliminar;
     private Button btnConsultar;
 
-    private SQLiteDatabase db;
-    private UsuariosHelper UsuarioH;
     private DataBaseOpenHelper DbOpenHelper ;
-
+    private UsuariosHelper UsuarioH;
+    private ClientesHelper ClientesH;
 
 
     @Override
@@ -50,20 +50,30 @@ public class ConsultaArticuloActivity extends Activity {
 
         DbOpenHelper = new DataBaseOpenHelper(ConsultaArticuloActivity.this);
         UsuarioH = new UsuariosHelper(DbOpenHelper.database);
-
+        ClientesH = new ClientesHelper(DbOpenHelper.database);
 
         btnConsultar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                String Codigo = "001",Usuario = "rm",Contrasenia ="aa";
-                Cursor c = UsuarioH.BuscarUsuariosCount();
-
+//                String Codigo = "001",Usuario = "rm",Contrasenia ="aa";
+//                Cursor c = UsuarioH.BuscarUsuariosCount();
+//                //Recorremos los resultados para mostrarlos en pantalla
+//                txtResultado.setText("");
+//                if (c.moveToFirst()) {
+////                    //Recorremos el cursor hasta que no haya más registros
+//                    do {
+//                        String cod = c.getString(0);
+//                       //String nom = c.getString(1);
+//                        txtResultado.append(" " + cod + "\n");
+//                    } while(c.moveToNext());
+//                }
+                Cursor c = ClientesH.BuscarClientesCount();
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtResultado.setText("");
                 if (c.moveToFirst()) {
 //                    //Recorremos el cursor hasta que no haya más registros
                     do {
                         String cod = c.getString(0);
-                       //String nom = c.getString(1);
+                        //String nom = c.getString(1);
                         txtResultado.append(" " + cod + "\n");
                     } while(c.moveToNext());
                 }
