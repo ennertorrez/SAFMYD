@@ -10,30 +10,34 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
+import com.suplidora.sistemas.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
-import com.suplidora.sistemas.Auxiliar.variables_publicas;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -72,6 +76,8 @@ public class Login extends Activity {
     private CartillasBcDetalleHelper CartillasBcDetalleH;
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
+    private ConfiguracionSistemaHelper ConfigH;
+    private ClientesSucursalHelper ClientesSucH;
 
     private SincronizarDatos sd;
 
@@ -88,19 +94,28 @@ public class Login extends Activity {
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
-
+        ConfigH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
+        ClientesSucH = new ClientesSucursalHelper(DbOpenHelper.database);
         CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper,ClientesH,VendedoresH,CartillasBcH,
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH);
+                PrecioEspecialH, ConfigH, ClientesSucH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
+        txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    btnIngresar.performClick();
+                }
+                return false;
+            }
+        });
         btnIngresar = (Button) findViewById(R.id.btnIngresar);
 
         btnIngresar.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +186,7 @@ public class Login extends Activity {
                         variables_publicas.CodigoVendedor = c.getString("Codigo");
                         variables_publicas.NombreVendedor = c.getString("Nombre");
                         variables_publicas.UsuarioLogin = c.getString("Usuario");
+                        variables_publicas.TipoUsuario = c.getString("Tipo");
                         String Contrasenia = c.getString("Contrasenia");
                         String Tipo = c.getString("Tipo");
                         variables_publicas.RutaCliente = c.getString("Ruta");

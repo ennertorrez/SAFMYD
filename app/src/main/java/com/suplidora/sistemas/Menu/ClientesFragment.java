@@ -9,12 +9,14 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -58,13 +60,14 @@ public class ClientesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         myView= inflater.inflate(R.layout.masterclientes_layout,container,false);
-        getActivity().setTitle("Maestro Clientes");
+        getActivity().setTitle("Maestro Cliente");
         lv = (ListView) myView.findViewById(R.id.list);
         registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
+
         listaClientes = new ArrayList<>();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -91,7 +94,7 @@ public class ClientesFragment extends Fragment {
                     return;
                 }
                 new GetClientes().execute();
-                lblFooter.setText("Clientes encontrados: " + String.valueOf(listaClientes.size()));
+                lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
             }
         });
         return myView;
@@ -210,7 +213,7 @@ public class ClientesFragment extends Fragment {
                     R.id.Direccion});
 
             lv.setAdapter(adapter);
-            lblFooter.setText("Clientes Encontrados encontrados: " + String.valueOf(listaClientes.size()));
+            lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
         }
     }
     public boolean onCreateOptionsMenu(Menu menu) {

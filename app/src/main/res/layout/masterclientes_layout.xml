@@ -40,7 +40,10 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/rgGrupo"
         android:layout_toLeftOf="@+id/btnBuscar"
-        android:hint="Ingrese su busqueda" />
+        android:hint="Ingrese su busqueda"
+        android:maxLines="1"
+        android:inputType="text"
+       />
 
     <TextView
         android:background="@color/colorPrimary"

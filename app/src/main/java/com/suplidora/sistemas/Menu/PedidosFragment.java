@@ -6,12 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -58,13 +62,33 @@ public class PedidosFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         myView= inflater.inflate(R.layout.masterclientes_layout,container,false);
-        getActivity().setTitle("Maestro Clientes");
+        getActivity().setTitle("Maestro Cliente");
         lv = (ListView) myView.findViewById(R.id.list);
         registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
+
+        rgGrupo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                if(group.getCheckedRadioButtonId()== R.id.rbCodigo){
+                    txtBusqueda.setInputType(InputType.TYPE_CLASS_NUMBER);
+                }
+                else {
+                    txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+            }
+        });
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
+        txtBusqueda.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    btnBuscar.performClick();
+                }
+                return false;
+            }
+        });
         listaClientes = new ArrayList<>();
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +106,7 @@ public class PedidosFragment extends Fragment {
                     return;
                 }
                 new GetClientesPedidos().execute();
-                lblFooter.setText("Clientes encontrados: " + String.valueOf(listaClientes.size()));
+                lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
             }
         });
         // Launching new screen on Selecting Single ListItem
@@ -216,7 +240,7 @@ public class PedidosFragment extends Fragment {
                     R.layout.list_cliente, new String[]{"IdCliente", "Nombre", "Direccion"}, new int[]{R.id.IdCliente, R.id.Nombre,
                     R.id.Direccion});
             lv.setAdapter(adapter);
-            lblFooter.setText("Clientes Encontrados encontrados: " + String.valueOf(listaClientes.size()));
+            lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
         }
     }
 }

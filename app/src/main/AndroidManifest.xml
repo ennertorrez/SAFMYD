@@ -71,7 +71,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConsultaArticuloActivity">
+        <activity android:name=".ConsultaClienteActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ConsultaArticuloActivity" />
 

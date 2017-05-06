@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Cliente;
 
 public class ClientesHelper {
 
@@ -77,6 +78,38 @@ public class ClientesHelper {
     public  void EliminaClientes() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CLIENTES+";");
         Log.d("clientes_elimina", "Datos eliminados");
+    }
+
+    public Cliente BuscarCliente(String Codigo){
+        Cliente cli= new Cliente();
+        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente ='"+Codigo +"'", null);
+        if(c.moveToFirst()){
+            do {
+                cli = new Cliente(c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdCliente)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodCv)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Nombre)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaCreacion)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Telefono)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Direccion)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdDepartamento)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdMunicipio)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Ciudad)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Ruc)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Cedula)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_LimiteCredito)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdFormaPago)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdVendedor)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Excento)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodigoLetra)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Ruta)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Frecuencia)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_PrecioEspecial)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra))
+                );
+            }while (c.moveToNext());
+        }
+
+        return cli;
     }
 
 }

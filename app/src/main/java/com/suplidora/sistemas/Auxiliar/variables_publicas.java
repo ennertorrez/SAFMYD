@@ -11,6 +11,7 @@ public class variables_publicas {
 	public static String CodigoVendedor="";
 	public static String UsuarioLogin="";
 	public static String NombreVendedor="";
+	public static String TipoUsuario="";
 	public static boolean LoginOk=false;
 	public static String IdCliente ="" ;
 	public static String CodCv ="";
@@ -21,14 +22,14 @@ public class variables_publicas {
 	public static String direccionIp="http://186.1.18.75:8080";
 
 	//Variables BD
-	public static final int DATABASE_VERSION = 9;
+	public static final int DATABASE_VERSION = 10;
 	public static final String DATABASE_NAME = "SysContabv3.db";
 	//Variables TB
 	public static final String TABLE_ARTICULOS = "Articulos";
-	public static final String TABLE_CLIENTES = "Clientes";
+	public static final String TABLE_CLIENTES = "Cliente";
 	public static final String TABLE_PEDIDOS = "Pedidos";
 	public static final String TABLE_USUARIOS = "Usuarios";
-	public static final String TABLE_VENDEDORES = "Vendedores";
+	public static final String TABLE_VENDEDORES = "Vendedor";
 	public static final String TABLE_CLIENTES_SUCURSALES = "ClientesSucursales";
 	public static final String TABLE_FORMA_PAGO = "FormaPago";
 	public static final String TABLE_CARTILLAS_BC = "CartillasBC";

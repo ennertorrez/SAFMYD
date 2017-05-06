@@ -67,7 +67,7 @@ public class SincronizarDatos {
         ClientesSucH = ClientesSuch;
     }
 
-    //Clientes
+    //Cliente
     public String SincronizarClientes()throws JSONException {
         /*******************************CLIENTES******************************/
         //************CLIENTES
@@ -121,7 +121,7 @@ public class SincronizarDatos {
         return  jsonStrC;
     }
 
-    //Vendedores
+    //Vendedor
     public String SincronizarVendedores()throws JSONException {
         //************VENDEDORES
         HttpHandler shV = new HttpHandler();

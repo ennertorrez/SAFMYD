@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Usuario;
 
 public class UsuariosHelper {
 
@@ -43,4 +44,6 @@ public class UsuariosHelper {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_USUARIOS+";");
         Log.d("Usuario_elimina", "Datos eliminados");
     }
+
+
     }
