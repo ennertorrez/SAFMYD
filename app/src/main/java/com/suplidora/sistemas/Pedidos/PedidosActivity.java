@@ -19,11 +19,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Principal.Login;
 import com.suplidora.sistemas.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class PedidosActivity extends Activity {
 
@@ -50,11 +57,35 @@ public class PedidosActivity extends Activity {
     ArrayAdapter<String> adapter;
 
     private ListView lv;
+    Spinner cboVendedor;
+    Spinner cboSucursal;
+    Spinner cboCondicion;
+
+    private DataBaseOpenHelper DbOpenHelper ;
+    private VendedoresHelper VendedoresH ;
+    private ClientesSucursalHelper ClientesSucursalH ;
+    private FormaPagoHelper FormaPagoH ;
+    private  ArticulosHelper ArticulosH;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
+
+        DbOpenHelper=new DataBaseOpenHelper(PedidosActivity.this);
+        VendedoresH = new VendedoresHelper(DbOpenHelper.database);
+        ClientesSucursalH = new ClientesSucursalHelper(DbOpenHelper.database);
+        FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
+        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+
+        cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
+        cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
+        cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
+
+        // Loading spinner data from database
+        CargaDatosCombo();
 
         btnAgregar = (Button)findViewById(R.id.btnAgregar);
         btnBuscar = (Button)findViewById(R.id.btnBuscar);
@@ -85,9 +116,6 @@ public class PedidosActivity extends Activity {
         lblRuta.setText(variables_publicas.RutaCliente);
         lblCanal.setText(variables_publicas.Canal);
 
-        //String Vendedor = cboVendedor.getSelectedItem().toString();
-        //Vendedor.setText(variables_publicas.NombreVendedor);
-       // lblNombre.setText(Nombre);
 
         //Obtenemos las referencias a los controles
         txtCodigoArticulo = (EditText)findViewById(R.id.txtCodigoArticulo);
@@ -99,11 +127,11 @@ public class PedidosActivity extends Activity {
 
         //list = (ListView) findViewById(R.id.listPedido);
 
-        final ArticulosHelper usdbh = new ArticulosHelper(PedidosActivity.this);
+
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
-                Cursor c = usdbh.BuscarArticulo(CodigoArticulo);
+                Cursor c = ArticulosH.BuscarArticulo(CodigoArticulo);
 
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtCodigoArticulo.setText("");
@@ -151,6 +179,7 @@ public class PedidosActivity extends Activity {
                         String[]{"Cantidad","Precio","Descripcion"}, new
                         int[]{R.id.lblCantidad,R.id.lblPrecio,R.id.lblDescripcion});
                 lv.setAdapter(adapter);
+
                 txtCodigoArticulo.setText("");
                 lblDescripcionArticulo.setText("");
                 txtCantidad.setText("");
@@ -206,6 +235,26 @@ public class PedidosActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+    private void CargaDatosCombo() {
 
+        //DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+        List<String> vendedores = VendedoresH.ObtenerListaVendedores();
+//        List<String> ClientesSuc = ClientesSucursalH.ObtenerListaClientesSucursales();
+//        List<String> FormaPago = FormaPagoH.ObtenerListaFormaPago();
 
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter1 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, vendedores);
+//        ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, ClientesSuc);
+//        ArrayAdapter<String> dataAdapter3 = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, FormaPago);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        dataAdapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        cboVendedor.setAdapter(dataAdapter1);
+//        cboSucursal.setAdapter(dataAdapter2);
+//        cboCondicion.setAdapter(dataAdapter3);
+    }
 }

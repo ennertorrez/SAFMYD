@@ -139,19 +139,24 @@ public class ClientesFragment extends Fragment {
 
                         String IdCliente = c.getString("IdCliente");
                         String CodCv = c.getString("CodCv");
-                        String Cliente = c.getString("Cliente");
                         String Nombre = c.getString("Nombre");
-                        String FechaIngreso = c.getString("FechaIngreso");
-                        String ClienteNuevo = c.getString("ClienteNuevo");
-                        String Ruta = c.getString("Ruta");
+                        String FechaCreacion = c.getString("FechaCreacion");
+                        String Telefono = c.getString("Telefono");
                         String Direccion = c.getString("Direccion");
+                        String IdDepartamento = c.getString("IdDepartamento");
+                        String IdMunicipio = c.getString("IdMunicipio");
+                        String Ciudad = c.getString("Ciudad");
+                        String Ruc = c.getString("Ruc");
                         String Cedula = c.getString("Cedula");
-                        String IdVendedor = c.getString("IdVendedor");
-                        String Vendedor = c.getString("Vendedor");
-                        String IdSupervisor = c.getString("IdSupervisor");
-                        String Supervisor = c.getString("Supervisor");
-                        String Subruta = c.getString("Subruta");
-                        String FechaUltimaCompra = c.getString("FechaUltimaCompra");
+                        String LimiteCredito = c.getString("LimiteCredito");
+                        String IdFormaPago = c.getString("IdFormaPago");
+                        String IdVendedor  = c.getString("IdVendedor");
+                        String Excento = c.getString("Excento");
+                        String CodigoLetra = c.getString("CodigoLetra");
+                        String Ruta = c.getString("Ruta");
+                        String Frecuencia  = c.getString("Frecuencia");
+                        String PrecioEspecial = c.getString("PrecioEspecial");
+                        String FechaUltimaCompra	= c.getString("FechaUltimaCompra");
 
                         HashMap<String, String> cliente = new HashMap<>();
 

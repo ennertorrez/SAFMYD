@@ -17,6 +17,7 @@ import com.suplidora.sistemas.AndroidJSONParsingActivity;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.ConsultaArticuloActivity;
 import com.suplidora.sistemas.Menu.MapViewFragment;
+import com.suplidora.sistemas.Menu.PedidosFragment;
 import com.suplidora.sistemas.R;
 import com.suplidora.sistemas.Menu.ClientesFragment;
 import com.suplidora.sistemas.Menu.MaestroProductoFragment;
@@ -115,9 +116,9 @@ public class MenuActivity extends AppCompatActivity
                 /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
                 startActivity(newAct);*/
                 //Para pruebas
-                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
-              startActivity(newActi);
-               // fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
+//                Intent newActi = new Intent(getApplicationContext(), ConsultaArticuloActivity.class);
+//              startActivity(newActi);
+                fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
+import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
@@ -44,36 +46,45 @@ public class Login extends Activity {
     private Button btnIngresar;
     private EditText txtUsuario;
     private EditText txtPassword;
-    private String Usuario= "";
+    private String Usuario = "";
     private String Contrasenia = "";
     private ProgressDialog pDialog;
     private String tipoBusqueda = "3";
 
     // URL to get contacts JSON
 
-    final String url= variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
-    final String urlClientes=variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
-    final String urlPedidos=variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
+    final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
 
-    private DataBaseOpenHelper DbOpenHelper ;
-    private UsuariosHelper UsuariosH ;
-    private ClientesHelper ClientesH ;
+    final String urlFormaPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
+    final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
+
+    private DataBaseOpenHelper DbOpenHelper;
+
+    private UsuariosHelper UsuariosH;
+    private ClientesHelper ClientesH;
+    private VendedoresHelper VendedoresH;
+
+    private SincronizarDatos sd;
 
 
     ArrayList<HashMap<String, String>> listaUsers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.iniciosesion);
 
-        DbOpenHelper=new DataBaseOpenHelper(Login.this);
+        DbOpenHelper = new DataBaseOpenHelper(Login.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
+        VendedoresH = new VendedoresHelper(DbOpenHelper.database);
 
-        txtUsuario = (EditText)findViewById(R.id.txtUsuario);
-        txtPassword = (EditText)findViewById(R.id.txtPassword);
-        btnIngresar = (Button)findViewById(R.id.btnIngresar);
+        sd = new SincronizarDatos(DbOpenHelper,ClientesH);
+
+        txtUsuario = (EditText) findViewById(R.id.txtUsuario);
+        txtPassword = (EditText) findViewById(R.id.txtPassword);
+        btnIngresar = (Button) findViewById(R.id.btnIngresar);
 
         btnIngresar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,11 +96,11 @@ public class Login extends Activity {
                 Usuario = txtUsuario.getText().toString();
                 Contrasenia = txtPassword.getText().toString();
 
-                if(TextUtils.isEmpty(Usuario)) {
+                if (TextUtils.isEmpty(Usuario)) {
                     txtUsuario.setError("Ingrese el nombre de usuario");
                     return;
                 }
-                if(TextUtils.isEmpty(Contrasenia)) {
+                if (TextUtils.isEmpty(Contrasenia)) {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
@@ -99,14 +110,16 @@ public class Login extends Activity {
 //                    mensajeAviso("Esta offline");
 //                }
                 //if (isOnlineNet()==true && getDatePhone() =="")
-                   //mensajeAviso("Esta online");
-                    new GetUser().execute();
-               // }
+                //mensajeAviso("Esta online");
+                //if getDatePhone()
+                new GetUser().execute();
+                // }
 
                 //AlertDialog.Builder builder = new AlertDialog.Builder(this);
             }
         });
     }
+
     private class GetUser extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -146,8 +159,8 @@ public class Login extends Activity {
                         variables_publicas.RutaCliente = c.getString("Ruta");
                         variables_publicas.Canal = c.getString("Canal");
                         String TasaCambio = c.getString("TasaCambio");
-                        UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor,variables_publicas.NombreVendedor,
-                                variables_publicas.UsuarioLogin,Contrasenia,Tipo,variables_publicas.RutaCliente,variables_publicas.Canal,TasaCambio);
+                        UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
+                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio);
 
 
                         variables_publicas.LoginOk = true;
@@ -177,41 +190,57 @@ public class Login extends Activity {
                     }
                 });
             }
-            /*******************************CLIENTES******************************/
-            //************CLIENTES
-            HttpHandler shC = new HttpHandler();
-            String urlStringC = urlClientes + "/" + variables_publicas.CodigoVendedor + "/" + tipoBusqueda;
-            String jsonStrC = shC.makeServiceCall(urlStringC);
-            Log.e(TAG, "Response from url: " + jsonStrC);
+            //SINCRONIZAR CLIENTES
+            try {
+                sd.SincronizarTodo();
+            } catch (final JSONException e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Json parsing error: " + e.getMessage(),
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+            /*******************************VENDEDORES******************************/
+            //************VENDEDORES
+            HttpHandler shV = new HttpHandler();
+            String urlStringV = urlVendedores;
+            String jsonStrV = shV.makeServiceCall(urlStringV);
+            Log.e(TAG, "Response from url: " + jsonStrV);
 
-            if (jsonStrC != null) {
-                //ClientesH.EliminaClientes();
+            if (jsonStrV != null) {
+                VendedoresH.EliminaVendedores();
                 try {
-                    JSONObject jsonObjC = new JSONObject(jsonStrC);
+                    JSONObject jsonObjV = new JSONObject(jsonStrV);
                     // Getting JSON Array node
-                    JSONArray clientes = jsonObjC.getJSONArray("BuscarClientesResult");
+                    JSONArray vendedores = jsonObjV.getJSONArray("ListaVendedoresResult");
 
                     // looping through All Contacts
-                    for (int i = 0; i < clientes.length(); i++) {
-                        JSONObject c = clientes.getJSONObject(i);
+                    for (int i = 0; i < vendedores.length(); i++) {
+                        JSONObject c = vendedores.getJSONObject(i);
 
-                        String IdCliente = c.getString("IdCliente");
-                        String CodCv = c.getString("CodCv");
-                        String Cliente = c.getString("Cliente");
-                        String Nombre = c.getString("Nombre");
-                        String FechaIngreso = c.getString("FechaIngreso");
-                        String ClienteNuevo = c.getString("ClienteNuevo");
-                        String Ruta = c.getString("Ruta");
-                        String Direccion = c.getString("Direccion");
-                        String Cedula = c.getString("Cedula");
-                        String IdVendedor = c.getString("IdVendedor");
-                        String Vendedor = c.getString("Vendedor");
-                        String IdSupervisor = c.getString("IdSupervisor");
-                        String Supervisor = c.getString("Supervisor");
-                        String Subruta = c.getString("Subruta");
-                        String FechaUltimaCompra = c.getString("FechaUltimaCompra");
-                        String Frecuencia = c.getString("Frecuencia");
-                       // ClientesH.GuardarTotalClientes(IdCliente,CodCv,Cliente,Nombre,FechaIngreso,ClienteNuevo,Ruta,Direccion,Cedula,IdVendedor,Vendedor,IdSupervisor,Supervisor,Subruta,FechaUltimaCompra,Frecuencia);
+                        String CODIGO = c.getString("CODIGO");
+                        String NOMBRE = c.getString("NOMBRE");
+                        String DEPARTAMENTO = c.getString("DEPARTAMENTO");
+                        String MUNICIPIO = c.getString("MUNICIPIO");
+                        String CIUDAD = c.getString("CIUDAD");
+                        String TELEFONO = c.getString("TELEFONO");
+                        String CELULAR = c.getString("CELULAR");
+                        String CORREO = c.getString("CORREO");
+                        String COD_ZONA = c.getString("COD_ZONA");
+                        String RUTA = c.getString("RUTA");
+                        String codsuper = c.getString("codsuper");
+                        String Status = c.getString("Status");
+                        String detalle = c.getString("detalle");
+                        String horeca = c.getString("horeca");
+                        String mayorista = c.getString("mayorista");
+                        String Super = c.getString("super");
+
+                        VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper, Status, detalle, horeca, mayorista, Super);
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -237,15 +266,16 @@ public class Login extends Activity {
                     }
                 });
             }
-            return  null;
+            return null;
         }
     }
+
     public Boolean isOnlineNet() {
 
         try {
             Process p = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.es");
 
-            int val           = p.waitFor();
+            int val = p.waitFor();
             boolean reachable = (val == 0);
             return reachable;
 
@@ -255,24 +285,26 @@ public class Login extends Activity {
         }
         return false;
     }
-    public void mensajeAviso(String texto){
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+
+    public void mensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setMessage(texto);
-        dlgAlert.setPositiveButton(R.string.aceptar,new DialogInterface.OnClickListener() {
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
             }
         });
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
-    private String getDatePhone()
-    {
+
+    private String getDatePhone() {
         Calendar cal = new GregorianCalendar();
         Date date = cal.getTime();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formatteDate = df.format(date);
         return formatteDate;
     }
+
     public static String getHourPhone() {
         Date dt = new Date();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");

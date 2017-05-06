@@ -92,26 +92,14 @@ public class PedidosFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // getting values from selected ListItem
-               String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
-//                String CodCv = ((TextView) view.findViewById(R.id.CodCv)).getText().toString();
+                String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
                 String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
-//                String lblRuta = ((TextView) view.findViewById(R.id.lblRuta)).getText().toString();
-                //String lblCanal = ((TextView) view.findViewById(R.id.lblCanal)).getText().toString();
-                //String CboVendedor = ((Spinner) view.findViewById(R.id.cboVendedor)).getSelectedItem().toString();
-
-//                String IdCliente = variables_publicas.IdCliente;
-//                String Ruta = variables_publicas.Ruta;
-
                 // Starting new intent
                 Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
 
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
-////                in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, CodCv );
-               in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
-//                in.putExtra(variables_publicas.CLIENTES_COLUMN_Ruta, Ruta );
-                //in.putExtra(variables_publicas.CLIENTES_COLUMN_Ca, lblCanal );
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
                 startActivity(in);
-
             }
         });
         return myView;
@@ -157,20 +145,26 @@ public class PedidosFragment extends Fragment {
                     for (int i = 0; i < clientes.length(); i++) {
                         JSONObject c = clientes.getJSONObject(i);
 
-                       String IdCliente = c.getString("IdCliente");
+                        String IdCliente = c.getString("IdCliente");
                         String CodCv = c.getString("CodCv");
                         String Nombre = c.getString("Nombre");
-                        String FechaIngreso = c.getString("FechaIngreso");
-                        String ClienteNuevo = c.getString("ClienteNuevo");
-                       String Ruta = c.getString("Ruta");
+                        String FechaCreacion = c.getString("FechaCreacion");
+                        String Telefono = c.getString("Telefono");
                         String Direccion = c.getString("Direccion");
+                        String IdDepartamento = c.getString("IdDepartamento");
+                        String IdMunicipio = c.getString("IdMunicipio");
+                        String Ciudad = c.getString("Ciudad");
+                        String Ruc = c.getString("Ruc");
                         String Cedula = c.getString("Cedula");
-                        String IdVendedor = c.getString("IdVendedor");
-                        String Vendedor = c.getString("Vendedor");
-                        String IdSupervisor = c.getString("IdSupervisor");
-                        String Supervisor = c.getString("Supervisor");
-                        String Subruta = c.getString("Subruta");
-                        String FechaUltimaCompra = c.getString("FechaUltimaCompra");
+                        String LimiteCredito = c.getString("LimiteCredito");
+                        String IdFormaPago = c.getString("IdFormaPago");
+                        String IdVendedor  = c.getString("IdVendedor");
+                        String Excento = c.getString("Excento");
+                        String CodigoLetra = c.getString("CodigoLetra");
+                        String Ruta = c.getString("Ruta");
+                        String Frecuencia  = c.getString("Frecuencia");
+                        String PrecioEspecial = c.getString("PrecioEspecial");
+                        String FechaUltimaCompra	= c.getString("FechaUltimaCompra");
 
                         HashMap<String, String> cliente = new HashMap<>();
 

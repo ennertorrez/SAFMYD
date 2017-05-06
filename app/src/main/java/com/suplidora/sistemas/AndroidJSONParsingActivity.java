@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,7 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Pedidos.PedidosActivity;
 
 public class AndroidJSONParsingActivity extends ListActivity {
 
@@ -35,7 +39,9 @@ public class AndroidJSONParsingActivity extends ListActivity {
     private String TAG = AndroidJSONParsingActivity.class.getSimpleName();
     // contacts JSONArray
     JSONArray contacts = null;
-    private ArticulosHelper databaseHelper;
+
+    private DataBaseOpenHelper DbOpenHelper ;
+    private  ArticulosHelper ArticulosH;
 
 
     public static ArrayList<HashMap<String, String>> listaArticulos;
@@ -46,7 +52,10 @@ public class AndroidJSONParsingActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_list);
-        databaseHelper=new ArticulosHelper(AndroidJSONParsingActivity.this);
+
+        DbOpenHelper=new DataBaseOpenHelper(AndroidJSONParsingActivity.this);
+        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+
         new GetArticulos().execute();
 
         // selecting single ListView item
@@ -97,7 +106,7 @@ public class AndroidJSONParsingActivity extends ListActivity {
             Log.e(TAG, "Response from url: " + jsonStr);
 
             if (jsonStr != null) {
-                databaseHelper.EliminaArticulos();
+                ArticulosH.EliminaArticulos();
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     listaArticulos = new ArrayList<>();
@@ -120,7 +129,7 @@ public class AndroidJSONParsingActivity extends ListActivity {
                         String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                         String detallista = c.getString("detallista");
 
-                        databaseHelper.GuardarTotalArticulos(Codigo, Nombre, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista,Bonificable,
+                        ArticulosH.GuardarTotalArticulos(Codigo, Nombre, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista,Bonificable,
                                 AplicaPrecioDetalle,
                                 DESCUENTO_MAXIMO,
                                 detallista);

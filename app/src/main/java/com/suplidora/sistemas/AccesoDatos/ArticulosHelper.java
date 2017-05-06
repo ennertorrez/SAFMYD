@@ -12,13 +12,10 @@ import com.suplidora.sistemas.Auxiliar.variables_publicas;
 
 public class ArticulosHelper {
 
-
-    ArticulosOpenHelper openHelper;
     private SQLiteDatabase database;
 
-    public ArticulosHelper(Context context){
-        openHelper = new ArticulosOpenHelper(context);
-        database = openHelper.getWritableDatabase();
+    public ArticulosHelper(SQLiteDatabase db){
+        database = db;
     }
     public void GuardarTotalArticulos(String Codigo, String Nombre, String PrecioSuper,
                                    String PrecioDetalle, String PrecioForaneo, String PrecioMayorista,
@@ -47,34 +44,5 @@ public class ArticulosHelper {
     public  void EliminaArticulos() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_ARTICULOS+";");
         Log.d("cursos_elimina", "Datos eliminados");
-    }
-    private class ArticulosOpenHelper extends SQLiteOpenHelper {
-        public ArticulosOpenHelper(Context context) {
-            // TODO Auto-generated constructor stub
-            super(context, variables_publicas.DATABASE_NAME, null, variables_publicas.DATABASE_VERSION);
-        }
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            // TODO Auto-generated method stub
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ARTICULOS + "( "
-                   // + ARTICULO_COLUMN_ID + " INTEGER PRIMARY KEY , "
-                    + variables_publicas.ARTICULO_COLUMN_Codigo + " TEXT , "
-                    + variables_publicas.ARTICULO_COLUMN_Nombre + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_PrecioSuper + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_PrecioDetalle + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_PrecioForaneo + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_PrecioMayorista + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_Bonificable + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_DESCUENTO_MAXIMO + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_detallista + " TEXT )" );
-        }
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // TODO Auto-generated method stub
-           db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_ARTICULOS);
-            onCreate(db);
-        }
-
     }
 }

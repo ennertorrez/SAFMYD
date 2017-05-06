@@ -23,6 +23,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="#0000FF" />
             <TextView
                 android:id="@+id/lblNombreCliente"
                 android:layout_width="match_parent"
@@ -86,10 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></Spinner>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="#0000FF" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -113,7 +114,7 @@
                     android:id="@+id/btnBuscar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
+                    android:background="@drawable/borde_campos_pedidos"
                     android:text="Buscar" />
             </LinearLayout>
 
@@ -161,17 +162,14 @@
                     android:id="@+id/btnAgregar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#5E9E5E"
+                    android:background="@drawable/borde_campos_pedidos"
                     android:onClick="Agregar"
                     android:text="Agregar" />
             </LinearLayout>
 
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="#0000FF" />
+
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -193,28 +191,39 @@
                         android:layout_height="wrap_content">
 
                         <TextView
-                            android:id="@+id/lblDescCantidad"
-                            android:layout_width="0dp"
+                            android:id="@+id/lblDescDescripcion"
+                            android:layout_width="180dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Cantiadad"
+                            android:layout_marginRight="1dp"
+                            android:paddingLeft="0dp"
+                            android:ems="@integer/mr_controller_volume_group_list_fade_out_duration_ms"
+                            android:text="Descripcion"
+                            android:textColor="#000000"
+                            android:typeface="monospace"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:id="@+id/lblDescCantidad"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="1dp"
+                            android:layout_gravity="left"
+                            android:text="Cant."
+                            android:textColor="#000000"
+                            android:typeface="monospace"
+                            android:background="@drawable/borde_campos_pedidos"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         <TextView
                             android:id="@+id/lbDeslPrecio"
-                            android:layout_width="0dp"
+                            android:layout_width="75dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_gravity="top"
                             android:text="Precio"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                        <TextView
-                            android:id="@+id/lblDescDescripcion"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:ems="@integer/mr_controller_volume_group_list_fade_out_duration_ms"
-                            android:text="Descripcion"
+                            android:textColor="#000000"
+                            android:typeface="monospace"
+                            android:background="@drawable/borde_campos_pedidos"
                             android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     </LinearLayout>
