@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -104,6 +106,15 @@ public class PedidosActivity extends Activity {
 
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscar = (Button) findViewById(R.id.btnBuscar);
+        txtCodigoArticulo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    btnBuscar.performClick();
+
+                }
+                return false;
+            }
+        });
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
@@ -164,6 +175,7 @@ public class PedidosActivity extends Activity {
                         lblDescripcionArticulo.append(nom);
                     } while (c.moveToNext());
                 }
+                txtCantidad.requestFocus();
             }
         });
         final ArrayList<HashMap<String, String>> listaArticulos;
