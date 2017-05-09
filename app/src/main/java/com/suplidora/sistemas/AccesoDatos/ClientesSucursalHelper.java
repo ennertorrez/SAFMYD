@@ -78,4 +78,27 @@ public class ClientesSucursalHelper {
         return list;
     }
 
+    public List<ClienteSucursal> ObtenerClienteSucursales(String IdCliente){
+        List<ClienteSucursal> list = new ArrayList<ClienteSucursal>();
+        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_CLIENTES_SUCURSALES+" where "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente+" = "+IdCliente+ " ORDER BY "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal;
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(new ClienteSucursal(cursor.getString(cursor.getColumnIndex("CodSuc")),
+                        cursor.getString(cursor.getColumnIndex("CodCliente")),
+                        cursor.getString(cursor.getColumnIndex("Sucursal")),
+                        cursor.getString(cursor.getColumnIndex("Ciudad")),
+                        cursor.getString(cursor.getColumnIndex("DeptoID")),
+                        cursor.getString(cursor.getColumnIndex("Direccion")),
+                        cursor.getString(cursor.getColumnIndex("FormaPagoID"))
+                ));
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        //database.close();
+        return list;
+    }
+
 }

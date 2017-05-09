@@ -158,8 +158,8 @@ public class Cliente {
         IdFormaPago = idFormaPago;
     }
 
-    public String getIdVendedor() {
-        return IdVendedor;
+    public int getIdVendedor() {
+        return Integer.parseInt( IdVendedor);
     }
 
     public void setIdVendedor(String idVendedor) {
@@ -212,5 +212,10 @@ public class Cliente {
 
     public void setFechaUltimaCompra(String fechaUltimaCompra) {
         FechaUltimaCompra = fechaUltimaCompra;
+    }
+
+    public String toString(){
+
+        return  this.getNombre();
     }
 }

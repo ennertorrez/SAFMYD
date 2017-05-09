@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -28,9 +29,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Cliente;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.Pedidos.PedidosActivity;
+import com.suplidora.sistemas.Principal.Login;
 import com.suplidora.sistemas.R;
 
 import org.json.JSONArray;
@@ -39,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -47,17 +54,20 @@ import java.util.HashMap;
 
 public class PedidosFragment extends Fragment {
     View myView;
-
+    private DataBaseOpenHelper DbOpenHelper;
+    private ClientesHelper ClientesH;
     private String TAG = PedidosFragment.class.getSimpleName();
-    private String busqueda = "1";
-    private String tipoBusqueda = "1";
+    private String busqueda = "";
+    private String tipoBusqueda = "2";
     private ProgressDialog pDialog;
     private ListView lv;
     private TextView lblFooter;
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-
+    private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
+    public static ArrayList<HashMap<String, String>> listaClientes;
+    private ArticulosHelper databaseHelper;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
@@ -90,6 +100,8 @@ public class PedidosFragment extends Fragment {
             }
         });
         listaClientes = new ArrayList<>();
+        new GetClientesPedidos().execute();
+        lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,10 +113,10 @@ public class PedidosFragment extends Fragment {
                 busqueda = txtBusqueda.getText().toString();
                 tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbCodigo ? "1" : "2";
 
-                if(TextUtils.isEmpty(busqueda)) {
+               /* if(TextUtils.isEmpty(busqueda)) {
                     txtBusqueda.setError("Ingrese un valor");
                     return;
-                }
+                }*/
                 new GetClientesPedidos().execute();
                 lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
             }
@@ -128,9 +140,7 @@ public class PedidosFragment extends Fragment {
         });
         return myView;
     }
-    private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
-    public static ArrayList<HashMap<String, String>> listaClientes;
-    private ArticulosHelper databaseHelper;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,7 +160,7 @@ public class PedidosFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            HttpHandler sh = new HttpHandler();
+           /* HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
             String urlString = url + busqueda.replace(" ","%20") + "/" + tipoBusqueda;
@@ -158,9 +168,22 @@ public class PedidosFragment extends Fragment {
 
             Log.e(TAG, "Response from url: " + jsonStr);
 
-            if (jsonStr != null) {
+            if (jsonStr != null) {*/
                 try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+                    ClientesH = new ClientesHelper(DbOpenHelper.database);
+
+                    switch (tipoBusqueda){
+                        case "1":
+
+                            listaClientes=ClientesH.BuscarClientesCodigo(busqueda);
+                            break;
+                        case  "2":
+                            listaClientes=ClientesH.BuscarClientesNombre(busqueda);
+                            break;
+                    }
+
+                    /*JSONObject jsonObj = new JSONObject(jsonStr);
                     listaClientes = new ArrayList<>();
                     // Getting JSON Array node
                     JSONArray clientes = jsonObj.getJSONArray("BuscarClientesResult");
@@ -198,9 +221,9 @@ public class PedidosFragment extends Fragment {
                         cliente.put("CodCv",CodCv);
                         cliente.put("Direccion",Direccion);
                         listaClientes.add(cliente);
-                    }
+                    }*/
 
-                } catch (final JSONException e) {
+                } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -212,7 +235,7 @@ public class PedidosFragment extends Fragment {
                         }
                     });
                 }
-            } else {
+            /*} else {
                 Log.e(TAG, "Couldn't get json from server.");
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -222,8 +245,8 @@ public class PedidosFragment extends Fragment {
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
-                });
-            }
+                });*/
+
             return null;
         }
         @Override
@@ -237,7 +260,7 @@ public class PedidosFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{"IdCliente", "Nombre", "Direccion"}, new int[]{R.id.IdCliente, R.id.Nombre,
+                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente, variables_publicas.CLIENTES_COLUMN_Nombre, variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente, R.id.Nombre,
                     R.id.Direccion});
             lv.setAdapter(adapter);
             lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));

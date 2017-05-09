@@ -83,7 +83,7 @@ public class ClienteSucursal {
     public void setFormaPagoID(String formaPagoID) {
         FormaPagoID = formaPagoID;
     }
-    public String ToString(){
+    public String toString(){
         return this.getSucursal();
     }
 }

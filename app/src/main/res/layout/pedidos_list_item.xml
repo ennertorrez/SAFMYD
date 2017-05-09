@@ -17,9 +17,13 @@
             android:layout_width="180dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:textColor="#0008ff"
+            android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
-            android:textSize="18dp"
+            android:textSize="14dp"
+            android:ellipsize="end"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingLeft="2dp"
             tools:ignore="SelectableText,SpUsage" />
 
         <TextView
@@ -27,18 +31,20 @@
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:textColor="#0008ff"
+            android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
-            android:textSize="18dp"
+            android:textSize="14dp"
+            android:paddingLeft="2dp"
             tools:ignore="SelectableText,SpUsage" />
         <TextView
             android:id="@+id/lblPrecio"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:textColor="#0008ff"
+            android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"
-            android:textSize="18dp"
+            android:textSize="14dp"
+            android:paddingLeft="2dp"
             tools:ignore="SelectableText,SpUsage" />
 
     </LinearLayout>

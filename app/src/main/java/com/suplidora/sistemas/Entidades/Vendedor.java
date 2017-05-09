@@ -32,8 +32,8 @@ public class Vendedor {
 
     }
 
-    public String getCODIGO() {
-        return CODIGO;
+    public int getCODIGO() {
+        return Integer.parseInt( CODIGO);
     }
 
     public void setCODIGO(String CODIGO) {
@@ -104,7 +104,7 @@ public class Vendedor {
         this.mayorista = mayorista;
     }
 
-    public String ToString(){
+    public String toString(){
         return this.getNOMBRE();
     }
 }

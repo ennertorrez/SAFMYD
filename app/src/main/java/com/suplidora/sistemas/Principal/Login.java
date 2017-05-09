@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
@@ -78,7 +79,7 @@ public class Login extends Activity {
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
-
+    private ArticulosHelper ArticulosH;
     private SincronizarDatos sd;
 
 
@@ -100,11 +101,11 @@ public class Login extends Activity {
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
-
+        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);

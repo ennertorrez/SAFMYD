@@ -5,6 +5,7 @@ import android.support.v4.content.res.ConfigurationHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
@@ -29,7 +30,7 @@ public class SincronizarDatos {
 
 
     private String urlClientes = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
-
+    private String urlArticulos= variables_publicas.direccionIp+"/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
@@ -43,6 +44,7 @@ public class SincronizarDatos {
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
+    private ArticulosHelper ArticulosH;
 
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
@@ -55,7 +57,7 @@ public class SincronizarDatos {
                             VendedoresHelper Vendedoresh,CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh,FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh,ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch) {
+                            ClientesSucursalHelper ClientesSuch,ArticulosHelper Articulosh) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -65,6 +67,48 @@ public class SincronizarDatos {
         PrecioEspecialH = PrecioEspecialh;
         ConfigSistemasH = ConfigSistemah;
         ClientesSucH = ClientesSuch;
+        ArticulosH = Articulosh;
+    }
+
+    private String SincronizarArticulos()throws JSONException {
+        HttpHandler shC = new HttpHandler();
+        String urlStringC = urlArticulos;
+        String jsonStrC = shC.makeServiceCall(urlStringC);
+
+        if (jsonStrC == null)
+            return null;
+        //Log.e(TAG, "Response from url: " + jsonStrC);
+
+        ArticulosH.EliminaArticulos();
+        JSONObject jsonObjC = new JSONObject(jsonStrC);
+        // Getting JSON Array node
+        JSONArray articulos = jsonObjC.getJSONArray("BuscarTotalArticuloResult");
+
+        DbOpenHelper.database.beginTransaction();
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < articulos.length(); i++) {
+                JSONObject c = articulos.getJSONObject(i);
+
+                String Codigo= c.getString("CODIGO_ARTICULO");
+                String Nombre = c.getString("NOMBRE");
+                String PrecioSuper=  c.getString("PrecioSuper");
+                String PrecioDetalle =  c.getString("PrecioDetalle");
+                String PrecioForaneo =  c.getString("PrecioForaneo");
+                String PrecioMayorista =  c.getString("PrecioMayorista");
+                String Bonificable =  c.getString("Bonificable");
+                String AplicaPrecioDetalle =  c.getString("AplicaPrecioDetalle");
+                String DESCUENTO_MAXIMO =  c.getString("DESCUENTO_MAXIMO");
+                String detallista =  c.getString("detallista");
+
+                ArticulosH.GuardarTotalArticulos(Codigo,Nombre,PrecioSuper,PrecioDetalle,PrecioForaneo,PrecioMayorista,Bonificable,AplicaPrecioDetalle,DESCUENTO_MAXIMO,detallista);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+        }
+        finally {
+            DbOpenHelper.database.endTransaction();
+        }
+        return  jsonStrC;
     }
 
     //Cliente
@@ -394,13 +438,16 @@ public class SincronizarDatos {
     }
 
     public void SincronizarTodo()throws JSONException {
-
+        SincronizarArticulos();
         SincronizarClientes();
         SincronizarVendedores();
         SincronizarCartillasBc();
         SincronizarCartillasBcDetalle();
         SincronizarFormaPago();
         SincronizarPrecioEspecial();
+        SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
     }
+
+
 }

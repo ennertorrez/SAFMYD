@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,9 +29,11 @@ import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.Entidades.Cliente;
 import com.suplidora.sistemas.Entidades.ClienteSucursal;
+import com.suplidora.sistemas.Entidades.FormaPago;
 import com.suplidora.sistemas.Entidades.Vendedor;
 import com.suplidora.sistemas.R;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +92,13 @@ public class PedidosActivity extends Activity {
         cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
         cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
 
+        // getting intent data
+        Intent in = getIntent();
+
+        // Get XML values from previous intent
+        IdCliente = in.getStringExtra(KEY_IdCliente);
+        Nombre = in.getStringExtra(KEY_NombreCliente);
+
         // Loading spinner data from database
         CargaDatosCombo();
 
@@ -102,12 +112,7 @@ public class PedidosActivity extends Activity {
 //        adapter = new ArrayAdapter<String>(this, R.layout.pedidos_list_item,R.id.lblCantidad, listItems);
 //        listView.setAdapter(adapter);
 
-        // getting intent data
-        Intent in = getIntent();
 
-        // Get XML values from previous intent
-        IdCliente = in.getStringExtra(KEY_IdCliente);
-        Nombre = in.getStringExtra(KEY_NombreCliente);
 
         // Displaying all values on the screen
         TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
@@ -135,6 +140,13 @@ public class PedidosActivity extends Activity {
 
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+
+                if(TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+                    txtCodigoArticulo.setError("Ingrese un valor");
+                    return;
+                }
+
+
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
                 Cursor c = ArticulosH.BuscarArticulo(CodigoArticulo);
 
@@ -159,6 +171,14 @@ public class PedidosActivity extends Activity {
 
         btnAgregar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                if(TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+                    txtCodigoArticulo.setError("Ingrese un valor");
+                    return;
+                }
+                if(TextUtils.isEmpty(txtCantidad.getText().toString())) {
+                    txtCantidad.setError("Ingrese un valor");
+                    return;
+                }
 
                 InputMethodManager inputManager = (InputMethodManager)
                         getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -248,27 +268,41 @@ public class PedidosActivity extends Activity {
         adapterVendedor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboVendedor.setAdapter(adapterVendedor);
 
+
         Cliente cliente =ClientesH.BuscarCliente(IdCliente);
-        String IdVendedor = cliente.getIdVendedor();
-        if (variables_publicas.TipoUsuario != "Vendedor") {
+        int IdVendedor = cliente.getIdVendedor();
+        if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = new Vendedor();
             for (int i = 0; vendedor.getCODIGO() != IdVendedor; i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
-            Vendedor vendedor = new Vendedor();
-            for (int i = 0; vendedor.getCODIGO() != variables_publicas.CodigoVendedor; i++)
+            Vendedor vendedor = vendedores.get(0);
+            for (int i = 0; vendedor.getCODIGO() != Integer.parseInt(variables_publicas.CodigoVendedor); i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         }
 
-        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerListaClientesSucursales();
+        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(IdCliente);
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboSucursal.setAdapter(adapterSucursal);
 
-        ClienteSucursal sucursal = new ClienteSucursal();
+
         cboSucursal.setSelection(0);
+
+
+        List<FormaPago> lstFormasPago= FormaPagoH.ObtenerListaFormaPago();
+        ArrayAdapter<FormaPago> adapterFormaPago = new ArrayAdapter<FormaPago>(this, android.R.layout.simple_spinner_item, lstFormasPago);
+        adapterFormaPago.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboCondicion.setAdapter(adapterFormaPago);
+        FormaPago condicion= lstFormasPago.get(0);
+        for (int i = 0;!(condicion.getCODIGO().equals( cliente.getIdFormaPago())); i++)
+            condicion = lstFormasPago.get(i);
+        cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
+        if (variables_publicas.TipoUsuario.equals("Vendedor")) {
+            cboCondicion.setEnabled(false);
+        }
 
 
 //        cboSucursal.setAdapter(dataAdapter2);
