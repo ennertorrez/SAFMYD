@@ -35,6 +35,6 @@ public class ConfiguracionSistemaHelper {
     }
     public  void EliminaConfigSistema() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CONFIGURACION_SISTEMA+";");
-        Log.d("PrecioEspecial_elimina", "Datos eliminados");
+        Log.d("ConfigSistemal_elimina", "Datos eliminados");
     }
     }
