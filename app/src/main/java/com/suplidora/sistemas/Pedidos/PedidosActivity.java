@@ -157,7 +157,6 @@ public class PedidosActivity extends Activity {
                     return;
                 }
 
-
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
                 Cursor c = ArticulosH.BuscarArticulo(CodigoArticulo);
 
