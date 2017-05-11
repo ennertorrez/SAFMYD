@@ -36,7 +36,7 @@ public class ArticulosHelper {
         database.insert(variables_publicas.TABLE_ARTICULOS, null, contentValues);
     }
     public Cursor BuscarArticulo(String Codigo) {
-        return database.rawQuery("select * from " + variables_publicas.TABLE_ARTICULOS +" where "+variables_publicas.ARTICULO_COLUMN_Codigo+" like '%"+Codigo+"'", null);
+        return database.rawQuery("select * from " + variables_publicas.TABLE_ARTICULOS +" where "+variables_publicas.ARTICULO_COLUMN_Codigo+" like '%"+Codigo+"' LIMIT 1", null);
     }
     public Cursor BuscarTotalArticulo() {
         return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_ARTICULOS +"", null);

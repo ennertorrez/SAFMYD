@@ -27,7 +27,7 @@
             tools:ignore="SelectableText,SpUsage" />
 
         <TextView
-            android:id="@+id/lblCantidad"
+            android:id="@+id/lblDetalleCantidad"
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
@@ -37,7 +37,40 @@
             android:paddingLeft="2dp"
             tools:ignore="SelectableText,SpUsage" />
         <TextView
-            android:id="@+id/lblPrecio"
+            android:id="@+id/lblDetallePrecio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="2dp"
+            tools:ignore="SelectableText,SpUsage" />
+
+        <TextView
+            android:id="@+id/lblDetallePorDescuento"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="2dp"
+            tools:ignore="SelectableText,SpUsage" />
+
+        <TextView
+            android:id="@+id/lblDetalleSubTotal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:paddingLeft="2dp"
+            tools:ignore="SelectableText,SpUsage" />
+
+        <TextView
+            android:id="@+id/lblDetalleTotal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="left"

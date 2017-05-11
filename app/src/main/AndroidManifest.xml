@@ -71,14 +71,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConsultaClienteActivity">
+        <activity android:name=".ConsultaArticuloActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ConsultaArticuloActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Pedidos.PedidosActivity">
+        <activity android:name=".Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.PedidosActivity" />
 

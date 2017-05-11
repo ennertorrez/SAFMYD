@@ -5,35 +5,35 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+
     tools:context=".Pedidos.PedidosActivity">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:gravity="top"
         android:orientation="vertical"
-        tools:ignore="UselessParent"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <View
+       <!--     <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:background="@color/colorPrimaryDark" />
+                android:background="@color/colorPrimaryDark" />-->
+
             <TextView
                 android:id="@+id/lblNombreCliente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
                 android:text="NombreCliente"
-                android:textColor="#000000"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="15dp"
                 android:textStyle="bold" />
 
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:text="1102-01-01-000024"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorAccent"
                     android:textSize="15dp"
                     android:textStyle="bold" />
 
@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:text="Mayorista"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorAccent"
                     android:textSize="15dp"
                     android:textStyle="bold" />
 
@@ -70,7 +70,7 @@
                     android:layout_gravity="top"
                     android:paddingLeft="15dp"
                     android:text="Super_02"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorAccent"
                     android:textSize="15dp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -79,25 +79,28 @@
         <Spinner
             android:id="@+id/cboVendedor"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            ></Spinner>
-
-        <Spinner
-            android:id="@+id/cboSucursal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            ></Spinner>
-        <Spinner
-            android:id="@+id/cboCondicion"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"></Spinner>
 
 
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content">
+          <Spinner
+              android:id="@+id/cboCondicion"
+              android:layout_width="150dp"
+              android:layout_height="wrap_content"></Spinner>
+
+          <Spinner
+              android:id="@+id/cboSucursal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+
+              ></Spinner>
+      </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="124dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -108,10 +111,12 @@
                     android:id="@+id/txtCodigoArticulo"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                   android:layout_weight="2"
-                    android:hint="Codigo Articulo"
+                    android:layout_weight="2"
                     android:background="@drawable/rounded_edittext"
-                   ></EditText>
+                    android:hint="Codigo Articulo"
+                    android:inputType="text"
+                    android:maxLines="1"></EditText>
+
 
                 <Button
                     android:id="@+id/btnBuscar"
@@ -131,9 +136,60 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:text="Descripcion articulo"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp">
+
+                <TextView
+                    android:id="@+id/lblDescPrecioArticulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginRight="10dp"
+                    android:text="PRECIO:"
                     android:textColor="#000000"
                     android:textSize="15dp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblPrecioArticulo"
+                    android:layout_width="85dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:text="85.26"
+                    android:textColor="@color/colorAccent"
+
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblDescUMArticulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:layout_marginRight="20dp"
+                    android:text="U/M:"
+                    android:textColor="#000000"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblUMArticulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:text="UNIDAD"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
 
             </LinearLayout>
 
@@ -146,10 +202,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
+                    android:background="@drawable/rounded_edittext"
                     android:ems="10"
                     android:hint="Cantidad"
                     android:inputType="number"
-                    android:background="@drawable/rounded_edittext"
                     tools:ignore="NestedWeights"></EditText>
 
                 <EditText
@@ -157,24 +213,22 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
+                    android:background="@drawable/rounded_edittext"
                     android:ems="10"
                     android:hint="Descuento"
                     android:inputType="number"
-                    android:background="@drawable/rounded_edittext"
                     tools:ignore="NestedWeights"></EditText>
 
                 <Button
                     android:id="@+id/btnAgregar"
-                    android:layout_height="wrap_content"
                     android:layout_width="50dp"
+                    android:layout_height="wrap_content"
                     android:background="@mipmap/ic_check_circle_black_24dp"
                     android:backgroundTint="#1cd100"
-                    android:onClick="Agregar"
-                     />
+                    android:onClick="Agregar" />
             </LinearLayout>
 
         </LinearLayout>
-
 
 
         <LinearLayout
@@ -193,6 +247,7 @@
                     android:layout_weight="0">
 
                     <LinearLayout
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
@@ -201,12 +256,12 @@
                             android:layout_width="180dp"
                             android:layout_height="wrap_content"
 
+                            android:background="@drawable/borde_campos_pedidos"
                             android:paddingLeft="0dp"
                             android:text="Descripcion"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
                             android:textColor="#000000"
-                            android:typeface="monospace"
-                            android:background="@drawable/borde_campos_pedidos"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:typeface="monospace" />
 
                         <TextView
                             android:id="@+id/lblDescCantidad"
@@ -214,22 +269,22 @@
                             android:layout_height="wrap_content"
 
                             android:layout_gravity="left"
-                            android:text="Cant."
-                            android:textColor="#000000"
-                            android:typeface="monospace"
                             android:background="@drawable/borde_campos_pedidos"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:text="Cant."
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
 
                         <TextView
                             android:id="@+id/lbDeslPrecio"
                             android:layout_width="75dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="top"
-                            android:text="Precio"
-                            android:textColor="#000000"
-                            android:typeface="monospace"
                             android:background="@drawable/borde_campos_pedidos"
-                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:text="Precio"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
 
                     </LinearLayout>
 
@@ -240,18 +295,20 @@
                     android:id="@+id/tableRow2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:scrollbarAlwaysDrawHorizontalTrack="true">
+
                         <ListView
                             android:id="@+id/listPedido"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_alignParentLeft="true"
-                            android:layout_alignParentStart="true"
-                            />
+                            android:layout_alignParentStart="true" />
 
                     </LinearLayout>
                 </TableRow>
@@ -281,7 +338,7 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="80dp"
+                        android:layout_height="70dp"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -289,61 +346,135 @@
                             android:layout_height="22dp"
                             android:orientation="horizontal">
 
+
+                            <TextView
+                                android:id="@+id/lblDescMon"
+                                android:layout_width="40dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="7dp"
+                                android:text="Mon: "
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorBlack" />
+
                             <TextView
                                 android:id="@+id/lblDescSubtotal"
-                                android:layout_width="80dp"
+                                android:layout_width="105dp"
                                 android:layout_height="wrap_content"
                                 android:text="SubTotal: "
-                                android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                            <TextView
-                                android:id="@+id/lblSubTotal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="100,000.00"
-                                android:textAppearance="?android:attr/textAppearanceMedium" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:orientation="horizontal">
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorBlack" />
 
                             <TextView
                                 android:id="@+id/lblDescIva"
-                                android:layout_width="80dp"
+                                android:layout_width="95dp"
                                 android:layout_height="wrap_content"
                                 android:text="IVA: "
+                                android:textColor="@color/colorBlack"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
                             <TextView
-                                android:id="@+id/lblIva"
-                                android:layout_width="wrap_content"
+                                android:id="@+id/lblDescTotal"
+                                android:layout_width="105dp"
                                 android:layout_height="wrap_content"
-                                android:text="100,000.00"
+                                android:text="Total: "
+                                android:textColor="@color/colorBlack"
                                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="22dp"
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/lblDescTotal"
-                                android:layout_width="80dp"
+                                android:id="@+id/lblMonCor"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Total: "
-                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                                android:layout_marginRight="10dp"
+                                android:text="COR"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorAccent" />
+
+                            <TextView
+                                android:id="@+id/lblSubTotalCor"
+                                android:layout_width="105dp"
+                                android:layout_height="wrap_content"
+                                android:text="100,000.00"
+
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorAccent" />
+
+
+                            <TextView
+                                android:id="@+id/lblIvaCor"
+                                android:layout_width="95dp"
+                                android:layout_height="wrap_content"
+                                android:text="100,000.00"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorAccent" />
+
+                            <TextView
+                                android:id="@+id/lblTotalCor"
+                                android:layout_width="105dp"
+                                android:layout_height="wrap_content"
+                                android:text="100,000.00"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorAccent" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/lblMonDol"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:text="DOL"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorPrimaryGreen" />
+
+                            <TextView
+                                android:id="@+id/lblSubTotalDol"
+                                android:layout_width="105dp"
+                                android:layout_height="wrap_content"
+                                android:text="100,000.00"
+
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorPrimaryGreen" />
+
+
+                            <TextView
+                                android:id="@+id/lblIvaDol"
+                                android:layout_width="95dp"
+                                android:layout_height="wrap_content"
+                                android:text="100,000.00"
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorPrimaryGreen" />
 
                             <TextView
                                 android:id="@+id/lblTotal"
-                                android:layout_width="wrap_content"
+                                android:layout_width="105dp"
                                 android:layout_height="wrap_content"
                                 android:text="100,000.00"
-                                android:textAppearance="?android:attr/textAppearanceMedium" />
+                                android:textAppearance="?android:attr/textAppearanceMedium"
+                                android:textColor="@color/colorPrimaryGreen" />
 
                         </LinearLayout>
+                        <!--  <LinearLayout
+                              android:layout_width="match_parent"
+                              android:layout_height="22dp"
+                              android:orientation="horizontal">
+
+
+
+
+
+                          </LinearLayout>-->
                     </LinearLayout>
                 </TableRow>
             </TableLayout>
