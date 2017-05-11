@@ -39,22 +39,22 @@ public class variables_publicas {
 	public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
 
 	//Variables CamposTbArticulos
-	//public static final String ARTICULO_COLUMN_Id= "Id";
+
 	public static final String ARTICULO_COLUMN_Codigo= "Codigo";
 	public static final String ARTICULO_COLUMN_Nombre = "Nombre";
-	public static final String ARTICULO_COLUMN_COSTO = "COSTO";
-	public static final String ARTICULO_COLUMN_UNIDAD = "UNIDAD";
+	public static final String ARTICULO_COLUMN_Costo = "Costo";
+	public static final String ARTICULO_COLUMN_Unidad = "Unidad";
 	public static final String ARTICULO_COLUMN_UnidadCaja = "UnidadCaja";
-	public static final String ARTICULO_COLUMN_ISC = "ISC";
-	public static final String ARTICULO_COLUMN_PorIVA = "PorIVA";
+	public static final String ARTICULO_COLUMN_Isc = "Isc";
+	public static final String ARTICULO_COLUMN_PorIva = "PorIva";
 	public static final String  ARTICULO_COLUMN_PrecioSuper= "PrecioSuper";
 	public static final String ARTICULO_COLUMN_PrecioDetalle = "PrecioDetalle";
 	public static final String ARTICULO_COLUMN_PrecioForaneo = "PrecioForaneo";
 	public static final String ARTICULO_COLUMN_PrecioMayorista = "PrecioMayorista";
 	public static final String ARTICULO_COLUMN_Bonificable = "Bonificable";
 	public static final String ARTICULO_COLUMN_AplicaPrecioDetalle = "AplicaPrecioDetalle";
-	public static final String ARTICULO_COLUMN_DESCUENTO_MAXIMO = "DESCUENTO_MAXIMO";
-	public static final String ARTICULO_COLUMN_detallista = "detallista";
+	public static final String ARTICULO_COLUMN_DescuentoMaximo = "DescuentoMaximo";
+	public static final String ARTICULO_COLUMN_Detallista = "Detallista";
 
 	//Variables CamposTbClientes
 	public static final String CLIENTES_COLUMN_IdCliente = "IdCliente";

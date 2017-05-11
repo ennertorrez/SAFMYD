@@ -25,19 +25,19 @@ public class ArticulosHelper {
         ContentValues contentValues = new ContentValues();
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Codigo, Codigo);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Nombre, Nombre);
-        contentValues.put(variables_publicas.ARTICULO_COLUMN_COSTO , COSTO);
-        contentValues.put(variables_publicas.ARTICULO_COLUMN_UNIDAD , UNIDAD);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_Costo , COSTO);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_Unidad , UNIDAD);
         contentValues.put(variables_publicas.ARTICULO_COLUMN_UnidadCaja , UnidadCaja);
-        contentValues.put(variables_publicas.ARTICULO_COLUMN_ISC , ISC);
-        contentValues.put(variables_publicas.ARTICULO_COLUMN_PorIVA , PorIVA);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_Isc , ISC);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_PorIva , PorIVA);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioSuper, PrecioSuper);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioDetalle, PrecioDetalle);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo, PrecioForaneo);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioMayorista, PrecioMayorista);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Bonificable, Bonificable);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, AplicaPrecioDetalle);
-         contentValues.put(variables_publicas.ARTICULO_COLUMN_DESCUENTO_MAXIMO, DESCUENTO_MAXIMO);
-         contentValues.put(variables_publicas.ARTICULO_COLUMN_detallista, detallista);
+         contentValues.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, DESCUENTO_MAXIMO);
+         contentValues.put(variables_publicas.ARTICULO_COLUMN_Detallista, detallista);
         //rows = database.insertWithOnConflict(TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_REPLACE);
         database.insert(variables_publicas.TABLE_ARTICULOS, null, contentValues);
     }

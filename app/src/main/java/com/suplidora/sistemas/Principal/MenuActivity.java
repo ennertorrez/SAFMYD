@@ -74,6 +74,9 @@ public class MenuActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == R.id.SincronizarDatos) {
+
+        }
         //noinspection SimplifiableIfStatement
         if (id == R.id.Salir) {
             finish();//return true;
