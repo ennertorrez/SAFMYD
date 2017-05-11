@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -81,15 +82,18 @@ public class Login extends Activity {
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private SincronizarDatos sd;
-
-
-    ArrayList<HashMap<String, String>> listaUsers;
+    String MsjLoging ="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.iniciosesion);
+
+        MsjLoging = variables_publicas.MensajeLogin;
+        if(MsjLoging != ""){
+        mensajeAviso(MsjLoging);
+        }
 
         DbOpenHelper = new DataBaseOpenHelper(Login.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
@@ -138,16 +142,21 @@ public class Login extends Activity {
                     return;
                 }
 
-//                if (isOnlineNet()==false)
-//                {
-//                    mensajeAviso("Esta offline");
-//                }
-                //if (isOnlineNet()==true && getDatePhone() =="")
-                //mensajeAviso("Esta online");
-                //if getDatePhone()
-                new GetUser().execute();
-                // }
-
+                Cursor c = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
+                if (isOnlineNet() == false && c.getCount() > 0) {
+                    //mensajeAviso("offline");
+                    variables_publicas.MensajeLogin ="";
+                    variables_publicas.LoginOk = true;
+                    Intent intent = new Intent("android.intent.action.Barra_cargado");
+                    startActivity(intent);
+                    finish();
+                } else if (isOnlineNet() == false && c.getCount() == 0) {
+                    mensajeAviso("Usuario o contraseña invalido");
+                }
+                if (isOnlineNet() == true) {
+                    //mensajeAviso("online");
+                    new GetUser().execute();
+                }
                 //AlertDialog.Builder builder = new AlertDialog.Builder(this);
             }
         });
@@ -159,6 +168,7 @@ public class Login extends Activity {
             super.onPreExecute();
             // Showing progress dialog
             Intent intent = new Intent("android.intent.action.Barra_cargado");
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
         }
@@ -173,13 +183,18 @@ public class Login extends Activity {
 
             /**********************************USUARIOS**************************************/
             if (jsonStr != null) {
-                UsuariosH.EliminaUsuarios();
+
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
-                    listaUsers = new ArrayList<>();
                     // Getting JSON Array node
                     JSONArray Usuarios = jsonObj.getJSONArray("BuscarUsuarioResult");
-
+                    if(Usuarios.length()  == 0)
+                    {
+                        variables_publicas.LoginOk = false;
+                       variables_publicas.MensajeLogin = "Usuario o contraseña invalido";
+                        return null;
+                    }
+                    UsuariosH.EliminaUsuarios();
                     // looping through All Contacts
                     for (int i = 0; i < Usuarios.length(); i++) {
                         JSONObject c = Usuarios.getJSONObject(i);
@@ -197,6 +212,23 @@ public class Login extends Activity {
                                 variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio);
 
                         variables_publicas.LoginOk = true;
+                        variables_publicas.MensajeLogin ="";
+
+                        //SINCRONIZAR DATOS
+                        try {
+                            sd.SincronizarTodo();
+                        } catch (final JSONException e) {
+                            Log.e(TAG, "Json parsing error: " + e.getMessage());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Json parsing error: " + e.getMessage(),
+                                            Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            });
+                        }
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -218,21 +250,6 @@ public class Login extends Activity {
                     public void run() {
                         Toast.makeText(getApplicationContext(),
                                 "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
-            }
-            //SINCRONIZAR DATOS
-            try {
-                sd.SincronizarTodo();
-            } catch (final JSONException e) {
-                Log.e(TAG, "Json parsing error: " + e.getMessage());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "Json parsing error: " + e.getMessage(),
                                 Toast.LENGTH_LONG)
                                 .show();
                     }

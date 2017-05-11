@@ -80,7 +80,9 @@ public class MenuActivity extends AppCompatActivity
         }
         if (id == R.id.CerrarSesion) {
             Intent newAct = new Intent(getApplicationContext(), Login.class);
+            newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(newAct);//return true;
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -76,8 +76,10 @@ public class Barra_cargado extends Activity {
              {
 //                 Intent intent=new Intent("android.intent.action.Login");
 //                 startActivity(intent);
-                 mensajeAviso("Usuario o contraseña invalidos");
+                 //mensajeAviso("Usuario o contraseña invalidos");
+                 String MensajeLogin = "MensajeLogin";
                  Intent newAct = new Intent(getApplicationContext(), Login.class);
+                 newAct.putExtra(variables_publicas.MensajeLogin, MensajeLogin );
                  startActivity(newAct);
                  finish();
              }
