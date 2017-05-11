@@ -1,7 +1,9 @@
 package com.suplidora.sistemas.Pedidos;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -55,6 +57,7 @@ public class PedidosActivity extends Activity {
     static final String KEY_NombreCliente = "Nombre";
     private Button btnAgregar;
     private Button btnBuscar;
+    private Button btnGuardar;
 
     EditText txtCantidad;
     ListView listView;
@@ -124,6 +127,7 @@ public class PedidosActivity extends Activity {
 
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscar = (Button) findViewById(R.id.btnBuscar);
+        btnGuardar = (Button) findViewById(R.id.btnGuardar);
         txtCodigoArticulo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
@@ -134,7 +138,6 @@ public class PedidosActivity extends Activity {
                 return  true;
             }
         });
-
 
         lblCodigoCliente.setText(IdCliente);
         lblNombre.setText(Nombre);
@@ -151,6 +154,11 @@ public class PedidosActivity extends Activity {
 
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
                 Cursor c = ArticulosH.BuscarArticulo(CodigoArticulo);
+                if (c.getCount() == 0)
+                {
+                    mensajeAviso("El Codigo de Articulo Ingresado no existe en la Base de Datos o esta deshabilitado para su Venta");
+                    return;
+                }
 
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtCodigoArticulo.setText("");
@@ -218,9 +226,34 @@ public class PedidosActivity extends Activity {
                 txtCantidad.setText("");
             }
         });
-//
-    }
+        btnGuardar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+                    txtCodigoArticulo.setError("Ingrese un valor");
+                    return;
+                }
+                if(lv.getCount() <=0)
+                {
+                    mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
+                }
+
+            }
+        });
+
+
+    }
+    public void mensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
