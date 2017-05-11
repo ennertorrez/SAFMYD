@@ -19,11 +19,17 @@ public class ArticulosHelper {
     }
     public void GuardarTotalArticulos(String Codigo, String Nombre, String PrecioSuper,
                                    String PrecioDetalle, String PrecioForaneo, String PrecioMayorista,
-                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista) {
+                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista,
+                                      String COSTO,String UNIDAD,String UnidadCaja,String ISC,String PorIVA) {
         long rows =0;
         ContentValues contentValues = new ContentValues();
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Codigo, Codigo);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Nombre, Nombre);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_COSTO , COSTO);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_UNIDAD , UNIDAD);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_UnidadCaja , UnidadCaja);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_ISC , ISC);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_PorIVA , PorIVA);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioSuper, PrecioSuper);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioDetalle, PrecioDetalle);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo, PrecioForaneo);
