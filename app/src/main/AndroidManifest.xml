@@ -57,23 +57,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".AndroidJSONParsingActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.AndroidJSONParsingActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity android:name=".SingleMenuItemActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SingleMenuItemActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".ConsultaArticuloActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.ConsultaArticuloActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
