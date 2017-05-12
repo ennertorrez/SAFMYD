@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -41,6 +42,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -143,8 +146,9 @@ public class Login extends Activity {
                     return;
                 }
 
+                boolean isOnline= checkInternetConnection();  //isOnlineNet();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
-                if (isOnlineNet() == false && variables_publicas.usuario!=null) {
+                if (isOnline== false && variables_publicas.usuario!=null) {
                     //mensajeAviso("offline");
                     variables_publicas.MensajeLogin ="";
                     variables_publicas.LoginOk = true;
@@ -152,10 +156,10 @@ public class Login extends Activity {
                     Intent intent = new Intent("android.intent.action.Barra_cargado");
                     startActivity(intent);
                     finish();
-                } else if (isOnlineNet() == false && variables_publicas.usuario==null) {
+                } else if (isOnline == false && variables_publicas.usuario==null) {
                     mensajeAviso("Usuario o contraseña invalido");
                 }
-                if (isOnlineNet() == true) {
+                if (isOnline == true) {
                     //mensajeAviso("online");
                     new GetUser().execute();
 
@@ -182,6 +186,7 @@ public class Login extends Activity {
             HttpHandler sh = new HttpHandler();
             String urlString = url + Usuario + "/" + Contrasenia;
             String jsonStr = sh.makeServiceCall(urlString);
+
             Log.e(TAG, "Response from url: " + jsonStr);
 
             /**********************************USUARIOS**************************************/
@@ -266,18 +271,29 @@ public class Login extends Activity {
 
     public Boolean isOnlineNet() {
 
-       try {
-            Process p = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.es");
-
-            int val = p.waitFor();
-            boolean reachable = (val == 0);
-            return reachable;
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
         }
-        return true;
+        catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+
+        return false;
+    }
+
+    private boolean checkInternetConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        // test for connection
+        if (cm.getActiveNetworkInfo() != null
+                && cm.getActiveNetworkInfo().isAvailable()
+                && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            Log.v(TAG, "Internet Connection Not Present");
+            return false;
+        }
     }
 
     public void mensajeAviso(String texto) {
