@@ -1,8 +1,6 @@
 package com.suplidora.sistemas.AccesoDatos;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -50,7 +48,7 @@ public class DataBaseOpenHelper {
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_USUARIOS + "( "
                     + variables_publicas.USUARIOS_COLUMN_Codigo + " TEXT , "
-                    + variables_publicas.USUARIOS_COLUMN_nombre + " TEXT, "
+                    + variables_publicas.USUARIOS_COLUMN_Nombre + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_Usuario + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_Contrasenia + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_Tipo + " TEXT, "
@@ -137,6 +135,35 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor + " TEXT , "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo + " TEXT ) " );
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS + "( "
+                    + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdCliente + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_Observacion + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdFormaPago + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_Fecha + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_Usuario + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_IMEI + " TEXT ) " );
+
+
+            db.execSQL("CREATE TABLE " +variables_publicas.TABLE_PEDIDOS_DETALLE + " ("
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " INTEGER "
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo + " INTEGER ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion + " TEXT ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad + " INTEGER ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA + " TEXT ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt + " TEXT ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Um + " TEXT ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal + " NUMERIC ,"
+            +variables_publicas.PEDIDOS_DETALLE_COLUMN_Total + " NUMERIC )");
+
         }
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -151,6 +178,8 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_DETALLE_CARTILLAS_BC);
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_PRECIO_ESPECIAL);
             db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_CONFIGURACION_SISTEMA);
+            db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_PEDIDOS);
+            db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_PEDIDOS_DETALLE);
 
             onCreate(db);
         }

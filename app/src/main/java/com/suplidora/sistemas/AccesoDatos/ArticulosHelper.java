@@ -2,13 +2,13 @@ package com.suplidora.sistemas.AccesoDatos;
 
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Articulo;
+import com.suplidora.sistemas.Entidades.FormaPago;
 
 public class ArticulosHelper {
 
@@ -17,10 +17,11 @@ public class ArticulosHelper {
     public ArticulosHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarTotalArticulos(String Codigo, String Nombre, String PrecioSuper,
+    public void GuardarTotalArticulos(String Codigo, String Nombre,
+                                      String COSTO,String UNIDAD,String UnidadCaja,String ISC,String PorIVA,String PrecioSuper,
                                    String PrecioDetalle, String PrecioForaneo, String PrecioMayorista,
-                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista,
-                                      String COSTO,String UNIDAD,String UnidadCaja,String ISC,String PorIVA) {
+                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista
+                                      ) {
         long rows =0;
         ContentValues contentValues = new ContentValues();
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Codigo, Codigo);
@@ -38,11 +39,37 @@ public class ArticulosHelper {
          contentValues.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, AplicaPrecioDetalle);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, DESCUENTO_MAXIMO);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Detallista, detallista);
-        //rows = database.insertWithOnConflict(TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_REPLACE);
+
         database.insert(variables_publicas.TABLE_ARTICULOS, null, contentValues);
     }
-    public Cursor BuscarArticulo(String Codigo) {
-        return database.rawQuery("select * from " + variables_publicas.TABLE_ARTICULOS +" where "+variables_publicas.ARTICULO_COLUMN_Codigo+" like '%"+Codigo+"' LIMIT 1", null);
+
+
+    public Articulo BuscarArticulo(String Codigo) {
+        String selectQuery = "select * from " + variables_publicas.TABLE_ARTICULOS + " where " + variables_publicas.ARTICULO_COLUMN_Codigo + " like '%" + Codigo + "' LIMIT 1";
+        Cursor c = database.rawQuery(selectQuery, null);
+        Articulo articulo=null;
+        if (c.moveToFirst()) {
+            do {
+                articulo = (new Articulo(c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Codigo)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Nombre)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Costo)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Unidad)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_UnidadCaja)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Isc)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_PorIva)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_PrecioSuper)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_PrecioDetalle)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_PrecioForaneo)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_PrecioMayorista)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Bonificable)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Detallista))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return articulo;
     }
     public Cursor BuscarTotalArticulo() {
         return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_ARTICULOS +"", null);

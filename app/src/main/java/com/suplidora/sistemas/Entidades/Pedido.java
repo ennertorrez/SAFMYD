@@ -1,27 +1,27 @@
 package com.suplidora.sistemas.Entidades;
 
-import com.suplidora.sistemas.Auxiliar.variables_publicas;
-
 /**
  * Created by Sistemas on 6/5/2017.
  */
 
 public class Pedido {
-
-    String IdVendedor = "";
-    String IdCliente = "";
-    String Cod_cv = "";
-    String Observacion = "";
-    String IdFormaPago = "";
-    String IdSucursal = "";
-    String Fecha = "";
-    String Usuario = "";
-    String IMEI = "";
+   String CodigoPedido ="";
+   String IdVendedor = "";
+   String IdCliente = "";
+   String Cod_cv = "";
+   String Observacion = "";
+   String IdFormaPago = "";
+   String IdSucursal = "";
+   String Fecha = "";
+   String Usuario = "";
+   String IMEI ="" ;
+   String TasaCambio ="";
 
     public Pedido() {
     }
 
-    public Pedido(String idVendedor, String idCliente, String cod_cv, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI) {
+    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI, String tasaCambio) {
+        CodigoPedido=codigoPedido;
         IdVendedor = idVendedor;
         IdCliente = idCliente;
         Cod_cv = cod_cv;
@@ -31,6 +31,7 @@ public class Pedido {
         Fecha = fecha;
         Usuario = usuario;
         this.IMEI = IMEI;
+        this.TasaCambio=tasaCambio;
     }
 
     public String getIdVendedor() {
@@ -103,5 +104,27 @@ public class Pedido {
 
     public void setIMEI(String IMEI) {
         this.IMEI = IMEI;
+    }
+
+    public String getCodigoPedido() {
+        return CodigoPedido;
+    }
+
+    public String getTasaCambio() {
+        return TasaCambio;
+    }
+
+    public void setTasaCambio(String tasaCambio) {
+        TasaCambio = tasaCambio;
+    }
+
+    public void setCodigoPedido(String codigoPedido) {
+
+
+        CodigoPedido = codigoPedido;
+    }
+
+    public String toString(){
+        return  this.getCodigoPedido();
     }
 }

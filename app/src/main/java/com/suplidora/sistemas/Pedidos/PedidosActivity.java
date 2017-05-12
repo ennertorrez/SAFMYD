@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -28,15 +27,21 @@ import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.Auxiliar.PedidoDetalleAdapter;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Articulo;
 import com.suplidora.sistemas.Entidades.Cliente;
 import com.suplidora.sistemas.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.Entidades.FormaPago;
+import com.suplidora.sistemas.Entidades.Pedido;
+import com.suplidora.sistemas.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.Entidades.Vendedor;
 import com.suplidora.sistemas.R;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,24 +52,35 @@ public class PedidosActivity extends Activity {
     private EditText txtDescuento;
     private EditText txtObservaciones;
     private TextView lblCantidad;
-    private TextView lblPrecio;
+    private TextView txtPrecioArticulo;
     private TextView lblDescripcion;
     private TextView lblNombCliente;
     private TextView lblCodCliente;
     private TextView lblDescripcionArticulo;
-    private String  focusedControl="";
+    private TextView lblTc;
+    private TextView lblSubTotalCor;
+    private TextView lblIvaCor;
+    private TextView lblTotalCor;
+    private TextView lblSubTotalDol;
+    private TextView lblIvaDol;
+    private TextView lblTotalDol;
+    private TextView lblFooter;
+    private String focusedControl = "";
     static final String KEY_IdCliente = "IdCliente";
     static final String KEY_NombreCliente = "Nombre";
     private Button btnAgregar;
     private Button btnBuscar;
+    private Articulo articulo;
     private Button btnGuardar;
-
+    private DecimalFormat df;
     EditText txtCantidad;
-    ListView listView;
-    ArrayList<String> listItems;
-    ArrayAdapter<String> adapter;
+    public static ArrayList<HashMap<String, String>> listaArticulos;
+
+
+    PedidoDetalleAdapter adapter;
 
     private ListView lv;
+    private Cliente cliente;
     Spinner cboVendedor;
     Spinner cboSucursal;
     Spinner cboCondicion;
@@ -76,14 +92,20 @@ public class PedidosActivity extends Activity {
     private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
-    private String IdCliente;
+    private int IdCliente;
+    private double tasaCambio = 0;
     private String Nombre;
+    private int IdVendedor;
+    private Pedido pedido;
+    private PedidosHelper PedidoH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
-
+        pedido = new Pedido();
+        df = new DecimalFormat("#.##");
+        listaArticulos = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ClientesSucursalH = new ClientesSucursalHelper(DbOpenHelper.database);
@@ -91,20 +113,22 @@ public class PedidosActivity extends Activity {
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
+        PedidoH = new PedidosHelper(DbOpenHelper.database);
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
         cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
-
+        lblFooter = (TextView) findViewById(R.id.lblFooter);
+        lblTc = (TextView) findViewById(R.id.lblTC);
+        tasaCambio = Double.parseDouble(variables_publicas.usuario.getTasaCambio());
         // Displaying all values on the screen
         TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         TextView lblRuta = (TextView) findViewById(R.id.lblRuta);
         TextView lblCanal = (TextView) findViewById(R.id.lblCanal);
-        Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
+        final Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         TextView lblNombre = (TextView) findViewById(R.id.lblNombreCliente);
+
         //Obtenemos las referencias a los controles
         txtCodigoArticulo = (EditText) findViewById(R.id.txtCodigoArticulo);
-        lblPrecio = (TextView) findViewById(R.id.lblDetallePrecio);
-        lblDescripcion = (TextView) findViewById(R.id.lblDescripcion);
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombreCliente);
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescripcionArticulo);
@@ -112,14 +136,21 @@ public class PedidosActivity extends Activity {
         txtCantidad.setFocusable(true);
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
-        txtDescuento= (EditText) findViewById(R.id.txtDescuento);
-        txtObservaciones=(EditText) findViewById(R.id.txtObservacion);
-
+        txtDescuento = (EditText) findViewById(R.id.txtDescuento);
+        txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
+        txtPrecioArticulo = (TextView) findViewById(R.id.txtPrecioArticulo);
+        lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
+        lblSubTotalCor = (TextView) findViewById(R.id.lblSubTotalCor);
+        lblIvaCor = (TextView) findViewById(R.id.lblIvaCor);
+        lblTotalCor = (TextView) findViewById(R.id.lblTotalCor);
+        lblSubTotalDol = (TextView) findViewById(R.id.lblSubTotalDol);
+        lblIvaDol = (TextView) findViewById(R.id.lblIvaDol);
+        lblTotalDol = (TextView) findViewById(R.id.lblTotalDol);
         // getting intent data
         Intent in = getIntent();
 
         // Get XML values from previous intent
-        IdCliente = in.getStringExtra(KEY_IdCliente);
+        IdCliente = Integer.parseInt(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
 
         // Loading spinner data from database
@@ -132,14 +163,14 @@ public class PedidosActivity extends Activity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     btnBuscar.performClick();
-                    focusedControl="txtCodigoArticulo";
+                    focusedControl = "txtCodigoArticulo";
                     return false;
                 }
-                return  true;
+                return true;
             }
         });
 
-        lblCodigoCliente.setText(IdCliente);
+        lblCodigoCliente.setText(cliente.getCodigoLetra());
         lblNombre.setText(Nombre);
         lblRuta.setText(variables_publicas.RutaCliente);
         lblCanal.setText(variables_publicas.Canal);
@@ -153,9 +184,8 @@ public class PedidosActivity extends Activity {
                 }
 
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
-                Cursor c = ArticulosH.BuscarArticulo(CodigoArticulo);
-                if (c.getCount() == 0)
-                {
+                articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
+                if (articulo == null) {
                     mensajeAviso("El Codigo de Articulo Ingresado no existe en la Base de Datos o esta deshabilitado para su Venta");
                     return;
                 }
@@ -163,17 +193,9 @@ public class PedidosActivity extends Activity {
                 //Recorremos los resultados para mostrarlos en pantalla
                 txtCodigoArticulo.setText("");
                 lblDescripcionArticulo.setText("");
-                if (c.moveToFirst()) {
-                    //Recorremos el cursor hasta que no haya más registros
-                    do {
-                        String cod = c.getString(0);
-                        String nom = c.getString(1);
-                        variables_publicas.PrecioActual = c.getString(4);
-
-                        txtCodigoArticulo.append(cod);
-                        lblDescripcionArticulo.append(nom);
-                    } while (c.moveToNext());
-                }
+                txtCodigoArticulo.setText(articulo.getCodigo());
+                lblDescripcionArticulo.setText(articulo.getNombre());
+                txtPrecioArticulo.setText(articulo.getPrecioSuper());
 
                 if (focusedControl.equals("txtCodigoArticulo")) {
                     txtCantidad.requestFocus();
@@ -182,50 +204,125 @@ public class PedidosActivity extends Activity {
                 }
             }
         });
-        final ArrayList<HashMap<String, String>> listaArticulos;
-        listaArticulos = new ArrayList<>();
+        final List<PedidoDetalle> lstPedidoDetalle = new ArrayList<>();
+
 
         btnAgregar.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
-                    txtCodigoArticulo.setError("Ingrese un valor");
-                    return;
-                }
-                if (TextUtils.isEmpty(txtCantidad.getText().toString())) {
-                    txtCantidad.setError("Ingrese un valor");
-                    return;
-                }
+                                          public void onClick(View v) {
+                                              if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+                                                  txtCodigoArticulo.setError("Ingrese un valor");
+                                                  return;
+                                              }
+                                              if (TextUtils.isEmpty(txtCantidad.getText().toString())) {
+                                                  txtCantidad.setError("Ingrese un valor");
+                                                  return;
+                                              }
 
-                InputMethodManager inputManager = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                                              InputMethodManager inputManager = (InputMethodManager)
+                                                      getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                                              inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                                      InputMethodManager.HIDE_NOT_ALWAYS);
 
-                Float PrecioItem = Float.parseFloat(variables_publicas.PrecioActual);
-                int CantidadItem = Integer.parseInt(txtCantidad.getText().toString());
-                Float Precio = PrecioItem * CantidadItem;
-                String DescripcionArt = lblDescripcionArticulo.getText().toString();
 
-                HashMap<String, String> ItemPedidos = new HashMap<>();
-                ItemPedidos.put("Cantidad", txtCantidad.getText().toString());
-                ItemPedidos.put("Precio", Precio.toString());
-                ItemPedidos.put("Descripcion", DescripcionArt);
+                                              Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
+                                              int CantidadItem = Integer.parseInt(txtCantidad.getText().toString());
+                                              Float Precio = PrecioItem * CantidadItem;
+                                              String DescripcionArt = lblDescripcionArticulo.getText().toString();
 
-                listaArticulos.add(ItemPedidos);
+                                              HashMap<String, String> itemPedidos = new HashMap<>();
 
-                ListAdapter adapter = new SimpleAdapter(
-                        getApplicationContext(), listaArticulos,
-                        R.layout.pedidos_list_item, new
-                        String[]{"Cantidad", "Precio", "Descripcion"}, new
-                        int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDescripcion});
-                lv.setAdapter(adapter);
+                                              itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+                                              itemPedidos.put("CodigoArticulo", articulo.getCodigo());
+                                              itemPedidos.put("Cantidad", txtCantidad.getText().toString());
+                                              itemPedidos.put("Precio", df.format(Precio));
+                                              itemPedidos.put("Descripcion", DescripcionArt);
+                                              itemPedidos.put("Costo", df.format(Double.parseDouble(articulo.getCosto())));
+                                              itemPedidos.put("Descuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
+                                              itemPedidos.put("BonificaA", "");
+                                              itemPedidos.put("Isc", articulo.getIsc());
+                                              itemPedidos.put("PorIva", articulo.getPorIva());
+                                              double subtotal, iva, total, descuento, isc, porIva;
+                                              subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
+                                              descuento = subtotal * (Double.parseDouble(itemPedidos.get("Descuento")) / 100);
+                                              porIva = Double.parseDouble(articulo.getPorIva());
+                                              iva = (subtotal - descuento) * porIva;
+                                              total = subtotal - descuento + iva;
+                                              itemPedidos.put("Iva", df.format(iva));
+                                              itemPedidos.put("Subtotal", df.format(subtotal));
+                                              itemPedidos.put("Total", df.format(total));
+                                              listaArticulos.add(itemPedidos);
+                                              ListAdapter adapter = new SimpleAdapter(
+                                                      getApplicationContext(), listaArticulos,
+                                                      R.layout.pedidos_list_item, new
+                                                      String[]{"Cantidad", "Precio", "Descripcion", "Descuento","Subtotal","Iva","Total"}, new
+                                                      int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento,R.id.lblDetalleSubTotal,R.id.lblDetalleIva,R.id.lblDetalleTotal});
+                                              lv.setAdapter(adapter);
 
-                txtCodigoArticulo.setText("");
-                lblDescripcionArticulo.setText("");
-                txtCantidad.setText("");
-            }
-        });
+              /*  PedidoDetalle item = new PedidoDetalle();
+                if (articulo != null) {
+                    item.setCantidad(txtCantidad.getText().toString());
+                    item.setPrecio(txtPrecioArticulo.getText().toString());
+                    item.setCodigoArticulo(articulo.getCodigo());
+                    item.setCosto(articulo.getCosto());
+                    item.setDescripcion(articulo.getNombre());
+                    item.setDescuento(txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
+                    item.setBonificaA("");
+                    item.setIsc(articulo.getIsc());
+                    item.setPorcentajeIva(articulo.getPorIva());
+                    double subtotal, iva, total, descuento, isc, porIva;
+                    subtotal = Double.parseDouble(item.getPrecio()) * Double.parseDouble(item.getCantidad());
+                    descuento = subtotal * (Double.parseDouble(item.getDescuento()) / 100);
+                    porIva = Double.parseDouble(articulo.getPorIva());
+                    iva = (subtotal - descuento) * porIva;
+                    total = subtotal - descuento + iva;
+
+                    item.setIva(String.valueOf(iva));
+                    item.setSubtotal(String.valueOf(subtotal));
+                    item.setDescuento(String.valueOf(descuento));
+                    item.setTotal(String.valueOf(total));
+
+                    lstPedidoDetalle.add(item);
+                    HashMap<String, String> itemPedido = new HashMap<String, String>();
+
+
+                    itemPedido.put("Descripcion", item.getDescripcion());
+                    itemPedido.put("Cantidad", item.getCantidad());
+                    itemPedido.put("Precio", item.getPrecio());
+                    listItems.add( itemPedido);
+
+                    ListAdapter adapter = new SimpleAdapter(
+                            getApplicationContext(), listItems,
+                            R.layout.pedidos_list_item, new String[]{variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion, variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio}, new int[]{R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,
+                            R.id.lblDetallePrecio});
+                    lv.setAdapter(adapter);*/
+
+
+              /*      PedidoDetalleAdapter adapter = new PedidoDetalleAdapter(getApplicationContext(), lstPedidoDetalle)
+                    {
+                        @Override
+                        public View getView(int position, View convertView, ViewGroup parent) {
+                            View itemView = super.getView(position, convertView, parent);
+                            if (((PedidoDetalle) getItem(position)).getDescripcion().contains("**"))
+                                itemView.setBackgroundColor(Color.RED);
+                            return itemView;
+                        }
+                    };*/
+
+
+                                              CalcularTotales();
+
+                                              txtCodigoArticulo.setText("");
+                                              lblDescripcionArticulo.setText("");
+                                              txtCantidad.setText("");
+                                              txtDescuento.setText("");
+                                              lblFooter.setText(String.valueOf(listaArticulos.size()));
+                                              txtCodigoArticulo.requestFocus();
+                                          }
+
+
+                                      }
+        );
         btnGuardar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,8 +331,7 @@ public class PedidosActivity extends Activity {
                     txtCodigoArticulo.setError("Ingrese un valor");
                     return;
                 }
-                if(lv.getCount() <=0)
-                {
+                if (lv.getCount() <= 0) {
                     mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
                 }
 
@@ -244,6 +340,31 @@ public class PedidosActivity extends Activity {
 
 
     }
+
+    private void CalcularTotales() {
+
+        double subtotal = 0, iva = 0, total = 0, descuento = 0;
+        for (int i = 0; i < listaArticulos.size(); i++) {
+            HashMap<String, String> item = listaArticulos.get(i);
+
+            subtotal += Double.parseDouble(item.get("Subtotal"));
+            iva += Double.parseDouble(item.get("Iva"));
+            total += Double.parseDouble(item.get("Total"));
+
+        }
+
+        lblSubTotalCor.setText(String.valueOf(subtotal));
+        lblIvaCor.setText(df.format(iva));
+        lblTotalCor.setText(String.valueOf(total));
+
+        if (tasaCambio > 0) {
+            lblSubTotalDol.setText(String.valueOf(df.format(subtotal / tasaCambio)));
+            lblIvaDol.setText(String.valueOf(df.format(iva / tasaCambio)));
+            lblTotalDol.setText(String.valueOf(df.format(total / tasaCambio)));
+        }
+
+    }
+
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setMessage(texto);
@@ -254,6 +375,7 @@ public class PedidosActivity extends Activity {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -269,8 +391,8 @@ public class PedidosActivity extends Activity {
         cboVendedor.setAdapter(adapterVendedor);
 
 
-        Cliente cliente = ClientesH.BuscarCliente(IdCliente);
-        int IdVendedor = cliente.getIdVendedor();
+        cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
+        IdVendedor = cliente.getIdVendedor();
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = new Vendedor();
             for (int i = 0; vendedor.getCODIGO() != IdVendedor; i++)
@@ -283,7 +405,7 @@ public class PedidosActivity extends Activity {
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         }
 
-        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(IdCliente);
+        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(String.valueOf(IdCliente));
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboSucursal.setAdapter(adapterSucursal);

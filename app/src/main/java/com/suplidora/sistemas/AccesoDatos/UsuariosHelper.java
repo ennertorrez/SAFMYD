@@ -2,10 +2,8 @@ package com.suplidora.sistemas.AccesoDatos;
 
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
@@ -25,17 +23,36 @@ public class UsuariosHelper {
         long rows =0;
         ContentValues contentValues = new ContentValues();
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Codigo, Codigo);
-         contentValues.put(variables_publicas.USUARIOS_COLUMN_nombre, nombre);
+         contentValues.put(variables_publicas.USUARIOS_COLUMN_Nombre, nombre);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Usuario, Usuario);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Contrasenia, Contrasenia);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Tipo, Tipo);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Ruta, Ruta);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Canal, Canal);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_TasaCambio, TasaCambio);
-        database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
+         database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
     }
-    public Cursor BuscarUsuarios(String Usuario,String Contrasenia) {
-        return database.rawQuery("select Usuario, Contrasenia from " + variables_publicas.TABLE_USUARIOS +" where "+variables_publicas.USUARIOS_COLUMN_Usuario+" = '"+Usuario+"' and "+variables_publicas.USUARIOS_COLUMN_Contrasenia+" = '"+Contrasenia+"'", null);
+    public Usuario BuscarUsuarios(String Usuario,String Contrasenia) {
+        Usuario usuario=null;
+        String selectQuery="SELECT * FROM " + variables_publicas.TABLE_USUARIOS
+                + " WHERE UPPER("+variables_publicas.USUARIOS_COLUMN_Usuario +") = UPPER('"+Usuario+"') AND "+ variables_publicas.USUARIOS_COLUMN_Contrasenia+" = '"+Contrasenia+"'";
+        Cursor c= database.rawQuery(selectQuery , null);
+        if (c.moveToFirst()) {
+            do {
+                usuario = (new Usuario(c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Codigo)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Nombre)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Usuario)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Contrasenia)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Tipo)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Ruta)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Canal)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_TasaCambio))
+
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return usuario;
     }
     public Cursor BuscarUsuariosCount() {
          return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_USUARIOS + "", null);

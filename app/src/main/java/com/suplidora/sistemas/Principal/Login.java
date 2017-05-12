@@ -33,6 +33,7 @@ import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Usuario;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
 
@@ -142,20 +143,22 @@ public class Login extends Activity {
                     return;
                 }
 
-                Cursor c = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
-                if (isOnlineNet() == false && c.getCount() > 0) {
+                variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
+                if (isOnlineNet() == false && variables_publicas.usuario!=null) {
                     //mensajeAviso("offline");
                     variables_publicas.MensajeLogin ="";
                     variables_publicas.LoginOk = true;
+
                     Intent intent = new Intent("android.intent.action.Barra_cargado");
                     startActivity(intent);
                     finish();
-                } else if (isOnlineNet() == false && c.getCount() == 0) {
+                } else if (isOnlineNet() == false && variables_publicas.usuario==null) {
                     mensajeAviso("Usuario o contraseña invalido");
                 }
                 if (isOnlineNet() == true) {
                     //mensajeAviso("online");
                     new GetUser().execute();
+
                 }
                 //AlertDialog.Builder builder = new AlertDialog.Builder(this);
             }
@@ -196,9 +199,9 @@ public class Login extends Activity {
                     }
                     UsuariosH.EliminaUsuarios();
                     // looping through All Contacts
+
                     for (int i = 0; i < Usuarios.length(); i++) {
                         JSONObject c = Usuarios.getJSONObject(i);
-
                         variables_publicas.CodigoVendedor = c.getString("Codigo");
                         variables_publicas.NombreVendedor = c.getString("Nombre");
                         variables_publicas.UsuarioLogin = c.getString("Usuario");
@@ -213,7 +216,7 @@ public class Login extends Activity {
 
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin ="";
-
+                        variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                         //SINCRONIZAR DATOS
                         try {
                             sd.SincronizarTodo();
@@ -230,6 +233,7 @@ public class Login extends Activity {
                             });
                         }
                     }
+
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     runOnUiThread(new Runnable() {
@@ -262,7 +266,7 @@ public class Login extends Activity {
 
     public Boolean isOnlineNet() {
 
-        try {
+       try {
             Process p = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.es");
 
             int val = p.waitFor();
@@ -273,7 +277,7 @@ public class Login extends Activity {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
     public void mensajeAviso(String texto) {

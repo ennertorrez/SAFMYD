@@ -8,16 +8,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Articulo;
+import com.suplidora.sistemas.Entidades.Pedido;
 
 public class PedidosHelper {
 
 
-    PedidosOpenHelper openHelper;
     private SQLiteDatabase database;
 
-    public PedidosHelper(Context context){
-        openHelper = new PedidosOpenHelper(context);
-        database = openHelper.getWritableDatabase();
+    public PedidosHelper(SQLiteDatabase db){
+        database = db;
     }
     public void GuardarTotalPedidos(String IdVendedor ,
                                     String IdCliente ,
@@ -50,30 +50,19 @@ public class PedidosHelper {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_PEDIDOS+";");
         Log.d("pedidos_elimina", "Datos eliminados");
     }
-    private class PedidosOpenHelper extends SQLiteOpenHelper {
-        public PedidosOpenHelper(Context context) {
-            // TODO Auto-generated constructor stub
-            super(context, variables_publicas.DATABASE_NAME, null, variables_publicas.DATABASE_VERSION);
+
+    public int ObtenerNuevoCodigoPedido(){
+
+        String selectQuery = "SELECT COUNT(*) as Cantidad FROM " + variables_publicas.TABLE_PEDIDOS  ;
+        Cursor c = database.rawQuery(selectQuery, null);
+        int numero=0;
+        if (c.moveToFirst()) {
+            do {
+               numero=c.getInt(0);
+            } while (c.moveToNext());
         }
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            // TODO Auto-generated method stub
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS + "( "
-                    + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdCliente + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_Observacion + " TEXT , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdFormaPago + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_Fecha + " TEXT , "
-                    + variables_publicas.PEDIDOS_COLUMN_Usuario + " TEXT , "
-                    + variables_publicas.PEDIDOS_COLUMN_IMEI + " TEXT ) " );
-        }
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            // TODO Auto-generated method stub
-            db.execSQL("DROP TABLE IF EXISTS "+ variables_publicas.TABLE_PEDIDOS);
-            onCreate(db);
-        }
+        c.close();
+        return numero+1;
     }
+
 }
