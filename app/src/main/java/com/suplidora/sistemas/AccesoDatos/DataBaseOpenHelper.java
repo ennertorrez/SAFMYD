@@ -59,7 +59,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.USUARIOS_COLUMN_TasaCambio + " TEXT )");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ARTICULOS + "( "
-                    // + ARTICULO_COLUMN_ID + " INTEGER PRIMARY KEY , "
+
                     + variables_publicas.ARTICULO_COLUMN_Codigo + " TEXT , "
                     + variables_publicas.ARTICULO_COLUMN_Nombre + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_Costo + " TEXT, "

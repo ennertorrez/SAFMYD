@@ -11,6 +11,8 @@ import com.suplidora.sistemas.Entidades.ClienteSucursal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.suplidora.sistemas.Auxiliar.variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente;
+
 public class ClientesSucursalHelper {
 
 //    ClientesOpenHelper openHelper;
@@ -34,7 +36,7 @@ public class ClientesSucursalHelper {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodSuc, CodSuc);
-        contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente, CodCliente);
+        contentValues.put(CLIENTES_SUCURSALES_COLUMN_CodCliente, CodCliente);
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal, Sucursal);
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_Ciudad, Ciudad);
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_DeptoID, DeptoID);
@@ -51,10 +53,10 @@ public class ClientesSucursalHelper {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CLIENTES_SUCURSALES+";");
         Log.d("ClientesSuc_elimina", "Datos eliminados");
     }
-    public List<ClienteSucursal> ObtenerListaClientesSucursales(){
+    public List<ClienteSucursal> ObtenerListaClientesSucursales(String IdCliente){
         List<ClienteSucursal> list = new ArrayList<ClienteSucursal>();
 
-        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_CLIENTES_SUCURSALES;
+        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_CLIENTES_SUCURSALES + " Where "+CLIENTES_SUCURSALES_COLUMN_CodCliente+" = "+IdCliente;
 
         Cursor cursor = database.rawQuery(selectQuery, null);
 
@@ -73,7 +75,7 @@ public class ClientesSucursalHelper {
         }
         // closing connection
         cursor.close();
-        database.close();
+     //   database.close();
 
         return list;
     }

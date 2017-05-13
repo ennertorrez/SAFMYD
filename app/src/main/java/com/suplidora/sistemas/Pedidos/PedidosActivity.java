@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -42,6 +41,8 @@ import com.suplidora.sistemas.Entidades.Vendedor;
 import com.suplidora.sistemas.R;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,10 +73,12 @@ public class PedidosActivity extends Activity {
     private Button btnBuscar;
     private Articulo articulo;
     private Button btnGuardar;
+    private  Button btnCancelar;
     private DecimalFormat df;
     EditText txtCantidad;
     public static ArrayList<HashMap<String, String>> listaArticulos;
-
+    public boolean Estado;
+    DialogInterface.OnClickListener dialogClickListener;
 
     PedidoDetalleAdapter adapter;
 
@@ -104,7 +107,12 @@ public class PedidosActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
         pedido = new Pedido();
-        df = new DecimalFormat("#.##");
+        df = new DecimalFormat("#0.00");
+        DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+        fmts.setGroupingSeparator(',');
+        df.setGroupingSize(3);
+        df.setGroupingUsed(true);
+        df.setDecimalFormatSymbols(fmts);
         listaArticulos = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
@@ -136,7 +144,11 @@ public class PedidosActivity extends Activity {
         txtCantidad.setFocusable(true);
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
+
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
+            txtDescuento.setEnabled(false);
+        }
         txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
         txtPrecioArticulo = (TextView) findViewById(R.id.txtPrecioArticulo);
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
@@ -153,12 +165,20 @@ public class PedidosActivity extends Activity {
         IdCliente = Integer.parseInt(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
 
+
         // Loading spinner data from database
         CargaDatosCombo();
 
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscar = (Button) findViewById(R.id.btnBuscar);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
+        btnCancelar = (Button) findViewById(R.id.btnCancelar);
+        btnCancelar.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               PedidosActivity.this.onBackPressed();
+            }
+        });
         txtCodigoArticulo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
@@ -172,8 +192,8 @@ public class PedidosActivity extends Activity {
 
         lblCodigoCliente.setText(cliente.getCodigoLetra());
         lblNombre.setText(Nombre);
-        lblRuta.setText(variables_publicas.RutaCliente);
-        lblCanal.setText(variables_publicas.Canal);
+        lblRuta.setText(variables_publicas.usuario.getRuta());
+        lblCanal.setText(variables_publicas.usuario.getCanal());
 
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -209,71 +229,78 @@ public class PedidosActivity extends Activity {
 
         btnAgregar.setOnClickListener(new OnClickListener() {
                                           public void onClick(View v) {
-                                              if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
-                                                  txtCodigoArticulo.setError("Ingrese un valor");
-                                                  return;
+
+                                              try {
+                                                  if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+                                                      txtCodigoArticulo.setError("Ingrese un valor");
+                                                      return;
+                                                  }
+                                                  if (TextUtils.isEmpty(txtCantidad.getText().toString())) {
+                                                      txtCantidad.setError("Ingrese un valor");
+                                                      return;
+                                                  }
+
+                                                  if (articulo == null) {
+                                                      txtCodigoArticulo.setError("Ingrese un valor");
+                                                      return;
+                                                  }
+
+                                                  InputMethodManager inputManager = (InputMethodManager)
+                                                          getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                                                  inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                                          InputMethodManager.HIDE_NOT_ALWAYS);
+
+
+                                                  Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
+                                                  Float Precio = PrecioItem;
+                                                  String DescripcionArt = lblDescripcionArticulo.getText().toString();
+
+                                                  HashMap<String, String> itemPedidos = new HashMap<>();
+
+                                                  itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+                                                  itemPedidos.put("CodigoArticulo", articulo.getCodigo());
+                                                  itemPedidos.put("Cantidad", txtCantidad.getText().toString());
+                                                  itemPedidos.put("Precio", String.valueOf(Precio));
+                                                  itemPedidos.put("Descripcion", DescripcionArt);
+                                                  itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
+                                                  itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
+
+                                                  itemPedidos.put("BonificaA", "");
+                                                  itemPedidos.put("Isc", articulo.getIsc());
+                                                  itemPedidos.put("PorIva", articulo.getPorIva());
+                                                  double subtotal, iva, total, descuento, isc, porIva;
+                                                  subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
+                                                  descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
+                                                  porIva = Double.parseDouble(articulo.getPorIva());
+                                                  iva = (subtotal - descuento) * porIva;
+                                                  total = subtotal - descuento + iva;
+                                                  itemPedidos.put("Descuento", df.format(descuento));
+                                                  itemPedidos.put("Iva", df.format(iva));
+                                                  itemPedidos.put("Subtotal", df.format(subtotal));
+                                                  itemPedidos.put("Total", df.format(total));
+                                                  listaArticulos.add(itemPedidos);
+                                                  SimpleAdapter adapter = new SimpleAdapter(
+                                                          getApplicationContext(), listaArticulos,
+                                                          R.layout.pedidos_list_item, new
+                                                          String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
+                                                          int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
+
+                                                  lv.setAdapter(adapter);
+
+                                                  CalcularTotales();
+
+                                                  txtCodigoArticulo.setText("");
+                                                  lblDescripcionArticulo.setText("");
+                                                  txtCantidad.setText("");
+                                                  txtDescuento.setText("");
+                                                  lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
+                                                  txtCodigoArticulo.requestFocus();
+
+                                              } catch (Exception e) {
+                                                  mensajeAviso(e.getMessage());
                                               }
-                                              if (TextUtils.isEmpty(txtCantidad.getText().toString())) {
-                                                  txtCantidad.setError("Ingrese un valor");
-                                                  return;
-                                              }
 
-                                              if (articulo==null){
-                                                  txtCodigoArticulo.setError("Ingrese un valor");
-                                                  return;
-                                              }
-
-                                              InputMethodManager inputManager = (InputMethodManager)
-                                                      getSystemService(Context.INPUT_METHOD_SERVICE);
-
-                                              inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                      InputMethodManager.HIDE_NOT_ALWAYS);
-
-
-                                              Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
-                                              Float Precio = PrecioItem;
-                                              String DescripcionArt = lblDescripcionArticulo.getText().toString();
-
-                                              HashMap<String, String> itemPedidos = new HashMap<>();
-
-                                              itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
-                                              itemPedidos.put("CodigoArticulo", articulo.getCodigo());
-                                              itemPedidos.put("Cantidad", txtCantidad.getText().toString());
-                                              itemPedidos.put("Precio", df.format(Precio));
-                                              itemPedidos.put("Descripcion", DescripcionArt);
-                                              itemPedidos.put("Costo", df.format(Double.parseDouble(articulo.getCosto())));
-                                              itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
-
-                                              itemPedidos.put("BonificaA", "");
-                                              itemPedidos.put("Isc", articulo.getIsc());
-                                              itemPedidos.put("PorIva", articulo.getPorIva());
-                                              double subtotal, iva, total, descuento, isc, porIva;
-                                              subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
-                                              descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
-                                              porIva = Double.parseDouble(articulo.getPorIva());
-                                              iva = (subtotal - descuento) * porIva;
-                                              total = subtotal - descuento + iva;
-                                              itemPedidos.put("Descuento", String.valueOf( descuento));
-                                              itemPedidos.put("Iva", df.format(iva));
-                                              itemPedidos.put("Subtotal", df.format(subtotal));
-                                              itemPedidos.put("Total", df.format(total));
-                                              listaArticulos.add(itemPedidos);
-                                              ListAdapter adapter = new SimpleAdapter(
-                                                      getApplicationContext(), listaArticulos,
-                                                      R.layout.pedidos_list_item, new
-                                                      String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento","Descuento","Subtotal","Iva","Total"}, new
-                                                      int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento,R.id.lblDetalleDescuento,R.id.lblDetalleSubTotal,R.id.lblDetalleIva,R.id.lblDetalleTotal});
-                                              lv.setAdapter(adapter);
-
-
-                                              CalcularTotales();
-
-                                              txtCodigoArticulo.setText("");
-                                              lblDescripcionArticulo.setText("");
-                                              txtCantidad.setText("");
-                                              txtDescuento.setText("");
-                                              lblFooter.setText( "Total items:"+ String.valueOf(listaArticulos.size()));
-                                              txtCodigoArticulo.requestFocus();
                                           }
 
 
@@ -303,13 +330,18 @@ public class PedidosActivity extends Activity {
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
 
-            subtotal += Double.parseDouble(item.get("Subtotal"));
-            iva += Double.parseDouble(item.get("Iva"));
-            total += Double.parseDouble(item.get("Total"));
+            try {
+                subtotal += (df.parse(item.get("Subtotal"))).doubleValue();
+                iva += (df.parse(item.get("Iva"))).doubleValue();
+                total += (df.parse(item.get("Total"))).doubleValue();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
 
         }
 
-        lblSubTotalCor.setText(df.format( subtotal));
+        lblSubTotalCor.setText(df.format(subtotal));
         lblIvaCor.setText(df.format(iva));
         lblTotalCor.setText(df.format(total));
 
@@ -330,6 +362,39 @@ public class PedidosActivity extends Activity {
         });
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
+    }
+
+
+    public void MensajePregunta(String mensaje, String titulo) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(titulo);
+        builder.setMessage(mensaje);
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                Estado = true;
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Estado = false;
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+
+
     }
 
     @Override
@@ -365,8 +430,6 @@ public class PedidosActivity extends Activity {
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboSucursal.setAdapter(adapterSucursal);
-
-
         cboSucursal.setSelection(0);
 
 
@@ -378,11 +441,27 @@ public class PedidosActivity extends Activity {
         for (int i = 0; !(condicion.getCODIGO().equals(cliente.getIdFormaPago())); i++)
             condicion = lstFormasPago.get(i);
         cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
-        if (variables_publicas.TipoUsuario.equals("Vendedor")) {
-            cboCondicion.setEnabled(false);
-        }
+        cboCondicion.setEnabled(false);
 
 
 //
+    }
+
+
+
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage("Esta seguro que desea cancelar el pedido actual?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        PedidosActivity.this.finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 }

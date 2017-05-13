@@ -156,7 +156,7 @@ public class ClientesHelper {
 
     public Cliente BuscarCliente(String Codigo){
         Cliente cli= new Cliente();
-        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente ='"+Codigo +"'", null);
+        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente = "+Codigo +"", null);
         if(c.moveToFirst()){
             do {
                 cli = new Cliente(c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdCliente)),
