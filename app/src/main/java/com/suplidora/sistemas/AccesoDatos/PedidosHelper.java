@@ -19,7 +19,7 @@ public class PedidosHelper {
     public PedidosHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarTotalPedidos(String IdVendedor ,
+    public void GuardarTotalPedidos(String CodigoPedido, String IdVendedor ,
                                     String IdCliente ,
                                     String Cod_cv ,
                                     String Observacion ,
@@ -30,7 +30,7 @@ public class PedidosHelper {
                                     String IMEI ) {
         long rows =0;
         ContentValues contentValues = new ContentValues();
-
+        contentValues.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido  , CodigoPedido );
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor  , IdVendedor );
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdCliente  , IdCliente );
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv  , Cod_cv );
@@ -40,7 +40,6 @@ public class PedidosHelper {
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Fecha  ,  Fecha);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Usuario  , Usuario );
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IMEI , IMEI);
-        //rows = database.insertWithOnConflict(TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_REPLACE);
         database.insert(variables_publicas.TABLE_PEDIDOS, null, contentValues);
     }
     public Cursor ObtenerListaPedidos() {

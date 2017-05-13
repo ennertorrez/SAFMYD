@@ -115,22 +115,22 @@ public class MenuActivity extends AppCompatActivity
                         .replace(R.id.content_frame, new MapViewFragment())
                         .commit();
                 break;
-            case R.id.btnClientes:
+            case R.id.btnMaestroClientes:
                 fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
                 break;
             case R.id.btnDevoluciones:
-                /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
+              /*  Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
+                startActivity(newAct);
+                Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);
                 startActivity(newAct);*/
-//                Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);
-//                startActivity(newAct);
                 break;
-            case R.id.btnPedidos:
-                /*Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
-                startActivity(newAct);*/
+            case R.id.btnNuevoPedido:
+               /* Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
+                startActivity(newAct);
                 //Para pruebas
-              /*  Intent newActi = new Intent(getApplicationContext(), ConsultaArticulosActivity.class);
-                startActivity(newActi);*/
-
+                Intent newActi = new Intent(getApplicationContext(), ConsultaArticulosActivity.class);
+                startActivity(newActi);
+*/
                 fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
                 break;
         }

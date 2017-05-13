@@ -68,13 +68,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConsultaArticuloActivity">
+   <!--     <activity android:name=".ConsultaArticuloActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ConsultaArticuloActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
+        </activity>-->
         <activity android:name=".Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">

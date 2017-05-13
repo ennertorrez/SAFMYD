@@ -1,11 +1,16 @@
 package com.suplidora.sistemas.Pedidos;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -13,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,12 +44,15 @@ import com.suplidora.sistemas.Entidades.FormaPago;
 import com.suplidora.sistemas.Entidades.Pedido;
 import com.suplidora.sistemas.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.Entidades.Vendedor;
+
 import com.suplidora.sistemas.R;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,8 +82,10 @@ public class PedidosActivity extends Activity {
     private Button btnBuscar;
     private Articulo articulo;
     private Button btnGuardar;
-    private  Button btnCancelar;
+    private Button btnCancelar;
     private DecimalFormat df;
+    private FormaPago condicion;
+    private ClienteSucursal sucursal;
     EditText txtCantidad;
     public static ArrayList<HashMap<String, String>> listaArticulos;
     public boolean Estado;
@@ -129,7 +140,7 @@ public class PedidosActivity extends Activity {
         lblTc = (TextView) findViewById(R.id.lblTC);
         tasaCambio = Double.parseDouble(variables_publicas.usuario.getTasaCambio());
         // Displaying all values on the screen
-        TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
+        final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         TextView lblRuta = (TextView) findViewById(R.id.lblRuta);
         TextView lblCanal = (TextView) findViewById(R.id.lblCanal);
         final Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
@@ -176,7 +187,7 @@ public class PedidosActivity extends Activity {
         btnCancelar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-               PedidosActivity.this.onBackPressed();
+                PedidosActivity.this.onBackPressed();
             }
         });
         txtCodigoArticulo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -245,57 +256,21 @@ public class PedidosActivity extends Activity {
                                                       return;
                                                   }
 
+                                                  boolean repetido = EsArticuloRepetido(txtCodigoArticulo.getText().toString());
+
+                                                  if (repetido) {
+                                                      mensajeAviso("Este artículo ya ha sigo agregado al pedido.");
+                                                      return;
+                                                  }
+
+                                                  AgregarDetalle();
+
                                                   InputMethodManager inputManager = (InputMethodManager)
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
 
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                                           InputMethodManager.HIDE_NOT_ALWAYS);
 
-
-                                                  Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
-                                                  Float Precio = PrecioItem;
-                                                  String DescripcionArt = lblDescripcionArticulo.getText().toString();
-
-                                                  HashMap<String, String> itemPedidos = new HashMap<>();
-
-                                                  itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
-                                                  itemPedidos.put("CodigoArticulo", articulo.getCodigo());
-                                                  itemPedidos.put("Cantidad", txtCantidad.getText().toString());
-                                                  itemPedidos.put("Precio", String.valueOf(Precio));
-                                                  itemPedidos.put("Descripcion", DescripcionArt);
-                                                  itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
-                                                  itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
-
-                                                  itemPedidos.put("BonificaA", "");
-                                                  itemPedidos.put("Isc", articulo.getIsc());
-                                                  itemPedidos.put("PorIva", articulo.getPorIva());
-                                                  double subtotal, iva, total, descuento, isc, porIva;
-                                                  subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
-                                                  descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
-                                                  porIva = Double.parseDouble(articulo.getPorIva());
-                                                  iva = (subtotal - descuento) * porIva;
-                                                  total = subtotal - descuento + iva;
-                                                  itemPedidos.put("Descuento", df.format(descuento));
-                                                  itemPedidos.put("Iva", df.format(iva));
-                                                  itemPedidos.put("Subtotal", df.format(subtotal));
-                                                  itemPedidos.put("Total", df.format(total));
-                                                  listaArticulos.add(itemPedidos);
-                                                  SimpleAdapter adapter = new SimpleAdapter(
-                                                          getApplicationContext(), listaArticulos,
-                                                          R.layout.pedidos_list_item, new
-                                                          String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
-                                                          int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
-
-                                                  lv.setAdapter(adapter);
-
-                                                  CalcularTotales();
-
-                                                  txtCodigoArticulo.setText("");
-                                                  lblDescripcionArticulo.setText("");
-                                                  txtCantidad.setText("");
-                                                  txtDescuento.setText("");
-                                                  lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
-                                                  txtCodigoArticulo.requestFocus();
 
                                               } catch (Exception e) {
                                                   mensajeAviso(e.getMessage());
@@ -310,18 +285,95 @@ public class PedidosActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
-                    txtCodigoArticulo.setError("Ingrese un valor");
-                    return;
-                }
-                if (lv.getCount() <= 0) {
-                    mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
+
+                try {
+
+
+                /*
+                    int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE);
+                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                    } else {
+                        //TODO
+                    }*/
+
+                    if (lv.getCount() <= 0) {
+                        mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
+                    }
+                    Calendar c = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                 /*  TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+                   telephonyManager.getDeviceId();*/
+                    String strDate = sdf.format(c.getTime());
+                    String codSuc=sucursal==null? "0" : sucursal.getCodSuc();
+                    PedidoH.GuardarTotalPedidos(String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
+                            txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
+                            strDate, variables_publicas.usuario.getUsuario(), "8888-8888");
+                } catch (Exception e) {
+                    mensajeAviso(e.getMessage());
                 }
 
             }
         });
 
 
+    }
+
+    private boolean EsArticuloRepetido(String s) {
+
+        for (HashMap<String, String> item : listaArticulos) {
+            if (item.get("CodigoArticulo").equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void AgregarDetalle() {
+        Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
+        Float Precio = PrecioItem;
+        String DescripcionArt = lblDescripcionArticulo.getText().toString();
+
+        HashMap<String, String> itemPedidos = new HashMap<>();
+
+        itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        itemPedidos.put("CodigoArticulo", articulo.getCodigo());
+        itemPedidos.put("Cantidad", txtCantidad.getText().toString());
+        itemPedidos.put("Precio", String.valueOf(Precio));
+        itemPedidos.put("Descripcion", DescripcionArt);
+        itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
+        itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
+
+        itemPedidos.put("BonificaA", "");
+        itemPedidos.put("Isc", articulo.getIsc());
+        itemPedidos.put("PorIva", articulo.getPorIva());
+        double subtotal, iva, total, descuento, isc, porIva;
+        subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
+        descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
+        porIva = Double.parseDouble(articulo.getPorIva());
+        iva = (subtotal - descuento) * porIva;
+        total = subtotal - descuento + iva;
+        itemPedidos.put("Descuento", df.format(descuento));
+        itemPedidos.put("Iva", df.format(iva));
+        itemPedidos.put("Subtotal", df.format(subtotal));
+        itemPedidos.put("Total", df.format(total));
+        listaArticulos.add(itemPedidos);
+        SimpleAdapter adapter = new SimpleAdapter(
+                getApplicationContext(), listaArticulos,
+                R.layout.pedidos_list_item, new
+                String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
+
+        lv.setAdapter(adapter);
+
+        CalcularTotales();
+
+        txtCodigoArticulo.setText("");
+        lblDescripcionArticulo.setText("");
+        txtCantidad.setText("");
+        txtDescuento.setText("");
+        lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
+        txtCodigoArticulo.requestFocus();
     }
 
     private void CalcularTotales() {
@@ -430,6 +482,18 @@ public class PedidosActivity extends Activity {
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboSucursal.setAdapter(adapterSucursal);
+        cboSucursal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v,int position, long id) {
+                // On selecting a spinner item
+                sucursal =(ClienteSucursal) adapter.getItemAtPosition(position);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
+
         cboSucursal.setSelection(0);
 
 
@@ -437,7 +501,7 @@ public class PedidosActivity extends Activity {
         ArrayAdapter<FormaPago> adapterFormaPago = new ArrayAdapter<FormaPago>(this, android.R.layout.simple_spinner_item, lstFormasPago);
         adapterFormaPago.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboCondicion.setAdapter(adapterFormaPago);
-        FormaPago condicion = lstFormasPago.get(0);
+        condicion = lstFormasPago.get(0);
         for (int i = 0; !(condicion.getCODIGO().equals(cliente.getIdFormaPago())); i++)
             condicion = lstFormasPago.get(i);
         cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
@@ -446,8 +510,6 @@ public class PedidosActivity extends Activity {
 
 //
     }
-
-
 
 
     @Override

@@ -9,11 +9,30 @@
         <item
             android:id="@+id/btnPedidos"
             android:icon="@drawable/ic_menu_plussign"
-            android:title="Pedidos" />
+            android:title="Pedidos"
+            >
+            <menu>
+                <item
+                    android:id="@+id/btnListadoPedidos"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="Lista Pedidos"/>
+                <item
+                    android:id="@+id/btnNuevoPedido"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Nuevo Pedido"/>
+            </menu>
+        </item>
         <item
             android:id="@+id/btnClientes"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Clientes" />
+            android:title="Clientes" >
+            <menu>
+                <item
+                    android:id="@+id/btnMaestroClientes"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="Maestro Clientes" />
+            </menu>
+        </item>
         <item
             android:id="@+id/btnDevoluciones"
             android:icon="@drawable/ic_menu_manage"

@@ -138,6 +138,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS + "( "
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " INTEGER "
                     + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " INTEGER , "
                     + variables_publicas.PEDIDOS_COLUMN_IdCliente + " INTEGER , "
                     + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " INTEGER , "
