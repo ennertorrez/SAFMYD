@@ -3,6 +3,7 @@ package com.suplidora.sistemas.Menu;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +38,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.HttpHandler;
+import com.suplidora.sistemas.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.R;
 
 /**
@@ -71,12 +74,19 @@ public class ClientesFragment extends Fragment {
         listaClientes = new ArrayList<>();
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//               Toast.makeText(getActivity().getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                //getFragmentManager().beginTransaction().replace(R.id.content_frame,new MaestroProductoFragment()).commit();
-//               Intent intent = new Intent(getActivity(),MenuActivity.class);
-//               startActivity(intent);
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                // getting values from selected ListItem
+                String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
+                String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
+                // Starting new intent
+                Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
+                startActivity(in);
             }
         });
         btnBuscar.setOnClickListener(new View.OnClickListener() {

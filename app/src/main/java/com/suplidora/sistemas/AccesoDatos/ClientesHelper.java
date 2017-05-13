@@ -79,7 +79,8 @@ public class ClientesHelper {
     }
 
     public ArrayList<HashMap<String, String>>  BuscarClientesNombre(String Busqueda) {
-        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_Nombre+" like '%"+Busqueda+" %'", null);
+        Busqueda= Busqueda.replace(" ","%");
+        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_Nombre+" like '%"+Busqueda+"%'", null);
         ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
 
         if(c.moveToFirst()){

@@ -72,7 +72,7 @@ public class PedidosFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         myView= inflater.inflate(R.layout.masterclientes_layout,container,false);
-        getActivity().setTitle("Maestro Cliente");
+        getActivity().setTitle("Nuevo Pedido");
         lv = (ListView) myView.findViewById(R.id.list);
         registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);

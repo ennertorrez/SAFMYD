@@ -43,6 +43,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -185,6 +189,7 @@ public class Login extends Activity {
             //************USUARIOS
             HttpHandler sh = new HttpHandler();
             String urlString = url + Usuario + "/" + Contrasenia;
+
             String jsonStr = sh.makeServiceCall(urlString);
 
             Log.e(TAG, "Response from url: " + jsonStr);

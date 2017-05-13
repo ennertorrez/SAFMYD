@@ -78,6 +78,7 @@ public class PedidosActivity extends Activity {
     private String focusedControl = "";
     static final String KEY_IdCliente = "IdCliente";
     static final String KEY_NombreCliente = "Nombre";
+    private String IdPedido;
     private Button btnAgregar;
     private Button btnBuscar;
     private Articulo articulo;
@@ -145,7 +146,6 @@ public class PedidosActivity extends Activity {
         TextView lblCanal = (TextView) findViewById(R.id.lblCanal);
         final Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         TextView lblNombre = (TextView) findViewById(R.id.lblNombreCliente);
-
         //Obtenemos las referencias a los controles
         txtCodigoArticulo = (EditText) findViewById(R.id.txtCodigoArticulo);
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
@@ -306,7 +306,7 @@ public class PedidosActivity extends Activity {
                    telephonyManager.getDeviceId();*/
                     String strDate = sdf.format(c.getTime());
                     String codSuc=sucursal==null? "0" : sucursal.getCodSuc();
-                    PedidoH.GuardarTotalPedidos(String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
+                    PedidoH.GuardarTotalPedidos(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
                             txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                             strDate, variables_publicas.usuario.getUsuario(), "8888-8888");
                 } catch (Exception e) {
@@ -465,6 +465,13 @@ public class PedidosActivity extends Activity {
 
 
         cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
+        if(cliente==null){
+
+            mensajeAviso("El cliente no se encuentra en la base de datos");
+            finish();
+        }
+        IdPedido=cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
+
         IdVendedor = cliente.getIdVendedor();
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
