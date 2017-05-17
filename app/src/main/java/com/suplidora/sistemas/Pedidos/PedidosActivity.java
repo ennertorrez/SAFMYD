@@ -47,6 +47,7 @@ import com.suplidora.sistemas.Entidades.Vendedor;
 
 import com.suplidora.sistemas.R;
 
+import java.net.Inet4Address;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -472,7 +473,7 @@ public class PedidosActivity extends Activity {
         }
         IdPedido=cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
 
-        IdVendedor = cliente.getIdVendedor();
+        IdVendedor = Integer.parseInt( cliente.getIdVendedor());
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
             for (int i = 0; vendedor.getCODIGO() != IdVendedor; i++)

@@ -179,7 +179,10 @@ public class ClientesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Ruta)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Frecuencia)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_PrecioEspecial)),
-                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra))
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodigoGalatea)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Descuento)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Empleado))
                 );
             }while (c.moveToNext());
         }

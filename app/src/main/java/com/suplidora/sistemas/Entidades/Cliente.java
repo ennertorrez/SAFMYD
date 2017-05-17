@@ -26,12 +26,14 @@ public class Cliente {
     String Frecuencia= "";
     String PrecioEspecial= "";
     String FechaUltimaCompra= "";
-
+    String CodigoGalatea="";
+    String Descuento="";
+    String Empleado="";
     public Cliente() {
 
     }
 
-    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra) {
+    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra, String codigoGalatea, String descuento, String empleado) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
@@ -52,6 +54,9 @@ public class Cliente {
         Frecuencia = frecuencia;
         PrecioEspecial = precioEspecial;
         FechaUltimaCompra = fechaUltimaCompra;
+        CodigoGalatea = codigoGalatea;
+        Descuento = descuento;
+        Empleado = empleado;
     }
 
     public String getIdCliente() {
@@ -158,8 +163,8 @@ public class Cliente {
         IdFormaPago = idFormaPago;
     }
 
-    public int getIdVendedor() {
-        return Integer.parseInt( IdVendedor);
+    public String getIdVendedor() {
+        return IdVendedor;
     }
 
     public void setIdVendedor(String idVendedor) {
@@ -212,6 +217,30 @@ public class Cliente {
 
     public void setFechaUltimaCompra(String fechaUltimaCompra) {
         FechaUltimaCompra = fechaUltimaCompra;
+    }
+
+    public String getCodigoGalatea() {
+        return CodigoGalatea;
+    }
+
+    public void setCodigoGalatea(String codigoGalatea) {
+        CodigoGalatea = codigoGalatea;
+    }
+
+    public String getDescuento() {
+        return Descuento;
+    }
+
+    public void setDescuento(String descuento) {
+        Descuento = descuento;
+    }
+
+    public String getEmpleado() {
+        return Empleado;
+    }
+
+    public void setEmpleado(String empleado) {
+        Empleado = empleado;
     }
 
     public String toString(){
