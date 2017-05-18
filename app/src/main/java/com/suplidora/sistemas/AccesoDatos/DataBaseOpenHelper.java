@@ -61,7 +61,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.USUARIOS_COLUMN_Ruta + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_Canal + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_TasaCambio + " TEXT, "
-                    + variables_publicas.USUARIOS_COLUMN_RutaForanea + " TEXT )");
+                    + variables_publicas.USUARIOS_COLUMN_RutaForanea + " TEXT, "
+                    + variables_publicas.USUARIOS_COLUMN_FechaActualiza + " TEXT )");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ARTICULOS + "( "
 

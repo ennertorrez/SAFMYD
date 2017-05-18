@@ -32,8 +32,8 @@ public class Vendedor {
 
     }
 
-    public int getCODIGO() {
-        return Integer.parseInt( CODIGO);
+    public String getCODIGO() {
+        return  CODIGO;
     }
 
     public void setCODIGO(String CODIGO) {

@@ -19,7 +19,7 @@ public class variables_publicas {
     public static String FechaActual="";
 
     //Variables BD
-    public static final int DATABASE_VERSION = 20;
+    public static final int DATABASE_VERSION = 21;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -120,6 +120,7 @@ public class variables_publicas {
     public static final String USUARIOS_COLUMN_Canal = "Canal";
     public static final String USUARIOS_COLUMN_TasaCambio = "TasaCambio";
     public static final String USUARIOS_COLUMN_RutaForanea = "RutaForanea";
+    public static final String USUARIOS_COLUMN_FechaActualiza = "FechaActualiza";
 
     public static final String VENDEDORES_COLUMN_CODIGO = "CODIGO";
     public static final String VENDEDORES_COLUMN_NOMBRE = "NOMBRE";

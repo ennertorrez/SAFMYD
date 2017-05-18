@@ -1,7 +1,11 @@
 package com.suplidora.sistemas.Principal;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,20 +13,36 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.vision.text.Line;
+import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
+import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
+import com.suplidora.sistemas.AccesoDatos.ConfiguracionSistemaHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
+import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
+import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.Menu.MapViewFragment;
 import com.suplidora.sistemas.Menu.PedidosFragment;
 import com.suplidora.sistemas.R;
 import com.suplidora.sistemas.Menu.ClientesFragment;
 import com.suplidora.sistemas.Menu.MaestroProductoFragment;
+
+import org.json.JSONException;
 /*import com.suplidora.sistemas.app.ControladorArticulo;
 import com.suplidora.sistemas.app.ControladorSincronizacion;*/
 
@@ -30,7 +50,24 @@ import com.suplidora.sistemas.app.ControladorSincronizacion;*/
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private String TAG = ClientesFragment.class.getSimpleName();
+    private ProgressDialog pDialog;
     TextView lblUsuarioHeader;
+
+    private DataBaseOpenHelper DbOpenHelper;
+
+    private SincronizarDatos sd;
+    private UsuariosHelper UsuariosH;
+    private ClientesHelper ClientesH;
+    private VendedoresHelper VendedoresH;
+
+    private CartillasBcHelper CartillasBcH;
+    private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private FormaPagoHelper FormaPagoH;
+    private PrecioEspecialHelper PrecioEspecialH;
+    private ConfiguracionSistemaHelper ConfigH;
+    private ClientesSucursalHelper ClientesSucH;
+    private ArticulosHelper ArticulosH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +91,22 @@ public class MenuActivity extends AppCompatActivity
         String Userheader = variables_publicas.usuario.getNombre();
         lblUsuarioHeader.setText(Userheader);
 
+        DbOpenHelper = new DataBaseOpenHelper(MenuActivity.this);
+        ClientesH = new ClientesHelper(DbOpenHelper.database);
+        UsuariosH = new UsuariosHelper(DbOpenHelper.database);
+        VendedoresH = new VendedoresHelper(DbOpenHelper.database);
+        ConfigH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
+        ClientesSucH = new ClientesSucursalHelper(DbOpenHelper.database);
+        CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
+        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
+        FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
+        PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
+        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
+                CartillasBcDetalleH,
+                FormaPagoH,
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH);
+
     }
 
     @Override
@@ -72,6 +125,57 @@ public class MenuActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+    private class SincronizaDatos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(MenuActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            //SINCRONIZAR DATOS
+            try {
+                sd.SincronizarTodo();
+            } catch (final JSONException e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Json parsing error: " + e.getMessage(),
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            mensajeAviso("Datos actualizados correctamente");
+        }
+    }
+    public void mensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -81,7 +185,7 @@ public class MenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.SincronizarDatos) {
-
+            new SincronizaDatos().execute();
         }
         //noinspection SimplifiableIfStatement
         if (id == R.id.Salir) {

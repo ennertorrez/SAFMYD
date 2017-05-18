@@ -48,6 +48,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -156,23 +157,41 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
-
                 boolean isOnline= checkInternetConnection();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
-                if (isOnline== false && variables_publicas.usuario!=null) {
 
+                if(isOnline && variables_publicas.usuario!=null)
+                {
+                    String FechaLocal = variables_publicas.usuario.getFechaActualiza();
+                    String FechaActual = getDatePhone();
+                    if(!FechaLocal.equals(FechaActual))
+                    {
+                       new GetUser().execute();
+                    }
+                    else
+                    {
+                        variables_publicas.MensajeLogin ="";
+                        variables_publicas.LoginOk = true;
+                        Intent intent = new Intent("android.intent.action.Barra_cargado");
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                else if(isOnline && variables_publicas.usuario == null)
+                {
+                    new GetUser().execute();
+                }
+                if(!isOnline && variables_publicas.usuario!=null)
+                {
                     variables_publicas.MensajeLogin ="";
                     variables_publicas.LoginOk = true;
-
                     Intent intent = new Intent("android.intent.action.Barra_cargado");
                     startActivity(intent);
                     finish();
-                } else if (isOnline == false && variables_publicas.usuario==null) {
-                    mensajeAviso("Usuario o contraseña invalido");
                 }
-                if (isOnline == true) {
-                    new GetUser().execute();
-
+                else if(!isOnline && variables_publicas.usuario == null)
+                {
+                    mensajeAviso("Usuario o contraseña invalido\nVerifique la conexion a internet");
                 }
             }
         });
@@ -227,8 +246,9 @@ public class Login extends Activity {
                         variables_publicas.Canal = c.getString("Canal");
                         String TasaCambio = c.getString("TasaCambio");
                         String RutaForanea=c.getString("RutaForanea");
+                        String FechaActualiza= getDatePhone();
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
-                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio,RutaForanea);
+                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio,RutaForanea,FechaActualiza);
 
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin ="";
