@@ -46,7 +46,11 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CLIENTES_COLUMN_Ruta + " TEXT , "
                     + variables_publicas.CLIENTES_COLUMN_Frecuencia + " TEXT , "
                     + variables_publicas.CLIENTES_COLUMN_PrecioEspecial + " TEXT , "
-                    + variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra + " TEXT ) ");
+                    + variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra + " TEXT,  "
+                    + variables_publicas.CLIENTES_COLUMN_Tipo + " TEXT ,  "
+                    + variables_publicas.CLIENTES_COLUMN_CodigoGalatea + " TEXT,  "
+                    + variables_publicas.CLIENTES_COLUMN_Descuento + " TEXT ,  "
+                    + variables_publicas.CLIENTES_COLUMN_Empleado + " TEXT )  ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_USUARIOS + "( "
                     + variables_publicas.USUARIOS_COLUMN_Codigo + " TEXT , "
@@ -57,7 +61,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.USUARIOS_COLUMN_Ruta + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_Canal + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_TasaCambio + " TEXT, "
-                    + variables_publicas.USUARIOS_COLUMN_FechaActualiza + " TEXT )");
+                    + variables_publicas.USUARIOS_COLUMN_RutaForanea + " TEXT )");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ARTICULOS + "( "
 
@@ -129,7 +133,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PRECIO_ESPECIAL_COLUMN_CodigoArticulo + " TEXT , "
                     + variables_publicas.PRECIO_ESPECIAL_COLUMN_IdCliente + " TEXT , "
                     + variables_publicas.PRECIO_ESPECIAL_COLUMN_Descuento + " TEXT , "
-                    + variables_publicas.PRECIO_ESPECIAL_COLUMN_Precio + " TEXT ) ");
+                    + variables_publicas.PRECIO_ESPECIAL_COLUMN_Precio + " TEXT , "
+                    + variables_publicas.PRECIO_ESPECIAL_COLUMN_Facturar + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONFIGURACION_SISTEMA + "( "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id + " TEXT , "
