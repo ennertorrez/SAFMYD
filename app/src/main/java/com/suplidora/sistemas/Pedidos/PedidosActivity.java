@@ -5,16 +5,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -356,6 +359,9 @@ public class PedidosActivity extends Activity {
                     PedidoH.GuardarTotalPedidos(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
                             txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                             variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), "8888-8888");
+
+                    mensajeAviso("Pedido guardado correctamente");
+
                 } catch (Exception e) {
                     mensajeAviso(e.getMessage());
                 }
@@ -489,7 +495,20 @@ public class PedidosActivity extends Activity {
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
                 String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
+                int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View currView = super.getView(position, convertView, parent);
+                HashMap<String,String>currItem =(HashMap<String, String>)  getItem(position);
+                if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).contains("**")) {
+                    currView.setBackgroundColor(Color.RED);
+                } else {
+                    currView.setBackgroundColor(Color.WHITE);
+                }
+                return currView;
+            }
+            };
 
         lv.setAdapter(adapter);
 
@@ -529,6 +548,7 @@ public class PedidosActivity extends Activity {
             lblIvaDol.setText(String.valueOf(df.format(iva / tasaCambio)));
             lblTotalDol.setText(String.valueOf(df.format(total / tasaCambio)));
         }
+        lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
 
     }
 
@@ -602,9 +622,20 @@ public class PedidosActivity extends Activity {
            switch (item.getItemId())
            {
                case R.id.Elimina_Item:
+                   HashMap<String,String> itemArticulo= listaArticulos.get(info.position);
                    listaArticulos.remove(info.position);
+
+                   if(!itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals("")){
+                       for(int i=0; i<listaArticulos.size();i++){
+                           HashMap<String,String> a= listaArticulos.get(i);
+                           if(a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA))){
+                               listaArticulos.remove(a);
+                           }
+                       }
+                   }
                    adapter.notifyDataSetChanged();
                    lv.setAdapter(adapter);
+
                    CalcularTotales();
                    return true;
 
@@ -702,5 +733,22 @@ public class PedidosActivity extends Activity {
                 })
                 .setNegativeButton("No", null)
                 .show();
+    }
+}
+
+class StateListItem {
+    public String itemTitle;
+    public long id;
+    public Boolean isItemSelected;
+
+    public StateListItem(String name, long id) {
+        this.itemTitle = name;
+        this.isItemSelected = false;
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return this.itemTitle;
     }
 }

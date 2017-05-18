@@ -85,12 +85,14 @@
         <Spinner
             android:id="@+id/cboVendedor"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></Spinner>
+            android:layout_height="25dp"
+            android:layout_marginBottom="2dp"></Spinner>
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="25dp"
+            >
 
             <Spinner
                 android:id="@+id/cboCondicion"
@@ -107,7 +109,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="124dp"
+            android:layout_height="115dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -222,7 +224,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="39dp">
+                android:layout_height="35dp">
 
                 <EditText
                     android:id="@+id/txtCantidad"
@@ -261,8 +263,8 @@
             <EditText
                 android:id="@+id/txtObservacion"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:ems="10"
+                android:layout_height="35dp"
+
                 android:hint="Observaciones"
                 android:inputType="text"
                 tools:ignore="NestedWeights"
@@ -296,7 +298,7 @@
 
                             <TextView
                                 android:id="@+id/lblColDescripcion"
-                                android:layout_width="180dp"
+                                android:layout_width="200dp"
                                 android:layout_height="wrap_content"
 
                                 android:background="@drawable/borde_campos_pedidos"
@@ -617,7 +619,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></TableLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="39dp"
             android:layout_marginTop="5dp">
@@ -635,8 +637,9 @@
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="@mipmap/ic_cancel_black_24dp"
+                android:layout_alignParentRight="true"
                 android:backgroundTint="#ff0000" />
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
 
