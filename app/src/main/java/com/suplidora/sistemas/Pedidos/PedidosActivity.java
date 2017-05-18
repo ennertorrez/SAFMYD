@@ -1,15 +1,22 @@
 package com.suplidora.sistemas.Pedidos;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MotionEvent;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -18,12 +25,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
@@ -31,7 +37,6 @@ import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.AccesoDatos.PedidosHelper;
-import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.PedidoDetalleAdapter;
@@ -42,8 +47,9 @@ import com.suplidora.sistemas.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.Entidades.FormaPago;
 import com.suplidora.sistemas.Entidades.Pedido;
 import com.suplidora.sistemas.Entidades.PedidoDetalle;
-import com.suplidora.sistemas.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.Entidades.Vendedor;
+
+import com.suplidora.sistemas.Principal.MenuActivity;
 import com.suplidora.sistemas.R;
 
 import java.text.DecimalFormat;
@@ -52,7 +58,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -87,13 +92,11 @@ public class PedidosActivity extends Activity {
     private DecimalFormat df;
     private FormaPago condicion;
     private ClienteSucursal sucursal;
-    private double valorPolitica = 3000;
     EditText txtCantidad;
     public static ArrayList<HashMap<String, String>> listaArticulos;
     public boolean Estado;
     DialogInterface.OnClickListener dialogClickListener;
 
-    PedidoDetalleAdapter adapter;
 
     private ListView lv;
     private Cliente cliente;
@@ -108,14 +111,14 @@ public class PedidosActivity extends Activity {
     private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
-    private PrecioEspecialHelper PrecioEspecialH;
     private int IdCliente;
     private double tasaCambio = 0;
-    private double subTotalPrecioSuper = 0;
     private String Nombre;
-    private int IdVendedor;
+    private String IdVendedor;
     private Pedido pedido;
     private PedidosHelper PedidoH;
+
+    private SimpleAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +140,6 @@ public class PedidosActivity extends Activity {
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
-        PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
         cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
@@ -157,21 +159,20 @@ public class PedidosActivity extends Activity {
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescripcionArticulo);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
-        txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+        Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
 
-                    if(!txtDescuento.isEnabled()){
-                        btnAgregar.performClick();
-                    }
-                    focusedControl = "txtCantidad";
-                    return false;
-                }
-                return true;
+        lv = (ListView) findViewById(R.id.listPedido);
+        lv.setAdapter(adapter);
+        registerForContextMenu(lv);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+                adapter.notifyDataSetChanged();
+                lv.setAdapter(adapter);
             }
         });
-        Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
-        lv = (ListView) findViewById(R.id.listPedido);
 
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
@@ -213,11 +214,9 @@ public class PedidosActivity extends Activity {
         // getting intent data
         Intent in = getIntent();
 
-
         // Get XML values from previous intent
         IdCliente = Integer.parseInt(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
-
 
         // Loading spinner data from database
         CargaDatosCombo();
@@ -259,7 +258,7 @@ public class PedidosActivity extends Activity {
                 String CodigoArticulo = txtCodigoArticulo.getText().toString();
                 articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
                 if (articulo == null) {
-                    mensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
+                    mensajeAviso("El Codigo de Articulo Ingresado no existe en la Base de Datos o esta deshabilitado para su Venta");
                     return;
                 }
 
@@ -268,8 +267,7 @@ public class PedidosActivity extends Activity {
                 lblDescripcionArticulo.setText("");
                 txtCodigoArticulo.setText(articulo.getCodigo());
                 lblDescripcionArticulo.setText(articulo.getNombre());
-
-                ObtenerPrecio();
+                txtPrecioArticulo.setText(articulo.getPrecioSuper());
 
                 if (focusedControl.equals("txtCodigoArticulo")) {
                     txtCantidad.requestFocus();
@@ -307,7 +305,6 @@ public class PedidosActivity extends Activity {
                                                   }
 
                                                   AgregarDetalle();
-                                                  subTotalPrecioSuper += Double.parseDouble(articulo.getPrecioSuper());
 
                                                   InputMethodManager inputManager = (InputMethodManager)
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -332,7 +329,6 @@ public class PedidosActivity extends Activity {
 
                 try {
 
-
                 /*
                     int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE);
                     if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -349,7 +345,7 @@ public class PedidosActivity extends Activity {
                  /*  TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
                    telephonyManager.getDeviceId();*/
                     String strDate = sdf.format(c.getTime());
-                    String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
+                    String codSuc=sucursal==null? "0" : sucursal.getCodSuc();
                     PedidoH.GuardarTotalPedidos(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
                             txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                             strDate, variables_publicas.usuario.getUsuario(), "8888-8888");
@@ -360,57 +356,6 @@ public class PedidosActivity extends Activity {
             }
         });
 
-
-    }
-
-    private void ObtenerPrecio() {
-
-        //Si es cliente Detalle
-        if (cliente.getTipo().equals("Detalle")) {
-            //Si es Ruta Foranea y no aplica PrecioDetalle
-            if (variables_publicas.usuario.getRutaForanea().equals("1") && !articulo.getAplicaPrecioDetalle().equals("true")) {
-                txtPrecioArticulo.setText(articulo.getPrecioSuper());
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioDetalle());
-            }
-        }
-
-        //Si es cliente Mayorista foraneo
-        if (cliente.getTipo().equals("Foreaneo")) {
-
-            if (subTotalPrecioSuper < valorPolitica) {
-                txtPrecioArticulo.setText(articulo.getPrecioSuper());
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioForaneo());
-            }
-        }
-        //Si es cliente Mayorista
-        if (cliente.getTipo().equals("Mayorista")) {
-            if (subTotalPrecioSuper < valorPolitica) {
-                txtPrecioArticulo.setText(articulo.getPrecioDetalle());
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioMayorista());
-            }
-        }
-
-        //Validamos que si es empleado, damos a precio mayorista
-        if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) {
-            txtPrecioArticulo.setText(articulo.getPrecioMayorista());
-        }
-
-        if(cliente.getPrecioEspecial().equals("true") && ( cliente.getTipo().equals("Super") || cliente.getTipo().equals("Mayorista")) ){
-            txtDescuento.setEnabled(false);
-
-            PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(String.valueOf(IdCliente),articulo.getCodigo());
-            if(precioEspecial!=null){
-                if(precioEspecial.getFacturar().equals("0")){
-                    mensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
-                    return;
-                }
-                txtPrecioArticulo.setText(precioEspecial.getPrecio());
-                txtDescuento.setText(precioEspecial.getDescuento());
-            }
-        }
 
     }
 
@@ -453,7 +398,7 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Subtotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
         listaArticulos.add(itemPedidos);
-        SimpleAdapter adapter = new SimpleAdapter(
+         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
                 String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
@@ -545,6 +490,36 @@ public class PedidosActivity extends Activity {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+
+        String HeaderMenu = obj.get("CodigoArticulo")  +"\n"+ obj.get("Descripcion") ;
+
+        menu.setHeaderTitle(HeaderMenu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.eliminar_item_pedido, menu);
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch (item.getItemId())
+        {
+            case R.id.Elimina_Item:
+                listaArticulos.remove(info.position);
+                adapter.notifyDataSetChanged();
+                lv.setAdapter(adapter);
+                return true;
+
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
@@ -560,14 +535,14 @@ public class PedidosActivity extends Activity {
 
 
         cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
-        if (cliente == null) {
+        if(cliente==null){
 
             mensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
         }
-        IdPedido = cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
+        IdPedido=cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
 
-        IdVendedor = Integer.parseInt(cliente.getIdVendedor());
+        IdVendedor = cliente.getIdVendedor();
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
             for (int i = 0; vendedor.getCODIGO() != IdVendedor; i++)
@@ -575,7 +550,7 @@ public class PedidosActivity extends Activity {
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
             Vendedor vendedor = vendedores.get(0);
-            for (int i = 0; vendedor.getCODIGO() != Integer.parseInt(variables_publicas.CodigoVendedor); i++)
+            for (int i = 0; vendedor.getCODIGO() != variables_publicas.CodigoVendedor; i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         }
@@ -586,19 +561,16 @@ public class PedidosActivity extends Activity {
         cboSucursal.setAdapter(adapterSucursal);
         cboSucursal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+            public void onItemSelected(AdapterView<?> adapter, View v,int position, long id) {
                 // On selecting a spinner item
-                sucursal = (ClienteSucursal) adapter.getItemAtPosition(position);
+                sucursal =(ClienteSucursal) adapter.getItemAtPosition(position);
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
 
-
         cboSucursal.setSelection(0);
-
 
         List<FormaPago> lstFormasPago = FormaPagoH.ObtenerListaFormaPago();
         ArrayAdapter<FormaPago> adapterFormaPago = new ArrayAdapter<FormaPago>(this, android.R.layout.simple_spinner_item, lstFormasPago);
@@ -609,11 +581,8 @@ public class PedidosActivity extends Activity {
             condicion = lstFormasPago.get(i);
         cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
         cboCondicion.setEnabled(false);
-
-
 //
     }
-
 
     @Override
     public void onBackPressed() {
@@ -629,4 +598,5 @@ public class PedidosActivity extends Activity {
                 .setNegativeButton("No", null)
                 .show();
     }
+
 }

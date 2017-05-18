@@ -14,8 +14,9 @@ public class Usuario {
     private String Canal = "" ;
     private String TasaCambio = "";
     private String RutaForanea="";
+    private String FechaActualiza="";
 
-    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String rutaForanea) {
+    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String rutaForanea,String fechaActualiza) {
         Codigo = codigo;
         this.nombre = nombre;
         Usuario = usuario;
@@ -25,6 +26,7 @@ public class Usuario {
         Canal = canal;
         TasaCambio = tasaCambio;
         RutaForanea=rutaForanea;
+        FechaActualiza = fechaActualiza;
     }
 
     public Usuario() {
@@ -105,5 +107,13 @@ public class Usuario {
 
     public void setRutaForanea(String rutaForanea) {
         RutaForanea = rutaForanea;
+    }
+
+    public String getFechaActualiza() {
+        return FechaActualiza;
+    }
+
+    public void setFechaActualiza(String fechaActualiza) {
+        FechaActualiza = fechaActualiza;
     }
 }
