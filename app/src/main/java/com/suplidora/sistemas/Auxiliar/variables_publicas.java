@@ -13,15 +13,12 @@ public class variables_publicas {
     public static boolean LoginOk = false;
     public static String MensajeLogin = "";
     public static String IdCliente = "";
-    public static String CodCv = "";
-    public static String NombreCliente = "";
     public static String RutaCliente = "";
     public static String Canal = "";
-    public static String PrecioActual = "";
     public static String direccionIp = "http://186.1.18.75:8080";
 
     //Variables BD
-    public static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 20;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -76,6 +73,7 @@ public class variables_publicas {
     public static final String CLIENTES_COLUMN_Frecuencia = "Frecuencia";
     public static final String CLIENTES_COLUMN_PrecioEspecial = "PrecioEspecial";
     public static final String CLIENTES_COLUMN_FechaUltimaCompra = "FechaUltimaCompra";
+    public static final String CLIENTES_COLUMN_Tipo = "Tipo";
     public static final String CLIENTES_COLUMN_CodigoGalatea="CodigoGalatea";
     public static final String CLIENTES_COLUMN_Descuento="Descuento";
     public static final String CLIENTES_COLUMN_Empleado="Empleado";
@@ -120,6 +118,7 @@ public class variables_publicas {
     public static final String USUARIOS_COLUMN_Ruta = "Ruta";
     public static final String USUARIOS_COLUMN_Canal = "Canal";
     public static final String USUARIOS_COLUMN_TasaCambio = "TasaCambio";
+    public static final String USUARIOS_COLUMN_RutaForanea = "RutaForanea";
 
     public static final String VENDEDORES_COLUMN_CODIGO = "CODIGO";
     public static final String VENDEDORES_COLUMN_NOMBRE = "NOMBRE";
@@ -168,6 +167,7 @@ public class variables_publicas {
     public static final String PRECIO_ESPECIAL_COLUMN_IdCliente = "IdCliente";
     public static final String PRECIO_ESPECIAL_COLUMN_Descuento = "Descuento";
     public static final String PRECIO_ESPECIAL_COLUMN_Precio = "Precio";
+    public static final String PRECIO_ESPECIAL_COLUMN_Facturar = "Facturar";
 
     public static final String CONFIGURACION_SISTEMA_COLUMN_Id = "Id";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Sistema = "Sistema";

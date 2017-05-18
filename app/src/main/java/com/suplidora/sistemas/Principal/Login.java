@@ -221,8 +221,9 @@ public class Login extends Activity {
                         variables_publicas.RutaCliente = c.getString("Ruta");
                         variables_publicas.Canal = c.getString("Canal");
                         String TasaCambio = c.getString("TasaCambio");
+                        String RutaForanea=c.getString("RutaForanea");
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
-                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio);
+                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio,RutaForanea);
 
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin ="";

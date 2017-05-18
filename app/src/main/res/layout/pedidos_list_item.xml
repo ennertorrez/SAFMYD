@@ -8,8 +8,10 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+
+        >
 
         <!--   <TextView
                android:id="@+id/lblDetalleCodigo"
@@ -106,7 +108,8 @@
             android:textSize="14dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"
-            tools:ignore="SelectableText,SpUsage" />
+            tools:ignore="SelectableText,SpUsage"
+            android:focusable="false"/>
 
         <TextView
             android:id="@+id/lblDetalleIva"
@@ -119,7 +122,8 @@
             android:textSize="14dp"
             android:textStyle="bold"
             tools:ignore="SelectableText,SpUsage"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:focusable="false"/>
 
         <TextView
             android:id="@+id/lblDetalleTotal"
@@ -132,7 +136,8 @@
             android:textSize="14dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"
-            tools:ignore="SelectableText,SpUsage" />
+            tools:ignore="SelectableText,SpUsage"
+            android:focusable="false"/>
 
     </LinearLayout>
 

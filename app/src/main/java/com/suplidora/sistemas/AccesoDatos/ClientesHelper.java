@@ -43,7 +43,7 @@ public class ClientesHelper {
                                       String Ruta ,
                                       String Frecuencia ,
                                       String PrecioEspecial ,
-                                      String FechaUltimaCompra) {
+                                      String FechaUltimaCompra,String Tipo,String CodigoGalatea,String Descuento,String Empleado) {
         long rows =0;
 
         ContentValues contentValues = new ContentValues();
@@ -68,6 +68,10 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Frecuencia ,Frecuencia );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial ,PrecioEspecial );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra,FechaUltimaCompra);
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_Tipo,Tipo);
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, CodigoGalatea);
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_Descuento, Descuento);
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_Empleado, Empleado);
         //rows = database.insertWithOnConflict(TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_REPLACE);
         database.insert(variables_publicas.TABLE_CLIENTES, null, contentValues);
     }
@@ -106,6 +110,10 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString(c.getColumnIndex("Frecuencia")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString(c.getColumnIndex("PrecioEspecial")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString(c.getColumnIndex("FechaUltimaCompra")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString(c.getColumnIndex("Tipo")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString(c.getColumnIndex("CodigoGalatea")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString(c.getColumnIndex("Descuento")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString(c.getColumnIndex("Empleado")));
                         lst.add(cliente);
 
             }while (c.moveToNext());
@@ -140,6 +148,10 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString(c.getColumnIndex("Frecuencia")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString(c.getColumnIndex("PrecioEspecial")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString(c.getColumnIndex("FechaUltimaCompra")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString(c.getColumnIndex("Tipo")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString(c.getColumnIndex("CodigoGalatea")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString(c.getColumnIndex("Descuento")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString(c.getColumnIndex("Empleado")));
                 lst.add(cliente);
 
             }while (c.moveToNext());
@@ -180,6 +192,7 @@ public class ClientesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Frecuencia)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_PrecioEspecial)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Tipo)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodigoGalatea)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Descuento)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Empleado))

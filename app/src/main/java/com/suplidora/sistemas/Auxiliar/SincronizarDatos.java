@@ -159,8 +159,12 @@ public class SincronizarDatos {
                 String Frecuencia = c.getString("Frecuencia");
                 String PrecioEspecial = c.getString("PrecioEspecial");
                 String FechaUltimaCompra = c.getString("FechaUltimaCompra");
+                String Tipo= c.getString("Tipo");
+                String CodigoGalatea = c.getString("CodigoGalatea");
+                String Descuento = c.getString("Descuento");
+                String Empleado= c.getString("Empleado");
 
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra);
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra,Tipo,CodigoGalatea,Descuento,Empleado);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }
@@ -357,8 +361,9 @@ public class SincronizarDatos {
                 String IdCliente = c.getString("IdCliente");
                 String Descuento = c.getString("Descuento");
                 String Precio = c.getString("Precio");
+                String Facturar = c.getString("Facturar");
 
-                PrecioEspecialH.GuardarPrecioEspecial(Id,CodigoArticulo,IdCliente,Descuento,Precio);
+                PrecioEspecialH.GuardarPrecioEspecial(Id,CodigoArticulo,IdCliente,Descuento,Precio,Facturar);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }

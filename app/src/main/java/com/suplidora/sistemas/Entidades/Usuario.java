@@ -13,8 +13,9 @@ public class Usuario {
     private String Ruta = "" ;
     private String Canal = "" ;
     private String TasaCambio = "";
+    private String RutaForanea="";
 
-    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio) {
+    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String rutaForanea) {
         Codigo = codigo;
         this.nombre = nombre;
         Usuario = usuario;
@@ -23,6 +24,7 @@ public class Usuario {
         Ruta = ruta;
         Canal = canal;
         TasaCambio = tasaCambio;
+        RutaForanea=rutaForanea;
     }
 
     public Usuario() {
@@ -95,5 +97,13 @@ public class Usuario {
 
     public String ToString(){
         return this.getNombre();
+    }
+
+    public String getRutaForanea() {
+        return RutaForanea;
+    }
+
+    public void setRutaForanea(String rutaForanea) {
+        RutaForanea = rutaForanea;
     }
 }

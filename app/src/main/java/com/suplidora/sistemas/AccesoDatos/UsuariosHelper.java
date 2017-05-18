@@ -18,7 +18,7 @@ public class UsuariosHelper {
     }
     public void GuardarUsuario(String Codigo, String nombre, String Usuario,
                                    String Contrasenia, String Tipo, String Ruta,
-                                      String Canal,String TasaCambio) {
+                                      String Canal,String TasaCambio,String RutaForanea) {
 
         long rows =0;
         ContentValues contentValues = new ContentValues();
@@ -30,6 +30,7 @@ public class UsuariosHelper {
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Ruta, Ruta);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_Canal, Canal);
          contentValues.put(variables_publicas.USUARIOS_COLUMN_TasaCambio, TasaCambio);
+        contentValues.put(variables_publicas.USUARIOS_COLUMN_RutaForanea, RutaForanea);
          database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
     }
     public Usuario BuscarUsuarios(String Usuario,String Contrasenia) {
@@ -46,7 +47,8 @@ public class UsuariosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Tipo)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Ruta)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Canal)),
-                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_TasaCambio))
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_TasaCambio)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_RutaForanea))
 
                 ));
             } while (c.moveToNext());
