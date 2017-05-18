@@ -38,9 +38,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Cliente;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.Pedidos.PedidosActivity;
+import com.suplidora.sistemas.Principal.Login;
 import com.suplidora.sistemas.R;
 
 /**
@@ -58,18 +62,22 @@ public class ClientesFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
+    private ClientesHelper ClienteH;
+    private DataBaseOpenHelper DbOpenHelper;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        myView= inflater.inflate(R.layout.masterclientes_layout,container,false);
+        myView = inflater.inflate(R.layout.masterclientes_layout, container, false);
         getActivity().setTitle("Maestro Cliente");
+        DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+        ClienteH = new ClientesHelper(DbOpenHelper.database);
         lv = (ListView) myView.findViewById(R.id.list);
         registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
-        txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
+        txtBusqueda = (EditText) myView.findViewById(R.id.txtBusqueda);
 
         listaClientes = new ArrayList<>();
 
@@ -84,8 +92,16 @@ public class ClientesFragment extends Fragment {
                 // Starting new intent
                 Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
 
-                in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
-                in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
+
+                /*Guardamos el cliente seleccionado*/
+                for (HashMap<String, String> cliente : listaClientes) {
+                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente)) {
+                        ClienteH.GuardarTotalClientes(cliente);
+                    }
+                }
+
                 startActivity(in);
             }
         });
@@ -99,7 +115,7 @@ public class ClientesFragment extends Fragment {
                 busqueda = txtBusqueda.getText().toString();
                 tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbCodigo ? "1" : "2";
 
-                if(TextUtils.isEmpty(busqueda)) {
+                if (TextUtils.isEmpty(busqueda)) {
                     txtBusqueda.setError("Ingrese un valor");
                     return;
                 }
@@ -109,6 +125,7 @@ public class ClientesFragment extends Fragment {
         });
         return myView;
     }
+
     // URL to get contacts JSON
     private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
     public static ArrayList<HashMap<String, String>> listaClientes;
@@ -134,7 +151,7 @@ public class ClientesFragment extends Fragment {
             HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
-            String urlString = url + busqueda.replace(" ","%20") + "/" + tipoBusqueda;
+            String urlString = url + busqueda.replace(" ", "%20") + "/" + tipoBusqueda;
             String jsonStr = sh.makeServiceCall(urlString);
 
             Log.e(TAG, "Response from url: " + jsonStr);
@@ -150,33 +167,33 @@ public class ClientesFragment extends Fragment {
                     for (int i = 0; i < clientes.length(); i++) {
                         JSONObject c = clientes.getJSONObject(i);
 
-                        String IdCliente = c.getString("IdCliente");
-                        String CodCv = c.getString("CodCv");
-                        String Nombre = c.getString("Nombre");
-                        String FechaCreacion = c.getString("FechaCreacion");
-                        String Telefono = c.getString("Telefono");
-                        String Direccion = c.getString("Direccion");
-                        String IdDepartamento = c.getString("IdDepartamento");
-                        String IdMunicipio = c.getString("IdMunicipio");
-                        String Ciudad = c.getString("Ciudad");
-                        String Ruc = c.getString("Ruc");
-                        String Cedula = c.getString("Cedula");
-                        String LimiteCredito = c.getString("LimiteCredito");
-                        String IdFormaPago = c.getString("IdFormaPago");
-                        String IdVendedor  = c.getString("IdVendedor");
-                        String Excento = c.getString("Excento");
-                        String CodigoLetra = c.getString("CodigoLetra");
-                        String Ruta = c.getString("Ruta");
-                        String Frecuencia  = c.getString("Frecuencia");
-                        String PrecioEspecial = c.getString("PrecioEspecial");
-                        String FechaUltimaCompra	= c.getString("FechaUltimaCompra");
 
                         HashMap<String, String> cliente = new HashMap<>();
 
-                        cliente.put("IdCliente",IdCliente);
-                        cliente.put("CodCv",CodCv);
-                        cliente.put("Nombre",Nombre);
-                        cliente.put("Direccion",Direccion);
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString("IdCliente"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString("CodCv"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString("Nombre"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString("FechaCreacion"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString("Direccion"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdDepartamento, c.getString("IdDepartamento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdMunicipio, c.getString("IdMunicipio"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ciudad, c.getString("Ciudad"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruc, c.getString("Ruc"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Cedula, c.getString("Cedula"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_LimiteCredito, c.getString("LimiteCredito"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdFormaPago, c.getString("IdFormaPago"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdVendedor, c.getString("IdVendedor"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Excento, c.getString("Excento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoLetra, c.getString("CodigoLetra"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruta, c.getString("Ruta"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString("Frecuencia"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString("PrecioEspecial"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString("FechaUltimaCompra"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString("Tipo"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
 
                         listaClientes.add(cliente);
                     }
@@ -226,6 +243,7 @@ public class ClientesFragment extends Fragment {
             lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
         }
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.main, menu);
@@ -241,7 +259,7 @@ public class ClientesFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-             //finish();//return true;
+            //finish();//return true;
         }
         return super.onOptionsItemSelected(item);
     }
