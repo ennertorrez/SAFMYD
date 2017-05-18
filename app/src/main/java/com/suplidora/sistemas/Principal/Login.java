@@ -150,10 +150,10 @@ public class Login extends Activity {
                     return;
                 }
 
-                boolean isOnline= checkInternetConnection();  //isOnlineNet();
+                boolean isOnline= checkInternetConnection();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 if (isOnline== false && variables_publicas.usuario!=null) {
-                    //mensajeAviso("offline");
+
                     variables_publicas.MensajeLogin ="";
                     variables_publicas.LoginOk = true;
 
@@ -164,11 +164,9 @@ public class Login extends Activity {
                     mensajeAviso("Usuario o contraseña invalido");
                 }
                 if (isOnline == true) {
-                    //mensajeAviso("online");
                     new GetUser().execute();
 
                 }
-                //AlertDialog.Builder builder = new AlertDialog.Builder(this);
             }
         });
     }

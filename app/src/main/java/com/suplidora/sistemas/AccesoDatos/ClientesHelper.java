@@ -201,6 +201,11 @@ public class ClientesHelper {
         Log.d("clientes_elimina", "Datos eliminados");
     }
 
+    public  void EliminaCliente(String IdCliente) {
+        database.execSQL("DELETE FROM "+variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_IdCliente+" = '"+IdCliente+"'");
+        Log.d("clientes_elimina", "Datos eliminados");
+    }
+
     public Cliente BuscarCliente(String Codigo){
         Cliente cli= new Cliente();
         Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente = "+Codigo +"", null);
