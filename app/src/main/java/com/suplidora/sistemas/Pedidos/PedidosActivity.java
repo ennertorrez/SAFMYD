@@ -1,22 +1,18 @@
 package com.suplidora.sistemas.Pedidos;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -31,7 +27,6 @@ import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
@@ -40,6 +35,7 @@ import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.AccesoDatos.PedidosHelper;
+import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.PedidoDetalleAdapter;
@@ -101,7 +97,6 @@ public class PedidosActivity extends Activity {
     public boolean Estado;
     DialogInterface.OnClickListener dialogClickListener;
 
-    PedidoDetalleAdapter adapter;
 
     private ListView lv;
     private Cliente cliente;
@@ -122,10 +117,9 @@ public class PedidosActivity extends Activity {
     private double tasaCambio = 0;
     private double subTotalPrecioSuper = 0;
     private String Nombre;
-    private String IdVendedor;
+    private int IdVendedor;
     private Pedido pedido;
     private PedidosHelper PedidoH;
-
     private SimpleAdapter adapter;
 
     @Override
@@ -184,7 +178,7 @@ public class PedidosActivity extends Activity {
         });
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
-        lv.setAdapter(adapter);
+
         registerForContextMenu(lv);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -195,7 +189,6 @@ public class PedidosActivity extends Activity {
                 lv.setAdapter(adapter);
             }
         });
-
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
             txtDescuento.setEnabled(false);
@@ -330,6 +323,7 @@ public class PedidosActivity extends Activity {
                                                   }
 
                                                   AgregarDetalle();
+
                                                   subTotalPrecioSuper += Double.parseDouble(articulo.getPrecioSuper());
 
                                                   InputMethodManager inputManager = (InputMethodManager)
@@ -351,38 +345,23 @@ public class PedidosActivity extends Activity {
         btnGuardar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 try {
 
-
-                /*
-                    int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE);
-                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
-                    } else {
-                        //TODO
-                    }*/
 
                     if (lv.getCount() <= 0) {
                         mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
                     }
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                 /*  TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                   telephonyManager.getDeviceId();*/
-                    String strDate = sdf.format(c.getTime());
+
                     String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
                     PedidoH.GuardarTotalPedidos(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
                             txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
-                            strDate, variables_publicas.usuario.getUsuario(), "8888-8888");
+                            variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), "8888-8888");
                 } catch (Exception e) {
                     mensajeAviso(e.getMessage());
                 }
 
             }
         });
-
 
     }
 
@@ -399,7 +378,7 @@ public class PedidosActivity extends Activity {
         }
 
         //Si es cliente Mayorista foraneo
-        if (cliente.getTipo().equals("Foreaneo")) {
+        if (cliente.getTipo().equals("Foraneo")) {
 
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
@@ -461,7 +440,7 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Descripcion", DescripcionArt);
         itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
         itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
-
+        itemPedidos.put("TipoArt", "P");
         itemPedidos.put("BonificaA", "");
         itemPedidos.put("Isc", articulo.getIsc());
         itemPedidos.put("PorIva", articulo.getPorIva());
@@ -476,7 +455,37 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Subtotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
         listaArticulos.add(itemPedidos);
-        SimpleAdapter adapter = new SimpleAdapter(
+        HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo),variables_publicas.usuario.getCanal(),variables_publicas.FechaActual,itemPedidos.get("Cantidad"));
+        if(itemBonificado.size()>0){
+            HashMap<String, String> articuloBonificado = new HashMap<>();
+            articuloBonificado.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+            articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
+
+            articuloBonificado.put("Cantidad", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB));
+            articuloBonificado.put("Precio", "0");
+            articuloBonificado.put("Descripcion","**"+itemBonificado.get( variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
+            articuloBonificado.put("Costo", "");
+            articuloBonificado.put("PorDescuento", "0");
+            articuloBonificado.put("TipoArt", "B");
+            articuloBonificado.put("BonificaA", "");
+            articuloBonificado.put("Isc", "0");
+            articuloBonificado.put("PorIva", "0");
+            articuloBonificado.put("Descuento", "0");
+            articuloBonificado.put("Iva", "0");
+            articuloBonificado.put("Subtotal", "0");
+            articuloBonificado.put("Total", "0");
+            //Actualizamos el campo BonificaA del item que lo bonifica
+            for(HashMap<String,String> item: listaArticulos){
+                if(item.get("CodigoArticulo").equals(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV)) && item.get("TipoArt").equals("P")){
+                    item.put("BonificaA",itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
+                    break;
+                }
+            }
+            listaArticulos.add(articuloBonificado);
+
+
+        }
+        adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
                 String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
@@ -570,33 +579,44 @@ public class PedidosActivity extends Activity {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
     {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+       try{
+           super.onCreateContextMenu(menu, v, menuInfo);
+           AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+           HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
-        String HeaderMenu = obj.get("CodigoArticulo")  +"\n"+ obj.get("Descripcion") ;
+           String HeaderMenu = obj.get("CodigoArticulo")  +"\n"+ obj.get("Descripcion") ;
 
-        menu.setHeaderTitle(HeaderMenu);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.eliminar_item_pedido, menu);
+           menu.setHeaderTitle(HeaderMenu);
+           MenuInflater inflater = getMenuInflater();
+           inflater.inflate(R.menu.eliminar_item_pedido, menu);
+       }catch (Exception e){
+           mensajeAviso(e.getMessage());
+       }
     }
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+       try{
+           AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        switch (item.getItemId())
-        {
-            case R.id.Elimina_Item:
-                listaArticulos.remove(info.position);
-                adapter.notifyDataSetChanged();
-                lv.setAdapter(adapter);
-                return true;
+           switch (item.getItemId())
+           {
+               case R.id.Elimina_Item:
+                   listaArticulos.remove(info.position);
+                   adapter.notifyDataSetChanged();
+                   lv.setAdapter(adapter);
+                   CalcularTotales();
+                   return true;
 
-            default:
-                return super.onContextItemSelected(item);
-        }
+               default:
+                   return super.onContextItemSelected(item);
+           }
+       }catch (Exception e){
+           mensajeAviso(e.getMessage());
+       }
+       return false;
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -613,6 +633,7 @@ public class PedidosActivity extends Activity {
 
 
         cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
+        IdVendedor = Integer.parseInt(cliente.getIdVendedor());
         if (cliente == null) {
 
             mensajeAviso("El cliente no se encuentra en la base de datos");
@@ -620,15 +641,15 @@ public class PedidosActivity extends Activity {
         }
         IdPedido = cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
 
-        IdVendedor = Integer.parseInt(cliente.getIdVendedor());
+
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
-            for (int i = 0; vendedor.getCODIGO() != IdVendedor; i++)
+            for (int i = 0; Integer.parseInt( vendedor.getCODIGO()) != IdVendedor; i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
             Vendedor vendedor = vendedores.get(0);
-            for (int i = 0; vendedor.getCODIGO() != Integer.parseInt(variables_publicas.CodigoVendedor); i++)
+            for (int i = 0; Integer.parseInt( vendedor.getCODIGO()) != Integer.parseInt(variables_publicas.CodigoVendedor); i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         }
