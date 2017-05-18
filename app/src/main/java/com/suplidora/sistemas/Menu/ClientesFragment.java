@@ -98,7 +98,9 @@ public class ClientesFragment extends Fragment {
                 /*Guardamos el cliente seleccionado*/
                 for (HashMap<String, String> cliente : listaClientes) {
                     if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente)) {
+                        ClienteH.EliminaCliente(IdCliente);
                         ClienteH.GuardarTotalClientes(cliente);
+
                     }
                 }
 

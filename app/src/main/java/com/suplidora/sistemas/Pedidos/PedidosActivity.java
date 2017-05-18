@@ -177,6 +177,30 @@ public class PedidosActivity extends Activity {
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
             txtDescuento.setEnabled(false);
         }
+        txtDescuento.setOnFocusChangeListener(new View.OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (!hasFocus)
+                {
+                    if(articulo==null) {
+                        txtDescuento.setText("0");
+                    }
+                    else {
+                        double descuento = Double.parseDouble( txtDescuento.getText().toString());
+                        double descuentoArticulo=Double.parseDouble(articulo.getDescuentoMaximo());
+                        double descuentoCliente=Double.parseDouble(cliente.getDescuento());
+                        double descuentoMayor = descuentoArticulo>descuentoCliente? descuentoArticulo :descuentoCliente;
+                      if( descuento > descuentoMayor){
+                          mensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
+                          txtDescuento.setText("0");
+                          return;
+                      }
+                    }
+                }
+            }
+        });
         txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
         txtPrecioArticulo = (TextView) findViewById(R.id.txtPrecioArticulo);
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
