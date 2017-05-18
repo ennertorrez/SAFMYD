@@ -16,6 +16,7 @@ public class variables_publicas {
     public static String RutaCliente = "";
     public static String Canal = "";
     public static String direccionIp = "http://186.1.18.75:8080";
+    public static String FechaActual="";
 
     //Variables BD
     public static final int DATABASE_VERSION = 20;

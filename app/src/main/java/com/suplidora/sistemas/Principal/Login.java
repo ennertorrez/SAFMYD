@@ -138,6 +138,13 @@ public class Login extends Activity {
 
                 inputMethodManager.hideSoftInputFromWindow(txtUsuario.getWindowToken(), 0);
                 inputMethodManager.hideSoftInputFromWindow(txtPassword.getWindowToken(), 0);
+
+                Calendar c = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                variables_publicas.FechaActual = sdf.format(c.getTime());
+
+
+
                 Usuario = txtUsuario.getText().toString();
                 Contrasenia = txtPassword.getText().toString();
 

@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
@@ -109,6 +110,7 @@ public class PedidosActivity extends Activity {
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private PrecioEspecialHelper PrecioEspecialH;
+    private CartillasBcDetalleHelper CartillasBcDetalleH;
     private int IdCliente;
     private double tasaCambio = 0;
     private double subTotalPrecioSuper = 0;
@@ -138,6 +140,7 @@ public class PedidosActivity extends Activity {
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
+        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
         cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
@@ -307,6 +310,7 @@ public class PedidosActivity extends Activity {
                                                   }
 
                                                   AgregarDetalle();
+
                                                   subTotalPrecioSuper += Double.parseDouble(articulo.getPrecioSuper());
 
                                                   InputMethodManager inputManager = (InputMethodManager)
@@ -328,38 +332,23 @@ public class PedidosActivity extends Activity {
         btnGuardar.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 try {
 
-
-                /*
-                    int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE);
-                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSIONS_REQUEST_READ_PHONE_STATE);
-                    } else {
-                        //TODO
-                    }*/
 
                     if (lv.getCount() <= 0) {
                         mensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
                     }
-                    Calendar c = Calendar.getInstance();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                 /*  TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                   telephonyManager.getDeviceId();*/
-                    String strDate = sdf.format(c.getTime());
+
                     String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
                     PedidoH.GuardarTotalPedidos(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), lblCodigoCliente.getText().toString(),
                             txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
-                            strDate, variables_publicas.usuario.getUsuario(), "8888-8888");
+                            variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), "8888-8888");
                 } catch (Exception e) {
                     mensajeAviso(e.getMessage());
                 }
 
             }
         });
-
 
     }
 
@@ -376,7 +365,7 @@ public class PedidosActivity extends Activity {
         }
 
         //Si es cliente Mayorista foraneo
-        if (cliente.getTipo().equals("Foreaneo")) {
+        if (cliente.getTipo().equals("Foraneo")) {
 
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
@@ -438,7 +427,7 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Descripcion", DescripcionArt);
         itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
         itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
-
+        itemPedidos.put("TipoArt", "P");
         itemPedidos.put("BonificaA", "");
         itemPedidos.put("Isc", articulo.getIsc());
         itemPedidos.put("PorIva", articulo.getPorIva());
@@ -453,6 +442,36 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Subtotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
         listaArticulos.add(itemPedidos);
+        HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo),variables_publicas.usuario.getCanal(),variables_publicas.FechaActual,itemPedidos.get("Cantidad"));
+        if(itemBonificado.size()>0){
+            HashMap<String, String> articuloBonificado = new HashMap<>();
+            articuloBonificado.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+            articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
+
+            articuloBonificado.put("Cantidad", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB));
+            articuloBonificado.put("Precio", "0");
+            articuloBonificado.put("Descripcion","**"+itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
+            articuloBonificado.put("Costo", "");
+            articuloBonificado.put("PorDescuento", "0");
+            articuloBonificado.put("TipoArt", "B");
+            articuloBonificado.put("BonificaA", "");
+            articuloBonificado.put("Isc", "0");
+            articuloBonificado.put("PorIva", "0");
+            articuloBonificado.put("Descuento", "0");
+            articuloBonificado.put("Iva", "0");
+            articuloBonificado.put("Subtotal", "0");
+            articuloBonificado.put("Total", "0");
+            //Actualizamos el campo BonificaA del item que lo bonifica
+            for(HashMap<String,String> item: listaArticulos){
+                if(item.get("CodigoArticulo").equals(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV)) && item.get("TipoArt").equals("P")){
+                    item.put("BonificaA",itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
+                    break;
+                }
+            }
+            listaArticulos.add(articuloBonificado);
+
+
+        }
         SimpleAdapter adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new

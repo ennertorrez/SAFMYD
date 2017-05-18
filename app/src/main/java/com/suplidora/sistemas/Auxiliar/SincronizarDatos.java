@@ -1,10 +1,5 @@
 package com.suplidora.sistemas.Auxiliar;
 
-import android.content.Context;
-import android.support.v4.content.res.ConfigurationHelper;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcHelper;
@@ -14,13 +9,17 @@ import com.suplidora.sistemas.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.AccesoDatos.PrecioEspecialHelper;
-import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.HttpHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by usuario on 5/5/2017.
@@ -30,14 +29,14 @@ public class SincronizarDatos {
 
 
     private String urlClientes = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
-    private String urlArticulos= variables_publicas.direccionIp+"/ServicioTotalArticulos.svc/BuscarTotalArticulo";
+    private String urlArticulos = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
-    final String urlFormasPago= variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
-    final String urlListPrecioEspecial= variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
-    final String urlGetConfiguraciones= variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
-    final String urlGetClienteSucursales= variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
+    final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
+    final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
+    final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
+    final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
 
 
     private String TAG = SincronizarDatos.class.getSimpleName();
@@ -53,11 +52,11 @@ public class SincronizarDatos {
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
 
-    public SincronizarDatos(DataBaseOpenHelper dbh , ClientesHelper Clientesh,
-                            VendedoresHelper Vendedoresh,CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh,FormaPagoHelper FormaPagoh,
-                            PrecioEspecialHelper PrecioEspecialh,ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch,ArticulosHelper Articulosh) {
+    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
+                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
+                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
+                            PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -70,7 +69,7 @@ public class SincronizarDatos {
         ArticulosH = Articulosh;
     }
 
-    private String SincronizarArticulos()throws JSONException {
+    private String SincronizarArticulos() throws JSONException {
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlArticulos;
         String jsonStrC = shC.makeServiceCall(urlStringC);
@@ -90,34 +89,33 @@ public class SincronizarDatos {
             for (int i = 0; i < articulos.length(); i++) {
                 JSONObject c = articulos.getJSONObject(i);
 
-                String Codigo= c.getString("CODIGO_ARTICULO");
+                String Codigo = c.getString("CODIGO_ARTICULO");
                 String Nombre = c.getString("NOMBRE");
                 String COSTO = c.getString("COSTO");
                 String UNIDAD = c.getString("UNIDAD");
                 String UnidadCaja = c.getString("UnidadCaja");
                 String ISC = c.getString("ISC");
                 String PorIVA = c.getString("PorIVA");
-                String PrecioSuper=  c.getString("PrecioSuper");
-                String PrecioDetalle =  c.getString("PrecioDetalle");
-                String PrecioForaneo =  c.getString("PrecioForaneo");
-                String PrecioMayorista =  c.getString("PrecioMayorista");
-                String Bonificable =  c.getString("Bonificable");
-                String AplicaPrecioDetalle =  c.getString("AplicaPrecioDetalle");
-                String DESCUENTO_MAXIMO =  c.getString("DESCUENTO_MAXIMO");
-                String detallista =  c.getString("detallista");
+                String PrecioSuper = c.getString("PrecioSuper");
+                String PrecioDetalle = c.getString("PrecioDetalle");
+                String PrecioForaneo = c.getString("PrecioForaneo");
+                String PrecioMayorista = c.getString("PrecioMayorista");
+                String Bonificable = c.getString("Bonificable");
+                String AplicaPrecioDetalle = c.getString("AplicaPrecioDetalle");
+                String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
+                String detallista = c.getString("detallista");
 
-                ArticulosH.GuardarTotalArticulos(Codigo,Nombre,COSTO,UNIDAD,UnidadCaja,ISC,PorIVA, PrecioSuper,PrecioDetalle,PrecioForaneo,PrecioMayorista,Bonificable,AplicaPrecioDetalle,DESCUENTO_MAXIMO,detallista);
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrC;
+        return jsonStrC;
     }
 
     //Cliente
-    public String SincronizarClientes()throws JSONException {
+    public String SincronizarClientes() throws JSONException {
         /*******************************CLIENTES******************************/
         //************CLIENTES
         HttpHandler shC = new HttpHandler();
@@ -128,10 +126,10 @@ public class SincronizarDatos {
             return null;
         //Log.e(TAG, "Response from url: " + jsonStrC);
 
-            ClientesH.EliminaClientes();
-            JSONObject jsonObjC = new JSONObject(jsonStrC);
-            // Getting JSON Array node
-            JSONArray clientes = jsonObjC.getJSONArray("BuscarClientesResult");
+        ClientesH.EliminaClientes();
+        JSONObject jsonObjC = new JSONObject(jsonStrC);
+        // Getting JSON Array node
+        JSONArray clientes = jsonObjC.getJSONArray("BuscarClientesResult");
 
         DbOpenHelper.database.beginTransaction();
         try {
@@ -159,23 +157,22 @@ public class SincronizarDatos {
                 String Frecuencia = c.getString("Frecuencia");
                 String PrecioEspecial = c.getString("PrecioEspecial");
                 String FechaUltimaCompra = c.getString("FechaUltimaCompra");
-                String Tipo= c.getString("Tipo");
+                String Tipo = c.getString("Tipo");
                 String CodigoGalatea = c.getString("CodigoGalatea");
                 String Descuento = c.getString("Descuento");
-                String Empleado= c.getString("Empleado");
+                String Empleado = c.getString("Empleado");
 
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra,Tipo,CodigoGalatea,Descuento,Empleado);
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrC;
+        return jsonStrC;
     }
 
     //Vendedor
-    public String SincronizarVendedores()throws JSONException {
+    public String SincronizarVendedores() throws JSONException {
         //************VENDEDORES
         HttpHandler shV = new HttpHandler();
         String urlStringV = urlVendedores;
@@ -192,39 +189,38 @@ public class SincronizarDatos {
 
         DbOpenHelper.database.beginTransaction();
         try {
-        // looping through All Contacts
-        for (int i = 0; i < vendedores.length(); i++) {
-            JSONObject c = vendedores.getJSONObject(i);
+            // looping through All Contacts
+            for (int i = 0; i < vendedores.length(); i++) {
+                JSONObject c = vendedores.getJSONObject(i);
 
-            String CODIGO = c.getString("CODIGO");
-            String NOMBRE = c.getString("NOMBRE");
-            String DEPARTAMENTO = c.getString("DEPARTAMENTO");
-            String MUNICIPIO = c.getString("MUNICIPIO");
-            String CIUDAD = c.getString("CIUDAD");
-            String TELEFONO = c.getString("TELEFONO");
-            String CELULAR = c.getString("CELULAR");
-            String CORREO = c.getString("CORREO");
-            String COD_ZONA = c.getString("COD_ZONA");
-            String RUTA = c.getString("RUTA");
-            String codsuper = c.getString("codsuper");
-            String Status = c.getString("Status");
-            String detalle = c.getString("detalle");
-            String horeca = c.getString("horeca");
-            String mayorista = c.getString("mayorista");
-            String Super = c.getString("super");
+                String CODIGO = c.getString("CODIGO");
+                String NOMBRE = c.getString("NOMBRE");
+                String DEPARTAMENTO = c.getString("DEPARTAMENTO");
+                String MUNICIPIO = c.getString("MUNICIPIO");
+                String CIUDAD = c.getString("CIUDAD");
+                String TELEFONO = c.getString("TELEFONO");
+                String CELULAR = c.getString("CELULAR");
+                String CORREO = c.getString("CORREO");
+                String COD_ZONA = c.getString("COD_ZONA");
+                String RUTA = c.getString("RUTA");
+                String codsuper = c.getString("codsuper");
+                String Status = c.getString("Status");
+                String detalle = c.getString("detalle");
+                String horeca = c.getString("horeca");
+                String mayorista = c.getString("mayorista");
+                String Super = c.getString("super");
 
-            VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper, Status, detalle, horeca, mayorista, Super);
-        }
+                VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper, Status, detalle, horeca, mayorista, Super);
+            }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrV;
+        return jsonStrV;
     }
 
     //CartillasBc
-    public String SincronizarCartillasBc()throws JSONException {
+    public String SincronizarCartillasBc() throws JSONException {
         HttpHandler shCartillas = new HttpHandler();
         String urlStringCartillas = urlCartillasBc;
         String jsonStrCartillas = shCartillas.makeServiceCall(urlStringCartillas);
@@ -245,23 +241,47 @@ public class SincronizarDatos {
 
                 String id = c.getString("id");
                 String codigo = c.getString("codigo");
-                String fechaini = c.getString("fechaini");
-                String fechafinal = c.getString("fechafinal");
+
+                Date Dateini = jd2d(c.getString("fechaini"));
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String strFechaIni=df.format(Dateini );
+                String fechaini = strFechaIni;
+
+                Date Datefin=jd2d(c.getString("fechafinal"));
+                String strFin=df.format(Datefin );
+                String fechafinal =strFin;
                 String tipo = c.getString("tipo");
                 String aprobado = c.getString("aprobado");
 
-                CartillasBcH.GuardarCartillasBc(id,codigo,fechaini,fechafinal,tipo,aprobado);
+                CartillasBcH.GuardarCartillasBc(id, codigo, fechaini, fechafinal, tipo, aprobado);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrCartillas;
+        return jsonStrCartillas;
+    }
+
+    private static Pattern p = Pattern.compile("\\((\\d+)([+-]\\d{2})(\\d{2})\\)");
+
+    public static Date jd2d(String jsonDateString) {
+        Matcher m = p.matcher(jsonDateString);
+        if (m.find()) {
+            long millis = Long.parseLong(m.group(1));
+            long offsetHours = Long.parseLong(m.group(2));
+            long offsetMinutes = Long.parseLong(m.group(3));
+            if (offsetHours < 0) offsetMinutes *= -1;
+            return new Date(
+                    millis
+                            + offsetHours * 60l * 60l * 1000l
+                            + offsetMinutes * 60l * 1000l
+            );
+        }
+        return null;
     }
 
     //CartillasBcDetalle
-    public String SincronizarCartillasBcDetalle()throws JSONException {
+    public String SincronizarCartillasBcDetalle() throws JSONException {
         HttpHandler shCartillasD = new HttpHandler();
         String urlStringCartillasD = urlDetalleCartillasBc;
         String jsonStrCartillasD = shCartillasD.makeServiceCall(urlStringCartillasD);
@@ -291,18 +311,17 @@ public class SincronizarDatos {
                 String tipo = c.getString("tipo");
                 String activo = c.getString("activo");
 
-                CartillasBcDetalleH.GuardarCartillasBcDetalle(id,itemV,descripcionV,cantidad,itemB,descripcionB,cantidadB,codigo,tipo,activo);
+                CartillasBcDetalleH.GuardarCartillasBcDetalle(id, itemV, descripcionV, cantidad, itemB, descripcionB, cantidadB, codigo, tipo, activo);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrCartillasD;
+        return jsonStrCartillasD;
     }
 
     //FormaPago
-    public String SincronizarFormaPago()throws JSONException {
+    public String SincronizarFormaPago() throws JSONException {
         HttpHandler shFormaPago = new HttpHandler();
         String urlStringFormaPago = urlFormasPago;
         String jsonStrFormaPago = shFormaPago.makeServiceCall(urlStringFormaPago);
@@ -326,18 +345,17 @@ public class SincronizarDatos {
                 String DIAS = c.getString("DIAS");
                 String EMPRESA = c.getString("EMPRESA");
 
-                FormaPagoH.GuardarTotalFormaPago(CODIGO,NOMBRE,DIAS,EMPRESA);
+                FormaPagoH.GuardarTotalFormaPago(CODIGO, NOMBRE, DIAS, EMPRESA);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrFormaPago;
+        return jsonStrFormaPago;
     }
 
     //PrecioEspecial
-    public String SincronizarPrecioEspecial()throws JSONException {
+    public String SincronizarPrecioEspecial() throws JSONException {
         HttpHandler shPrecioEspecial = new HttpHandler();
         String urlStringPrecioEspecial = urlListPrecioEspecial;
         String jsonStrPrecioEspecial = shPrecioEspecial.makeServiceCall(urlStringPrecioEspecial);
@@ -363,18 +381,17 @@ public class SincronizarDatos {
                 String Precio = c.getString("Precio");
                 String Facturar = c.getString("Facturar");
 
-                PrecioEspecialH.GuardarPrecioEspecial(Id,CodigoArticulo,IdCliente,Descuento,Precio,Facturar);
+                PrecioEspecialH.GuardarPrecioEspecial(Id, CodigoArticulo, IdCliente, Descuento, Precio, Facturar);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrPrecioEspecial;
+        return jsonStrPrecioEspecial;
     }
 
     //ConfiguracionSistema
-    public String SincronizarConfiguracionSistema()throws JSONException {
+    public String SincronizarConfiguracionSistema() throws JSONException {
         HttpHandler shConfiguracionSistema = new HttpHandler();
         String urlStringConfiguracionSistema = urlGetConfiguraciones;
         String jsonStrConfiguracionSistema = shConfiguracionSistema.makeServiceCall(urlStringConfiguracionSistema);
@@ -399,18 +416,17 @@ public class SincronizarDatos {
                 String Valor = c.getString("Valor");
                 String Activo = c.getString("Activo");
 
-                ConfigSistemasH.GuardarConfiguracionSistema(Id,Sistema,Configuracion,Valor,Activo);
+                ConfigSistemasH.GuardarConfiguracionSistema(Id, Sistema, Configuracion, Valor, Activo);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrConfiguracionSistema;
+        return jsonStrConfiguracionSistema;
     }
 
     //ClientesSucursal
-    public String SincronizarClientesSucursal()throws JSONException {
+    public String SincronizarClientesSucursal() throws JSONException {
         HttpHandler shClientesSucursal = new HttpHandler();
         String urlStringClientesSucursal = urlGetClienteSucursales;
         String jsonStrClientesSucursal = shClientesSucursal.makeServiceCall(urlStringClientesSucursal);
@@ -437,17 +453,16 @@ public class SincronizarDatos {
                 String Direccion = c.getString("Direccion");
                 String FormaPagoID = c.getString("FormaPagoID");
 
-              ClientesSucH.GuardarTotalClientesSucursal(CodSuc,CodCliente,Sucursal,Ciudad,DeptoID,Direccion,FormaPagoID);
+                ClientesSucH.GuardarTotalClientesSucursal(CodSuc, CodCliente, Sucursal, Ciudad, DeptoID, Direccion, FormaPagoID);
             }
             DbOpenHelper.database.setTransactionSuccessful();
-        }
-        finally {
+        } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return  jsonStrClientesSucursal;
+        return jsonStrClientesSucursal;
     }
 
-    public void SincronizarTodo()throws JSONException {
+    public void SincronizarTodo() throws JSONException {
         SincronizarArticulos();
         SincronizarClientes();
         SincronizarVendedores();

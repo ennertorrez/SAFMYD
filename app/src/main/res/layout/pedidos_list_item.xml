@@ -13,21 +13,6 @@
 
         >
 
-        <!--   <TextView
-               android:id="@+id/lblDetalleCodigo"
-               android:layout_width="0dp"
-               android:layout_height="0dp"
-               android:inputType="text"
-               android:maxLines="1"
-               tools:ignore="SelectableText,SpUsage" />
-
-           <TextView
-               android:id="@+id/lblDetalleCodigoArticulo"
-               android:layout_width="0dp"
-               android:layout_height="0dp"
-               android:inputType="text"
-               android:maxLines="1"
-               tools:ignore="SelectableText,SpUsage" />-->
 
         <TextView
             android:id="@+id/lblDetalleDescripcion"

@@ -40,4 +40,7 @@ public class CartillasBcHelper {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CARTILLAS_BC+";");
         Log.d("CartillasBc_elimina", "Datos eliminados");
     }
+
+
+
     }
