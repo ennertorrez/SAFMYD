@@ -21,7 +21,7 @@ public class variables_publicas {
     public static String direccionIp = "http://186.1.18.75:8080";
 
     //Variables BD
-    public static final int DATABASE_VERSION = 16;
+    public static final int DATABASE_VERSION = 19;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -117,6 +117,7 @@ public class variables_publicas {
     public static final String USUARIOS_COLUMN_Ruta = "Ruta";
     public static final String USUARIOS_COLUMN_Canal = "Canal";
     public static final String USUARIOS_COLUMN_TasaCambio = "TasaCambio";
+    public static final String USUARIOS_COLUMN_FechaActualiza = "FechaActualiza";
 
     public static final String VENDEDORES_COLUMN_CODIGO = "CODIGO";
     public static final String VENDEDORES_COLUMN_NOMBRE = "NOMBRE";

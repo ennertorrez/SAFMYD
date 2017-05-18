@@ -13,8 +13,9 @@ public class Usuario {
     private String Ruta = "" ;
     private String Canal = "" ;
     private String TasaCambio = "";
+    private String FechaActualiza = "";
 
-    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio) {
+    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String fechaActualiza) {
         Codigo = codigo;
         this.nombre = nombre;
         Usuario = usuario;
@@ -23,6 +24,7 @@ public class Usuario {
         Ruta = ruta;
         Canal = canal;
         TasaCambio = tasaCambio;
+       FechaActualiza = fechaActualiza;
     }
 
     public Usuario() {
@@ -91,6 +93,14 @@ public class Usuario {
 
     public void setTasaCambio(String tasaCambio) {
         TasaCambio = tasaCambio;
+    }
+
+    public String getFechaActualiza() {
+        return FechaActualiza;
+    }
+
+    public void setFechaActualiza(String fechaActualiza) {
+        FechaActualiza = fechaActualiza;
     }
 
     public String ToString(){

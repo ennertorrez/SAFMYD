@@ -226,6 +226,7 @@ public class ClientesFragment extends Fragment {
             lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
         }
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.main, menu);

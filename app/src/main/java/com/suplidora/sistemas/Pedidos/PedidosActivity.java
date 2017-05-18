@@ -12,8 +12,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -26,6 +29,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.ClientesHelper;
@@ -45,6 +49,7 @@ import com.suplidora.sistemas.Entidades.Pedido;
 import com.suplidora.sistemas.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.Entidades.Vendedor;
 
+import com.suplidora.sistemas.Principal.MenuActivity;
 import com.suplidora.sistemas.R;
 
 import java.text.DecimalFormat;
@@ -92,7 +97,6 @@ public class PedidosActivity extends Activity {
     public boolean Estado;
     DialogInterface.OnClickListener dialogClickListener;
 
-    PedidoDetalleAdapter adapter;
 
     private ListView lv;
     private Cliente cliente;
@@ -113,6 +117,8 @@ public class PedidosActivity extends Activity {
     private int IdVendedor;
     private Pedido pedido;
     private PedidosHelper PedidoH;
+
+    private SimpleAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +160,17 @@ public class PedidosActivity extends Activity {
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
+
         lv = (ListView) findViewById(R.id.listPedido);
+        lv.setAdapter(adapter);
+        registerForContextMenu(lv);
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+            }
+        });
 
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
@@ -175,7 +191,6 @@ public class PedidosActivity extends Activity {
         // Get XML values from previous intent
         IdCliente = Integer.parseInt(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
-
 
         // Loading spinner data from database
         CargaDatosCombo();
@@ -288,7 +303,6 @@ public class PedidosActivity extends Activity {
 
                 try {
 
-
                 /*
                     int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE);
                     if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -358,7 +372,7 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("Subtotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
         listaArticulos.add(itemPedidos);
-        SimpleAdapter adapter = new SimpleAdapter(
+         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
                 String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
@@ -449,6 +463,39 @@ public class PedidosActivity extends Activity {
 
     }
 
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+//    {
+//        super.onCreateContextMenu(menu, v, menuInfo);
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+//        HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+//
+//        String HeaderMenu = obj.get("CodigoArticulo")  +"\n"+ obj.get("Descripcion") ;
+//
+//        menu.setHeaderTitle(HeaderMenu);
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.eliminar_item_pedido, menu);
+//    }
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item) {
+//
+//        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+////        HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+//
+//        //lv = (ListView) findViewById(R.id.listPedido);
+//        //lv.setAdapter(null);
+//        switch (item.getItemId())
+//        {
+//            case R.id.Elimina_Item:
+//                listaArticulos.remove(info.position);
+//                adapter.notifyDataSetChanged();
+//                lv.setAdapter(adapter);
+//                return true;
+//
+//            default:
+//                return super.onContextItemSelected(item);
+//        }
+//    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -518,7 +565,6 @@ public class PedidosActivity extends Activity {
 //
     }
 
-
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
@@ -533,4 +579,5 @@ public class PedidosActivity extends Activity {
                 .setNegativeButton("No", null)
                 .show();
     }
+
 }

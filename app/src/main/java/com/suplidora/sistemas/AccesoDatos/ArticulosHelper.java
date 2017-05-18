@@ -76,6 +76,6 @@ public class ArticulosHelper {
     }
     public  void EliminaArticulos() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_ARTICULOS+";");
-        Log.d("cursos_elimina", "Datos eliminados");
+        Log.d("Articulo_elimina", "Datos eliminados");
     }
 }

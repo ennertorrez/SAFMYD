@@ -39,7 +39,7 @@
             android:maxLines="1"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
 
             />
@@ -53,7 +53,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"/>
 
@@ -78,7 +78,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"/>
 
@@ -91,7 +91,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"/>
 
@@ -103,7 +103,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"
             tools:ignore="SelectableText,SpUsage" />
@@ -116,7 +116,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             tools:ignore="SelectableText,SpUsage"
             android:inputType="numberDecimal"/>
@@ -129,7 +129,7 @@
             android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:textStyle="bold"
             android:inputType="numberDecimal"
             tools:ignore="SelectableText,SpUsage" />
