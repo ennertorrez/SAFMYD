@@ -49,7 +49,7 @@ public class Barra_cargado extends Activity {
          for(int progreso = 1;progreso<=10;progreso++){//Creamos un for de 1 a 10 que ir� contando los segundos.
          	
              try {
-                     Thread.sleep(300);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
+                     Thread.sleep(100);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
                     
              } catch (InterruptedException e) {}
             
