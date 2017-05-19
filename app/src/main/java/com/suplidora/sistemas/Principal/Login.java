@@ -34,6 +34,7 @@ import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Configuraciones;
 import com.suplidora.sistemas.Entidades.Usuario;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
@@ -73,6 +74,7 @@ public class Login extends Activity {
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
+    final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
 
     final String urlFormaPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
@@ -91,7 +93,7 @@ public class Login extends Activity {
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private SincronizarDatos sd;
-    String MsjLoging ="";
+    String MsjLoging = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +102,8 @@ public class Login extends Activity {
         setContentView(R.layout.iniciosesion);
 
         MsjLoging = variables_publicas.MensajeLogin;
-        if(MsjLoging != ""){
-        mensajeAviso(MsjLoging);
+        if (MsjLoging != "") {
+            mensajeAviso(MsjLoging);
         }
 
         DbOpenHelper = new DataBaseOpenHelper(Login.this);
@@ -157,40 +159,32 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
-                boolean isOnline= checkInternetConnection();
+                boolean isOnline = checkInternetConnection();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
+                //variables_publicas.configuracion = ConfigH.BuscarVersionConfig()
 
-                if(isOnline && variables_publicas.usuario!=null)
-                {
+                if (isOnline && variables_publicas.usuario != null) {
                     String FechaLocal = variables_publicas.usuario.getFechaActualiza();
                     String FechaActual = getDatePhone();
-                    if(!FechaLocal.equals(FechaActual))
-                    {
-                       new GetUser().execute();
-                    }
-                    else
-                    {
-                        variables_publicas.MensajeLogin ="";
+                    if (!FechaLocal.equals(FechaActual)) {
+                        new GetUser().execute();
+                    } else {
+                        variables_publicas.MensajeLogin = "";
                         variables_publicas.LoginOk = true;
                         Intent intent = new Intent("android.intent.action.Barra_cargado");
                         startActivity(intent);
                         finish();
                     }
-                }
-                else if(isOnline && variables_publicas.usuario == null)
-                {
+                } else if (isOnline && variables_publicas.usuario == null) {
                     new GetUser().execute();
                 }
-                if(!isOnline && variables_publicas.usuario!=null)
-                {
-                    variables_publicas.MensajeLogin ="";
+                if (!isOnline && variables_publicas.usuario != null) {
+                    variables_publicas.MensajeLogin = "";
                     variables_publicas.LoginOk = true;
                     Intent intent = new Intent("android.intent.action.Barra_cargado");
                     startActivity(intent);
                     finish();
-                }
-                else if(!isOnline && variables_publicas.usuario == null)
-                {
+                } else if (!isOnline && variables_publicas.usuario == null) {
                     mensajeAviso("Usuario o contraseña invalido\nVerifique la conexion a internet");
                 }
             }
@@ -225,10 +219,9 @@ public class Login extends Activity {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     // Getting JSON Array node
                     JSONArray Usuarios = jsonObj.getJSONArray("BuscarUsuarioResult");
-                    if(Usuarios.length()  == 0)
-                    {
+                    if (Usuarios.length() == 0) {
                         variables_publicas.LoginOk = false;
-                       variables_publicas.MensajeLogin = "Usuario o contraseña invalido";
+                        variables_publicas.MensajeLogin = "Usuario o contraseña invalido";
                         return null;
                     }
                     UsuariosH.EliminaUsuarios();
@@ -245,13 +238,13 @@ public class Login extends Activity {
                         variables_publicas.RutaCliente = c.getString("Ruta");
                         variables_publicas.Canal = c.getString("Canal");
                         String TasaCambio = c.getString("TasaCambio");
-                        String RutaForanea=c.getString("RutaForanea");
-                        String FechaActualiza= getDatePhone();
+                        String RutaForanea = c.getString("RutaForanea");
+                        String FechaActualiza = getDatePhone();
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
-                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio,RutaForanea,FechaActualiza);
+                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza);
 
                         variables_publicas.LoginOk = true;
-                        variables_publicas.MensajeLogin ="";
+                        variables_publicas.MensajeLogin = "";
                         variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                         //SINCRONIZAR DATOS
                         try {
@@ -300,16 +293,71 @@ public class Login extends Activity {
         }
     }
 
+    private class GetConfiguracion extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            //***********Configuracion
+            HttpHandler sh = new HttpHandler();
+            String urlString = urlGetConfiguraciones;
+            String jsonStr = sh.makeServiceCall(urlString);
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    JSONArray Usuarios = jsonObj.getJSONArray("BuscarUsuarioResult");
+                    // looping through All Contacts
+
+                    for (int i = 0; i < Usuarios.length(); i++) {
+                        JSONObject c = Usuarios.getJSONObject(i);
+
+                        String Id = c.getString("Id");
+                        String Sistema = c.getString("Sistema");
+                        String Configuracion = c.getString("Configuracion");
+                        String Valor = c.getString("Valor");
+                        String Activo = c.getString("Activo");
+                    }
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "Json parsing error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+                }
+            } else {
+                Log.e(TAG, "Couldn't get json from server.");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+            return null;
+        }
+    }
+
     public Boolean isOnlineNet() {
 
         Runtime runtime = Runtime.getRuntime();
         try {
             Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int     exitValue = ipProcess.waitFor();
+            int exitValue = ipProcess.waitFor();
             return (exitValue == 0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        catch (IOException e)          { e.printStackTrace(); }
-        catch (InterruptedException e) { e.printStackTrace(); }
 
         return false;
     }

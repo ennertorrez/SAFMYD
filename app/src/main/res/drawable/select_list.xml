@@ -4,5 +4,5 @@
         android:state_selected="true"
         android:drawable="@color/White"/>
     <item
-        android:drawable="@color/wallet_holo_blue_light" />
+        android:drawable="@color/colorAccent" />
 </selector>

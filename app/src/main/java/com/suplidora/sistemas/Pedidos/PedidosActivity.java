@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -178,17 +179,22 @@ public class PedidosActivity extends Activity {
         });
         Spinner prueba = (Spinner) findViewById(R.id.cboCondicion);
         lv = (ListView) findViewById(R.id.listPedido);
-
         registerForContextMenu(lv);
+        lv.setItemsCanFocus(false);
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                view.setSelected(true);
-                adapter.notifyDataSetChanged();
-                lv.setAdapter(adapter);
+            public void onItemClick(AdapterView<?> adpterView, View view, int position,long id) {
+                for (int i = 0; i < lv.getChildCount(); i++) {
+                    if(position == i ){
+                        lv.getChildAt(i).setBackgroundColor(Color.CYAN);
+                    }else{
+                        lv.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
+                    }
+                }
             }
         });
+
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
             txtDescuento.setEnabled(false);
@@ -488,8 +494,8 @@ public class PedidosActivity extends Activity {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
+                String[]{"Descripcion", "Precio", "Cantidad", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleDescripcion, R.id.lblDetallePrecio, R.id.lblDetalleCantidad, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal});
 
         lv.setAdapter(adapter);
 
@@ -516,10 +522,7 @@ public class PedidosActivity extends Activity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-
         }
-
         lblSubTotalCor.setText(df.format(subtotal));
         lblIvaCor.setText(df.format(iva));
         lblTotalCor.setText(df.format(total));

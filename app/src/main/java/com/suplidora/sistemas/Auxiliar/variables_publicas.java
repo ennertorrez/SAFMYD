@@ -1,11 +1,13 @@
 package com.suplidora.sistemas.Auxiliar;
 
 
+import com.suplidora.sistemas.Entidades.Configuraciones;
 import com.suplidora.sistemas.Entidades.Usuario;
 
 public class variables_publicas {
 
     public static Usuario usuario=null;
+    public static Configuraciones configuracion=null;
     public static String CodigoVendedor = "";
     public static String UsuarioLogin = "";
     public static String NombreVendedor = "";
@@ -19,7 +21,7 @@ public class variables_publicas {
     public static String FechaActual="";
 
     //Variables BD
-    public static final int DATABASE_VERSION = 21;
+    public static final int DATABASE_VERSION = 22;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Entidades.Configuraciones;
 
 public class ConfiguracionSistemaHelper {
 
@@ -30,8 +31,23 @@ public class ConfiguracionSistemaHelper {
 
         database.insert(variables_publicas.TABLE_CONFIGURACION_SISTEMA, null, contentValues);
     }
-    public Cursor BuscarConfigSistema() {
-        return database.rawQuery("select * from " + variables_publicas.TABLE_CONFIGURACION_SISTEMA +" ", null);
+    public Configuraciones BuscarVersionConfig(String Valor) {
+        Configuraciones configuraciones = null;
+        String selectQuery="SELECT * FROM " + variables_publicas.TABLE_CONFIGURACION_SISTEMA
+                + " WHERE "+variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor+" = '"+Valor+"'";
+        Cursor c= database.rawQuery(selectQuery , null);
+        if (c.moveToFirst()) {
+            do {
+                configuraciones = (new Configuraciones(c.getString(c.getColumnIndex(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id)),
+                        c.getString(c.getColumnIndex(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Sistema)),
+                        c.getString(c.getColumnIndex(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion)),
+                        c.getString(c.getColumnIndex(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor)),
+                        c.getString(c.getColumnIndex(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return configuraciones;
     }
     public  void EliminaConfigSistema() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CONFIGURACION_SISTEMA+";");
