@@ -58,9 +58,9 @@ import com.suplidora.sistemas.Entidades.Vendedor;
 import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -135,7 +135,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private PedidosHelper PedidoH;
     private String CodigoLetra = "";
     private String jsonPedido = "";
-    private boolean finalizar=false;
+    private boolean finalizar = false;
     //endregion
 
     //region OnCreate
@@ -214,21 +214,25 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         txtDescuento.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    if (articulo == null) {
-                        txtDescuento.setText("0");
-                    } else {
-                        double descuento = Double.parseDouble(txtDescuento.getText().toString());
-                        double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
-                        double descuentoCliente = Double.parseDouble(cliente.getDescuento());
-                        double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
-                        if (descuento > descuentoMayor) {
-                            MensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
-                            txtDescuento.setText("0");
-                            return;
-                        }
-                    }
-                }
+              try{
+                  if (!hasFocus) {
+                      if (articulo == null) {
+                          txtDescuento.setText("0");
+                      } else {
+                          double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty()? "0":txtDescuento.getText().toString() );
+                          double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
+                          double descuentoCliente = Double.parseDouble(cliente.getDescuento());
+                          double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
+                          if (descuento > descuentoMayor) {
+                              MensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
+                              txtDescuento.setText("0");
+                              return;
+                          }
+                      }
+                  }
+              }catch (Exception ex){
+                  MensajeAviso(ex.getMessage());
+              }
             }
         });
         txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
@@ -347,7 +351,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         DbOpenHelper.database.setTransactionSuccessful();
                         DbOpenHelper.database.endTransaction();
                         SincronizarPedido();
-                        finalizar=true;
+                        finalizar = true;
                         MensajeAviso("Pedido guardado correctamente");
                     }
                 } catch (Exception e) {
@@ -367,9 +371,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         Gson gson = new Gson();
         HashMap<String, String> pedido = PedidoH.ObtenerPedido(IdPedido);
         jsonPedido = gson.toJson(pedido);
-        try{
+        try {
             new SincronizardorPedidos().execute().get();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             MensajeAviso(ex.getMessage());
         }
 
@@ -423,7 +427,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             MensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
         }
-        IdPedido ="-"+ cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
+        IdPedido = "-" + cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
             for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != IdVendedor; i++)
@@ -527,7 +531,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         Float Precio = PrecioItem;
         String DescripcionArt = lblDescripcionArticulo.getText().toString();
         HashMap<String, String> itemPedidos = new HashMap<>();
-        itemPedidos.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        itemPedidos.put("CodigoPedido", IdPedido);
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
         itemPedidos.put("Precio", String.valueOf(Precio));
@@ -545,28 +549,31 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         iva = (subtotal - descuento) * porIva;
         total = subtotal - descuento + iva;
         itemPedidos.put("Descuento", df.format(descuento));
+        itemPedidos.put("PorcentajeIva", articulo.getPorIva());
+        itemPedidos.put("Um", articulo.getUnidad());
         itemPedidos.put("Iva", df.format(iva));
-        itemPedidos.put("Subtotal", df.format(subtotal));
+        itemPedidos.put("SubTotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
         listaArticulos.add(itemPedidos);
         HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), variables_publicas.usuario.getCanal(), variables_publicas.FechaActual, itemPedidos.get("Cantidad"));
+        Articulo articuloB = ArticulosH.BuscarArticulo(itemBonificado.get("itemB"));
         if (itemBonificado.size() > 0) {
             HashMap<String, String> articuloBonificado = new HashMap<>();
-            articuloBonificado.put("CodigoPedido", cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+            articuloBonificado.put("CodigoPedido", IdPedido);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-
+            articuloBonificado.put("Um",articuloB==null? "UNIDAD": articuloB.getUnidad());
             articuloBonificado.put("Cantidad", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB));
             articuloBonificado.put("Precio", "0");
             articuloBonificado.put("Descripcion", "**" + itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
-            articuloBonificado.put("Costo", "");
+            articuloBonificado.put("Costo", "0");
             articuloBonificado.put("PorDescuento", "0");
             articuloBonificado.put("TipoArt", "B");
             articuloBonificado.put("BonificaA", "");
             articuloBonificado.put("Isc", "0");
-            articuloBonificado.put("PorIva", "0");
+            articuloBonificado.put("PorcentajeIva", "0");
             articuloBonificado.put("Descuento", "0");
             articuloBonificado.put("Iva", "0");
-            articuloBonificado.put("Subtotal", "0");
+            articuloBonificado.put("SubTotal", "0");
             articuloBonificado.put("Total", "0");
             //Actualizamos el campo BonificaA del item que lo bonifica
             for (HashMap<String, String> item : listaArticulos) {
@@ -615,7 +622,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             HashMap<String, String> item = listaArticulos.get(i);
 
             try {
-                subtotal += (df.parse(item.get("Subtotal"))).doubleValue();
+                subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
                 iva += (df.parse(item.get("Iva"))).doubleValue();
                 total += (df.parse(item.get("Total"))).doubleValue();
             } catch (ParseException e) {
@@ -643,7 +650,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         dlgAlert.setMessage(texto);
         dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                if(finalizar){
+                if (finalizar) {
                     finish();
                 }
             }
@@ -758,18 +765,39 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedido/";
             String urlString = url + jsonPedido;
+            String jsonStr = sh.makeServiceCallPost(urlString);
 
-            String jsonStr = sh.makeServiceCall(urlString);
-
-            /**********************************USUARIOS**************************************/
+            /**********************************Actualizamos los datos del pedido**************************************/
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
                     // Getting JSON Array node
                     NoPedido = (String) result.get("SincronizarPedidoResult");
                     PedidoH.ActualizarPedido(IdPedido, NoPedido);
+                    PedidoDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
 
+                    Gson gson = new Gson();
+                    List<HashMap<String, String>> pedidoDetalle = PedidoDetalleH.ObtenerPedidoDetalle(NoPedido);
+                    for (HashMap<String,String> item:pedidoDetalle) {
+                        item.put("SubTotal",item.get("SubTotal").replace(",",""));
+                        item.put("Costo",item.get("Costo").replace(",",""));
+                        item.put("Total",item.get("Total").replace(",",""));
+                        item.put("Iva",item.get("Iva").replace(",",""));
+                        item.put("Precio",item.get("Precio").replace(",",""));
+                        item.put("Descuento",item.get("Descuento").replace(",",""));
+                        item.put("Descripcion",item.get("Descripcion").replace("/"," "));
+                    }
+                    String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
+                //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
+                    final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoDetalle/";
+                    String urlStringDetalle = urlDetalle + jsonPedidoDetalle;
+                    String jsonStrDetalle = sh.makeServiceCall(urlStringDetalle);
 
+                    if (jsonStrDetalle != null) {
+                        return null;
+                    } else {
+                        MensajeAviso("Ha ocurrido un error al sincronizar el detalle del pedido");
+                    }
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
                 }

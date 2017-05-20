@@ -52,7 +52,7 @@ public class PedidosHelper {
 
     public boolean ActualizarPedido(String CodigoPedido, String NoPedido){
         ContentValues con = new ContentValues();
-        con.put("CodigoPedido", CodigoPedido);
+        con.put("CodigoPedido", NoPedido);
         long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS, con, variables_publicas.PEDIDOS_COLUMN_CodigoPedido +"="+CodigoPedido, null );
         if(rowInserted != -1)
             return true;
