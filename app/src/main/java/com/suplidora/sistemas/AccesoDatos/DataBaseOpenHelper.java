@@ -145,35 +145,35 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS + "( "
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " INTEGER "
-                    + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdCliente + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " INTEGER , "
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " TEXT, "
+                    + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdCliente + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Observacion + " TEXT , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdFormaPago + " INTEGER , "
-                    + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " INTEGER , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdFormaPago + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Fecha + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Usuario + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_IMEI + " TEXT ) ");
 
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS_DETALLE + " ("
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " INTEGER "
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo + " INTEGER ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " TEXT, "
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion + " TEXT ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad + " INTEGER ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt + " TEXT ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva + " NUMERIC ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Um + " TEXT ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal + " NUMERIC ,"
-                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Total + " NUMERIC )");
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_Total + " TEXT )");
 
         }
 

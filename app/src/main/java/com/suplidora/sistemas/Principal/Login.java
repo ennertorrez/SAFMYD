@@ -141,7 +141,7 @@ public class Login extends Activity {
                 inputMethodManager.hideSoftInputFromWindow(txtPassword.getWindowToken(), 0);
 
                 Calendar c = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 variables_publicas.FechaActual = sdf.format(c.getTime());
 
 

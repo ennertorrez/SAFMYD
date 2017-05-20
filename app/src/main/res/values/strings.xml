@@ -3,7 +3,7 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
+<string name="permdesc_deadlyActivity">REQUEST_READ_PHONE_STATE </string>
     <string name="val">N:</string>
     <string name="nreg">C:</string>
     <string name="ins">Ins</string>

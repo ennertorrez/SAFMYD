@@ -11,6 +11,10 @@ import com.suplidora.sistemas.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.Entidades.Articulo;
 import com.suplidora.sistemas.Entidades.Pedido;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class PedidosHelper {
 
 
@@ -19,7 +23,7 @@ public class PedidosHelper {
     public PedidosHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarTotalPedidos(String CodigoPedido, String IdVendedor ,
+    public boolean GuardarPedido(String CodigoPedido, String IdVendedor ,
                                     String IdCliente ,
                                     String Cod_cv ,
                                     String Observacion ,
@@ -40,10 +44,44 @@ public class PedidosHelper {
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Fecha  ,  Fecha);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Usuario  , Usuario );
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IMEI , IMEI);
-        database.insert(variables_publicas.TABLE_PEDIDOS, null, contentValues);
+       long rowInserted= database.insert(variables_publicas.TABLE_PEDIDOS, null, contentValues);
+        if(rowInserted != -1)
+            return true;
+        else return false;
     }
-    public Cursor ObtenerListaPedidos() {
-        return database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS, null);
+
+    public boolean ActualizarPedido(String CodigoPedido, String NoPedido){
+        ContentValues con = new ContentValues();
+        con.put("CodigoPedido", CodigoPedido);
+        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS, con, variables_publicas.PEDIDOS_COLUMN_CodigoPedido +"="+CodigoPedido, null );
+        if(rowInserted != -1)
+            return true;
+        else return false;
+    }
+
+    public List<HashMap<String,String>> ObtenerListaPedidos() {
+        HashMap<String, String> pedido = null;
+        List<HashMap<String,String>> lst= new ArrayList<>();
+        String Query ="SELECT * FROM " + variables_publicas.TABLE_PEDIDOS+ ";";
+        Cursor c = database.rawQuery(Query,null );
+        if (c.moveToFirst()) {
+            do {
+                pedido = new HashMap<>();
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+                lst.add(pedido);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
     public  void EliminaPedidos() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_PEDIDOS+";");
@@ -62,6 +100,29 @@ public class PedidosHelper {
         }
         c.close();
         return numero+1;
+    }
+    public HashMap<String,String> ObtenerPedido(String CodigoPedido){
+
+        Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS + " Where " + variables_publicas.PEDIDOS_COLUMN_CodigoPedido + " = ?", new String[]{CodigoPedido});
+        HashMap<String, String> pedido = null;
+        if (c.moveToFirst()) {
+            do {
+                pedido = new HashMap<>();
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+
+            } while (c.moveToNext());
+        }
+        c.close();
+        return pedido;
     }
 
 }
