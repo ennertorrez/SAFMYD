@@ -350,7 +350,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     if (GuardarPedido()) {
                         DbOpenHelper.database.setTransactionSuccessful();
                         DbOpenHelper.database.endTransaction();
-                        SincronizarPedido();
+                       // SincronizarPedido();
                         finalizar = true;
                         MensajeAviso("Pedido guardado correctamente");
                     }

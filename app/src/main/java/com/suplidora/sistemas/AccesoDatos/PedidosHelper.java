@@ -124,5 +124,39 @@ public class PedidosHelper {
         c.close();
         return pedido;
     }
+    public HashMap<String,String> ObtenerPedidosXfechaNomb(String Fecha,String Nombre){
+
+        Cursor c;
+        if(Nombre.equals(null))
+        {
+            c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS +
+                    " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " C ON C."+variables_publicas.CLIENTES_COLUMN_IdCliente+" = P."+variables_publicas.PEDIDOS_COLUMN_IdCliente+
+                    " WHERE "+variables_publicas.PEDIDOS_COLUMN_Fecha+" = ?", new String[]{Fecha});
+        }
+        else {
+            c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS +
+                    " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " C ON C." + variables_publicas.CLIENTES_COLUMN_IdCliente + " = P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
+                    "WHERE C."+variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE ? AND "+variables_publicas.PEDIDOS_COLUMN_Fecha+ " = ?", new String[]{Nombre,Fecha});
+        }
+        HashMap<String, String> pedido = null;
+        if (c.moveToFirst()) {
+            do {
+                pedido = new HashMap<>();
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+
+            } while (c.moveToNext());
+        }
+        c.close();
+        return pedido;
+    }
 
 }
