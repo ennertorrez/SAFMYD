@@ -16,7 +16,7 @@ public class ConfiguracionSistemaHelper {
     public ConfiguracionSistemaHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarConfiguracionSistema(String Id ,
+    public boolean GuardarConfiguracionSistema(String Id ,
                                       String Sistema ,
                                       String Configuracion ,
                                       String Valor ,
@@ -29,12 +29,16 @@ public class ConfiguracionSistemaHelper {
          contentValues.put(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor, Valor);
          contentValues.put(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Activo, Activo);
 
-        database.insert(variables_publicas.TABLE_CONFIGURACION_SISTEMA, null, contentValues);
+        long Guarda = database.insert(variables_publicas.TABLE_CONFIGURACION_SISTEMA, null, contentValues);
+        if (Guarda !=-1)
+            return  true;
+        else
+            return false;
     }
-    public Configuraciones BuscarVersionConfig(String Valor) {
+    public Configuraciones BuscarValorConfig(String VersionDatos) {
         Configuraciones configuraciones = null;
         String selectQuery="SELECT * FROM " + variables_publicas.TABLE_CONFIGURACION_SISTEMA
-                + " WHERE "+variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Valor+" = '"+Valor+"'";
+                + " WHERE " + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion+"= '"+VersionDatos+"'";
         Cursor c= database.rawQuery(selectQuery , null);
         if (c.moveToFirst()) {
             do {

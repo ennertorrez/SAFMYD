@@ -74,7 +74,7 @@ public class Login extends Activity {
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
-    final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
+    final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
 
     final String urlFormaPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
@@ -146,8 +146,6 @@ public class Login extends Activity {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 variables_publicas.FechaActual = sdf.format(c.getTime());
 
-
-
                 Usuario = txtUsuario.getText().toString();
                 Contrasenia = txtPassword.getText().toString();
 
@@ -159,14 +157,24 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
+
                 boolean isOnline = checkInternetConnection();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
-                //variables_publicas.configuracion = ConfigH.BuscarVersionConfig()
+                String VersionDatos = "VersionDatos";
+                variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
 
-                if (isOnline && variables_publicas.usuario != null) {
+                if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
+                    try{
+                    new GetValorConfig().execute().get();}
+                    catch (Exception e){
+                        mensajeAviso(e.getMessage());
+                    }
                     String FechaLocal = variables_publicas.usuario.getFechaActualiza();
                     String FechaActual = getDatePhone();
-                    if (!FechaLocal.equals(FechaActual)) {
+                    int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
+                    int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
+
+                    if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
                         new GetUser().execute();
                     } else {
                         variables_publicas.MensajeLogin = "";
@@ -191,6 +199,7 @@ public class Login extends Activity {
         });
     }
 
+    //region ObtieneUsuario
     private class GetUser extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -292,32 +301,38 @@ public class Login extends Activity {
             return null;
         }
     }
+    //endregion
 
-    private class GetConfiguracion extends AsyncTask<Void, Void, Void> {
+    //region ObtieneValorConfiguracion
+    private class GetValorConfig extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
-            //***********Configuracion
+
             HttpHandler sh = new HttpHandler();
             String urlString = urlGetConfiguraciones;
+
             String jsonStr = sh.makeServiceCall(urlString);
+
             Log.e(TAG, "Response from url: " + jsonStr);
 
+            /**********************************USUARIOS**************************************/
             if (jsonStr != null) {
+
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     // Getting JSON Array node
-                    JSONArray Usuarios = jsonObj.getJSONArray("BuscarUsuarioResult");
-                    // looping through All Contacts
+                    JSONArray Usuarios = jsonObj.getJSONArray("GetConfiguracionesResult");
 
                     for (int i = 0; i < Usuarios.length(); i++) {
                         JSONObject c = Usuarios.getJSONObject(i);
-
-                        String Id = c.getString("Id");
-                        String Sistema = c.getString("Sistema");
-                        String Configuracion = c.getString("Configuracion");
                         String Valor = c.getString("Valor");
-                        String Activo = c.getString("Activo");
+                        String Configuracion = c.getString("Configuracion");
+                        String ConfigVDatos = "VersionDatos";
+                        if (Configuracion.equals(ConfigVDatos)) {
+                            variables_publicas.ValorConfigServ = Valor;
+                        }
                     }
+
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     runOnUiThread(new Runnable() {
@@ -331,6 +346,7 @@ public class Login extends Activity {
                     });
                 }
             } else {
+
                 Log.e(TAG, "Couldn't get json from server.");
                 runOnUiThread(new Runnable() {
                     @Override
@@ -342,9 +358,11 @@ public class Login extends Activity {
                     }
                 });
             }
+
             return null;
         }
     }
+    //endregion
 
     public Boolean isOnlineNet() {
 

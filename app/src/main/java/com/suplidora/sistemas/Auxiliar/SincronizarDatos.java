@@ -424,6 +424,28 @@ public class SincronizarDatos {
         }
         return jsonStrConfiguracionSistema;
     }
+    public String ObtenerValorConfigDatos() throws JSONException {
+        HttpHandler shConfigSistema = new HttpHandler();
+        String urlStringConfigSistema = urlGetConfiguraciones;
+        String jsonStrConfiguracionSistema = shConfigSistema.makeServiceCall(urlStringConfigSistema);
+
+        if (jsonStrConfiguracionSistema == null)
+            return null;
+
+        JSONObject jsonObjConfiguracionSistema = new JSONObject(jsonStrConfiguracionSistema);
+        JSONArray ValorConfig = jsonObjConfiguracionSistema.getJSONArray("GetConfiguracionesResult");
+
+        for (int i = 0; i < ValorConfig.length(); i++) {
+            JSONObject c = ValorConfig.getJSONObject(i);
+            String Valor = c.getString("Valor");
+            String Configuracion = c.getString("Configuracion");
+            if(Configuracion == "VersionDatos")
+            {
+                variables_publicas.ValorConfigServ = Valor;
+            }
+        }
+        return jsonStrConfiguracionSistema;
+    }
 
     //ClientesSucursal
     public String SincronizarClientesSucursal() throws JSONException {
