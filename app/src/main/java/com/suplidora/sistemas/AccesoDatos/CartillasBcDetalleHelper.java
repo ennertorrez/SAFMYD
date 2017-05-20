@@ -58,11 +58,14 @@ public class CartillasBcDetalleHelper {
 
     public HashMap<String, String> BuscarBonificacion(String ItemV, String Canal, String Fecha,String Cantidad){
         HashMap<String,String> cartillaDetalle = new HashMap<String, String>();
+        if(Canal.equalsIgnoreCase("Super")){
+            Canal="MAYORISTA";
+        }
         String selectQuery = "SELECT * FROM "+variables_publicas.TABLE_CARTILLAS_BC+" cb INNER JOIN "+variables_publicas.TABLE_DETALLE_CARTILLAS_BC+" db ON cb.codigo= db.codigo " +
-                "WHERE db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV+"= ? AND DB."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_tipo+" = ? COLLATE NOCASE " +
-                "AND db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad+" <= ? AND  ( ? BETWEEN cb.fechaini AND cb.fechafinal)" +
+                "WHERE db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV+"= '"+ItemV+"' AND DB."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_tipo+" = '"+Canal+"' COLLATE NOCASE " +
+                "AND cast(db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad+" as integer) <= cast("+Cantidad+" as integer) AND  ( '"+Fecha+"' BETWEEN cb.fechaini AND cb.fechafinal)" +
                 " AND db.activo = 'true'";
-        Cursor c = database.rawQuery(selectQuery, new String[]{ItemV,Canal,Cantidad,Fecha});
+        Cursor c = database.rawQuery(selectQuery,null);
         if (c.moveToFirst()) {
             do {
               cartillaDetalle.put(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_id,c.getString(c.getColumnIndex(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_id)));
