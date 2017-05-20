@@ -83,9 +83,9 @@ public class PedidosDetalleHelper {
         else return false;
     }
 
-    public List<HashMap<String, String>> ObtenerDetallePedido(String CodigoPedido) {
+    public List<HashMap<String, String>> ObtenerPedidoDetalle(String CodigoPedido) {
         List<HashMap<String,String>> lst= new ArrayList<>();
-        Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS_DETALLE + " Where " + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " = ? COLLATE NOCASE", new String[]{CodigoPedido});
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_PEDIDOS_DETALLE + " WHERE " + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " = ? ", new String[]{CodigoPedido});
         if (c.moveToFirst()) {
             do {
                 HashMap<String, String> detalle = new HashMap<>();
@@ -121,6 +121,13 @@ public class PedidosDetalleHelper {
         Log.d("Det. pedido eliminado: "+CodigoPedido, "Datos eliminados");
     }
 
-
+    public boolean ActualizarCodigoPedido(String CodigoPedido, String NoPedido){
+        ContentValues con = new ContentValues();
+        con.put("CodigoPedido", NoPedido);
+        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS_DETALLE, con, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido +" = '"+CodigoPedido+"'", null );
+        if(rowInserted != -1)
+            return true;
+        else return false;
+    }
 
 }
