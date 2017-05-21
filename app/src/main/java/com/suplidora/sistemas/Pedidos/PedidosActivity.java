@@ -16,6 +16,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +35,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.storage.OnPausedListener;
 import com.google.gson.Gson;
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
@@ -59,7 +61,11 @@ import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
 
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -68,9 +74,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class PedidosActivity extends Activity {
 
-    private static final int REQUEST_READ_PHONE_STATE = 1;
+
     //region Declaracion de controles
     private EditText txtCodigoArticulo;
     private EditText txtDescuento;
@@ -214,25 +220,25 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         txtDescuento.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-              try{
-                  if (!hasFocus) {
-                      if (articulo == null) {
-                          txtDescuento.setText("0");
-                      } else {
-                          double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty()? "0":txtDescuento.getText().toString() );
-                          double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
-                          double descuentoCliente = Double.parseDouble(cliente.getDescuento());
-                          double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
-                          if (descuento > descuentoMayor) {
-                              MensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
-                              txtDescuento.setText("0");
-                              return;
-                          }
-                      }
-                  }
-              }catch (Exception ex){
-                  MensajeAviso(ex.getMessage());
-              }
+                try {
+                    if (!hasFocus) {
+                        if (articulo == null) {
+                            txtDescuento.setText("0");
+                        } else {
+                            double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty() ? "0" : txtDescuento.getText().toString());
+                            double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
+                            double descuentoCliente = Double.parseDouble(cliente.getDescuento());
+                            double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
+                            if (descuento > descuentoMayor) {
+                                MensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
+                                txtDescuento.setText("0");
+                                return;
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    MensajeAviso(ex.getMessage());
+                }
             }
         });
         txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
@@ -268,7 +274,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         });
         txtCodigoArticulo.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE) || (actionId == EditorInfo.IME_ACTION_NEXT) || (actionId == EditorInfo.IME_ACTION_GO) || (actionId == EditorInfo.IME_ACTION_SEND)) {
                     btnBuscar.performClick();
                     focusedControl = "txtCodigoArticulo";
                     return false;
@@ -302,11 +308,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                 ObtenerPrecio();
 
-                if (focusedControl.equals("txtCodigoArticulo")) {
+                //if (!focusedControl.equalsIgnoreCase("txtCodigoArticulo")) {
                     txtCantidad.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_IMPLICIT);
-                }
+                    focusedControl = "";
+               // }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_IMPLICIT);
+
             }
         });
         final List<PedidoDetalle> lstPedidoDetalle = new ArrayList<>();
@@ -334,7 +343,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
 
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                          InputMethodManager.HIDE_NOT_ALWAYS);
+                                                          InputMethodManager.SHOW_IMPLICIT);
                                               } catch (Exception e) {
                                                   MensajeAviso(e.getMessage());
                                               }
@@ -350,9 +359,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     if (GuardarPedido()) {
                         DbOpenHelper.database.setTransactionSuccessful();
                         DbOpenHelper.database.endTransaction();
-                       // SincronizarPedido();
+                        SincronizarPedido();
                         finalizar = true;
-                        MensajeAviso("Pedido guardado correctamente");
+                        //MostrarMensajeOk();
+                          MensajeAviso("Pedido guardado correctamente");
                     }
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
@@ -387,13 +397,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
         String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+      /*  int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_READ_PHONE_STATE);
         } else {
             IMEI = getIMEI(PedidosActivity.this);
-        }
+        }*/
 
 
         //Guardamos el Header
@@ -554,14 +564,21 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         itemPedidos.put("Iva", df.format(iva));
         itemPedidos.put("SubTotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
-        listaArticulos.add(itemPedidos);
+
+
         HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), variables_publicas.usuario.getCanal(), variables_publicas.FechaActual, itemPedidos.get("Cantidad"));
         Articulo articuloB = ArticulosH.BuscarArticulo(itemBonificado.get("itemB"));
         if (itemBonificado.size() > 0) {
+
+            //Validamos que solamente se puedan ingresar 18 articulos
+            if(listaArticulos.size()==17 && cliente.getDetallista().equalsIgnoreCase("false")){
+                MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
+            }
+            listaArticulos.add(itemPedidos);
             HashMap<String, String> articuloBonificado = new HashMap<>();
             articuloBonificado.put("CodigoPedido", IdPedido);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-            articuloBonificado.put("Um",articuloB==null? "UNIDAD": articuloB.getUnidad());
+            articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
             articuloBonificado.put("Cantidad", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB));
             articuloBonificado.put("Precio", "0");
             articuloBonificado.put("Descripcion", "**" + itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
@@ -584,10 +601,18 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             listaArticulos.add(articuloBonificado);
         }
+        else{
+            //Validamos que solamente se puedan ingresar 18 articulos
+            if(listaArticulos.size()==18 && cliente.getDetallista().equalsIgnoreCase("false")){
+                MensajeAviso("No se puede agregar el producto seleccionado,ya que excede el limite de 18 productos para un pedido Mayorista");
+                return;
+            }
+            listaArticulos.add(itemPedidos);
+        }
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "Subtotal", "Iva", "Total"}, new
+                String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
                 int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
@@ -659,16 +684,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         dlgAlert.create().show();
     }
 
-    public String getIMEI(Activity activity) {
+/*    public String getIMEI(Activity activity) {
         TelephonyManager telephonyManager = (TelephonyManager) activity
                 .getSystemService(Context.TELEPHONY_SERVICE);
         return telephonyManager.getDeviceId();
-    }
+    }*/
     //endregion
 
     //region Eventos
 
-
+/*
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -681,7 +706,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             default:
                 break;
         }
-    }
+    }*/
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -765,7 +790,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedido/";
             String urlString = url + jsonPedido;
-            String jsonStr = sh.makeServiceCallPost(urlString);
+            String urlStr = urlString;
+            String encodeUrl = "";
+            try {
+                URL Url = new URL(urlStr);
+                URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                encodeUrl = uri.toURL().toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String jsonStr = sh.makeServiceCallPost(encodeUrl);
+
 
             /**********************************Actualizamos los datos del pedido**************************************/
             if (jsonStr != null) {
@@ -778,20 +813,29 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     Gson gson = new Gson();
                     List<HashMap<String, String>> pedidoDetalle = PedidoDetalleH.ObtenerPedidoDetalle(NoPedido);
-                    for (HashMap<String,String> item:pedidoDetalle) {
-                        item.put("SubTotal",item.get("SubTotal").replace(",",""));
-                        item.put("Costo",item.get("Costo").replace(",",""));
-                        item.put("Total",item.get("Total").replace(",",""));
-                        item.put("Iva",item.get("Iva").replace(",",""));
-                        item.put("Precio",item.get("Precio").replace(",",""));
-                        item.put("Descuento",item.get("Descuento").replace(",",""));
-                        item.put("Descripcion",item.get("Descripcion").replace("/"," "));
+                    for (HashMap<String, String> item : pedidoDetalle) {
+                        item.put("SubTotal", item.get("SubTotal").replace(",", ""));
+                        item.put("Costo", item.get("Costo").replace(",", ""));
+                        item.put("Total", item.get("Total").replace(",", ""));
+                        item.put("Iva", item.get("Iva").replace(",", ""));
+                        item.put("Precio", item.get("Precio").replace(",", ""));
+                        item.put("Descuento", item.get("Descuento").replace(",", ""));
+                        item.put("Descripcion", item.get("Descripcion").replace("/", " "));
                     }
                     String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
-                //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
+                    //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
                     final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoDetalle/";
                     String urlStringDetalle = urlDetalle + jsonPedidoDetalle;
-                    String jsonStrDetalle = sh.makeServiceCall(urlStringDetalle);
+
+                    try {
+                        URL Url = new URL(urlStringDetalle);
+                        URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                        encodeUrl = uri.toURL().toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    String jsonStrDetalle = sh.makeServiceCallPost(encodeUrl);
 
                     if (jsonStrDetalle != null) {
                         return null;
@@ -816,5 +860,26 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             return null;
         }
     }
+
+/*    private void MostrarMensajeOk() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(PedidosActivity.this);
+        LayoutInflater inflater = (PedidosActivity.this).getLayoutInflater();
+        builder.setCancelable(false);
+        View v = inflater.inflate(R.layout.dialog_ok_layout, null);
+        builder.setView(v);
+        Button btnOK = (Button) v.findViewById(R.id.btnOkDialogo);
+        btnOK.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        builder.create();
+        builder.show();
+
+    }*/
+
+
 }
 

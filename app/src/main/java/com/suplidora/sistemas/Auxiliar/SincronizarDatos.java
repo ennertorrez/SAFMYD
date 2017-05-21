@@ -161,8 +161,9 @@ public class SincronizarDatos {
                 String CodigoGalatea = c.getString("CodigoGalatea");
                 String Descuento = c.getString("Descuento");
                 String Empleado = c.getString("Empleado");
+                String Detallista =c.getString("Detallista");
 
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado);
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado,Detallista);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         } finally {

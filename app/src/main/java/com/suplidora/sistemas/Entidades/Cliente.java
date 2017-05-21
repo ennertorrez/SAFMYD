@@ -30,11 +30,12 @@ public class Cliente {
     String CodigoGalatea="";
     String Descuento="";
     String Empleado="";
+    String Detallista="";
     public Cliente() {
 
     }
 
-    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado) {
+    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
@@ -59,6 +60,7 @@ public class Cliente {
         CodigoGalatea = codigoGalatea;
         Descuento = descuento;
         Empleado = empleado;
+        Detallista=detallista;
     }
 
     public String getIdCliente() {
@@ -253,6 +255,13 @@ public class Cliente {
         Empleado = empleado;
     }
 
+    public String getDetallista() {
+        return Detallista;
+    }
+
+    public void setDetallista(String detallista) {
+        Detallista = detallista;
+    }
 
     public String toString(){
 

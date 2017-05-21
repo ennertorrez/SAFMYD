@@ -21,11 +21,13 @@ public class HttpHandler {
 
     public String makeServiceCall(String reqUrl) {
         String response = null;
+        HttpURLConnection conn=null;
         try {
             URL url = new URL(reqUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            // read the response
+            conn.setRequestProperty("Accept","*/*");
+            conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
             InputStream in = new BufferedInputStream(conn.getInputStream());
             response = convertStreamToString(in);
         } catch (MalformedURLException e) {
@@ -33,9 +35,12 @@ public class HttpHandler {
         } catch (ProtocolException e) {
             Log.e(TAG, "ProtocolException: " + e.getMessage());
         } catch (IOException e) {
+
             Log.e(TAG, "IOException: " + e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Exception: " + e.getMessage());
+        }finally {
+
         }
         return response;
     }
@@ -46,7 +51,9 @@ public class HttpHandler {
             URL url = new URL(reqUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            // read the response
+            conn.setRequestProperty("Accept","*/*");
+            conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
+            InputStream error= conn.getErrorStream();
             InputStream in = new BufferedInputStream(conn.getInputStream());
             response = convertStreamToString(in);
         } catch (MalformedURLException e) {

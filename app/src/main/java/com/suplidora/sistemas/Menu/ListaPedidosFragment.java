@@ -164,7 +164,7 @@ public class ListaPedidosFragment extends Fragment {
 
 //                            listapedidos=ClientesH.BuscarClientesCodigo(busqueda);
 //                            listapedidos=ClientesH.BuscarClientesNombre(busqueda);
-                    listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
+                   // listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
 
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());

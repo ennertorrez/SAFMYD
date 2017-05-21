@@ -29,7 +29,7 @@ android {
             signingConfig signingConfigs.SISAGO
         }
         debug {
-            signingConfig signingConfigs.SISAGO
+            debuggable true
         }
     }
     productFlavors {
