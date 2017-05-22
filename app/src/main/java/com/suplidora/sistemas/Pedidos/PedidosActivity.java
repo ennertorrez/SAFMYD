@@ -836,10 +836,7 @@ public class PedidosActivity extends Activity {
                     }
 
                     String jsonStrDetalle = sh.makeServiceCallPost(encodeUrl);
-
-                    if (jsonStrDetalle != null) {
-                        return null;
-                    } else {
+                    if (jsonStrDetalle == null) {
                         MensajeAviso("Ha ocurrido un error al sincronizar el detalle del pedido");
                     }
                 } catch (Exception ex) {
