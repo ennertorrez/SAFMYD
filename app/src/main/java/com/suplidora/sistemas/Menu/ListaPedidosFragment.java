@@ -4,6 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -49,19 +54,16 @@ public class ListaPedidosFragment extends Fragment {
     private String TAG = ListaPedidosFragment.class.getSimpleName();
     private String busqueda = "";
     private String fecha = "";
-    private String tipoBusqueda = "2";
     private ProgressDialog pDialog;
     private ListView lv;
     private TextView lblFooter;
+    private TextView tvSincroniza;
     private EditText txtBusqueda;
-    private RadioGroup rgGrupo;
     private Button btnBuscar;
-    private DatePicker datePicker;
-    private Calendar calendar;
     private TextView txtFechaPedido;
-    private int year, month, day;
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
+    private SimpleAdapter adapter;
 
     @Nullable
     @Override
@@ -72,7 +74,19 @@ public class ListaPedidosFragment extends Fragment {
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         txtFechaPedido = (EditText) myView.findViewById(R.id.txtFechaPedido);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
+
         txtFechaPedido.setText(getDatePhone());
+        fecha = txtFechaPedido.getText().toString();
+        LayoutInflater inflate = getActivity().getLayoutInflater();
+        View dialogView = inflate.inflate(R.layout.list_pedidos_guardados, null);
+
+        tvSincroniza = (TextView) dialogView.findViewById(R.id.tvSincronizar);
+
+        DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+        PedidosH = new PedidosHelper(DbOpenHelper.database);
+        variables_publicas.Pedidos = PedidosH.BuscarPedidosSinconizar();
+
+
         /***DatePicker***/
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -82,6 +96,7 @@ public class ListaPedidosFragment extends Fragment {
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateLabel();
+                fecha = txtFechaPedido.getText().toString();
             }
         };
         txtFechaPedido.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +108,7 @@ public class ListaPedidosFragment extends Fragment {
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-        fecha = txtFechaPedido.getText().toString();
+
         /******/
 
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
@@ -106,7 +121,7 @@ public class ListaPedidosFragment extends Fragment {
             }
         });
         listapedidos = new ArrayList<>();
-        new GetClientesPedidos().execute();
+        new GetListaPedidos().execute();
         lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +133,19 @@ public class ListaPedidosFragment extends Fragment {
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
 
-                new GetClientesPedidos().execute();
+                new GetListaPedidos().execute();
+                if(variables_publicas.Pedidos != null)
+                {
+                    String CodPedido = variables_publicas.Pedidos.getCodigoPedido();
+                    if (CodPedido.contains("-"))
+                    {
+                        tvSincroniza.setBackgroundColor(Color.BLUE);
+                        lv.setAdapter(adapter);
+                    }
+                }
+                else {
+                    tvSincroniza.setBackgroundColor(Color.BLUE);
+                }
                 lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
             }
         });
@@ -146,7 +173,7 @@ public class ListaPedidosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    private class GetClientesPedidos extends AsyncTask<Void, Void, Void> {
+    private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -159,12 +186,9 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
                 try {
-//                    DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
-//                    ClientesH = new ClientesHelper(DbOpenHelper.database);
-
-//                            listapedidos=ClientesH.BuscarClientesCodigo(busqueda);
-//                            listapedidos=ClientesH.BuscarClientesNombre(busqueda);
-                   // listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
+                    DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+                    PedidosH = new PedidosHelper(DbOpenHelper.database);
+                    listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
 
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -189,24 +213,38 @@ public class ListaPedidosFragment extends Fragment {
             /**
              * Updating parsed JSON data into ListView
              * */
-            ListAdapter adapter = new SimpleAdapter(
+            adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
                     R.layout.list_pedidos_guardados, new String[]{variables_publicas.PEDIDOS_COLUMN_CodigoPedido, variables_publicas.CLIENTES_COLUMN_Nombre,
-                    variables_publicas.PEDIDOS_COLUMN_Fecha,variables_publicas.PEDIDOS_COLUMN_IdFormaPago},
-                    new int[]{R.id.CodigoPedido, R.id.Cliente, R.id.Fecha, R.id.IdFormaPago});
+                    variables_publicas.PEDIDOS_COLUMN_Fecha},
+                    new int[]{R.id.CodigoPedido, R.id.Cliente, R.id.Fecha}){
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View currView = super.getView(position, convertView, parent);
+                    HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
+                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).contains("-")) {
+                            tvSincroniza.setBackgroundColor(Color.BLUE);
+                    }
+                    else {
+                        tvSincroniza.setBackgroundColor(Color.BLACK);
+                    }
+                    return currView;
+                }
+            };
+
             lv.setAdapter(adapter);
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
         }
     }
     private void updateLabel() {
-        String myFormat = "MM/dd/yy"; //In which you need put here
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         txtFechaPedido.setText(sdf.format(myCalendar.getTime()));
     }
     private String getDatePhone() {
         Calendar cal = new GregorianCalendar();
         Date date = cal.getTime();
-        SimpleDateFormat df = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formatteDate = df.format(date);
         return formatteDate;
     }

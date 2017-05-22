@@ -8,48 +8,74 @@
     android:padding="@dimen/activity_horizontal_margin"
     app:menu = "@menu/main"
     tools:context=".Menu.ListaPedidosFragment" >
-   >
 
     <TextView
-        android:id="@+id/CodigoPedido"
-        android:layout_width="match_parent"
+        android:id="@+id/Pedido"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:paddingTop="6dip"
-        android:textColor="@color/colorPrimaryDark"
+        android:paddingBottom="1dip"
+        android:paddingTop="1dip"
+        android:text="Pedido:"
+        android:textColor="@color/colorBlack"
         android:textSize="16sp"
         android:textStyle="bold"/>
  <TextView
-     android:id="@+id/Cliente"
-     android:layout_width="match_parent"
+     android:id="@+id/CodigoPedido"
+     android:layout_width="160dp"
      android:layout_height="wrap_content"
-     android:paddingBottom="2dip"
-     android:paddingTop="6dip"
+     android:layout_marginLeft="70dp"
+     android:paddingBottom="1dip"
+     android:paddingTop="1dip"
      android:textColor="@color/colorPrimaryDark"
      android:textSize="16sp"
      android:textStyle="bold"/>
-
+    <TextView
+        android:id="@+id/lblFecha"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="1dip"
+        android:paddingTop="1dip"
+        android:text="Fecha: "
+        android:textColor="@color/colorBlack"
+        android:layout_below="@id/CodigoPedido"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
     <TextView
         android:id="@+id/Fecha"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:paddingBottom="1dip"
+        android:paddingTop="1dip"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_below="@id/CodigoPedido"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/tvSincronizar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="300dp"
+        android:background="@mipmap/ic_fiber_manual_record_black_24dp"
+        android:backgroundTint="#ff0000"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/Cliente"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="2dip"
         android:textColor="@color/colorAccent"
-        android:layout_below="@id/IdCliente"
+        android:layout_below="@id/Fecha"
         />
-    <TextView
-        android:id="@+id/IdFormaPago"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#5d5d5d"
-        android:textStyle="bold"
-        android:paddingBottom="2dip"
-        android:layout_below="@id/Nombre"
-        />
+
     <FrameLayout
         android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
     </FrameLayout>
 </RelativeLayout>

@@ -36,6 +36,7 @@ import com.suplidora.sistemas.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.Menu.MapViewFragment;
 import com.suplidora.sistemas.Menu.PedidosFragment;
 import com.suplidora.sistemas.R;
@@ -221,6 +222,9 @@ public class MenuActivity extends AppCompatActivity
                 break;
             case R.id.btnMaestroClientes:
                 fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
+                break;
+            case R.id.btnListadoPedidos:
+                fragmentManager.beginTransaction().replace(R.id.content_frame, new ListaPedidosFragment()).commit();
                 break;
             case R.id.btnDevoluciones:
               /*  Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);

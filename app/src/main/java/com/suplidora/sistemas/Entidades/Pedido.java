@@ -15,12 +15,12 @@ public class Pedido {
    String Fecha = "";
    String Usuario = "";
    String IMEI ="" ;
-   String TasaCambio ="";
+   //String TasaCambio ="";
 
     public Pedido() {
     }
 
-    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI, String tasaCambio) {
+    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI) {
         CodigoPedido=codigoPedido;
         IdVendedor = idVendedor;
         IdCliente = idCliente;
@@ -31,7 +31,7 @@ public class Pedido {
         Fecha = fecha;
         Usuario = usuario;
         this.IMEI = IMEI;
-        this.TasaCambio=tasaCambio;
+        //this.TasaCambio=tasaCambio;
     }
 
     public String getIdVendedor() {
@@ -110,13 +110,13 @@ public class Pedido {
         return CodigoPedido;
     }
 
-    public String getTasaCambio() {
-        return TasaCambio;
-    }
-
-    public void setTasaCambio(String tasaCambio) {
-        TasaCambio = tasaCambio;
-    }
+//    public String getTasaCambio() {
+//        return TasaCambio;
+//    }
+//
+//    public void setTasaCambio(String tasaCambio) {
+//        TasaCambio = tasaCambio;
+//    }
 
     public void setCodigoPedido(String codigoPedido) {
 

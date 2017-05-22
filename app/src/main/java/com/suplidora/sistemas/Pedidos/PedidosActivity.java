@@ -359,7 +359,7 @@ public class PedidosActivity extends Activity {
                     if (GuardarPedido()) {
                         DbOpenHelper.database.setTransactionSuccessful();
                         DbOpenHelper.database.endTransaction();
-                        SincronizarPedido();
+                        //SincronizarPedido();
                         finalizar = true;
                         //MostrarMensajeOk();
                           MensajeAviso("Pedido guardado correctamente");
