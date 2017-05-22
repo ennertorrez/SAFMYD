@@ -16,7 +16,7 @@ public class UsuariosHelper {
     public  UsuariosHelper(SQLiteDatabase db){
         database = db;
     }
-    public void GuardarUsuario(String Codigo, String nombre, String Usuario,
+    public boolean GuardarUsuario(String Codigo, String nombre, String Usuario,
                                    String Contrasenia, String Tipo, String Ruta,
                                       String Canal,String TasaCambio,String RutaForanea,String FechaActualiza) {
 
@@ -32,7 +32,11 @@ public class UsuariosHelper {
          contentValues.put(variables_publicas.USUARIOS_COLUMN_TasaCambio, TasaCambio);
         contentValues.put(variables_publicas.USUARIOS_COLUMN_RutaForanea, RutaForanea);
         contentValues.put(variables_publicas.USUARIOS_COLUMN_FechaActualiza, FechaActualiza);
-         database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
+         long inserted=database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
+        if(inserted!=-1)
+            return true;
+        else
+            return false;
     }
     public Usuario BuscarUsuarios(String Usuario,String Contrasenia) {
         Usuario usuario=null;

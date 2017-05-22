@@ -63,7 +63,7 @@ public class CartillasBcDetalleHelper {
         }
         String selectQuery = "SELECT * FROM "+variables_publicas.TABLE_CARTILLAS_BC+" cb INNER JOIN "+variables_publicas.TABLE_DETALLE_CARTILLAS_BC+" db ON cb.codigo= db.codigo " +
                 "WHERE db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV+"= '"+ItemV+"' AND DB."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_tipo+" = '"+Canal+"' COLLATE NOCASE " +
-                "AND cast(db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad+" as integer) <= cast("+Cantidad+" as integer) AND  ( '"+Fecha+"' BETWEEN cb.fechaini AND cb.fechafinal)" +
+                "AND cast(db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad+" as integer) <= cast("+Cantidad+" as integer) AND  ( CAST('"+Fecha+"' AS DATE) BETWEEN CAST(cb.fechaini AS DATE) AND CAST(cb.fechafinal as DATE) )" +
                 " AND db.activo = 'true'";
         Cursor c = database.rawQuery(selectQuery,null);
         if (c.moveToFirst()) {

@@ -179,7 +179,6 @@ public class Login extends Activity {
                     } else {
                         variables_publicas.MensajeLogin = "";
                         variables_publicas.LoginOk = true;
-                        variables_publicas.CodigoVendedor = variables_publicas.usuario.getCodigo();
                         Intent intent = new Intent("android.intent.action.Barra_cargado");
                         startActivity(intent);
                         finish();

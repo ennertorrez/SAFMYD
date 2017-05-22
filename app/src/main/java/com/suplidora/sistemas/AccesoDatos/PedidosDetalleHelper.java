@@ -30,6 +30,7 @@ public class PedidosDetalleHelper {
                                      String Isc,
                                      String Costo,
                                      String Precio,
+                                     String TipoPrecio,
                                      String PorcentajeIva,
                                      String Iva,
                                      String Um,
@@ -49,6 +50,7 @@ public class PedidosDetalleHelper {
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc, Isc);
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo, Costo);
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio, Precio);
+        contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, TipoPrecio);
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva, PorcentajeIva);
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva, Iva);
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um, Um);
@@ -72,6 +74,7 @@ public class PedidosDetalleHelper {
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc));
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo));
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio));
+        contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio));
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva));
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva));
         contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um, lstArticulos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um));
@@ -100,6 +103,7 @@ public class PedidosDetalleHelper {
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc)));
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo)));
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio)));
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva)));
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva)));
                 detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um)));

@@ -10,7 +10,7 @@
     <item
         android:id="@+id/CerrarSesion"
         android:orderInCategory="100"
-        android:title="Cerrar sesiòn"
+        android:title="Cerrar sesión"
         app:showAsAction="never" />
     <item
         android:id="@+id/Salir"

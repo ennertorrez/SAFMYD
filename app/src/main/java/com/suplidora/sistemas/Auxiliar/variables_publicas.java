@@ -11,9 +11,9 @@ public class variables_publicas {
     public static Configuraciones Configuracion=null;
     public static Pedido Pedidos=null;
     public static String ValorConfigServ="";
-    public static String CodigoVendedor = "";
     public static String UsuarioLogin = "";
     public static String NombreVendedor = "";
+    public static String CodigoVendedor = "";
     public static String TipoUsuario = "";
     public static boolean LoginOk = false;
     public static String MensajeLogin = "";
@@ -109,6 +109,7 @@ public class variables_publicas {
     public static final String PEDIDOS_DETALLE_COLUMN_Isc = "Isc";
     public static final String PEDIDOS_DETALLE_COLUMN_Costo = "Costo";
     public static final String PEDIDOS_DETALLE_COLUMN_Precio = "Precio";
+    public static final String PEDIDOS_DETALLE_COLUMN_TipoPrecio="TipoPrecio";
     public static final String PEDIDOS_DETALLE_COLUMN_PorcentajeIva = "PorcentajeIva";
     public static final String PEDIDOS_DETALLE_COLUMN_Iva = "Iva";
     public static final String PEDIDOS_DETALLE_COLUMN_Um = "Um";

@@ -222,11 +222,16 @@ public class ListaPedidosFragment extends Fragment {
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
                     HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
-                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).contains("-")) {
-                            tvSincroniza.setBackgroundColor(Color.BLUE);
+                    tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
+                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
+                        tvSincroniza.setBackground(getResources().getDrawable(R.mipmap.ic_fiber_manual_record_black_24dp));
+                        tvSincroniza.setBackgroundColor(Color.RED);
+
                     }
                     else {
-                        tvSincroniza.setBackgroundColor(Color.BLACK);
+                        tvSincroniza.setBackground(getResources().getDrawable(R.mipmap.ic_fiber_manual_record_black_24dp));
+                        tvSincroniza.setBackgroundColor(Color.parseColor("#FF278001"));
+
                     }
                     return currView;
                 }

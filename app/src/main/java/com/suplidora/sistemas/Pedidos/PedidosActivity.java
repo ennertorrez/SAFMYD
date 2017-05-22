@@ -35,7 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.storage.OnPausedListener;
 import com.google.gson.Gson;
 import com.suplidora.sistemas.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.AccesoDatos.CartillasBcDetalleHelper;
@@ -61,12 +60,9 @@ import com.suplidora.sistemas.HttpHandler;
 import com.suplidora.sistemas.R;
 
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -74,9 +70,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PedidosActivity extends Activity {
+public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-
+    private static final int REQUEST_READ_PHONE_STATE = 1;
     //region Declaracion de controles
     private EditText txtCodigoArticulo;
     private EditText txtDescuento;
@@ -142,6 +138,9 @@ public class PedidosActivity extends Activity {
     private String CodigoLetra = "";
     private String jsonPedido = "";
     private boolean finalizar = false;
+    private String TipoPrecio = "";
+    private boolean guardadoOK = false;
+    private Vendedor vendedor = null;
     //endregion
 
     //region OnCreate
@@ -309,9 +308,9 @@ public class PedidosActivity extends Activity {
                 ObtenerPrecio();
 
                 //if (!focusedControl.equalsIgnoreCase("txtCodigoArticulo")) {
-                    txtCantidad.requestFocus();
-                    focusedControl = "";
-               // }
+                txtCantidad.requestFocus();
+                focusedControl = "";
+                // }
 
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_IMPLICIT);
@@ -338,12 +337,14 @@ public class PedidosActivity extends Activity {
                                                       return;
                                                   }
                                                   AgregarDetalle();
+
                                                   subTotalPrecioSuper += Double.parseDouble(articulo.getPrecioSuper());
                                                   InputMethodManager inputManager = (InputMethodManager)
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
 
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                          InputMethodManager.SHOW_IMPLICIT);
+                                                          InputMethodManager.RESULT_SHOWN);
+                                                  articulo = null;
                                               } catch (Exception e) {
                                                   MensajeAviso(e.getMessage());
                                               }
@@ -359,10 +360,8 @@ public class PedidosActivity extends Activity {
                     if (GuardarPedido()) {
                         DbOpenHelper.database.setTransactionSuccessful();
                         DbOpenHelper.database.endTransaction();
-                        //SincronizarPedido();
-                        finalizar = true;
-                        //MostrarMensajeOk();
-                          MensajeAviso("Pedido guardado correctamente");
+                        SincronizarPedido();
+                        MostrarMensajeGuardar();
                     }
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
@@ -397,13 +396,13 @@ public class PedidosActivity extends Activity {
         }
         String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
 
-      /*  int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_READ_PHONE_STATE);
         } else {
             IMEI = getIMEI(PedidosActivity.this);
-        }*/
+        }
 
 
         //Guardamos el Header
@@ -445,10 +444,24 @@ public class PedidosActivity extends Activity {
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
             Vendedor vendedor = vendedores.get(0);
-            for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != Integer.parseInt(variables_publicas.CodigoVendedor); i++)
+            for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != Integer.parseInt(variables_publicas.usuario.getCodigo()); i++) {
                 vendedor = vendedores.get(i);
+                this.vendedor = vendedor;
+            }
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         }
+        cboVendedor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                vendedor = (Vendedor) adapter.getItemAtPosition(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
         List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(String.valueOf(IdCliente));
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -482,8 +495,10 @@ public class PedidosActivity extends Activity {
             //Si es Ruta Foranea y no aplica PrecioDetalle
             if (variables_publicas.usuario.getRutaForanea().equals("1") && !articulo.getAplicaPrecioDetalle().equals("true")) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
+                TipoPrecio = "PrecioSuper";
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioDetalle());
+                TipoPrecio = "PrecioDetalle";
             }
         }
 
@@ -492,22 +507,27 @@ public class PedidosActivity extends Activity {
 
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
+                TipoPrecio = "PrecioSuper";
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioForaneo());
+                TipoPrecio = "PrecioForaneo";
             }
         }
         //Si es cliente Mayorista
         if (cliente.getTipo().equals("Mayorista")) {
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioDetalle());
+                TipoPrecio = "PrecioDetalle";
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioMayorista());
+                TipoPrecio = "PrecioMayorista";
             }
         }
 
         //Validamos que si es empleado, damos a precio mayorista
         if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) {
             txtPrecioArticulo.setText(articulo.getPrecioMayorista());
+            TipoPrecio = "PrecioMayorista";
         }
 
         if (cliente.getPrecioEspecial().equals("true") && (cliente.getTipo().equals("Super") || cliente.getTipo().equals("Mayorista"))) {
@@ -521,6 +541,7 @@ public class PedidosActivity extends Activity {
                 }
                 txtPrecioArticulo.setText(precioEspecial.getPrecio());
                 txtDescuento.setText(precioEspecial.getDescuento());
+                TipoPrecio = "PrecioEspecial";
             }
         }
 
@@ -545,6 +566,7 @@ public class PedidosActivity extends Activity {
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
         itemPedidos.put("Precio", String.valueOf(Precio));
+        itemPedidos.put("TipoPrecio", TipoPrecio);
         itemPedidos.put("Descripcion", DescripcionArt);
         itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
         itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
@@ -571,7 +593,7 @@ public class PedidosActivity extends Activity {
         if (itemBonificado.size() > 0) {
 
             //Validamos que solamente se puedan ingresar 18 articulos
-            if(listaArticulos.size()==17 && cliente.getDetallista().equalsIgnoreCase("false")){
+            if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
             }
             listaArticulos.add(itemPedidos);
@@ -579,8 +601,10 @@ public class PedidosActivity extends Activity {
             articuloBonificado.put("CodigoPedido", IdPedido);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
             articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
-            articuloBonificado.put("Cantidad", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB));
+            int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
+            articuloBonificado.put("Cantidad", String.valueOf((int) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
             articuloBonificado.put("Precio", "0");
+            articuloBonificado.put("TipoPrecio", "0");
             articuloBonificado.put("Descripcion", "**" + itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
             articuloBonificado.put("Costo", "0");
             articuloBonificado.put("PorDescuento", "0");
@@ -600,10 +624,9 @@ public class PedidosActivity extends Activity {
                 }
             }
             listaArticulos.add(articuloBonificado);
-        }
-        else{
+        } else {
             //Validamos que solamente se puedan ingresar 18 articulos
-            if(listaArticulos.size()==18 && cliente.getDetallista().equalsIgnoreCase("false")){
+            if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que excede el limite de 18 productos para un pedido Mayorista");
                 return;
             }
@@ -619,7 +642,7 @@ public class PedidosActivity extends Activity {
             public View getView(int position, View convertView, ViewGroup parent) {
                 View currView = super.getView(position, convertView, parent);
                 HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
-                if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).contains("**")) {
+                if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).startsWith("**")) {
                     currView.setBackgroundColor(Color.RED);
                 } else {
                     currView.setBackgroundColor(Color.WHITE);
@@ -684,16 +707,45 @@ public class PedidosActivity extends Activity {
         dlgAlert.create().show();
     }
 
-/*    public String getIMEI(Activity activity) {
+    public void MostrarMensajeGuardar() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = null;
+        if (guardadoOK) {
+            dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
+            Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
+            btnOK.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+            dialogView = inflater.inflate(R.layout.offline_layout, null);
+            dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+        }
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public String getIMEI(Activity activity) {
         TelephonyManager telephonyManager = (TelephonyManager) activity
                 .getSystemService(Context.TELEPHONY_SERVICE);
         return telephonyManager.getDeviceId();
-    }*/
+    }
     //endregion
 
     //region Eventos
 
-/*
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -706,7 +758,7 @@ public class PedidosActivity extends Activity {
             default:
                 break;
         }
-    }*/
+    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -825,7 +877,7 @@ public class PedidosActivity extends Activity {
                     String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
                     //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
                     final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoDetalle/";
-                    String urlStringDetalle = urlDetalle + jsonPedidoDetalle;
+                    String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + vendedor.getCODIGO() + "/" + jsonPedidoDetalle;
 
                     try {
                         URL Url = new URL(urlStringDetalle);
@@ -838,6 +890,10 @@ public class PedidosActivity extends Activity {
                     String jsonStrDetalle = sh.makeServiceCallPost(encodeUrl);
                     if (jsonStrDetalle == null) {
                         MensajeAviso("Ha ocurrido un error al sincronizar el detalle del pedido");
+                    } else {
+                        result = new JSONObject(jsonStrDetalle);
+                        // Getting JSON Array node
+                        guardadoOK = ((String) result.get("SincronizarPedidoDetalleResult")).equalsIgnoreCase("true");
                     }
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
@@ -857,26 +913,5 @@ public class PedidosActivity extends Activity {
             return null;
         }
     }
-
-/*    private void MostrarMensajeOk() {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(PedidosActivity.this);
-        LayoutInflater inflater = (PedidosActivity.this).getLayoutInflater();
-        builder.setCancelable(false);
-        View v = inflater.inflate(R.layout.dialog_ok_layout, null);
-        builder.setView(v);
-        Button btnOK = (Button) v.findViewById(R.id.btnOkDialogo);
-        btnOK.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        builder.create();
-        builder.show();
-
-    }*/
-
-
 }
 

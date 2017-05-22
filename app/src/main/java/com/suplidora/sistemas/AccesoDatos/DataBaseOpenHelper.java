@@ -169,6 +169,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo + " TEXT ,"
+                    + variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva + " TEXT ,"

@@ -119,7 +119,7 @@ public class SincronizarDatos {
         /*******************************CLIENTES******************************/
         //************CLIENTES
         HttpHandler shC = new HttpHandler();
-        String urlStringC = urlClientes + "/" + variables_publicas.CodigoVendedor + "/" + 3;
+        String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo()+ "/" + 3;
         String jsonStrC = shC.makeServiceCall(urlStringC);
 
         if (jsonStrC == null)

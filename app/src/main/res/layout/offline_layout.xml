@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:minHeight="120dp">
+
+    <RelativeLayout    xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:minHeight="150dp">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EL PEDIDO NO PUDO SER SINCRONIZADO, PEDIDO GUARDADO LOCALMENTE"
+            android:textColor="#d24d36"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            />
+
+        <ImageView
+            android:id="@+id/imagenOffline"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@mipmap/ic_portable_wifi_off_black_24dp"
+            android:backgroundTint="#d24d36"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+
+
+    </RelativeLayout>
+</TableLayout>

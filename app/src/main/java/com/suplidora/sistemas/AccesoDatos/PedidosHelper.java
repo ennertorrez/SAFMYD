@@ -131,8 +131,8 @@ public class PedidosHelper {
     public ArrayList<HashMap<String, String>> ObtenerPedidosXfechaNomb(String Fecha, String Nombre) {
 
         String selectQuery = "select * from " + variables_publicas.TABLE_PEDIDOS +
-                " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " = P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
-                " WHERE Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND " + variables_publicas.PEDIDOS_COLUMN_Fecha + " = '" + Fecha + "'";
+                " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
+                " AS INT) WHERE Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND CAST(" + variables_publicas.PEDIDOS_COLUMN_Fecha + " AS DATE) = CAST('" + Fecha + "' AS DATE)";
         Cursor c = database.rawQuery(selectQuery, null);
 
         ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
