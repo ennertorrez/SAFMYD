@@ -371,7 +371,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         });
     }
 
-
+    private void scrollMyListViewToBottom() {
+        lv.post(new Runnable() {
+            @Override
+            public void run() {
+                // Select the last row so it will scroll into view...
+                lv.setSelection(adapter.getCount() - 1);
+            }
+        });
+    }
     //endregion
 
     //region Metodos

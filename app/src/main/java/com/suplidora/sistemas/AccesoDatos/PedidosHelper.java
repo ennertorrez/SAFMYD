@@ -132,7 +132,8 @@ public class PedidosHelper {
 
         String selectQuery = "select * from " + variables_publicas.TABLE_PEDIDOS +
                 " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
-                " AS INT) WHERE Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND CAST(" + variables_publicas.PEDIDOS_COLUMN_Fecha + " AS DATE) = CAST('" + Fecha + "' AS DATE)";
+                " AS INT) WHERE Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND DATE(P." + variables_publicas.PEDIDOS_COLUMN_Fecha + ") = DATE('" + Fecha + "')";
+
         Cursor c = database.rawQuery(selectQuery, null);
 
         ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();

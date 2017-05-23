@@ -1,9 +1,11 @@
 package com.suplidora.sistemas.Menu;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -69,8 +71,8 @@ public class ListaPedidosFragment extends Fragment {
         txtFechaPedido = (EditText) myView.findViewById(R.id.txtFechaPedido);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
 
-        txtFechaPedido.setText(getDatePhone());
-        fecha = txtFechaPedido.getText().toString();
+       // txtFechaPedido.setText(getDatePhone());
+
         LayoutInflater inflate = getActivity().getLayoutInflater();
         View dialogView = inflate.inflate(R.layout.list_pedidos_guardados, null);
 
@@ -79,6 +81,7 @@ public class ListaPedidosFragment extends Fragment {
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         PedidosH = new PedidosHelper(DbOpenHelper.database);
         variables_publicas.Pedidos = PedidosH.BuscarPedidosSinconizar();
+        fecha = getDatePhone();
 
 
         /***DatePicker***/
@@ -90,7 +93,6 @@ public class ListaPedidosFragment extends Fragment {
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateLabel();
-                fecha = txtFechaPedido.getText().toString();
             }
         };
         txtFechaPedido.setOnClickListener(new View.OnClickListener() {
@@ -121,24 +123,15 @@ public class ListaPedidosFragment extends Fragment {
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                fecha = txtFechaPedido.getText().toString();
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
-
-                new GetListaPedidos().execute();
-                if(variables_publicas.Pedidos != null)
-                {
-                    String CodPedido = variables_publicas.Pedidos.getCodigoPedido();
-                    if (CodPedido.contains("-"))
-                    {
-                        tvSincroniza.setBackgroundColor(Color.BLUE);
-                        lv.setAdapter(adapter);
-                    }
-                }
-                else {
-                    tvSincroniza.setBackgroundColor(Color.BLUE);
+                try{
+                    new GetListaPedidos().execute().get();}
+                catch (Exception e){
+                    mensajeAviso(e.getMessage());
                 }
                 lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
             }
@@ -166,6 +159,7 @@ public class ListaPedidosFragment extends Fragment {
                 try {
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     PedidosH = new PedidosHelper(DbOpenHelper.database);
+
                     listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
 
                 } catch (final Exception e) {
@@ -215,9 +209,19 @@ public class ListaPedidosFragment extends Fragment {
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
         }
     }
+    public void mensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(getActivity());
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
     private void updateLabel() {
-        String myFormat = "yyyy-MM-dd"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        String myFormat = ("yyyy-MM-dd");; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         txtFechaPedido.setText(sdf.format(myCalendar.getTime()));
     }
     private String getDatePhone() {

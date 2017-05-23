@@ -30,8 +30,8 @@
                     android:textSize="20dp"
                     android:textStyle="bold"
                     android:textColor="@color/colorAccent"
-                    style="@android:style/Widget.DeviceDefault.Light.Spinner"
-                    android:background="@drawable/spinner_datetime"
+                    android:background="@drawable/borde_campos_pedidos"
+                    android:drawableRight="@drawable/ic_date_range_black_24dp"
                     android:orientation="horizontal"
                     android:textAlignment="center"
                     android:layout_marginRight="45dp"
@@ -90,7 +90,6 @@
                     android:id="@+id/listpedidosdia"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-
                     />
 
                 <TextView
