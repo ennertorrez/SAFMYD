@@ -4,11 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,9 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -225,7 +219,7 @@ public class ListaPedidosFragment extends Fragment {
                     HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
                     tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
                     if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
-                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
+                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_red));
                     }
                     else {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
