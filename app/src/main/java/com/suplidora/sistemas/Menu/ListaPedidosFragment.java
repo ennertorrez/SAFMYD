@@ -106,6 +106,7 @@ public class ListaPedidosFragment extends Fragment {
                 new DatePickerDialog(getActivity(), date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                txtFechaPedido.setEnabled(false);
             }
         });
 
@@ -224,14 +225,10 @@ public class ListaPedidosFragment extends Fragment {
                     HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
                     tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
                     if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
-                        tvSincroniza.setBackground(getResources().getDrawable(R.mipmap.ic_fiber_manual_record_black_24dp));
-                        tvSincroniza.setBackgroundColor(Color.RED);
-
+                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
                     }
                     else {
-                        tvSincroniza.setBackground(getResources().getDrawable(R.mipmap.ic_fiber_manual_record_black_24dp));
-                        tvSincroniza.setBackgroundColor(Color.parseColor("#FF278001"));
-
+                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
                     }
                     return currView;
                 }
