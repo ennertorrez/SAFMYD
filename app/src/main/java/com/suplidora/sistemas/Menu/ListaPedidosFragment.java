@@ -100,7 +100,6 @@ public class ListaPedidosFragment extends Fragment {
                 new DatePickerDialog(getActivity(), date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-                txtFechaPedido.setEnabled(false);
             }
         });
 
@@ -144,23 +143,7 @@ public class ListaPedidosFragment extends Fragment {
                 lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
             }
         });
-        // Launching new screen on Selecting Single ListItem
-//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view,
-//                                    int position, long id) {
-//                // getting values from selected ListItem
-//                String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
-//                String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
-//                // Starting new intent
-//                Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
-//
-//                in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
-//                in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
-//                startActivity(in);
-//            }
-//        });
+
         return myView;
     }
     @Override
@@ -174,7 +157,7 @@ public class ListaPedidosFragment extends Fragment {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage("Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
