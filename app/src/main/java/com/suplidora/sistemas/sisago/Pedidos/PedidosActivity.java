@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -69,6 +72,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -152,6 +156,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
         pedido = new Pedido();
+
+        Locale locale = new Locale("en", "US");
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.locale = locale;
+        getApplicationContext().createConfigurationContext(conf);
+        res.updateConfiguration(conf, dm);
+
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
@@ -924,7 +937,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         item.put("Iva", item.get("Iva").replace(",", ""));
                         item.put("Precio", item.get("Precio").replace(",", ""));
                         item.put("Descuento", item.get("Descuento").replace(",", ""));
-                        item.put("Descripcion", item.get("Descripcion").replace("/", " "));
+                      //  item.put("Descripcion", item.get("Descripcion").replace("/", " "));
                     }
                     String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
                     //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
