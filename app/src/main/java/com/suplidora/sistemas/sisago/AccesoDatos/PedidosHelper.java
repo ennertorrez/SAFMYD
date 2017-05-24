@@ -135,7 +135,7 @@ public class PedidosHelper {
 
     public ArrayList<HashMap<String, String>> ObtenerPedidosXfechaNomb(String Fecha, String Nombre) {
 
-        String selectQuery = "select P.*,DATE(P.Fecha) as FechaP,'F000000' as Factura,'No enviado' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago from " + variables_publicas.TABLE_PEDIDOS +
+        String selectQuery = "select P.*,DATE(P.Fecha) as FechaP,'' as Factura,'No enviado' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago from " + variables_publicas.TABLE_PEDIDOS +
                 " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
                 " AS INT) INNER JOIN "+variables_publicas.TABLE_FORMA_PAGO+" " +
                 "Fp ON Fp."+variables_publicas.FORMA_PAGO_COLUMN_CODIGO+" = P."+variables_publicas.PEDIDOS_COLUMN_IdFormaPago+""+

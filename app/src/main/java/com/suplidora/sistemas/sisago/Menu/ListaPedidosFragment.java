@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -41,7 +42,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+
+import static com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos.jd2d;
 
 
 /**
@@ -66,7 +70,7 @@ public class ListaPedidosFragment extends Fragment {
     public Calendar myCalendar = Calendar.getInstance();
     private SimpleAdapter adapter;
 
-    final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
+    final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
 
     @Nullable
     @Override
@@ -88,7 +92,8 @@ public class ListaPedidosFragment extends Fragment {
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         PedidosH = new PedidosHelper(DbOpenHelper.database);
         variables_publicas.Pedidos = PedidosH.BuscarPedidosSinconizar();
-        fecha = getDatePhone();
+        txtFechaPedido.setText(getDatePhone());
+        fecha = txtFechaPedido.getText().toString();
 
 
         /***DatePicker***/
@@ -128,16 +133,14 @@ public class ListaPedidosFragment extends Fragment {
             new GetListaPedidos().execute().get();}
         catch (Exception e){
             mensajeAviso(e.getMessage());}
-//        try{
-//            new GetPedidoVendedor().execute().get();}
-//        catch (Exception e){
-//            mensajeAviso(e.getMessage());}
+
         lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fecha = txtFechaPedido.getText().toString();
+                listapedidos.clear();
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
@@ -158,93 +161,9 @@ public class ListaPedidosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    //region ObtienePedidoVendedorService
-    private class GetPedidoVendedor extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
 
-            HttpHandler sh = new HttpHandler();
-            String urlString = urlPedidosVendedor+"/"+variables_publicas.CodigoVendedor+"/"+getDatePhone();
-            String jsonStr = sh.makeServiceCall(urlString);
-            Log.e(TAG, "Response from url: " + jsonStr);
 
-            if (jsonStr != null) {
-
-                try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-                    // Getting JSON Array node
-                    JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
-
-                    for (int i = 0; i < Pedidos.length(); i++) {
-                        JSONObject c = Pedidos.getJSONObject(i);
-                        String FACTURA = c.getString("FACTURA");
-                        String StatusPedido = c.getString("StatusPedido");
-                        String cliente = c.getString("cliente");
-                        String condicion = c.getString("condicion");
-                        String fecha = c.getString("fecha");
-                        String pedido = c.getString("pedido");
-                        String total = c.getString("total");
-
-                        HashMap<String, String> pedidos = new HashMap<>();
-
-                        pedidos.put("FACTURA",FACTURA);
-                        pedidos.put("StatusPedido",StatusPedido);
-                        pedidos.put("cliente",cliente);
-                        pedidos.put("condicion",condicion);
-                        pedidos.put("fecha",fecha);
-                        pedidos.put("pedido",pedido);
-                        pedidos.put("total",total);
-                        listapedidos.add(pedidos);
-                    }
-
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    mensajeAviso(e.getMessage());
-                }
-            } else {
-
-                Log.e(TAG, "Couldn't get json from server.");
-               mensajeAviso("Couldn't get json from server. Check LogCat for possible errors!");
-            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-            adapter = new SimpleAdapter(
-                    getActivity(), listapedidos,
-                    R.layout.list_pedidos_guardados, new String[]{"FACTURA", "StatusPedido",
-                    "cliente","condicion","fecha","pedido","total"},
-                    new int[]{R.id.Factura,R.id.Estado,R.id.Cliente,R.id.CondicionPago,R.id.Fecha,
-                            R.id.CodigoPedido, R.id.TotalPedido}){
-                @Override
-                public View getView(int position, View convertView, ViewGroup parent) {
-                    View currView = super.getView(position, convertView, parent);
-                    HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
-                    tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
-                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
-                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_red));
-                    }
-                    else {
-                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
-                    }
-                    return currView;
-                }
-            };
-
-            lv.setAdapter(adapter);
-            lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
-        }
-    }
-    //endregionS
-
-    //region ObtieneListaPedidos
+    //region ObtieneListaPedidosLocal
     private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -261,7 +180,22 @@ public class ListaPedidosFragment extends Fragment {
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     PedidosH = new PedidosHelper(DbOpenHelper.database);
 
-                    listapedidos = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
+                    GetPedidosService();
+                    List<HashMap<String , String >> ListaLocal = null;
+
+                    ListaLocal = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
+
+                    for (HashMap<String , String> item: ListaLocal) {
+                        HashMap<String , String> itempedido = new HashMap<>();
+                        itempedido.put("Factura",item.get("Factura"));
+                        itempedido.put("Estado",item.get("Estado"));
+                        itempedido.put("NombreCliente",item.get("NombreCliente"));
+                        itempedido.put("FormaPago",item.get("FormaPago"));
+                        itempedido.put("FechaP",item.get("FechaP"));
+                        itempedido.put("CodigoPedido",item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+                        itempedido.put("Total",item.get(variables_publicas.PEDIDOS_COLUMN_Total));
+                        listapedidos.add(item);
+                    }
 
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
@@ -309,6 +243,53 @@ public class ListaPedidosFragment extends Fragment {
 
             lv.setAdapter(adapter);
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
+        }
+    }
+
+    private void GetPedidosService() {
+        String CodigoVendedor =  variables_publicas.usuario.getCodigo();
+        HttpHandler sh = new HttpHandler();
+        String urlString = urlPedidosVendedor+"/"+CodigoVendedor+"/"+fecha+"/"+busqueda;
+        String jsonStr = sh.makeServiceCall(urlString);
+        Log.e(TAG, "Response from url: " + jsonStr);
+
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
+
+                for (int i = 0; i < Pedidos.length(); i++) {
+                    JSONObject c = Pedidos.getJSONObject(i);
+                    String FACTURA = c.getString("FACTURA");
+                    String StatusPedido = c.getString("StatusPedido");
+                    String cliente = c.getString("cliente");
+                    String condicion = c.getString("condicion");
+                    String fecha = c.getString("fecha");
+                    String pedido = c.getString("pedido");
+                    String total = c.getString("total");
+
+                    HashMap<String, String> pedidos = new HashMap<>();
+
+                    pedidos.put("Factura",FACTURA);
+                    pedidos.put("Estado",StatusPedido);
+                    pedidos.put("NombreCliente",cliente);
+                    pedidos.put("FormaPago",condicion);
+                    pedidos.put("FechaP",fecha);
+                    pedidos.put("CodigoPedido",pedido);
+                    pedidos.put("Total",total);
+                    listapedidos.add(pedidos);
+                }
+
+            } catch (final JSONException e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                mensajeAviso(e.getMessage());
+            }
+        } else {
+
+            Log.e(TAG, "Couldn't get json from server.");
+            mensajeAviso("Couldn't get json from server. Check LogCat for possible errors!");
         }
     }
     //endregion

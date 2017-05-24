@@ -992,7 +992,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         item.put("Iva", item.get("Iva").replace(",", ""));
                         item.put("Precio", item.get("Precio").replace(",", ""));
                         item.put("Descuento", item.get("Descuento").replace(",", ""));
-                        //  item.put("Descripcion", item.get("Descripcion").replace("/", " "));
+                         item.put("Descripcion", item.get("Descripcion").replace("/", " "));
                     }
                     String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
                     //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
