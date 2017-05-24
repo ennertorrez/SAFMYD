@@ -2,15 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="110dp"
-    android:minHeight="110dp">
+    android:minHeight="110dp"
+   >
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:text="PEDIDO GUARDADO EXITOSAMENTE"
         android:textAlignment="center"
         android:textColor="#1aa90d"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        />
     <Button
         android:id="@+id/btnOkDialogo"
         android:layout_width="50dp"
