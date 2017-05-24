@@ -156,7 +156,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Fecha + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Usuario + " TEXT , "
-                    + variables_publicas.PEDIDOS_COLUMN_IMEI + " TEXT ) ");
+                    + variables_publicas.PEDIDOS_COLUMN_IMEI + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_Total + " TEXT ) ");
 
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PEDIDOS_DETALLE + " ("

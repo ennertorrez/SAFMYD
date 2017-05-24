@@ -97,6 +97,7 @@ public class variables_publicas {
     public static final String PEDIDOS_COLUMN_Fecha = "Fecha";
     public static final String PEDIDOS_COLUMN_Usuario = "Usuario";
     public static final String PEDIDOS_COLUMN_IMEI = "IMEI";
+    public static final String PEDIDOS_COLUMN_Total = "Total";
 
 
     public static final String PEDIDOS_DETALLE_COLUMN_CodigoPedido = "CodigoPedido";

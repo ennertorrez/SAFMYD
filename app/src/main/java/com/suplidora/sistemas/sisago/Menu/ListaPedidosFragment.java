@@ -28,7 +28,12 @@ import android.widget.Toast;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +65,8 @@ public class ListaPedidosFragment extends Fragment {
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
     private SimpleAdapter adapter;
+
+    final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
 
     @Nullable
     @Override
@@ -117,7 +124,14 @@ public class ListaPedidosFragment extends Fragment {
             }
         });
         listapedidos = new ArrayList<>();
-        new GetListaPedidos().execute();
+        try{
+            new GetListaPedidos().execute().get();}
+        catch (Exception e){
+            mensajeAviso(e.getMessage());}
+//        try{
+//            new GetPedidoVendedor().execute().get();}
+//        catch (Exception e){
+//            mensajeAviso(e.getMessage());}
         lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +158,93 @@ public class ListaPedidosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    //region ObtienePedidoVendedorService
+    private class GetPedidoVendedor extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            HttpHandler sh = new HttpHandler();
+            String urlString = urlPedidosVendedor+"/"+variables_publicas.CodigoVendedor+"/"+getDatePhone();
+            String jsonStr = sh.makeServiceCall(urlString);
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            if (jsonStr != null) {
+
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
+
+                    for (int i = 0; i < Pedidos.length(); i++) {
+                        JSONObject c = Pedidos.getJSONObject(i);
+                        String FACTURA = c.getString("FACTURA");
+                        String StatusPedido = c.getString("StatusPedido");
+                        String cliente = c.getString("cliente");
+                        String condicion = c.getString("condicion");
+                        String fecha = c.getString("fecha");
+                        String pedido = c.getString("pedido");
+                        String total = c.getString("total");
+
+                        HashMap<String, String> pedidos = new HashMap<>();
+
+                        pedidos.put("FACTURA",FACTURA);
+                        pedidos.put("StatusPedido",StatusPedido);
+                        pedidos.put("cliente",cliente);
+                        pedidos.put("condicion",condicion);
+                        pedidos.put("fecha",fecha);
+                        pedidos.put("pedido",pedido);
+                        pedidos.put("total",total);
+                        listapedidos.add(pedidos);
+                    }
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    mensajeAviso(e.getMessage());
+                }
+            } else {
+
+                Log.e(TAG, "Couldn't get json from server.");
+               mensajeAviso("Couldn't get json from server. Check LogCat for possible errors!");
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+            adapter = new SimpleAdapter(
+                    getActivity(), listapedidos,
+                    R.layout.list_pedidos_guardados, new String[]{"FACTURA", "StatusPedido",
+                    "cliente","condicion","fecha","pedido","total"},
+                    new int[]{R.id.Factura,R.id.Estado,R.id.Cliente,R.id.CondicionPago,R.id.Fecha,
+                            R.id.CodigoPedido, R.id.TotalPedido}){
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View currView = super.getView(position, convertView, parent);
+                    HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
+                    tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
+                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
+                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_red));
+                    }
+                    else {
+                        tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
+                    }
+                    return currView;
+                }
+            };
+
+            lv.setAdapter(adapter);
+            lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
+        }
+    }
+    //endregionS
+
+    //region ObtieneListaPedidos
     private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -187,9 +288,10 @@ public class ListaPedidosFragment extends Fragment {
              * */
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
-                    R.layout.list_pedidos_guardados, new String[]{variables_publicas.PEDIDOS_COLUMN_CodigoPedido, variables_publicas.CLIENTES_COLUMN_Nombre,
-                    variables_publicas.PEDIDOS_COLUMN_Fecha},
-                    new int[]{R.id.CodigoPedido, R.id.Cliente, R.id.Fecha}){
+                    R.layout.list_pedidos_guardados, new String[]{"Factura","Estado",
+                    "NombreCliente","FormaPago","FechaP",variables_publicas.PEDIDOS_COLUMN_CodigoPedido,variables_publicas.PEDIDOS_COLUMN_Total},
+                    new int[]{R.id.Factura,R.id.Estado,R.id.Cliente,R.id.CondicionPago,R.id.Fecha,
+                            R.id.CodigoPedido,R.id.TotalPedido}){
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
@@ -209,6 +311,8 @@ public class ListaPedidosFragment extends Fragment {
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
         }
     }
+    //endregion
+
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(getActivity());
         dlgAlert.setMessage(texto);
@@ -219,6 +323,7 @@ public class ListaPedidosFragment extends Fragment {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
+
     private void updateLabel() {
         String myFormat = ("yyyy-MM-dd");; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
