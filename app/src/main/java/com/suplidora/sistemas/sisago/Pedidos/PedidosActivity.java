@@ -141,6 +141,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String TipoPrecio = "";
     private boolean guardadoOK = false;
     private Vendedor vendedor = null;
+    private double PrecioItem = 0;
     //endregion
 
     //region OnCreate
@@ -328,7 +329,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       return;
                                                   }
 
-                                                  if (Double.parseDouble( txtCantidad.getText().toString())<1 ) {
+                                                  if (Double.parseDouble(txtCantidad.getText().toString()) < 1) {
                                                       txtCantidad.setError("Ingrese un valor mayor a 0");
                                                       return;
                                                   }
@@ -363,12 +364,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 try {
                     CodigoLetra = lblCodigoCliente.getText().toString();
                     DbOpenHelper.database.beginTransaction();
-                    if (GuardarPedido()) {
-                        DbOpenHelper.database.setTransactionSuccessful();
-                        DbOpenHelper.database.endTransaction();
-                        SincronizarPedido();
-                        MostrarMensajeGuardar();
-                    }
+                    Guardar();
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
                     MensajeAviso(e.getMessage());
@@ -403,11 +399,46 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         return false;
     }
 
-    private boolean GuardarPedido() {
+    private boolean Guardar() {
         if (lv.getCount() <= 0) {
             MensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
             return false;
         }
+
+        String mensaje = "";
+        if (Double.parseDouble(lblSubTotalCor.getText().toString()) < 3000) {
+            mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
+        }
+        else{
+            mensaje="Esta seguro que desea guardar el pedido?";
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (GuardarPedido()) {
+                            DbOpenHelper.database.setTransactionSuccessful();
+                            DbOpenHelper.database.endTransaction();
+                            SincronizarPedido();
+                            MostrarMensajeGuardar();
+                        }
+                        PedidosActivity.this.finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+
+      return true;
+    }
+
+    private boolean GuardarPedido() {
         String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
@@ -510,8 +541,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             if (variables_publicas.usuario.getRutaForanea().equals("1") && !articulo.getAplicaPrecioDetalle().equals("true")) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
                 TipoPrecio = "PrecioSuper";
+                PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioDetalle());
+                PrecioItem = Double.parseDouble(articulo.getPrecioDetalle());
                 TipoPrecio = "PrecioDetalle";
             }
         }
@@ -521,9 +554,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioSuper());
+                PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
                 TipoPrecio = "PrecioSuper";
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioForaneo());
+                PrecioItem = Double.parseDouble(articulo.getPrecioForaneo());
                 TipoPrecio = "PrecioForaneo";
             }
         }
@@ -531,9 +566,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         if (cliente.getTipo().equals("Mayorista")) {
             if (subTotalPrecioSuper < valorPolitica) {
                 txtPrecioArticulo.setText(articulo.getPrecioDetalle());
+                PrecioItem = Double.parseDouble(articulo.getPrecioDetalle());
                 TipoPrecio = "PrecioDetalle";
             } else {
                 txtPrecioArticulo.setText(articulo.getPrecioMayorista());
+                PrecioItem = Double.parseDouble(articulo.getPrecioMayorista());
                 TipoPrecio = "PrecioMayorista";
             }
         }
@@ -572,8 +609,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void AgregarDetalle() {
-        Float PrecioItem = Float.parseFloat(articulo.getPrecioMayorista());
-        Float Precio = PrecioItem;
+        double Precio = PrecioItem;
         String DescripcionArt = lblDescripcionArticulo.getText().toString();
         HashMap<String, String> itemPedidos = new HashMap<>();
         itemPedidos.put("CodigoPedido", IdPedido);
@@ -646,6 +682,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             listaArticulos.add(itemPedidos);
         }
+        PrecioItem = 0;
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
