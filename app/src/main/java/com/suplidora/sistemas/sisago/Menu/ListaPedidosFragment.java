@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.Menu;
+package com.suplidora.sistemas.sisago.Menu;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -25,10 +25,11 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.suplidora.sistemas.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.AccesoDatos.PedidosHelper;
-import com.suplidora.sistemas.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.R;
+import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,8 +124,14 @@ public class ListaPedidosFragment extends Fragment {
             }
         });
         listapedidos = new ArrayList<>();
-        new GetListaPedidos().execute();
-        new GetPedidoVendedor().execute();
+        try{
+            new GetListaPedidos().execute().get();}
+        catch (Exception e){
+            mensajeAviso(e.getMessage());}
+//        try{
+//            new GetPedidoVendedor().execute().get();}
+//        catch (Exception e){
+//            mensajeAviso(e.getMessage());}
         lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +158,7 @@ public class ListaPedidosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    //region ObtienePedidoVendedor
+    //region ObtienePedidoVendedorService
     private class GetPedidoVendedor extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
@@ -235,7 +242,7 @@ public class ListaPedidosFragment extends Fragment {
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
         }
     }
-    //endregion
+    //endregionS
 
     //region ObtieneListaPedidos
     private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
@@ -281,9 +288,8 @@ public class ListaPedidosFragment extends Fragment {
              * */
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
-                    R.layout.list_pedidos_guardados, new String[]{"00000000","No enviado",
-                    variables_publicas.CLIENTES_COLUMN_Nombre,variables_publicas.FORMA_PAGO_COLUMN_NOMBRE,
-                    variables_publicas.PEDIDOS_COLUMN_Fecha,variables_publicas.PEDIDOS_COLUMN_CodigoPedido,variables_publicas.PEDIDOS_COLUMN_Total},
+                    R.layout.list_pedidos_guardados, new String[]{"Factura","Estado",
+                    "NombreCliente","FormaPago","FechaP",variables_publicas.PEDIDOS_COLUMN_CodigoPedido,variables_publicas.PEDIDOS_COLUMN_Total},
                     new int[]{R.id.Factura,R.id.Estado,R.id.Cliente,R.id.CondicionPago,R.id.Fecha,
                             R.id.CodigoPedido,R.id.TotalPedido}){
                 @Override

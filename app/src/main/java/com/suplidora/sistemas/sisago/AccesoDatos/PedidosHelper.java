@@ -135,11 +135,11 @@ public class PedidosHelper {
 
     public ArrayList<HashMap<String, String>> ObtenerPedidosXfechaNomb(String Fecha, String Nombre) {
 
-        String selectQuery = "select * from " + variables_publicas.TABLE_PEDIDOS +
+        String selectQuery = "select P.*,DATE(P.Fecha) as FechaP,'F000000' as Factura,'No enviado' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago from " + variables_publicas.TABLE_PEDIDOS +
                 " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
                 " AS INT) INNER JOIN "+variables_publicas.TABLE_FORMA_PAGO+" " +
                 "Fp ON Fp."+variables_publicas.FORMA_PAGO_COLUMN_CODIGO+" = P."+variables_publicas.PEDIDOS_COLUMN_IdFormaPago+""+
-                " WHERE Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND DATE(P." + variables_publicas.PEDIDOS_COLUMN_Fecha + ") = DATE('" + Fecha + "')";
+                " WHERE P."+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" LIKE '-%' AND Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND DATE(P." + variables_publicas.PEDIDOS_COLUMN_Fecha + ") = DATE('" + Fecha + "')";
 
         Cursor c = database.rawQuery(selectQuery, null);
 
@@ -149,15 +149,17 @@ public class PedidosHelper {
                 HashMap<String, String> pedido = new HashMap<>();
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
-                pedido.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Nombre)));
-                pedido.put(variables_publicas.FORMA_PAGO_COLUMN_NOMBRE, c.getString(c.getColumnIndex(variables_publicas.FORMA_PAGO_COLUMN_NOMBRE)));
+                pedido.put("NombreCliente", c.getString(c.getColumnIndex("NombreCliente")));
+                pedido.put("FormaPago", c.getString(c.getColumnIndex("FormaPago")));
+                pedido.put("Factura", c.getString(c.getColumnIndex("Factura")));
+                pedido.put("Estado", c.getString(c.getColumnIndex("Estado")));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
-                pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
+                pedido.put("FechaP", c.getString(c.getColumnIndex("FechaP")));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));

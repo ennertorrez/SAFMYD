@@ -92,7 +92,7 @@
             android:paddingBottom="1dip" />
         <TextView
             android:id="@+id/TotalPedido"
-            android:layout_width="120dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingBottom="1dip"
