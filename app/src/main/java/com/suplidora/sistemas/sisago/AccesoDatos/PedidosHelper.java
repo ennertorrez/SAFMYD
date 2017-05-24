@@ -27,6 +27,7 @@ public class PedidosHelper {
     public boolean GuardarPedido(String CodigoPedido, String IdVendedor,
                                  String IdCliente,
                                  String Cod_cv,
+                                 String Tipo,
                                  String Observacion,
                                  String IdFormaPago,
                                  String IdSucursal,
@@ -39,6 +40,7 @@ public class PedidosHelper {
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, IdVendedor);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, IdCliente);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, Cod_cv);
+        contentValues.put(variables_publicas.PEDIDOS_COLUMN_Tipo   , Tipo);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Observacion, Observacion);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, IdFormaPago);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, IdSucursal);
@@ -73,6 +75,7 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
@@ -116,6 +119,7 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
@@ -149,6 +153,7 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.FORMA_PAGO_COLUMN_NOMBRE, c.getString(c.getColumnIndex(variables_publicas.FORMA_PAGO_COLUMN_NOMBRE)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
@@ -172,6 +177,7 @@ public class PedidosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)),
+                        c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)),

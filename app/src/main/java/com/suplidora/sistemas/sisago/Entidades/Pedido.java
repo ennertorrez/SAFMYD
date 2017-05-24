@@ -9,6 +9,7 @@ public class Pedido {
    String IdVendedor = "";
    String IdCliente = "";
    String Cod_cv = "";
+    String Tipo="";
    String Observacion = "";
    String IdFormaPago = "";
    String IdSucursal = "";
@@ -20,11 +21,12 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI) {
+    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv,String tipo, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI) {
         CodigoPedido=codigoPedido;
         IdVendedor = idVendedor;
         IdCliente = idCliente;
         Cod_cv = cod_cv;
+        Tipo=tipo;
         Observacion = observacion;
         IdFormaPago = idFormaPago;
         IdSucursal = idSucursal;
@@ -32,6 +34,14 @@ public class Pedido {
         Usuario = usuario;
         this.IMEI = IMEI;
         //this.TasaCambio=tasaCambio;
+    }
+
+    public String getTipo() {
+        return Tipo;
+    }
+
+    public void setTipo(String tipo) {
+        Tipo = tipo;
     }
 
     public String getIdVendedor() {
