@@ -150,6 +150,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PEDIDOS_COLUMN_IdVendedor + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_IdCliente + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " TEXT , "
+                    + variables_publicas.PEDIDOS_COLUMN_Tipo + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_Observacion + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_IdFormaPago + " TEXT , "
                     + variables_publicas.PEDIDOS_COLUMN_IdSucursal + " TEXT , "

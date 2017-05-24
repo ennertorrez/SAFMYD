@@ -142,6 +142,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private boolean guardadoOK = false;
     private Vendedor vendedor = null;
     private double PrecioItem = 0;
+    private String Tipo="";
     //endregion
 
     //region OnCreate
@@ -406,10 +407,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
         String mensaje = "";
-        if (Double.parseDouble(lblSubTotalCor.getText().toString()) < 3000) {
+        if (Double.parseDouble(lblSubTotalCor.getText().toString().replace(",","")) < 3000.00) {
             mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
+            Tipo="Detalle";
         }
         else{
+            Tipo=cliente.getTipo();
             mensaje="Esta seguro que desea guardar el pedido?";
         }
         new AlertDialog.Builder(this)
@@ -424,7 +427,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             SincronizarPedido();
                             MostrarMensajeGuardar();
                         }
-                        PedidosActivity.this.finish();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -451,7 +453,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
         //Guardamos el Header
-        boolean saved = PedidoH.GuardarPedido(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), cliente.getCodCv(),
+        boolean saved = PedidoH.GuardarPedido(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), cliente.getCodCv(),Tipo,
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                 variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI);
 
