@@ -117,6 +117,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private double valorPolitica = 3000;
     public static ArrayList<HashMap<String, String>> listaArticulos;
     public boolean Estado;
+    public double total ;
     private Cliente cliente;
     private int IdCliente;
     private double tasaCambio = 0;
@@ -416,7 +417,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         //Guardamos el Header
         boolean saved = PedidoH.GuardarPedido(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), cliente.getCodCv(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
-                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI);
+                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI,String.valueOf(total));
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -673,7 +674,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void CalcularTotales() {
 
-        double subtotal = 0, iva = 0, total = 0, descuento = 0;
+        double subtotal = 0, iva = 0,  descuento = 0;
+        total = 0;
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
 
@@ -684,10 +686,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-
         }
-
         lblSubTotalCor.setText(df.format(subtotal));
         lblIvaCor.setText(df.format(iva));
         lblTotalCor.setText(df.format(total));

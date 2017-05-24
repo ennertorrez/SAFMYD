@@ -6,75 +6,143 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/activity_horizontal_margin"
-    app:menu = "@menu/main"
-    tools:context=".Menu.ListaPedidosFragment" >
+    app:menu="@menu/main"
+    tools:context=".Menu.ListaPedidosFragment">
 
-    <TextView
-        android:id="@+id/Pedido"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:paddingBottom="1dip"
-        android:paddingTop="1dip"
-        android:text="Pedido:"
-        android:textColor="@color/colorBlack"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
- <TextView
-     android:id="@+id/CodigoPedido"
-     android:layout_width="160dp"
-     android:layout_height="wrap_content"
-     android:layout_marginLeft="70dp"
-     android:paddingBottom="1dip"
-     android:paddingTop="1dip"
-     android:textColor="@color/colorPrimaryDark"
-     android:textSize="16sp"
-     android:textStyle="bold"/>
-    <TextView
-        android:id="@+id/lblFecha"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:paddingBottom="1dip"
-        android:paddingTop="1dip"
-        android:text="Fecha: "
-        android:textColor="@color/colorBlack"
-        android:layout_below="@id/CodigoPedido"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
-    <TextView
-        android:id="@+id/Fecha"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="70dp"
-        android:paddingBottom="1dip"
-        android:paddingTop="1dip"
-        android:textColor="@color/colorPrimaryDark"
-        android:layout_below="@id/CodigoPedido"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
-    <TextView
-        android:id="@+id/tvSincronizar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@mipmap/ic_fiber_manual_record_black_24dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_alignParentRight="true"/>
-    <TextView
-        android:id="@+id/Cliente"
+    <RelativeLayout
+        android:id="@+id/Rl1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/Pedido"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dip"
+            android:paddingTop="1dip"
+            android:text="Pedido:"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/CodigoPedido"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="65dp"
+            android:paddingBottom="1dip"
+            android:paddingTop="1dip"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/Fecha"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/CodigoPedido"
+            android:paddingBottom="1dip"
+            android:paddingTop="1dip"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tvSincronizar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:background="@mipmap/ic_fiber_manual_record_black_24dp"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:textColor="@color/colorAccent"
-        android:layout_below="@id/Fecha"
-        />
+        android:id="@+id/Rl2"
+        android:layout_below="@+id/Rl1">
 
-    <FrameLayout
-        android:id="@+id/content_view"
+        <TextView
+            android:id="@+id/Cliente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dip"
+            android:textColor="@color/colorAccent" />
+    </RelativeLayout>
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:id="@+id/Rl3"
+        android:layout_below="@+id/Rl2">
+        <TextView
+            android:id="@+id/CondicionPago"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dip"
+            android:textColor="@color/colorAccent" />
+        <TextView
+            android:id="@+id/lblTotalPedido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monto Total:"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:layout_toRightOf ="@+id/CondicionPago"
+            android:paddingBottom="1dip" />
+        <TextView
+            android:id="@+id/TotalPedido"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="1dip"
+            android:textColor="@color/colorAccent" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/Rl4"
+        android:layout_below="@+id/Rl3">
+
+        <TextView
+            android:id="@+id/lblEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado:"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:paddingBottom="1dip" />
+
+        <TextView
+            android:id="@+id/Estado"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dip"
+            android:layout_toRightOf="@+id/lblEstado"
+            android:textColor="@color/colorAccent" />
+        </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl4">
+
+        <TextView
+            android:id="@+id/lblFactura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Factura:"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:paddingBottom="1dip" />
+
+        <TextView
+            android:id="@+id/Factura"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dip"
+            android:layout_toRightOf="@+id/lblFactura"
+            android:textColor="@color/colorAccent" />
+    </RelativeLayout>
 </RelativeLayout>
