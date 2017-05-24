@@ -729,7 +729,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 iva += (df.parse(item.get("Iva"))).doubleValue();
                 total += (df.parse(item.get("Total"))).doubleValue();
             } catch (ParseException e) {
-                e.printStackTrace();
+               MensajeAviso(e.getMessage());
             }
         }
         lblSubTotalCor.setText(df.format(subtotal));
