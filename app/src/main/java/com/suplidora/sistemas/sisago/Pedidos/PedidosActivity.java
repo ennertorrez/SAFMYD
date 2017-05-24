@@ -156,20 +156,20 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         setContentView(R.layout.pedidos);
         pedido = new Pedido();
 
-        Locale locale = new Locale("en", "US");
+       /* Locale locale = new Locale("en", "US");
         Resources res = getResources();
         DisplayMetrics dm = res.getDisplayMetrics();
         Configuration conf = res.getConfiguration();
         conf.locale = locale;
         getApplicationContext().createConfigurationContext(conf);
-        res.updateConfiguration(conf, dm);
+        res.updateConfiguration(conf, dm);*/
 
-        df = new DecimalFormat("#0.00");
-        DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+        df = new DecimalFormat("###,###.00");
+       /* DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
-        df.setDecimalFormatSymbols(fmts);
+        df.setDecimalFormatSymbols(fmts);*/
         listaArticulos = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
