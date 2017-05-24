@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.aplicacionprueba;
+package com.suplidora.sistemas.sisago.aplicacionprueba;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.suplidora.sistemas.aplicacionprueba", appContext.getPackageName());
+        assertEquals("com.suplidora.sistemas.sisago.aplicacionprueba", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.suplidora.sistemas.aplicacionprueba;
+package com.suplidora.sistemas.sisago.aplicacionprueba;
 
 import org.junit.Test;
 
