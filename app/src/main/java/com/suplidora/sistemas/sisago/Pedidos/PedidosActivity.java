@@ -47,6 +47,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -68,6 +69,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -355,6 +358,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                   double cantidad = Double.parseDouble(txtCantidad.getText().toString());
                                                   AgregarDetalle();
                                                   RecalcularDetalle();
+                                                  CalcularTotales();
+                                                  txtPrecioArticulo.setText("");
 
                                                   InputMethodManager inputManager = (InputMethodManager)
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -608,6 +613,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void RecalcularDetalle() {
         subTotalPrecioSuper = 0;
+        for (HashMap<String, String> item : listaArticulos) {
+            subTotalPrecioSuper = Double.parseDouble( item.get("SubTotal").replace(",",""));
+        }
 
         for (HashMap<String, String> item : listaArticulos) {
             Articulo articulo = ArticulosH.BuscarArticulo(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
@@ -992,7 +1000,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         item.put("Iva", item.get("Iva").replace(",", ""));
                         item.put("Precio", item.get("Precio").replace(",", ""));
                         item.put("Descuento", item.get("Descuento").replace(",", ""));
-                         item.put("Descripcion", item.get("Descripcion").replace("/", " "));
+                        item.put("Descripcion", Codificar(item.get("Descripcion")));
                     }
                     String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
                     //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");

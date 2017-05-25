@@ -33,6 +33,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
+import com.suplidora.sistemas.sisago.Auxiliar.Utiles;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -208,7 +209,7 @@ public class Login extends Activity {
         protected Void doInBackground(Void... arg0) {
             //************USUARIOS
             HttpHandler sh = new HttpHandler();
-            String urlString = url + Usuario + "/" + Codificar(Contrasenia);
+            String urlString = url + Usuario + "/" + Utiles.Codificar(Contrasenia);
             String encodeUrl = "";
             try {
                 URL Url = new URL(urlString);
@@ -266,7 +267,7 @@ public class Login extends Activity {
                                 @Override
                                 public void run() {
                                     Toast.makeText(getApplicationContext(),
-                                            "Json parsing error: " + e.getMessage(),
+                                            "error: " + "No se ha podido establecer contacto con el servidor",
                                             Toast.LENGTH_LONG)
                                             .show();
                                 }
@@ -275,7 +276,7 @@ public class Login extends Activity {
                     }
 
                 } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    Log.e(TAG, "error: " + "No se ha podido establecer contacto con el servidor");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -288,12 +289,12 @@ public class Login extends Activity {
                 }
             } else {
 
-                Log.e(TAG, "Couldn't get json from server.");
+                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "No se ha podido establecer contacto con el servidor",
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
@@ -304,20 +305,6 @@ public class Login extends Activity {
         }
     }
 
-    private String Codificar(String contrasenia) {
-        return contrasenia.replace("+","(plus)")
-                .replace("#","(hash)")
-                .replace(".","(dot)")
-                .replace("@","at")
-                .replace("*","(star)")
-                .replace("-","(minus)")
-                .replace(",","(comma)")
-                .replace(":","(semicolon)")
-                .replace("!","(exclamation)")
-                .replace("?","(question)")
-                .replace("/","(slash)")
-                .replace("~","(tilde)");
-    }
     //endregion
 
     //region ObtieneValorConfiguracion
@@ -351,12 +338,12 @@ public class Login extends Activity {
                     }
 
                 } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    Log.e(TAG, "No se ha podido establecer contacto con el servidor");
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
+                                    "No se ha podido establecer contacto con el servidor",
                                     Toast.LENGTH_LONG)
                                     .show();
                         }
@@ -364,12 +351,12 @@ public class Login extends Activity {
                 }
             } else {
 
-                Log.e(TAG, "Couldn't get json from server.");
+                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "No se ha podido establecer contacto con el servidor",
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
