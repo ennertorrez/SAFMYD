@@ -186,7 +186,7 @@ public class ListaPedidosFragment extends Fragment {
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     PedidosH = new PedidosHelper(DbOpenHelper.database);
 
-                    GetPedidosService();
+
                     List<HashMap<String , String >> ListaLocal = null;
 
                     ListaLocal = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
@@ -202,6 +202,7 @@ public class ListaPedidosFragment extends Fragment {
                         itempedido.put("Total",item.get(variables_publicas.PEDIDOS_COLUMN_Total));
                         listapedidos.add(item);
                     }
+                    GetPedidosService();
 
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());

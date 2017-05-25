@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,7 +36,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
-
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -42,6 +43,8 @@ import com.suplidora.sistemas.sisago.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.net.URI;
@@ -119,6 +122,9 @@ public class Login extends Activity {
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
+        TextView lblVersion = (TextView) findViewById(R.id.login_version);
+
+        lblVersion.setText("Versión " + getCurrentVersion());
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
@@ -180,7 +186,7 @@ public class Login extends Activity {
                         finish();
                     }
                 } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
-                        new GetUser().execute();
+                    new GetUser().execute();
                 }
                 if (!isOnline && variables_publicas.usuario != null) {
                     variables_publicas.MensajeLogin = "";
@@ -193,6 +199,57 @@ public class Login extends Activity {
                 }
             }
         });
+
+  ValidarUltimaVersion();
+
+    }
+
+    private void ValidarUltimaVersion() {
+        if (checkInternetConnection()) {
+            String latestVersion = "";
+            String currentVersion = getCurrentVersion();
+            try {
+                latestVersion = new GetLatestVersion().execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            //If the versions are not the same
+            if (latestVersion != null && !currentVersion.equals(latestVersion)) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Nueva version disponible");
+                builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
+                builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Click button action
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
+                        dialog.dismiss();
+                        ValidarUltimaVersion();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
+            }
+
+        }
+    }
+
+    private String getCurrentVersion() {
+        PackageManager pm = this.getPackageManager();
+        PackageInfo pInfo = null;
+
+        try {
+            pInfo = pm.getPackageInfo(this.getPackageName(), 0);
+
+        } catch (PackageManager.NameNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        String currentVersion = pInfo.versionName;
+
+        return currentVersion;
     }
 
     //region ObtieneUsuario
@@ -296,7 +353,7 @@ public class Login extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "error: "+"No se ha podido establecer contacto con el servidor",
+                                "error: " + "No se ha podido establecer contacto con el servidor",
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
@@ -394,7 +451,7 @@ public class Login extends Activity {
                 && cm.getActiveNetworkInfo().isConnected()) {
             return true;
         } else {
-            Log.v(TAG, "Internet Connection Not Present");
+            Log.v(TAG, "No tiene conexión a internet");
             return false;
         }
     }
@@ -424,4 +481,32 @@ public class Login extends Activity {
         String formatteHour = df.format(dt.getTime());
         return formatteHour;
     }
+
+
+    private class GetLatestVersion extends AsyncTask<String, String, String> {
+        String latestVersion;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                //It retrieves the latest version by scraping the content of current version from play store at runtime
+                String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+                Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+
+            return latestVersion;
+        }
+    }
+
+
 }

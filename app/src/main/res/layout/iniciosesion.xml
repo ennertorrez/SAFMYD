@@ -7,6 +7,16 @@
     android:scrollbarAlwaysDrawVerticalTrack="true">
 
     <TextView
+        android:id="@+id/login_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Version 1.0"
+        android:textColor="#303F9F"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/login_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -62,6 +72,7 @@
                     android:layout_marginTop="16dp"
                     android:singleLine="true"
                     android:drawableLeft="@mipmap/ic_https_black_24dp"
+                    android:inputType="textPassword"
                     android:drawableTint="#0d00ff"
                     android:hint="Contraseña" />
             </android.support.design.widget.TextInputLayout>
