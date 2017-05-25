@@ -57,7 +57,7 @@ public class ListaPedidosFragment extends Fragment {
     private DataBaseOpenHelper DbOpenHelper;
     private PedidosHelper PedidosH;
     private String TAG = ListaPedidosFragment.class.getSimpleName();
-    private String busqueda = "";
+    private String busqueda = "%";
     private String fecha = "";
     private ProgressDialog pDialog;
     private ListView lv;
@@ -114,6 +114,11 @@ public class ListaPedidosFragment extends Fragment {
                 new DatePickerDialog(getActivity(), date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                InputMethodManager inputManager = (InputMethodManager)
+                        getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
 
@@ -250,6 +255,7 @@ public class ListaPedidosFragment extends Fragment {
         String CodigoVendedor =  variables_publicas.usuario.getCodigo();
         String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
+        busqueda = busqueda.isEmpty() ? "%": busqueda;
         String urlString = urlPedidosVendedor+"/"+CodigoVendedor+"/"+fecha+"/"+busqueda;
         try {
             URL Url = new URL(urlString);
@@ -317,6 +323,7 @@ public class ListaPedidosFragment extends Fragment {
         String myFormat = ("yyyy-MM-dd");; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
         txtFechaPedido.setText(sdf.format(myCalendar.getTime()));
+        btnBuscar.performClick();
     }
     private String getDatePhone() {
         Calendar cal = new GregorianCalendar();
