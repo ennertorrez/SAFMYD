@@ -216,6 +216,7 @@ public class Login extends Activity {
                 e.printStackTrace();
             }
 
+
             //If the versions are not the same
             if (latestVersion != null && !currentVersion.equals(latestVersion)) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
