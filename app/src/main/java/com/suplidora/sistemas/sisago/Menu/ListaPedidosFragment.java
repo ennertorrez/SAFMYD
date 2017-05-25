@@ -134,12 +134,12 @@ public class ListaPedidosFragment extends Fragment {
             }
         });
         listapedidos = new ArrayList<>();
-        try{
-            new GetListaPedidos().execute().get();}
-        catch (Exception e){
-            mensajeAviso(e.getMessage());}
+//        try{
+//            new GetListaPedidos().execute().get();}
+//        catch (Exception e){
+//            mensajeAviso(e.getMessage());}
 
-        lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
+        new GetListaPedidos().execute();
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,11 +150,12 @@ public class ListaPedidosFragment extends Fragment {
 
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
-                try{
-                    new GetListaPedidos().execute().get();}
-                catch (Exception e){
-                    mensajeAviso(e.getMessage());
-                }
+//                try{
+//                    new GetListaPedidos().execute().get();}
+//                catch (Exception e){
+//                    mensajeAviso(e.getMessage());
+//                }
+                new GetListaPedidos().execute();
                 lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
             }
         });
@@ -219,6 +220,7 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
