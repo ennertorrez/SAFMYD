@@ -134,10 +134,6 @@ public class ListaPedidosFragment extends Fragment {
             }
         });
         listapedidos = new ArrayList<>();
-//        try{
-//            new GetListaPedidos().execute().get();}
-//        catch (Exception e){
-//            mensajeAviso(e.getMessage());}
 
         new GetListaPedidos().execute();
 
@@ -150,11 +146,6 @@ public class ListaPedidosFragment extends Fragment {
 
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
-//                try{
-//                    new GetListaPedidos().execute().get();}
-//                catch (Exception e){
-//                    mensajeAviso(e.getMessage());
-//                }
                 new GetListaPedidos().execute();
                 lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
             }
@@ -166,8 +157,6 @@ public class ListaPedidosFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
-
 
     //region ObtieneListaPedidosLocal
     private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
@@ -186,7 +175,6 @@ public class ListaPedidosFragment extends Fragment {
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     PedidosH = new PedidosHelper(DbOpenHelper.database);
 
-
                     List<HashMap<String , String >> ListaLocal = null;
 
                     ListaLocal = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
@@ -203,16 +191,17 @@ public class ListaPedidosFragment extends Fragment {
                         listapedidos.add(item);
                     }
                     GetPedidosService();
-
                 } catch (final Exception e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    //Log.e(TAG, "Json parsing error: " + e.getMessage());
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG)
-                                    .show();
+                            for (int i=0; i < 2; i++)
+                            {
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "No es posible conectarse al servidor. \n Solo se mostraran los pedidos locales que no se han sincronizados!: ",
+                                        Toast.LENGTH_LONG).show();
+                            }
                         }
                     });
                 }
@@ -253,8 +242,7 @@ public class ListaPedidosFragment extends Fragment {
             lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
         }
     }
-
-    private void GetPedidosService() {
+    private void GetPedidosService() throws Exception{
         String CodigoVendedor =  variables_publicas.usuario.getCodigo();
         String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
@@ -270,9 +258,6 @@ public class ListaPedidosFragment extends Fragment {
         String jsonStr = sh.makeServiceCall(encodeUrl);
         Log.e(TAG, "Response from url: " + jsonStr);
 
-        if (jsonStr != null) {
-
-            try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
                 JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
@@ -298,16 +283,6 @@ public class ListaPedidosFragment extends Fragment {
                     pedidos.put("Total",total);
                     listapedidos.add(pedidos);
                 }
-
-            } catch (final JSONException e) {
-                Log.e(TAG, "Json parsing error: " + e.getMessage());
-                mensajeAviso(e.getMessage());
-            }
-        } else {
-
-            Log.e(TAG, "Couldn't get json from server.");
-            mensajeAviso("Couldn't get json from server. Check LogCat for possible errors!");
-        }
     }
     //endregion
 
@@ -321,7 +296,6 @@ public class ListaPedidosFragment extends Fragment {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
-
     private void updateLabel() {
         String myFormat = ("yyyy-MM-dd");; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
