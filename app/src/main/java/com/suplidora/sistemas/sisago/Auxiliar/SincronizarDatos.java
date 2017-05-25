@@ -244,15 +244,8 @@ public class SincronizarDatos {
 
                 String id = c.getString("id");
                 String codigo = c.getString("codigo");
-
-                Date Dateini = jd2d(c.getString("fechaini"));
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                String strFechaIni=df.format(Dateini );
-                String fechaini = strFechaIni;
-
-                Date Datefin=jd2d(c.getString("fechafinal"));
-                String strFin=df.format(Datefin );
-                String fechafinal =strFin;
+                String fechaini=c.getString("fechaini");
+                String fechafinal =c.getString("fechafinal");
                 String tipo = c.getString("tipo");
                 String aprobado = c.getString("aprobado");
 

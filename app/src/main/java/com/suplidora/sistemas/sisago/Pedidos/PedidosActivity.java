@@ -65,6 +65,7 @@ import org.json.JSONObject;
 import java.net.URI;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,12 +164,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         getApplicationContext().createConfigurationContext(conf);
         res.updateConfiguration(conf, dm);*/
 
-        df = new DecimalFormat("###,###.00");
-       /* DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+        df = new DecimalFormat("#0.00");
+        DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
-        df.setDecimalFormatSymbols(fmts);*/
+        df.setDecimalFormatSymbols(fmts);
         listaArticulos = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
@@ -692,6 +693,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         HashMap<String, String> itemPedidos = new HashMap<>();
         itemPedidos.put("CodigoPedido", IdPedido);
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
+        itemPedidos.put("Cod", articulo.getCodigo().substring(articulo.getCodigo().length()-3));
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
         itemPedidos.put("Precio", String.valueOf(Precio));
         itemPedidos.put("TipoPrecio", TipoPrecio);
@@ -728,6 +730,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             HashMap<String, String> articuloBonificado = new HashMap<>();
             articuloBonificado.put("CodigoPedido", IdPedido);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
+            itemPedidos.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).substring(articulo.getCodigo().length()-3,3));
             articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
             int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
             articuloBonificado.put("Cantidad", String.valueOf((int) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
@@ -764,8 +767,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{"Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
+                String[]{ "Cod", "Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
