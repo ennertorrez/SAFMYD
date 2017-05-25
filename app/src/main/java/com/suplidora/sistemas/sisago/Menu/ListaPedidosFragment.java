@@ -36,6 +36,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,8 +46,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import static com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos.jd2d;
 
 
 /**
@@ -248,9 +248,17 @@ public class ListaPedidosFragment extends Fragment {
 
     private void GetPedidosService() {
         String CodigoVendedor =  variables_publicas.usuario.getCodigo();
+        String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
         String urlString = urlPedidosVendedor+"/"+CodigoVendedor+"/"+fecha+"/"+busqueda;
-        String jsonStr = sh.makeServiceCall(urlString);
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String jsonStr = sh.makeServiceCall(encodeUrl);
         Log.e(TAG, "Response from url: " + jsonStr);
 
         if (jsonStr != null) {
