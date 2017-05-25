@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
@@ -179,25 +180,30 @@ public class MenuActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        if (id == R.id.SincronizarDatos) {
-            new SincronizaDatos().execute();
-        }
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.Salir) {
-            finish();//return true;
-        }
-        if (id == R.id.CerrarSesion) {
-            Intent newAct = new Intent(getApplicationContext(), Login.class);
-            newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(newAct);//return true;
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
+       try{
+           int id = item.getItemId();
+
+           if (id == R.id.SincronizarDatos) {
+               new SincronizaDatos().execute();
+           }
+           //noinspection SimplifiableIfStatement
+           if (id == R.id.Salir) {
+               finish();//return true;
+           }
+           if (id == R.id.CerrarSesion) {
+               Intent newAct = new Intent(getApplicationContext(), Login.class);
+               newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+               startActivity(newAct);//return true;
+               finish();
+           }
+           return super.onOptionsItemSelected(item);
+       }catch (Exception e){
+           Funciones.MensajeAviso(getApplicationContext(), e.getMessage(),false);
+       }
+       finally {
+           return super.onOptionsItemSelected(item);
+       }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
