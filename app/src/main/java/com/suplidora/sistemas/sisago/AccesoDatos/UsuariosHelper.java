@@ -62,8 +62,29 @@ public class UsuariosHelper {
         c.close();
         return usuario;
     }
-    public Cursor BuscarUsuariosCount() {
-         return database.rawQuery("select COUNT(*) from " + variables_publicas.TABLE_USUARIOS + "", null);
+    public Usuario BuscarUltimoUsuario() {
+        Usuario usuario=null;
+        String selectQuery="SELECT * FROM " + variables_publicas.TABLE_USUARIOS+" LIMIT 1";
+
+        Cursor c= database.rawQuery(selectQuery , null);
+        if (c.moveToFirst()) {
+            do {
+                usuario = (new Usuario(c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Codigo)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Nombre)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Usuario)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Contrasenia)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Tipo)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Ruta)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Canal)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_TasaCambio)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_RutaForanea)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_FechaActualiza))
+
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return usuario;
     }
     public  void EliminaUsuarios() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_USUARIOS+";");

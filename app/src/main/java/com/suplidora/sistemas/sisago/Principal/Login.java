@@ -37,6 +37,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -122,6 +123,11 @@ public class Login extends Activity {
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
+        Usuario UltimoUsuario = UsuariosH.BuscarUltimoUsuario();
+        if (UltimoUsuario != null) {
+            txtUsuario.setText(UltimoUsuario.getUsuario());
+            txtPassword.requestFocus();
+        }
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
 
         lblVersion.setText("Versión " + getCurrentVersion());
@@ -200,7 +206,7 @@ public class Login extends Activity {
             }
         });
 
-  ValidarUltimaVersion();
+        ValidarUltimaVersion();
 
     }
 
