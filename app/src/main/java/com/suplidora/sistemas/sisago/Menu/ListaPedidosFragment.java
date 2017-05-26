@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -42,6 +43,8 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -72,6 +75,7 @@ public class ListaPedidosFragment extends Fragment {
     private ListView lv;
     private TextView lblFooter;
     private TextView tvSincroniza;
+    private TextView tvEstado;
     private EditText txtBusqueda;
     private Button btnBuscar;
     private Button btnSincronizar;
@@ -101,6 +105,7 @@ public class ListaPedidosFragment extends Fragment {
         LayoutInflater inflate = getActivity().getLayoutInflater();
         View dialogView = inflate.inflate(R.layout.list_pedidos_guardados, null);
         tvSincroniza = (TextView) dialogView.findViewById(R.id.tvSincronizar);
+        tvEstado = (TextView) dialogView.findViewById(R.id.Estado);
 
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         PedidosH = new PedidosHelper(DbOpenHelper.database);
@@ -280,6 +285,17 @@ public class ListaPedidosFragment extends Fragment {
             /**
              * Updating parsed JSON data into ListView
              * */
+            DecimalFormat df = new DecimalFormat("C$ #0.00");
+            DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+            fmts.setGroupingSeparator(',');
+            df.setGroupingSize(3);
+            df.setGroupingUsed(true);
+            df.setDecimalFormatSymbols(fmts);
+            for(HashMap<String, String> item: listapedidos)
+            {
+                double total=Double.parseDouble( item.get(variables_publicas.PEDIDOS_COLUMN_Total));
+                item.put(variables_publicas.PEDIDOS_COLUMN_Total,df.format(total));
+            }
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
                     R.layout.list_pedidos_guardados, new String[]{"Factura","Estado",
@@ -291,12 +307,21 @@ public class ListaPedidosFragment extends Fragment {
                     View currView = super.getView(position, convertView, parent);
                     HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
                     tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
+                    tvEstado = (TextView) currView.findViewById(R.id.Estado);
                     if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_red));
+                        //tvEstado.setBackgroundColor(Color.parseColor("#FFB9B9B9"));
+                        tvEstado.setTextColor(Color.parseColor("#FF6C6C6C"));
                     }
                     else {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
                     }
+                    if(currItem.get("Estado").equals("PENDIENTE"))
+                    {tvEstado.setTextColor(Color.parseColor("#FFBF5300"));}
+                    if(currItem.get("Estado").equals("ANULADO"))
+                    {tvEstado.setTextColor(Color.parseColor("#FFFF0000"));}
+                    if(currItem.get("Estado").equals("FACTURADO"))
+                    {tvEstado.setTextColor(Color.parseColor("#FF2D8600"));}
                     return currView;
                 }
             };
@@ -351,16 +376,6 @@ public class ListaPedidosFragment extends Fragment {
 
     private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
         private String NoPedido;
-/*
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Sincronizando datos, por favor espere...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }*/
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -465,12 +480,6 @@ public class ListaPedidosFragment extends Fragment {
             return null;
         }
 
-      /*  @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-        }*/
     }
 
     public void mensajeAviso(String texto) {
