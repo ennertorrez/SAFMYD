@@ -3,6 +3,7 @@ package com.suplidora.sistemas.sisago.Pedidos;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,7 +48,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
-import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -104,6 +104,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private Spinner cboCondicion;
     private ListView lv;
     private SimpleAdapter adapter;
+    private ProgressDialog pDialog;
     //endregion
 
     //region Declaracion de variables
@@ -120,7 +121,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private double valorPolitica = 3000;
     public static ArrayList<HashMap<String, String>> listaArticulos;
     public boolean Estado;
-    public double total ;
+    public double total;
     private Cliente cliente;
     private int IdCliente;
     private double tasaCambio = 0;
@@ -235,19 +236,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 try {
-                    if (!hasFocus) {
+                    if (!hasFocus && txtDescuento.getText().length() > 0) {
                         if (articulo == null) {
                             txtDescuento.setText("0");
                         } else {
-                            double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty() ? "0" : txtDescuento.getText().toString());
-                            double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
-                            double descuentoCliente = Double.parseDouble(cliente.getDescuento());
-                            double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
-                            if (descuento > descuentoMayor) {
-                                MensajeAviso("El descuento aplicado a este producto es mayor al descuento maximo!");
-                                txtDescuento.setText("0");
-                                return;
-                            }
+                            ValidarDescuento();
                         }
                     }
                 } catch (Exception ex) {
@@ -356,6 +349,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       MensajeAviso("Este artículo ya ha sigo agregado al pedido.");
                                                       return;
                                                   }
+
+                                                  if (!ValidarDescuento()) {
+                                                      return;
+                                                  }
+
                                                   double cantidad = Double.parseDouble(txtCantidad.getText().toString());
                                                   AgregarDetalle();
                                                   RecalcularDetalle();
@@ -368,6 +366,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                                           InputMethodManager.RESULT_SHOWN);
                                                   articulo = null;
+                                                  txtCodigoArticulo.setText(null);
+                                                  txtCantidad.setError(null);
                                               } catch (Exception e) {
                                                   MensajeAviso(e.getMessage());
                                               }
@@ -387,6 +387,21 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
             }
         });
+    }
+
+    private boolean ValidarDescuento() {
+
+        double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty() ? "0" : txtDescuento.getText().toString());
+        double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
+        double descuentoCliente = Double.parseDouble(cliente.getDescuento());
+        double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
+        if (descuento > descuentoMayor) {
+            MensajeAviso("El descuento maximo permitido para este producto es de: " + String.valueOf(descuentoArticulo));
+            txtDescuento.setText("");
+            txtDescuento.requestFocus();
+            return false;
+        }
+        return true;
     }
 
     private void scrollMyListViewToBottom() {
@@ -469,7 +484,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         //Guardamos el Header
         boolean saved = PedidoH.GuardarPedido(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), cliente.getCodCv(), Tipo,
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
-                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI,String.valueOf(total));
+                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(total));
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -492,7 +507,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         cboVendedor.setAdapter(adapterVendedor);
 
         cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
-        IdVendedor = Integer.parseInt(cliente.getIdVendedor());
+        if (variables_publicas.usuario.getCodigo().equals("0")) {
+            IdVendedor = Integer.parseInt(cliente.getIdVendedor());
+        } else {
+            IdVendedor = Integer.parseInt(variables_publicas.usuario.getCodigo());
+        }
+
         if (cliente == null) {
             MensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
@@ -615,7 +635,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private void RecalcularDetalle() {
         subTotalPrecioSuper = 0;
         for (HashMap<String, String> item : listaArticulos) {
-            subTotalPrecioSuper = Double.parseDouble( item.get("SubTotal").replace(",",""));
+            subTotalPrecioSuper = Double.parseDouble(item.get("SubTotal").replace(",", ""));
         }
 
         for (HashMap<String, String> item : listaArticulos) {
@@ -661,16 +681,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             double subtotal, iva, total, descuento, porIva;
             subtotal = Double.parseDouble(item.get("Precio")) * Double.parseDouble(item.get("Cantidad"));
             descuento = subtotal * (Double.parseDouble(item.get("PorDescuento")) / 100);
+            subtotal=subtotal-descuento;
             porIva = Double.parseDouble(articulo.getPorIva());
-            iva = (subtotal - descuento) * porIva;
-            total = subtotal - descuento + iva;
+            iva = subtotal  * porIva;
+            total = subtotal  + iva;
             item.put("Descuento", df.format(descuento));
             item.put("PorcentajeIva", articulo.getPorIva());
             item.put("Um", articulo.getUnidad());
             item.put("Iva", df.format(iva));
             item.put("SubTotal", df.format(subtotal));
             item.put("Total", df.format(total));
-            subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",",""));
+            subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
         }
 
 
@@ -693,7 +714,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         HashMap<String, String> itemPedidos = new HashMap<>();
         itemPedidos.put("CodigoPedido", IdPedido);
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
-        itemPedidos.put("Cod", articulo.getCodigo().substring(articulo.getCodigo().length()-3));
+        itemPedidos.put("Cod", articulo.getCodigo().substring(articulo.getCodigo().length() - 3));
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
         itemPedidos.put("Precio", String.valueOf(Precio));
         itemPedidos.put("TipoPrecio", TipoPrecio);
@@ -707,9 +728,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double subtotal, iva, total, descuento, isc, porIva;
         subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
         descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
+        subtotal= subtotal-descuento;
         porIva = Double.parseDouble(articulo.getPorIva());
-        iva = (subtotal - descuento) * porIva;
-        total = subtotal - descuento + iva;
+        iva = subtotal * porIva;
+        total = subtotal  + iva;
         itemPedidos.put("Descuento", df.format(descuento));
         itemPedidos.put("PorcentajeIva", articulo.getPorIva());
         itemPedidos.put("Um", articulo.getUnidad());
@@ -730,7 +752,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             HashMap<String, String> articuloBonificado = new HashMap<>();
             articuloBonificado.put("CodigoPedido", IdPedido);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-            itemPedidos.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).substring(articulo.getCodigo().length()-3,3));
+            itemPedidos.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).substring(articulo.getCodigo().length() - 3, 3));
             articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
             int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
             articuloBonificado.put("Cantidad", String.valueOf((int) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
@@ -767,7 +789,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{ "Cod", "Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
+                String[]{"Cod", "Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
                 int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
@@ -797,7 +819,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void CalcularTotales() {
 
-        double subtotal = 0, iva = 0,  descuento = 0;
+        double subtotal = 0, iva = 0, descuento = 0;
         total = 0;
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
@@ -967,6 +989,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
     private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(PedidosActivity.this);
+            pDialog.setMessage("Guardando datos, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -1042,6 +1073,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 });
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
         }
     }
 }

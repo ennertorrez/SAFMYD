@@ -39,6 +39,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
@@ -369,6 +370,13 @@ public class Login extends Activity {
 
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog!=null && pDialog.isShowing())
+                pDialog.dismiss();
+        }
     }
 
     //endregion
@@ -493,10 +501,6 @@ public class Login extends Activity {
     private class GetLatestVersion extends AsyncTask<String, String, String> {
         String latestVersion;
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -513,6 +517,8 @@ public class Login extends Activity {
 
             return latestVersion;
         }
+
+
     }
 
 

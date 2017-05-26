@@ -132,7 +132,7 @@ public class MenuActivity extends AppCompatActivity
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(MenuActivity.this);
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage("Cargando datos, por favor espere......");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -193,7 +193,7 @@ public class MenuActivity extends AppCompatActivity
            }
            if (id == R.id.CerrarSesion) {
                Intent newAct = new Intent(getApplicationContext(), Login.class);
-               newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+              newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                startActivity(newAct);//return true;
                finish();
            }
