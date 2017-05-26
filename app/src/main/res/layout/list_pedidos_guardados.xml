@@ -82,7 +82,9 @@
             android:layout_width="165dp"
             android:layout_height="wrap_content"
             android:paddingBottom="1dip"
-            android:textColor="@color/colorAccent" />
+            android:textColor="#9925ff"
+            android:textSize="16sp"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/lblTotalPedido"
             android:layout_width="65dp"
@@ -145,7 +147,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="1dip"
             android:layout_toRightOf="@+id/lblFactura"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="#FF2D8600"
             android:textSize="16sp"
             android:textStyle="bold" />
         </RelativeLayout>
