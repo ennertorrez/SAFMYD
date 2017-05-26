@@ -1022,6 +1022,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     JSONObject result = new JSONObject(jsonStr);
                     // Getting JSON Array node
                     NoPedido = (String) result.get("SincronizarPedidoResult");
+                    if(NoPedido.equals("false")){
+                        guardadoOK=false;
+                        return null;
+                    }
                     PedidoH.ActualizarPedido(IdPedido, NoPedido);
                     PedidoDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
 

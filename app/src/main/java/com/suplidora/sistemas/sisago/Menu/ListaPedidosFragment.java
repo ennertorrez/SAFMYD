@@ -169,13 +169,16 @@ public class ListaPedidosFragment extends Fragment {
                             break;
                         }
                         IdVendedor = Clientes.getIdVendedor();
-                        SincronizarPedido(item);
+                        HashMap<String,String> pedido = PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+                        IdPedido=pedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
+                        SincronizarPedido(pedido);
                         if(guardadoOK ==  false)
                         {
                             mensajeAviso("No se ha podido sincronizar el pedido: "+item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
                             break;
                         }
                     }
+                    btnBuscar.performClick();
                 }
                 else
                 {
@@ -348,7 +351,7 @@ public class ListaPedidosFragment extends Fragment {
 
     private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
         private String NoPedido;
-
+/*
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -357,7 +360,7 @@ public class ListaPedidosFragment extends Fragment {
             pDialog.setMessage("Sincronizando datos, por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
-        }
+        }*/
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -462,12 +465,12 @@ public class ListaPedidosFragment extends Fragment {
             return null;
         }
 
-        @Override
+      /*  @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             if (pDialog.isShowing())
                 pDialog.dismiss();
-        }
+        }*/
     }
 
     public void mensajeAviso(String texto) {
