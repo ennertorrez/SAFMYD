@@ -1,8 +1,11 @@
 package com.suplidora.sistemas.sisago.Auxiliar;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.util.Log;
 
 import com.suplidora.sistemas.sisago.R;
 
@@ -49,17 +52,26 @@ public class Funciones {
         }
         return null;
     }
-    public static void MensajeAviso(final Context context, String texto, final boolean finalizarActivity) {
+    public static void MensajeAviso(final Context context, String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
         dlgAlert.setMessage(texto);
         dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-               if(finalizarActivity){
 
-               }
             }
         });
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
+    }
+    public static boolean checkInternetConnection(Activity activity) {
+        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        // test for connection
+        if (cm.getActiveNetworkInfo() != null
+                && cm.getActiveNetworkInfo().isAvailable()
+                && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,15 +24,20 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Entidades.Usuario;
+import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URI;
@@ -45,7 +49,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+
+import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
 
 
 /**
@@ -56,6 +61,9 @@ public class ListaPedidosFragment extends Fragment {
     View myView;
     private DataBaseOpenHelper DbOpenHelper;
     private PedidosHelper PedidosH;
+    private PedidosDetalleHelper PedidosDetalleH;
+    private ClientesHelper ClientesH;
+    private VendedoresHelper VendedoresH;
 
     private String TAG = ListaPedidosFragment.class.getSimpleName();
     private String busqueda = "%";
@@ -73,6 +81,11 @@ public class ListaPedidosFragment extends Fragment {
     private SimpleAdapter adapter;
 
     final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
+    private String jsonPedido;
+    private String IdPedido;
+    private Cliente Clientes;
+    private String IdVendedor;
+    private boolean guardadoOK = true;
 
     @Nullable
     @Override
@@ -91,6 +104,9 @@ public class ListaPedidosFragment extends Fragment {
 
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         PedidosH = new PedidosHelper(DbOpenHelper.database);
+        PedidosDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
+        ClientesH = new ClientesHelper(DbOpenHelper.database);
+        VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         variables_publicas.Pedidos = PedidosH.BuscarPedidosSinconizar();
         txtFechaPedido.setText(getDatePhone());
         fecha = txtFechaPedido.getText().toString();
@@ -141,6 +157,30 @@ public class ListaPedidosFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                if(Funciones.checkInternetConnection(getActivity()))
+                {
+                    List <HashMap <String ,String>> PedidosLocal =  PedidosH.ObtenerPedidosLocales(fecha,"");
+                    for (HashMap <String,String> item: PedidosLocal)
+                    {
+                        Clientes = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));
+                        if(Clientes == null)
+                        {
+                            mensajeAviso("No se ha podido obtener datos del clientes");
+                            break;
+                        }
+                        IdVendedor = Clientes.getIdVendedor();
+                        SincronizarPedido(item);
+                        if(guardadoOK ==  false)
+                        {
+                            mensajeAviso("No se ha podido sincronizar el pedido: "+item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    mensajeAviso("Verifique su conexion a internet");
+                }
             }
         });
 
@@ -165,6 +205,19 @@ public class ListaPedidosFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
+    private boolean SincronizarPedido(HashMap<String, String> pedido) {
+        Gson gson = new Gson();
+
+        jsonPedido = gson.toJson(pedido);
+        try {
+            new SincronizardorPedidos().execute().get();
+        } catch (Exception ex) {
+            Funciones.MensajeAviso(getActivity().getApplicationContext(),ex.getMessage());
+        }
+
+        return false;
+    }
+
     //region ObtieneListaPedidosLocal
     private class GetListaPedidos extends AsyncTask<Void, Void, Void> {
         @Override
@@ -184,7 +237,7 @@ public class ListaPedidosFragment extends Fragment {
 
                     List<HashMap<String , String >> ListaLocal = null;
 
-                    ListaLocal = PedidosH.ObtenerPedidosXfechaNomb(fecha,busqueda);
+                    ListaLocal = PedidosH.ObtenerPedidosLocales(fecha,busqueda);
 
                     for (HashMap<String , String> item: ListaLocal) {
                         HashMap<String , String> itempedido = new HashMap<>();
@@ -192,7 +245,7 @@ public class ListaPedidosFragment extends Fragment {
                         itempedido.put("Estado",item.get("Estado"));
                         itempedido.put("NombreCliente",item.get("NombreCliente"));
                         itempedido.put("FormaPago",item.get("FormaPago"));
-                        itempedido.put("FechaP",item.get("FechaP"));
+                        itempedido.put("Fecha",item.get("Fecha"));
                         itempedido.put("CodigoPedido",item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
                         itempedido.put("Total",item.get(variables_publicas.PEDIDOS_COLUMN_Total));
                         listapedidos.add(item);
@@ -206,7 +259,7 @@ public class ListaPedidosFragment extends Fragment {
                             for (int i=0; i < 2; i++)
                             {
                                 Toast.makeText(getActivity().getApplicationContext(),
-                                        "No es posible conectarse al servidor. \n Solo se mostraran los pedidos locales que no se han sincronizados!: ",
+                                        "No es posible conectarse al servidor. \n Solo se mostraran los pedidos locales que no se han sincronizados! ",
                                         Toast.LENGTH_LONG).show();
                             }
                         }
@@ -227,7 +280,7 @@ public class ListaPedidosFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
                     R.layout.list_pedidos_guardados, new String[]{"Factura","Estado",
-                    "NombreCliente","FormaPago","FechaP",variables_publicas.PEDIDOS_COLUMN_CodigoPedido,variables_publicas.PEDIDOS_COLUMN_Total},
+                    "NombreCliente","FormaPago","Fecha",variables_publicas.PEDIDOS_COLUMN_CodigoPedido,variables_publicas.PEDIDOS_COLUMN_Total},
                     new int[]{R.id.Factura,R.id.Estado,R.id.Cliente,R.id.CondicionPago,R.id.Fecha,
                             R.id.CodigoPedido,R.id.TotalPedido}){
                 @Override
@@ -285,13 +338,137 @@ public class ListaPedidosFragment extends Fragment {
                     pedidos.put("Estado",StatusPedido);
                     pedidos.put("NombreCliente",cliente);
                     pedidos.put("FormaPago",condicion);
-                    pedidos.put("FechaP",fecha);
+                    pedidos.put("Fecha",fecha);
                     pedidos.put("CodigoPedido",pedido);
                     pedidos.put("Total",total);
                     listapedidos.add(pedidos);
                 }
     }
     //endregion
+
+    private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
+        private String NoPedido;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(getActivity());
+            pDialog.setMessage("Sincronizando datos, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpHandler sh = new HttpHandler();
+            final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedido/";
+            String urlString = url + jsonPedido;
+            String urlStr = urlString;
+            String encodeUrl = "";
+            try {
+                URL Url = new URL(urlStr);
+                URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                encodeUrl = uri.toURL().toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String jsonStr = sh.makeServiceCallPost(encodeUrl);
+
+
+            /**********************************Actualizamos los datos del pedido**************************************/
+            if (jsonStr != null) {
+                try {
+                    JSONObject result = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    NoPedido = (String) result.get("SincronizarPedidoResult");
+                    if(NoPedido.equals("false"))
+                    {
+                        guardadoOK = false;
+                        return  null;
+                    }
+                    PedidosH.ActualizarPedido(IdPedido, NoPedido);
+                    PedidosDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
+
+                    Gson gson = new Gson();
+                    List<HashMap<String, String>> pedidoDetalle = PedidosDetalleH.ObtenerPedidoDetalle(NoPedido);
+                    for (HashMap<String, String> item : pedidoDetalle) {
+                        item.put("SubTotal", item.get("SubTotal").replace(",", ""));
+                        item.put("Costo", item.get("Costo").replace(",", ""));
+                        item.put("Total", item.get("Total").replace(",", ""));
+                        item.put("Iva", item.get("Iva").replace(",", ""));
+                        item.put("Precio", item.get("Precio").replace(",", ""));
+                        item.put("Descuento", item.get("Descuento").replace(",", ""));
+                        item.put("Descripcion", Codificar(item.get("Descripcion")));
+                    }
+                    String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
+                    //    jsonPedidoDetalle = URLEncoder.encode(jsonPedidoDetalle,"UTF-8");
+                    final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoDetalle/";
+                    String urlStringDetalle = urlDetalle + Clientes.getCodigoLetra() + "/" + IdVendedor + "/" + jsonPedidoDetalle;
+
+                    try {
+                        URL Url = new URL(urlStringDetalle);
+                        URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                        encodeUrl = uri.toURL().toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    String jsonStrDetalle = sh.makeServiceCallPost(encodeUrl);
+                    if (jsonStrDetalle == null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (int i=0; i < 2; i++)
+                                {
+                                    Toast.makeText(getActivity().getApplicationContext(),
+                                            "Ha ocurrido un error al sincronizar el detalle del pedido",
+                                            Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    } else {
+                        result = new JSONObject(jsonStrDetalle);
+                        // Getting JSON Array node
+                        guardadoOK = ((String) result.get("SincronizarPedidoDetalleResult")).equalsIgnoreCase("true");
+                    }
+                } catch (final Exception ex) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int i=0; i < 2; i++)
+                            {
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        ex.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+            } else {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i=0; i < 2; i++)
+                        {
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    "No se ha podido obtener los datos del servidor ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+               guardadoOK = false;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+        }
+    }
 
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(getActivity());

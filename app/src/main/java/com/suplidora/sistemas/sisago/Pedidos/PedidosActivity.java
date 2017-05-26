@@ -417,9 +417,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     //region Metodos
 
-    private boolean SincronizarPedido() {
+    private boolean SincronizarPedido(HashMap<String, String> pedido) {
         Gson gson = new Gson();
-        HashMap<String, String> pedido = PedidoH.ObtenerPedido(IdPedido);
+
         jsonPedido = gson.toJson(pedido);
         try {
             new SincronizardorPedidos().execute().get();
@@ -453,7 +453,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         if (GuardarPedido()) {
                             DbOpenHelper.database.setTransactionSuccessful();
                             DbOpenHelper.database.endTransaction();
-                            SincronizarPedido();
+                            SincronizarPedido(PedidoH.ObtenerPedido(IdPedido));
                             MostrarMensajeGuardar();
                         }
                     }

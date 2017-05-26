@@ -199,7 +199,7 @@ public class MenuActivity extends AppCompatActivity
            }
            return super.onOptionsItemSelected(item);
        }catch (Exception e){
-           Funciones.MensajeAviso(getApplicationContext(), e.getMessage(),false);
+           Funciones.MensajeAviso(getApplicationContext(), e.getMessage());
        }
        finally {
            return super.onOptionsItemSelected(item);

@@ -133,9 +133,9 @@ public class PedidosHelper {
         return pedido;
     }
 
-    public ArrayList<HashMap<String, String>> ObtenerPedidosXfechaNomb(String Fecha, String Nombre) {
+    public ArrayList<HashMap<String, String>> ObtenerPedidosLocales(String Fecha, String Nombre) {
 
-        String selectQuery = "select P.*,DATE(P.Fecha) as FechaP,'' as Factura,'No enviado' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago from " + variables_publicas.TABLE_PEDIDOS +
+        String selectQuery = "select P.*,DATE(P.Fecha) as Fecha,'' as Factura,'No enviado' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago from " + variables_publicas.TABLE_PEDIDOS +
                 " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
                 " AS INT) INNER JOIN "+variables_publicas.TABLE_FORMA_PAGO+" " +
                 "Fp ON Fp."+variables_publicas.FORMA_PAGO_COLUMN_CODIGO+" = P."+variables_publicas.PEDIDOS_COLUMN_IdFormaPago+""+
@@ -159,7 +159,7 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
-                pedido.put("FechaP", c.getString(c.getColumnIndex("FechaP")));
+                pedido.put("Fecha", c.getString(c.getColumnIndex("Fecha")));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));
