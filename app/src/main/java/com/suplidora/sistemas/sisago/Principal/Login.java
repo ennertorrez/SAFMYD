@@ -330,15 +330,20 @@ public class Login extends Activity {
                             sd.SincronizarTodo();
                         } catch (final JSONException e) {
                             Log.e(TAG, "Json parsing error: " + e.getMessage());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getApplicationContext(),
-                                            "error: " + e.getMessage(),
-                                            Toast.LENGTH_LONG)
-                                            .show();
-                                }
-                            });
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    for (int i=0; i < 2; i++)
+//                                    {
+//                                        Toast.makeText(getApplicationContext(),
+//                                                "No es posible conectarse al servidor. \n Por favor verifique su conexion a internet!: ",
+//                                                Toast.LENGTH_LONG).show();
+//                                    }
+//                                }
+//                            });
+                            variables_publicas.LoginOk = false;
+                                variables_publicas.MensajeLogin = "Ha ocurrido un error al sincronizar los datos. Por favor intente nuevamente";
+                            UsuariosH.EliminaUsuarios();
                         }
                     }
 

@@ -56,6 +56,7 @@ public class ListaPedidosFragment extends Fragment {
     View myView;
     private DataBaseOpenHelper DbOpenHelper;
     private PedidosHelper PedidosH;
+
     private String TAG = ListaPedidosFragment.class.getSimpleName();
     private String busqueda = "%";
     private String fecha = "";
@@ -65,6 +66,7 @@ public class ListaPedidosFragment extends Fragment {
     private TextView tvSincroniza;
     private EditText txtBusqueda;
     private Button btnBuscar;
+    private Button btnSincronizar;
     private TextView txtFechaPedido;
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
@@ -79,14 +81,12 @@ public class ListaPedidosFragment extends Fragment {
         getActivity().setTitle("Lista de Pedidos");
         lv = (ListView) myView.findViewById(R.id.listpedidosdia);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
+        btnSincronizar = (Button) myView.findViewById(R.id.btnSincronizar);
         txtFechaPedido = (EditText) myView.findViewById(R.id.txtFechaPedido);
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
 
-       // txtFechaPedido.setText(getDatePhone());
-
         LayoutInflater inflate = getActivity().getLayoutInflater();
         View dialogView = inflate.inflate(R.layout.list_pedidos_guardados, null);
-
         tvSincroniza = (TextView) dialogView.findViewById(R.id.tvSincronizar);
 
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
@@ -136,6 +136,13 @@ public class ListaPedidosFragment extends Fragment {
         listapedidos = new ArrayList<>();
 
         new GetListaPedidos().execute();
+
+        btnSincronizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
