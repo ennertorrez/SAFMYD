@@ -1064,7 +1064,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
                 }
-            } else {
+            }
+          /*  else {
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -1075,7 +1076,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 .show();
                     }
                 });
-            }
+            }*/
             return null;
         }
 
