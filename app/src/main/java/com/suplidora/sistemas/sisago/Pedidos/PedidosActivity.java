@@ -635,7 +635,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private void RecalcularDetalle() {
         subTotalPrecioSuper = 0;
         for (HashMap<String, String> item : listaArticulos) {
-            subTotalPrecioSuper = Double.parseDouble(item.get("SubTotal").replace(",", ""));
+            subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
         }
 
         for (HashMap<String, String> item : listaArticulos) {
@@ -1064,7 +1064,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
                 }
-            } else {
+            }
+          /*  else {
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -1075,7 +1076,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 .show();
                     }
                 });
-            }
+            }*/
             return null;
         }
 
