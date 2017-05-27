@@ -220,26 +220,6 @@ public class Login extends Activity {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-
-
-            //If the versions are not the same
-            if (latestVersion != null && !currentVersion.equals(latestVersion)) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Nueva version disponible");
-                builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
-                builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Click button action
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
-                        dialog.dismiss();
-                        ValidarUltimaVersion();
-                    }
-                });
-                builder.setCancelable(false);
-                builder.show();
-            }
-
         }
     }
 

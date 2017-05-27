@@ -422,7 +422,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         jsonPedido = gson.toJson(pedido);
         try {
-            new SincronizardorPedidos().execute().get();
+            new SincronizardorPedidos().execute();
         } catch (Exception ex) {
             MensajeAviso(ex.getMessage());
         }
@@ -454,7 +454,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             DbOpenHelper.database.setTransactionSuccessful();
                             DbOpenHelper.database.endTransaction();
                             SincronizarPedido(PedidoH.ObtenerPedido(IdPedido));
-                            MostrarMensajeGuardar();
+                           // MostrarMensajeGuardar();
                         }
                     }
                 })
@@ -1085,6 +1085,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             super.onPostExecute(result);
             if (pDialog.isShowing())
                 pDialog.dismiss();
+            MostrarMensajeGuardar();
         }
     }
 }
