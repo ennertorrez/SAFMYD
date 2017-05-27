@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -561,13 +562,20 @@ public class ListaPedidosFragment extends Fragment {
         try {
             super.onCreateContextMenu(menu, v, menuInfo);
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+
             HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
             String HeaderMenu = obj.get("CodigoPedido") + "\n" + obj.get("NombreCliente");
 
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getActivity().getMenuInflater();
+
             inflater.inflate(R.menu.eliminar_pedido, menu);
+            MenuItem tv = menu.getItem(0);
+            if(!obj.get("CodigoPedido").startsWith("-"))
+            tv.setTitle("Anular Pedido");
+
         } catch (Exception e) {
             mensajeAviso(e.getMessage());
         }
@@ -578,7 +586,6 @@ public class ListaPedidosFragment extends Fragment {
 
         try {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
 
             switch (item.getItemId()) {
                 case R.id.Elimina_pedido:
