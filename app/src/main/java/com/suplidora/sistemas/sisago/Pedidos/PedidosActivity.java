@@ -681,10 +681,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             double subtotal, iva, total, descuento, porIva;
             subtotal = Double.parseDouble(item.get("Precio")) * Double.parseDouble(item.get("Cantidad"));
             descuento = subtotal * (Double.parseDouble(item.get("PorDescuento")) / 100);
-            subtotal=subtotal-descuento;
+            subtotal = subtotal - descuento;
             porIva = Double.parseDouble(articulo.getPorIva());
-            iva = subtotal  * porIva;
-            total = subtotal  + iva;
+            iva = subtotal * porIva;
+            total = subtotal + iva;
             item.put("Descuento", df.format(descuento));
             item.put("PorcentajeIva", articulo.getPorIva());
             item.put("Um", articulo.getUnidad());
@@ -728,10 +728,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double subtotal, iva, total, descuento, isc, porIva;
         subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
         descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
-        subtotal= subtotal-descuento;
+        subtotal = subtotal - descuento;
         porIva = Double.parseDouble(articulo.getPorIva());
         iva = subtotal * porIva;
-        total = subtotal  + iva;
+        total = subtotal + iva;
         itemPedidos.put("Descuento", df.format(descuento));
         itemPedidos.put("PorcentajeIva", articulo.getPorIva());
         itemPedidos.put("Um", articulo.getUnidad());
@@ -1022,8 +1022,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     JSONObject result = new JSONObject(jsonStr);
                     // Getting JSON Array node
                     NoPedido = (String) result.get("SincronizarPedidoResult");
-                    if(NoPedido.equals("false")){
-                        guardadoOK=false;
+                    if (NoPedido.equals("false")) {
+                        guardadoOK = false;
                         return null;
                     }
                     PedidoH.ActualizarPedido(IdPedido, NoPedido);
