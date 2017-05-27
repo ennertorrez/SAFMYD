@@ -206,9 +206,7 @@ public class Login extends Activity {
                 }
             }
         });
-
         ValidarUltimaVersion();
-
     }
 
     private void ValidarUltimaVersion() {
