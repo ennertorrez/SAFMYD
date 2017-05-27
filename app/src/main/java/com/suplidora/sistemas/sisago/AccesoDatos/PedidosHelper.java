@@ -89,9 +89,10 @@ public class PedidosHelper {
         return lst;
     }
 
-    public void EliminaPedidos() {
-        database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS + ";");
-        Log.d("pedidos_elimina", "Datos eliminados");
+    public void EliminaPedidos(String IdPedido) {
+        database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS + " WHERE" +
+                " "+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" = '" + IdPedido + "' ;");
+        Log.d("pedido_eliminado", "Datos eliminados");
     }
 
     public int ObtenerNuevoCodigoPedido() {

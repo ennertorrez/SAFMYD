@@ -11,12 +11,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -85,6 +89,8 @@ public class ListaPedidosFragment extends Fragment {
     private SimpleAdapter adapter;
 
     final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
+    final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
+    //AnularPedido/{Pedido}/{Usuario}
     private String jsonPedido;
     private String IdPedido;
     private Cliente Clientes;
@@ -97,6 +103,7 @@ public class ListaPedidosFragment extends Fragment {
         myView= inflater.inflate(R.layout.listapedidos_layout,container,false);
         getActivity().setTitle("Lista de Pedidos");
         lv = (ListView) myView.findViewById(R.id.listpedidosdia);
+        registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         btnSincronizar = (Button) myView.findViewById(R.id.btnSincronizar);
         txtFechaPedido = (EditText) myView.findViewById(R.id.txtFechaPedido);
@@ -479,7 +486,65 @@ public class ListaPedidosFragment extends Fragment {
             }
             return null;
         }
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        try {
+            super.onCreateContextMenu(menu, v, menuInfo);
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
+            String HeaderMenu = obj.get("CodigoPedido") + "\n" + obj.get("NombreCliente");
+
+            menu.setHeaderTitle(HeaderMenu);
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.eliminar_pedido, menu);
+        } catch (Exception e) {
+            mensajeAviso(e.getMessage());
+        }
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            switch (item.getItemId()) {
+                case R.id.Elimina_pedido:
+                    HashMap<String, String> itemPedido = listapedidos.get(info.position);
+                    //listapedidos.remove(info.position);
+
+                    HashMap<String,String> pedido = PedidosH.ObtenerPedido(itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+                    IdPedido=pedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
+                    if(itemPedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).startsWith("-")) {
+                        PedidosH.EliminaPedidos(IdPedido);
+                        PedidosDetalleH.EliminarDetallePedido(IdPedido);
+                    }
+                    else if (Funciones.checkInternetConnection(getActivity()))
+                    {
+
+                    }
+
+//                    if (!itemPedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).startsWith("-")) {
+//                        for (int i = 0; i < listapedidos.size(); i++) {
+//                            HashMap<String, String> a = listapedidos.get(i);
+//                            if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(itemPedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA))) {
+//                                listapedidos.remove(a);
+//                            }
+//                        }
+//                    }
+                    btnBuscar.performClick();
+                    adapter.notifyDataSetChanged();
+                    lv.setAdapter(adapter);
+                    return true;
+
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        } catch (Exception e) {
+            mensajeAviso(e.getMessage());
+        }
+        return false;
     }
 
     public void mensajeAviso(String texto) {
