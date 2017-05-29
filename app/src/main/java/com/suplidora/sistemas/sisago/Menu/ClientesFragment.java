@@ -129,7 +129,7 @@ public class ClientesFragment extends Fragment {
     }
 
     // URL to get contacts JSON
-    private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
+    private static String url = variables_publicas.direccionIp+"/ServicioClientes.svc/BuscarClientes/";
     public static ArrayList<HashMap<String, String>> listaClientes;
 
     @Override

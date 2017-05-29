@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -94,8 +95,7 @@ public class MaestroProductoFragment extends Fragment {
     }
 
     // URL to get contacts JSON
-   // private static String url = "http://186.1.18.75:8080/ServiciosSisa.svc/BuscarArticulo/";
-    private static String url = "http://186.1.18.75:8080/ServicioTotalArticulos.svc/BuscarArticulo/";
+    private static String url = variables_publicas.direccionIp +"/ServicioTotalArticulos.svc/BuscarArticulo/";
     ArrayList<HashMap<String, String>> listaArticulos;
 
 

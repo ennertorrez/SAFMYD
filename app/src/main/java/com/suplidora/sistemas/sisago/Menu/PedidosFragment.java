@@ -65,7 +65,6 @@ public class PedidosFragment extends Fragment {
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-    private static String url = "http://186.1.18.75:8080/ServicioClientes.svc/BuscarClientes/";
     public static ArrayList<HashMap<String, String>> listaClientes;
     private ArticulosHelper databaseHelper;
     @Nullable
@@ -140,13 +139,11 @@ public class PedidosFragment extends Fragment {
         });
         return myView;
     }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
+//
     private class GetClientesPedidos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -160,69 +157,18 @@ public class PedidosFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-           /* HttpHandler sh = new HttpHandler();
 
-            // Making a request to url and getting response
-            String urlString = url + busqueda.replace(" ","%20") + "/" + tipoBusqueda;
-            String jsonStr = sh.makeServiceCall(urlString);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-
-            if (jsonStr != null) {*/
                 try {
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     ClientesH = new ClientesHelper(DbOpenHelper.database);
-
                     switch (tipoBusqueda){
                         case "1":
-
                             listaClientes=ClientesH.BuscarClientesCodigo(busqueda);
                             break;
                         case  "2":
                             listaClientes=ClientesH.BuscarClientesNombre(busqueda);
                             break;
                     }
-
-                    /*JSONObject jsonObj = new JSONObject(jsonStr);
-                    listaClientes = new ArrayList<>();
-                    // Getting JSON Array node
-                    JSONArray clientes = jsonObj.getJSONArray("BuscarClientesResult");
-
-                    // looping through All Contacts
-                    for (int i = 0; i < clientes.length(); i++) {
-                        JSONObject c = clientes.getJSONObject(i);
-
-                        String IdCliente = c.getString("IdCliente");
-                        String CodCv = c.getString("CodCv");
-                        String Nombre = c.getString("Nombre");
-                        String FechaCreacion = c.getString("FechaCreacion");
-                        String Telefono = c.getString("Telefono");
-                        String Direccion = c.getString("Direccion");
-                        String IdDepartamento = c.getString("IdDepartamento");
-                        String IdMunicipio = c.getString("IdMunicipio");
-                        String Ciudad = c.getString("Ciudad");
-                        String Ruc = c.getString("Ruc");
-                        String Cedula = c.getString("Cedula");
-                        String LimiteCredito = c.getString("LimiteCredito");
-                        String IdFormaPago = c.getString("IdFormaPago");
-                        String IdVendedor  = c.getString("IdVendedor");
-                        String Excento = c.getString("Excento");
-                        String CodigoLetra = c.getString("CodigoLetra");
-                        String Ruta = c.getString("Ruta");
-                        String Frecuencia  = c.getString("Frecuencia");
-                        String PrecioEspecial = c.getString("PrecioEspecial");
-                        String FechaUltimaCompra	= c.getString("FechaUltimaCompra");
-
-                        HashMap<String, String> cliente = new HashMap<>();
-
-                        // adding each child node to HashMap key => value
-                        cliente.put("Nombre",Nombre);
-                        cliente.put("IdCliente",IdCliente);
-                        cliente.put("CodCv",CodCv);
-                        cliente.put("Direccion",Direccion);
-                        listaClientes.add(cliente);
-                    }*/
-
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
                     getActivity().runOnUiThread(new Runnable() {
@@ -235,18 +181,6 @@ public class PedidosFragment extends Fragment {
                         }
                     });
                 }
-            /*} else {
-                Log.e(TAG, "Couldn't get json from server.");
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
-                                Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });*/
-
             return null;
         }
         @Override
