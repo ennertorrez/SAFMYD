@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -41,14 +45,16 @@ public class MaestroProductoFragment extends Fragment {
     View myView;
     private String TAG = MaestroProductoFragment.class.getSimpleName();
     private String busqueda = "1";
-    private String tipoBusqueda = "1";
+    private String tipoBusqueda = "2";
     private ProgressDialog pDialog;
     private ListView lv;
     private TextView lblFooter;
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-    private ArticulosHelper databaseHelper;
+
+    private DataBaseOpenHelper DbOpenHelper;
+    private ArticulosHelper ArticulosH;
 
     @Nullable
     @Override
@@ -61,16 +67,16 @@ public class MaestroProductoFragment extends Fragment {
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
         txtBusqueda = (EditText)myView.findViewById(R.id.txtBusqueda);
+        txtBusqueda.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+                    btnBuscar.performClick();
+                }
+                return false;
+            }
+        });
+        new GetArticulos().execute();
         listaArticulos = new ArrayList<>();
-
-/*prueba*/
-//        btnConsulta.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getActivity(),.class);
-//               startActivity(intent);
-//            }
-//        });
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,10 +88,10 @@ public class MaestroProductoFragment extends Fragment {
                 busqueda = txtBusqueda.getText().toString();
                 tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbCodigo ? "1" : "2";
 
-                if(TextUtils.isEmpty(busqueda)) {
-                    txtBusqueda.setError("Ingrese un valor");
-                    return;
-                }
+//                if(TextUtils.isEmpty(busqueda)) {
+//                    txtBusqueda.setError("Ingrese un valor");
+//                    return;
+//                }
 
                 new GetArticulos().execute();
                 lblFooter.setText("Articulos encontrados: " + String.valueOf(listaArticulos.size()));
@@ -118,76 +124,29 @@ public class MaestroProductoFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            HttpHandler sh = new HttpHandler();
-
-            // Making a request to url and getting response
-            String urlString = url + busqueda.replace(" ","%20") + "/" + tipoBusqueda;
-            String jsonStr = sh.makeServiceCall(urlString);
-
-            Log.e(TAG, "Response from url: " + jsonStr);
-
-            if (jsonStr != null) {
-                try {
-                    JSONObject jsonObj = new JSONObject(jsonStr);
-                    listaArticulos = new ArrayList<>();
-                    // Getting JSON Array node
-                    JSONArray articulos = jsonObj.getJSONArray("BuscarArticuloResult");
-
-                    // looping through All Contacts
-                    for (int i = 0; i < articulos.length(); i++) {
-                        JSONObject c = articulos.getJSONObject(i);
-
-                        //String Id = c.getString("Id");
-                        String Codigo = c.getString("CODIGO_ARTICULO");
-                        String Nombre = c.getString("NOMBRE");
-                        String PrecioSuper = c.getString("PrecioSuper");
-                        String PrecioDetalle = c.getString("PrecioDetalle");
-                        String PrecioForaneo = c.getString("PrecioForaneo");
-                        String PrecioMayorista = c.getString("PrecioMayorista");
-
-                        //databaseHelper.GuardarTotalArticulos(Codigo,Nombre,PrecioSuper,PrecioDetalle,PrecioForaneo,PrecioMayorista);
-
-                        HashMap<String, String> articulo = new HashMap<>();
-
-                        // adding each child node to HashMap key => value
-                        articulo.put("Codigo", Codigo);
-                        articulo.put("Codigo", Codigo);
-                        articulo.put("Nombre", Nombre);
-                        articulo.put("PrecioSuper","Super: "+ PrecioSuper);
-                        articulo.put("PrecioDetalle","Detalle: "+  PrecioDetalle);
-                        articulo.put("PrecioForaneo", "Foraneo: "+PrecioForaneo);
-                        articulo.put("PrecioMayorista", "Mayorista: "+ PrecioMayorista);
-
-                        listaArticulos.add(articulo);
-                    }
-
-                } catch (final JSONException e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
-
+            try {
+                DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+                ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+                switch (tipoBusqueda){
+                    case "1":
+                        listaArticulos=ArticulosH.BuscarArticuloCodigo(busqueda);
+                        break;
+                    case  "2":
+                        listaArticulos=ArticulosH.BuscarArticuloNombre(busqueda);
+                        break;
                 }
-            } else {
-                Log.e(TAG, "Couldn't get json from server.");
+            } catch (final Exception e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "Couldn't get json from server. Check LogCat for possible errors!",
+                                "Json parsing error: " + e.getMessage(),
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
                 });
-
             }
-
             return null;
         }
 
@@ -202,7 +161,7 @@ public class MaestroProductoFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaArticulos,
-                    R.layout.list_item, new String[]{"Codigo", "Nombre", "PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
                     R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
 
             lv.setAdapter(adapter);
