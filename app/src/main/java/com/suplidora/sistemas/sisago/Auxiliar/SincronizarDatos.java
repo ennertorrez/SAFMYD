@@ -520,7 +520,7 @@ public class SincronizarDatos {
 
         String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrPedido == null) {
-            Funciones.MensajeAviso(context,"Ha ocurrido un error al sincronizar el detalle del pedido");
+            //Funciones.MensajeAviso(context,"Ha ocurrido un error al sincronizar el detalle del pedido");
             return  false;
         } else {
             try {
