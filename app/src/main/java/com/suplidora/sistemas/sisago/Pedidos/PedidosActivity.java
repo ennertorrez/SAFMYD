@@ -15,12 +15,14 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -30,7 +32,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +53,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -72,8 +78,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
+import static com.suplidora.sistemas.sisago.Pedidos.PedidosActivity.listaArticulosItem;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private String TAG = PedidosActivity.class.getSimpleName();
 
     private static final int REQUEST_READ_PHONE_STATE = 1;
     //region Declaracion de controles
@@ -94,8 +103,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private TextView lblIvaDol;
     private TextView lblTotalDol;
     private TextView lblFooter;
+    private TextView lblFooterItem;
     private Button btnAgregar;
     private Button btnBuscar;
+    private Button btnOK;
     private Button btnGuardar;
     private Button btnCancelar;
     private EditText txtCantidad;
@@ -103,8 +114,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private Spinner cboSucursal;
     private Spinner cboCondicion;
     private ListView lv;
+    private ListView lvItem;
     private SimpleAdapter adapter;
     private ProgressDialog pDialog;
+    AlertDialog alertDialog;
     //endregion
 
     //region Declaracion de variables
@@ -120,6 +133,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private ClienteSucursal sucursal;
     private double valorPolitica = 3000;
     public static ArrayList<HashMap<String, String>> listaArticulos;
+    public static ArrayList<HashMap<String, String>> listaArticulosItem;
     public boolean Estado;
     public double total;
     private Cliente cliente;
@@ -148,6 +162,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private Vendedor vendedor = null;
     private double PrecioItem = 0;
     private String Tipo = "";
+    private String busqueda = "1";
+    private int tipoBusqueda =1;
     //endregion
 
     //region OnCreate
@@ -172,6 +188,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
         listaArticulos = new ArrayList<HashMap<String, String>>();
+        listaArticulosItem = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ClientesSucursalH = new ClientesSucursalHelper(DbOpenHelper.database);
@@ -219,6 +236,24 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         lv = (ListView) findViewById(R.id.listPedido);
 
         registerForContextMenu(lv);
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView1);
+
+        lv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+// Disallow the touch request for parent scroll on touch of child view
+                scrollView.requestDisallowInterceptTouchEvent(true);
+
+                int action = event.getActionMasked();
+                switch (action) {
+                    case MotionEvent.ACTION_UP:
+                        scrollView.requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                return false;
+            }
+        });
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -297,34 +332,26 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
-                    txtCodigoArticulo.setError("Ingrese un valor");
-                    return;
-                }
-                String CodigoArticulo = txtCodigoArticulo.getText().toString();
-                articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
-                if (articulo == null) {
-                    MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
-                    return;
-                }
+//                if (TextUtils.isEmpty(txtCodigoArticulo.getText().toString())) {
+//                    txtCodigoArticulo.setError("Ingrese un valor");
+//                    return;
+//                }
+
+                BuscarArticulo();
                 //Recorremos los resultados para mostrarlos en pantalla
-                txtCodigoArticulo.setText("");
-                lblDescripcionArticulo.setText("");
-                txtCodigoArticulo.setText(articulo.getCodigo());
-                lblDescripcionArticulo.setText(articulo.getNombre());
-
-                ObtenerPrecio();
-
-                //if (!focusedControl.equalsIgnoreCase("txtCodigoArticulo")) {
+//                txtCodigoArticulo.setText("");
+//                lblDescripcionArticulo.setText("");
+//                txtCodigoArticulo.setText(articulo.getCodigo());
+//                lblDescripcionArticulo.setText(articulo.getNombre());
+//                ObtenerPrecio();
+                btnOK.performClick();
                 txtCantidad.requestFocus();
                 focusedControl = "";
-                // }
-
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_IMPLICIT);
-
             }
         });
+
         final List<PedidoDetalle> lstPedidoDetalle = new ArrayList<>();
         btnAgregar.setOnClickListener(new OnClickListener() {
                                           public void onClick(View v) {
@@ -454,7 +481,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             DbOpenHelper.database.setTransactionSuccessful();
                             DbOpenHelper.database.endTransaction();
                             SincronizarPedido(PedidoH.ObtenerPedido(IdPedido));
-                           // MostrarMensajeGuardar();
                         }
                     }
                 })
@@ -888,6 +914,86 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         alertDialog.show();
     }
 
+    public void BuscarArticulo() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = null;
+
+            dialogView = inflater.inflate(R.layout.masterproductos_layout, null);
+            btnOK = (Button) dialogView.findViewById(R.id.btnBuscar);
+            final RadioGroup rgGrupo = (RadioGroup) dialogView.findViewById(R.id.rgGrupo);
+            final EditText txtBusquedaItem = (EditText) dialogView.findViewById(R.id.txtBusqueda);
+            lvItem = (ListView) dialogView.findViewById(R.id.list);
+            lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
+            txtBusquedaItem.setText(txtCodigoArticulo.getText());
+            btnOK.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputMethodManager.hideSoftInputFromWindow(txtBusquedaItem.getWindowToken(), 0);
+                    busqueda = txtBusquedaItem.getText().toString();
+                    try {
+                        int busquedaText= Integer.parseInt( busqueda);
+
+                       //rgGrupo.setId(R.id.rbCodigo);
+                         rgGrupo.check(R.id.rbCodigo);
+
+                    } catch (Exception ex) {
+                        //MensajeAviso(ex.getMessage());
+                        if(busqueda.contains("-"))
+                        {
+                            rgGrupo.check(R.id.rbCodigo);
+                        }
+                        else{
+                        rgGrupo.check(R.id.rbDescripcion);}
+                    }
+                    int boton = rgGrupo.getCheckedRadioButtonId();// == R.id.rbCodigo ? "1" : "2";
+                    switch (boton) {
+                        case R.id.rbCodigo:
+                            tipoBusqueda =1;
+                            break;
+                        case R.id.rbDescripcion:
+                            tipoBusqueda =2;
+                            break;
+                    }
+                    try {
+                        new GetArticulos().execute().get();
+                    } catch (Exception ex) {
+                        MensajeAviso(ex.getMessage());
+                    }
+                    if (listaArticulosItem.size() == 0) {
+                        MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
+                    }
+                    //lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
+                }
+            });
+        lvItem.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                txtCodigoArticulo.setText("");
+                lblDescripcionArticulo.setText("");
+                String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
+
+                articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
+
+                txtCodigoArticulo.setText(CodigoArticulo);
+                lblDescripcionArticulo.setText(articulo.getNombre());
+                ObtenerPrecio();
+
+                alertDialog.dismiss();
+            }
+        });
+        dialogBuilder.setView(dialogView);
+
+        alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
+
     public String getIMEI(Activity activity) {
         TelephonyManager telephonyManager = (TelephonyManager) activity
                 .getSystemService(Context.TELEPHONY_SERVICE);
@@ -1086,6 +1192,56 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             if (pDialog.isShowing())
                 pDialog.dismiss();
             MostrarMensajeGuardar();
+        }
+    }
+
+    private class GetArticulos extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(PedidosActivity.this);
+            pDialog.setMessage("Please wait...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            try {
+                DbOpenHelper = new DataBaseOpenHelper(getApplicationContext());
+                ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+                switch (tipoBusqueda){
+                    case 1:
+                        listaArticulosItem=ArticulosH.BuscarArticuloCodigo(busqueda);
+                        break;
+                    case  2:
+                        listaArticulosItem=ArticulosH.BuscarArticuloNombre(busqueda);
+                        break;
+                }
+            } catch (final Exception e) {
+                Funciones.MensajeAviso(getApplicationContext(),e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+            /**
+             * Updating parsed JSON data into ListView
+             * */
+            ListAdapter adapter = new SimpleAdapter(
+                    getApplicationContext(), listaArticulosItem,
+                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
+
+            lvItem.setAdapter(adapter);
+            lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
         }
     }
 }

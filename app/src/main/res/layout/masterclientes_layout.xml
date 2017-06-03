@@ -5,45 +5,64 @@
     android:name = "com.suplidora.sistemas.sisago.PopupListFragment"
    >
 
-
-    <RadioGroup
-        android:id="@+id/rgGrupo"
+    <RelativeLayout
+        android:id="@+id/Rl1"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:checkedButton="@+id/rbCodigo"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <RadioButton
-            android:id="@+id/rbCodigo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Codigo"
-            />
+        <RadioGroup
+            android:id="@+id/rgGrupo"
+            android:layout_width="200dp"
+            android:layout_height="45dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:checkedButton="@+id/rbCodigo"
+            android:background="@drawable/rounded_edittext"
+            android:orientation="horizontal">
 
-        <RadioButton
-            android:id="@+id/rbNombre"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nombre"
-            />
+            <RadioButton
+                android:id="@+id/rbCodigo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Codigo" />
 
+            <RadioButton
+                android:id="@+id/rbNombre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre" />
+        </RadioGroup>
+    </RelativeLayout>
 
-    </RadioGroup>
-
-    <EditText
-        android:id="@+id/txtBusqueda"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/Rl2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/rgGrupo"
-        android:layout_toLeftOf="@+id/btnBuscar"
-        android:hint="Ingrese su busqueda"
-        android:maxLines="1"
-        android:inputType="text"
-       />
+        android:layout_below="@+id/Rl1">
+
+        <EditText
+            android:id="@+id/txtBusqueda"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/btnBuscar"
+            android:background="@drawable/rounded_edittext"
+            android:hint="Ingrese su busqueda"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <Button
+            android:id="@+id/btnBuscar"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/places_ic_search"
+            android:backgroundTint="@color/colorPrimaryDark"
+
+            />
+    </RelativeLayout>
 
     <TextView
         android:background="@color/colorPrimary"
@@ -61,18 +80,7 @@
         android:layout_above="@+id/lblFooter"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/txtBusqueda"
+        android:layout_below="@+id/Rl2"
         />
-
-    <Button
-
-        android:id="@+id/btnBuscar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/list"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_weight="1"
-        android:text="Buscar" />
 
 </RelativeLayout>
