@@ -4,16 +4,31 @@
     android:layout_height="match_parent"
     android:name = "com.suplidora.sistemas.sisago.PopupListFragment"
    >
+    <RelativeLayout
+        android:id="@+id/RlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:background="@color/colorPrimary"
+        android:textColor="@color/White"
+        android:id="@+id/lblHeader"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+         />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/Rl1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/RlHeader">
 
         <RadioGroup
             android:id="@+id/rgGrupo"
             android:layout_width="200dp"
             android:layout_height="45dp"
+            android:layout_marginTop="3dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:checkedButton="@+id/rbCodigo"
