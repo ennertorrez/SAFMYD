@@ -20,7 +20,7 @@ public class variables_publicas {
     public static String IdCliente = "";
     public static String RutaCliente = "";
     public static String Canal = "";
-    public static String direccionIp = "http://192.168.1.249:8080";
+    public static String direccionIp = "http://186.1.18.75:8085";
     public static String FechaActual="";
 
     //Variables BD
