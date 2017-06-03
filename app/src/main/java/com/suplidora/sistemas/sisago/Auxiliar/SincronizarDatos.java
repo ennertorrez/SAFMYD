@@ -1,5 +1,9 @@
 package com.suplidora.sistemas.sisago.Auxiliar;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
@@ -8,19 +12,28 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
 import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.jd2d;
 
 /**
@@ -474,6 +487,58 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
+    }
+
+    public static boolean SincronizarPedido(Context context, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido){
+
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+        Gson gson = new Gson();
+        List<HashMap<String, String>> pedidoDetalle = PedidoDetalleH.ObtenerPedidoDetalle(IdPedido);
+        for (HashMap<String, String> item : pedidoDetalle) {
+            item.put("SubTotal", item.get("SubTotal").replace(",", ""));
+            item.put("Costo", item.get("Costo").replace(",", ""));
+            item.put("Total", item.get("Total").replace(",", ""));
+            item.put("Iva", item.get("Iva").replace(",", ""));
+            item.put("Precio", item.get("Precio").replace(",", ""));
+            item.put("Descuento", item.get("Descuento").replace(",", ""));
+            item.put("Descripcion", Codificar(item.get("Descripcion")));
+        }
+        String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
+        final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoTotal/";
+        String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + vendedor.getCODIGO() + "/" + jsonPedido+ "/" + jsonPedidoDetalle;
+
+        try {
+            URL Url = new URL(urlStringDetalle);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+
+        String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
+        if (jsonStrPedido == null) {
+            //Funciones.MensajeAviso(context,"Ha ocurrido un error al sincronizar el detalle del pedido");
+            return  false;
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrPedido);
+                String NoPedido = (String) result.get("SincronizarPedidoTotalResult");
+                if (NoPedido.equals("false")) {
+                    return false;
+                }
+                PedidoH.ActualizarPedido(IdPedido, NoPedido);
+                PedidoDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
+                return true;
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                return false;
+            }
+
+        }
+
     }
 
 
