@@ -132,6 +132,10 @@ public class Login extends Activity {
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
 
         lblVersion.setText("Versión " + getCurrentVersion());
+        if(variables_publicas.direccionIp == "http://186.1.18.75:8085")
+        {
+            lblVersion.setText("Versión " + getCurrentVersion() + "Desarrollo");
+        }
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
@@ -492,6 +496,7 @@ public class Login extends Activity {
                 String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
                 Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
                 latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+
 
             } catch (Exception e) {
                 e.printStackTrace();
