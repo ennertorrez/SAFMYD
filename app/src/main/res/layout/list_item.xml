@@ -21,8 +21,8 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dip"
         android:textColor="@color/colorAccent"
-        android:layout_below="@id/Codigo"
-      />
+        android:layout_below="@id/Codigo" />
+
     <TextView
         android:id="@+id/lblPrecioSuper"
         android:layout_width="60dp"
@@ -31,23 +31,25 @@
         android:text="Super: "
         android:textColor="@color/colorAccent"
         android:paddingBottom="2dip"
+        android:layout_below="@id/Nombre" />
+
+    <TextView
+        android:id="@+id/PrecioSuper"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
+        android:layout_toRightOf="@id/lblPrecioSuper"
+        android:gravity="right"
+        android:paddingRight="10dp"
+
         />
 
     <TextView
-    android:id="@+id/PrecioSuper"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textColor="#5d5d5d"
-    android:textStyle="bold"
-    android:paddingBottom="2dip"
-    android:layout_below="@id/Nombre"
-    android:layout_toRightOf="@id/lblPrecioSuper"
-    android:paddingLeft="28dp"
-    />
-    <TextView
         android:id="@+id/lblPrecioDetalle"
-        android:layout_width="100dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
@@ -55,20 +57,21 @@
         android:text="Detalle: "
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/PrecioSuper"
-        android:paddingLeft="28dp"
+        android:layout_marginLeft="5dp"
 
         />
+
     <TextView
         android:id="@+id/PrecioDetalle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/lblPrecioDetalle"
-        android:paddingLeft="28dp"
-      />
+        android:gravity="right"
+        android:paddingRight="10dp" />
 
     <TextView
         android:id="@+id/lblPrecioForaneo"
@@ -79,21 +82,24 @@
         android:text="Foraneo: "
         android:paddingBottom="2dip"
         android:layout_below="@id/lblPrecioSuper"
+
         />
+
     <TextView
         android:id="@+id/PrecioForaneo"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/PrecioSuper"
         android:layout_toRightOf="@id/lblPrecioForaneo"
-        android:paddingLeft="28dp"
-        />
+        android:paddingRight="10dp"
+        android:gravity="right" />
+
     <TextView
         android:id="@+id/lblPrecioMayorista"
-        android:layout_width="100dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
@@ -101,18 +107,18 @@
         android:text="Mayorista: "
         android:layout_below="@id/PrecioSuper"
         android:layout_toRightOf="@id/PrecioForaneo"
-        android:paddingLeft="28dp"
-        />
+        android:layout_marginLeft="5dp" />
+
     <TextView
         android:id="@+id/PrecioMayorista"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/PrecioSuper"
         android:layout_toRightOf="@id/lblPrecioMayorista"
-        android:paddingLeft="28dp"
-        />
+        android:gravity="right"
+        android:paddingRight="10dp" />
 
 </RelativeLayout>

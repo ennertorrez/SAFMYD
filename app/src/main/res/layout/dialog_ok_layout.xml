@@ -1,27 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="110dp"
     android:minHeight="110dp"
-   >
+    android:orientation="vertical"
+
+    >
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="#0e6e05" />
 
     <TextView
+        android:id="@+id/lblHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="PEDIDO GUARDADO EXITOSAMENTE"
         android:textAlignment="center"
-        android:textColor="#1aa90d"
-        android:textStyle="bold"
-        />
+        android:textColor="#0e6e05"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/lblHeader"
+        android:layout_marginTop="5dp"
+        android:background="#0e6e05">
+
+    </View>
+
     <Button
         android:id="@+id/btnOkDialogo"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@mipmap/ic_check_circle_black_24dp"
-        android:backgroundTint="#1cd100"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:onClick="Agregar"
-        />
+        android:background="@mipmap/ic_check_circle_black_24dp"
+        android:backgroundTint="#0e6e05"
+        android:onClick="Agregar" />
+
+
 
 </RelativeLayout>

@@ -11,11 +11,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -64,22 +64,14 @@ import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
-import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
-import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
-import static com.suplidora.sistemas.sisago.Pedidos.PedidosActivity.listaArticulosItem;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -165,6 +157,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String Tipo = "";
     private String busqueda = "1";
     private int tipoBusqueda =1;
+    private boolean validarTipoBusqueda;
     //endregion
 
     //region OnCreate
@@ -345,6 +338,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 //                txtCodigoArticulo.setText(articulo.getCodigo());
 //                lblDescripcionArticulo.setText(articulo.getNombre());
 //                ObtenerPrecio();
+                validarTipoBusqueda =true;
                 btnOK.performClick();
                 txtCantidad.requestFocus();
                 focusedControl = "";
@@ -409,7 +403,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             public void onClick(View v) {
                 try {
                     CodigoLetra = lblCodigoCliente.getText().toString();
-                    DbOpenHelper.database.beginTransaction();
+
                     Guardar();
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
@@ -489,12 +483,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 .setCancelable(false)
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        DbOpenHelper.database.beginTransaction();
                         if (GuardarPedido()) {
                             DbOpenHelper.database.setTransactionSuccessful();
                             DbOpenHelper.database.endTransaction();
                             SincronizarPedido(PedidoH.ObtenerPedido(IdPedido));
-                           // MostrarMensajeGuardar();
                         }
+                        else{
+                            DbOpenHelper.database.endTransaction();
+                        }
+
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -905,6 +903,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         View dialogView = null;
         if (guardadoOK) {
             dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
+
             Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
             btnOK.setOnClickListener(new OnClickListener() {
                 @Override
@@ -935,7 +934,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             dialogView = inflater.inflate(R.layout.masterproductos_layout, null);
             btnOK = (Button) dialogView.findViewById(R.id.btnBuscar);
-            final RadioGroup rgGrupo = (RadioGroup) dialogView.findViewById(R.id.rgGrupo);
+        final RadioGroup rgGrupo = (RadioGroup) dialogView.findViewById(R.id.rgGrupo);
+        rgGrupo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+
+            }
+        });
+
             final EditText txtBusquedaItem = (EditText) dialogView.findViewById(R.id.txtBusqueda);
             lvItem = (ListView) dialogView.findViewById(R.id.list);
             lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
@@ -947,21 +953,22 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     inputMethodManager.hideSoftInputFromWindow(txtBusquedaItem.getWindowToken(), 0);
                     busqueda = txtBusquedaItem.getText().toString();
-                    try {
-                        int busquedaText= Integer.parseInt( busqueda);
+                  if(validarTipoBusqueda){
+                      try {
+                          int busquedaText= Integer.parseInt( busqueda);
+                          rgGrupo.check(R.id.rbCodigo);
 
-                       //rgGrupo.setId(R.id.rbCodigo);
-                         rgGrupo.check(R.id.rbCodigo);
+                      } catch (Exception ex) {
 
-                    } catch (Exception ex) {
-                        //MensajeAviso(ex.getMessage());
-                        if(busqueda.contains("-"))
-                        {
-                            rgGrupo.check(R.id.rbCodigo);
-                        }
-                        else{
-                        rgGrupo.check(R.id.rbDescripcion);}
-                    }
+                          if(busqueda.contains("-"))
+                          {
+                              rgGrupo.check(R.id.rbCodigo);
+                          }
+                          else{
+                              rgGrupo.check(R.id.rbDescripcion);}
+                      }
+                      validarTipoBusqueda=false;
+                  }
                     int boton = rgGrupo.getCheckedRadioButtonId();// == R.id.rbCodigo ? "1" : "2";
                     switch (boton) {
                         case R.id.rbCodigo:
@@ -972,14 +979,30 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             break;
                     }
                     try {
-                        new GetArticulos().execute().get();
+                        switch (tipoBusqueda){
+                            case 1:
+                                listaArticulosItem=ArticulosH.BuscarArticuloCodigo(busqueda);
+                                break;
+                            case  2:
+                                listaArticulosItem=ArticulosH.BuscarArticuloNombre(busqueda);
+                                break;
+                        }
                     } catch (Exception ex) {
                         MensajeAviso(ex.getMessage());
                     }
                     if (listaArticulosItem.size() == 0) {
                         MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
                     }
-                    //lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
+
+                        ListAdapter adapter = new SimpleAdapter(
+                                getApplicationContext(), listaArticulosItem,
+                                R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                                R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
+
+                        lvItem.setAdapter(adapter);
+                        lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
+
+
                 }
             });
         lvItem.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1136,54 +1159,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
     }
 
-    private class GetArticulos extends AsyncTask<Void, Void, Void> {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // Showing progress dialog
-            pDialog = new ProgressDialog(PedidosActivity.this);
-            pDialog.setMessage("Please wait...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
-
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            try {
-                DbOpenHelper = new DataBaseOpenHelper(getApplicationContext());
-                ArticulosH = new ArticulosHelper(DbOpenHelper.database);
-                switch (tipoBusqueda){
-                    case 1:
-                        listaArticulosItem=ArticulosH.BuscarArticuloCodigo(busqueda);
-                        break;
-                    case  2:
-                        listaArticulosItem=ArticulosH.BuscarArticuloNombre(busqueda);
-                        break;
-                }
-            } catch (final Exception e) {
-                Funciones.MensajeAviso(getApplicationContext(),e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-            ListAdapter adapter = new SimpleAdapter(
-                    getApplicationContext(), listaArticulosItem,
-                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
-
-            lvItem.setAdapter(adapter);
-            lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
-        }
-    }
 }
 

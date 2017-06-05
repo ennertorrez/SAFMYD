@@ -22,13 +22,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
-import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
-import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
-import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
-import  com.suplidora.sistemas.sisago.R;
-
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
@@ -40,8 +33,14 @@ import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
+import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
+import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
+import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
+import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
 /*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
@@ -116,7 +115,21 @@ public class MenuActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmación requerida")
+                    .setMessage("Está seguro que desea salir de la aplicación?")
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         }
     }
 
@@ -251,4 +264,6 @@ public class MenuActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }
