@@ -608,6 +608,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void ObtenerPrecio() {
+
+        //si es cliente super
+        if (cliente.getTipo().equals("Super")) {
+            txtPrecioArticulo.setText(articulo.getPrecioSuper());
+            TipoPrecio = "PrecioSuper";
+            PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
+        }
+
         //Si es cliente Detalle
         if (cliente.getTipo().equals("Detalle")) {
             //Si es Ruta Foranea y no aplica PrecioDetalle
@@ -826,8 +834,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{"Cod", "Cantidad", "Precio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
+                String[]{"Cod", "Cantidad", "Precio","TipoPrecio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio,R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {

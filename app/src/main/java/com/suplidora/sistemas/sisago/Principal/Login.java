@@ -134,7 +134,7 @@ public class Login extends Activity {
         lblVersion.setText("Versión " + getCurrentVersion());
         if(variables_publicas.direccionIp == "http://186.1.18.75:8085")
         {
-            lblVersion.setText("Versión " + getCurrentVersion() + "Desarrollo");
+            lblVersion.setText("Versión " + getCurrentVersion() + " Desarrollo");
         }
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -219,6 +219,24 @@ public class Login extends Activity {
             String currentVersion = getCurrentVersion();
             try {
                 latestVersion = new GetLatestVersion().execute().get();
+
+                if (latestVersion != null && !currentVersion.equals(latestVersion)) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Nueva version disponible");
+                    builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
+                    builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Click button action
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setCancelable(false);
+                    builder.show();
+                }
+
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {

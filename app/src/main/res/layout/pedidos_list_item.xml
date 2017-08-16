@@ -67,6 +67,19 @@
            />
 
         <TextView
+            android:id="@+id/lblDetalleTipoPrecio"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:focusable="false"
+            android:gravity="right"
+            android:paddingLeft="2dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            />
+
+        <TextView
             android:id="@+id/lblDetallePorDescuento"
             android:layout_width="70dp"
             android:layout_height="match_parent"
