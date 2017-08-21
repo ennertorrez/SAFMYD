@@ -16,6 +16,7 @@ public class Articulo {
     String PrecioSuper= "";
     String PrecioDetalle = "";
     String PrecioForaneo = "";
+    String PrecioForaneo2 = "";
     String PrecioMayorista = "";
     String Bonificable = "";
     String AplicaPrecioDetalle = "";
@@ -25,7 +26,7 @@ public class Articulo {
     public Articulo() {
     }
 
-    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista) {
+    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo,String precioForaneo2, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista) {
         Codigo = codigo;
         Nombre = nombre;
         Costo = costo;
@@ -36,6 +37,7 @@ public class Articulo {
         PrecioSuper = precioSuper;
         PrecioDetalle = precioDetalle;
         PrecioForaneo = precioForaneo;
+        PrecioForaneo2= precioForaneo2;
         PrecioMayorista = precioMayorista;
         Bonificable = bonificable;
         AplicaPrecioDetalle = aplicaPrecioDetalle;
@@ -165,5 +167,13 @@ public class Articulo {
 
     public String toString() {
         return this.getNombre();
+    }
+
+    public String getPrecioForaneo2() {
+        return PrecioForaneo2;
+    }
+
+    public void setPrecioForaneo2(String precioForaneo2) {
+        PrecioForaneo2 = precioForaneo2;
     }
 }

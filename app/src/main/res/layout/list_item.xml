@@ -25,13 +25,14 @@
 
     <TextView
         android:id="@+id/lblPrecioSuper"
-        android:layout_width="60dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:text="Super: "
         android:textColor="@color/colorAccent"
         android:paddingBottom="2dip"
-        android:layout_below="@id/Nombre" />
+        android:layout_below="@id/Nombre"
+        android:gravity="right"/>
 
     <TextView
         android:id="@+id/PrecioSuper"
@@ -43,27 +44,28 @@
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/lblPrecioSuper"
         android:gravity="right"
-        android:paddingRight="10dp"
+
 
         />
 
     <TextView
         android:id="@+id/lblPrecioDetalle"
-        android:layout_width="70dp"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
         android:paddingBottom="2dip"
-        android:text="Detalle: "
+        android:text="Detalle:"
+        android:layout_marginLeft="15dp"
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/PrecioSuper"
-        android:layout_marginLeft="5dp"
+        android:gravity="right"
 
         />
 
     <TextView
         android:id="@+id/PrecioDetalle"
-        android:layout_width="match_parent"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
@@ -71,7 +73,7 @@
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/lblPrecioDetalle"
         android:gravity="right"
-        android:paddingRight="10dp" />
+         />
 
     <TextView
         android:id="@+id/lblPrecioForaneo"
@@ -79,11 +81,13 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
-        android:text="Foraneo: "
+        android:gravity="right"
+        android:text="Foraneo:"
         android:paddingBottom="2dip"
+        android:layout_marginLeft="15dp"
         android:layout_below="@id/lblPrecioSuper"
-
-        />
+        android:layout_toRightOf="@+id/PrecioMayorista"
+        android:layout_toStartOf="@+id/PrecioDetalle" />
 
     <TextView
         android:id="@+id/PrecioForaneo"
@@ -93,9 +97,9 @@
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/PrecioSuper"
-        android:layout_toRightOf="@id/lblPrecioForaneo"
-        android:paddingRight="10dp"
-        android:gravity="right" />
+        android:gravity="right"
+        android:layout_alignEnd="@+id/PrecioDetalle"
+        android:layout_toEndOf="@+id/lblPrecioDetalle" />
 
     <TextView
         android:id="@+id/lblPrecioMayorista"
@@ -106,12 +110,11 @@
         android:paddingBottom="2dip"
         android:text="Mayorista: "
         android:layout_below="@id/PrecioSuper"
-        android:layout_toRightOf="@id/PrecioForaneo"
-        android:layout_marginLeft="5dp" />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/PrecioMayorista"
-        android:layout_width="match_parent"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
@@ -119,6 +122,34 @@
         android:layout_below="@id/PrecioSuper"
         android:layout_toRightOf="@id/lblPrecioMayorista"
         android:gravity="right"
-        android:paddingRight="10dp" />
+      />
+
+    <TextView
+        android:id="@+id/lblPrecioForaneo2"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        android:gravity="right"
+        android:text="Foraneo2:"
+        android:paddingBottom="2dip"
+        android:layout_below="@id/PrecioMayorista"
+
+       ></TextView>
+
+
+    <TextView
+        android:id="@+id/PrecioForaneo2"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+
+        android:layout_below="@id/PrecioMayorista"
+        android:layout_toRightOf="@+id/lblPrecioForaneo2"
+        android:gravity="right"
+
+       />
 
 </RelativeLayout>

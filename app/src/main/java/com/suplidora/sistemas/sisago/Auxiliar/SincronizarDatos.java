@@ -114,13 +114,14 @@ public class SincronizarDatos {
                 String PrecioSuper = c.getString("PrecioSuper");
                 String PrecioDetalle = c.getString("PrecioDetalle");
                 String PrecioForaneo = c.getString("PrecioForaneo");
+                String PrecioForaneo2 = c.getString("PrecioForaneo2");
                 String PrecioMayorista = c.getString("PrecioMayorista");
                 String Bonificable = c.getString("Bonificable");
                 String AplicaPrecioDetalle = c.getString("AplicaPrecioDetalle");
                 String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                 String detallista = c.getString("detallista");
 
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo,PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         } finally {
@@ -435,6 +436,15 @@ public class SincronizarDatos {
             if(Configuracion == "VersionDatos")
             {
                 variables_publicas.ValorConfigServ = Valor;
+            }
+            if(Configuracion=="AplicarPrecioMayoristaXCaja"){
+                variables_publicas.AplicarPrecioMayoristaXCaja = Valor;
+            }
+            if(Configuracion=="PermitirVentaDetAMayoristaXCaja"){
+                variables_publicas.PermitirVentaDetAMayoristaXCaja = Valor;
+            }
+            if(Configuracion=="lstDepartamentosForaneo1"){
+                variables_publicas.lstDepartamentosForaneo1= Valor.split(",");
             }
         }
         return jsonStrConfiguracionSistema;

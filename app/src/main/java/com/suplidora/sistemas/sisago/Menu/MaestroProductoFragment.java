@@ -161,8 +161,8 @@ public class MaestroProductoFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaArticulos,
-                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
+                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioForaneo2","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioForaneo2,R.id.PrecioMayorista});
 
             lv.setAdapter(adapter);
             lblFooter.setText("Articulos encontrados: " + String.valueOf(listaArticulos.size()));

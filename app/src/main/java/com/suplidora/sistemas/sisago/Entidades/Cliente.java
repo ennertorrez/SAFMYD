@@ -31,11 +31,12 @@ public class Cliente {
     String Descuento="";
     String Empleado="";
     String Detallista="";
+    String RutaForanea="";
     public Cliente() {
 
     }
 
-    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista) {
+    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista,String rutaForanea) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
@@ -61,6 +62,7 @@ public class Cliente {
         Descuento = descuento;
         Empleado = empleado;
         Detallista=detallista;
+        RutaForanea=rutaForanea;
     }
 
     public String getIdCliente() {
@@ -261,6 +263,14 @@ public class Cliente {
 
     public void setDetallista(String detallista) {
         Detallista = detallista;
+    }
+
+    public String getRutaForanea() {
+        return RutaForanea;
+    }
+
+    public void setRutaForanea(String rutaForanea) {
+        RutaForanea = rutaForanea;
     }
 
     public String toString(){

@@ -77,6 +77,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.ARTICULO_COLUMN_PrecioSuper + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_PrecioDetalle + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_PrecioForaneo + " TEXT, "
+                    + variables_publicas.ARTICULO_COLUMN_PrecioForaneo2 + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_PrecioMayorista + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_Bonificable + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle + " TEXT, "

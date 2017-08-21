@@ -11,6 +11,9 @@ public class variables_publicas {
     public static Configuraciones Configuracion=null;
     public static Pedido Pedidos=null;
     public static String ValorConfigServ="";
+    public static String AplicarPrecioMayoristaXCaja;
+    public static String PermitirVentaDetAMayoristaXCaja;
+    public static String[] lstDepartamentosForaneo1;
     public static String UsuarioLogin = "";
     public static String NombreVendedor = "";
     public static String CodigoVendedor = "";
@@ -20,11 +23,11 @@ public class variables_publicas {
     public static String IdCliente = "";
     public static String RutaCliente = "";
     public static String Canal = "";
-    public static String direccionIp = "http://186.1.18.75:8080";
+    public static String direccionIp = "http://186.1.18.75:8085";
     public static String FechaActual="";
 
     //Variables BD
-    public static final int DATABASE_VERSION = 27;
+    public static final int DATABASE_VERSION = 29;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -52,6 +55,7 @@ public class variables_publicas {
     public static final String ARTICULO_COLUMN_PrecioSuper = "PrecioSuper";
     public static final String ARTICULO_COLUMN_PrecioDetalle = "PrecioDetalle";
     public static final String ARTICULO_COLUMN_PrecioForaneo = "PrecioForaneo";
+    public static final String ARTICULO_COLUMN_PrecioForaneo2 = "PrecioForaneo2";
     public static final String ARTICULO_COLUMN_PrecioMayorista = "PrecioMayorista";
     public static final String ARTICULO_COLUMN_Bonificable = "Bonificable";
     public static final String ARTICULO_COLUMN_AplicaPrecioDetalle = "AplicaPrecioDetalle";
@@ -84,6 +88,7 @@ public class variables_publicas {
     public static final String CLIENTES_COLUMN_Descuento="Descuento";
     public static final String CLIENTES_COLUMN_Empleado="Empleado";
     public static final String CLIENTES_COLUMN_Detallista="Detallista";
+    public static final String CLIENTES_COLUMN_RutaForanea="RutaForanea";
 
     //Variables CamposTbPedidos
     public static final String PEDIDOS_COLUMN_CodigoPedido = "CodigoPedido";
