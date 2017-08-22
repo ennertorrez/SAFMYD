@@ -83,23 +83,23 @@ public class ArticulosHelper {
         HashMap<String,String> articulo=null;
         if (c.moveToFirst()) {
             do {
-                HashMap<String,String> articulos= new HashMap<>();
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Codigo, c.getString(c.getColumnIndex("Codigo")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Costo, c.getString(c.getColumnIndex("Costo")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Unidad, c.getString(c.getColumnIndex("Unidad")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_UnidadCaja, c.getString(c.getColumnIndex("UnidadCaja")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Isc, c.getString(c.getColumnIndex("Isc")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PorIva, c.getString(c.getColumnIndex("PorIva")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PrecioSuper, c.getString(c.getColumnIndex("PrecioSuper")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PrecioDetalle, c.getString(c.getColumnIndex("PrecioDetalle")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo, c.getString(c.getColumnIndex("PrecioForaneo")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo2, c.getString(c.getColumnIndex("PrecioForaneo2")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_PrecioMayorista, c.getString(c.getColumnIndex("PrecioMayorista")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Bonificable, c.getString(c.getColumnIndex("Bonificable")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, c.getString(c.getColumnIndex("AplicaPrecioDetalle")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
+                articulo= new HashMap<>();
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Codigo, c.getString(c.getColumnIndex("Codigo")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Costo, c.getString(c.getColumnIndex("Costo")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Unidad, c.getString(c.getColumnIndex("Unidad")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_UnidadCaja, c.getString(c.getColumnIndex("UnidadCaja")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Isc, c.getString(c.getColumnIndex("Isc")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PorIva, c.getString(c.getColumnIndex("PorIva")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PrecioSuper, c.getString(c.getColumnIndex("PrecioSuper")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PrecioDetalle, c.getString(c.getColumnIndex("PrecioDetalle")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo, c.getString(c.getColumnIndex("PrecioForaneo")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PrecioForaneo2, c.getString(c.getColumnIndex("PrecioForaneo2")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_PrecioMayorista, c.getString(c.getColumnIndex("PrecioMayorista")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Bonificable, c.getString(c.getColumnIndex("Bonificable")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, c.getString(c.getColumnIndex("AplicaPrecioDetalle")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
 
             } while (c.moveToNext());
         }

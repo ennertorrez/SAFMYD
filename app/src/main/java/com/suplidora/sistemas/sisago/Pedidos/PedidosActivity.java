@@ -610,285 +610,180 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         cboCondicion.setEnabled(false);
     }
 
-    private void ObtenerPrecio() {
-
-        //si es cliente super
-        if (cliente.getTipo().equals("Super")) {
-            txtPrecioArticulo.setText(articulo.getPrecioSuper());
-            TipoPrecio = "PrecioSuper";
-            PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
-        }
-
-        //Si es cliente Detalle
-        if (cliente.getTipo().equals("Detalle")) {
-            //Si es Ruta Foranea y no aplica PrecioDetalle
-            if (variables_publicas.usuario.getRutaForanea().equals("1") && !articulo.getAplicaPrecioDetalle().equals("true")) {
-                txtPrecioArticulo.setText(articulo.getPrecioSuper());
-                TipoPrecio = "PrecioSuper";
-                PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioDetalle());
-                PrecioItem = Double.parseDouble(articulo.getPrecioDetalle());
-                TipoPrecio = "PrecioDetalle";
+    private void ObtenerPrecio(final HashMap<String, String> item,String CodArticulo, boolean ActualizarItem ) {
+        String[] lstDepartamentosForaneo1 = variables_publicas.lstDepartamentosForaneo1 ;
+        final HashMap<String,String> art = ArticulosH.BuscarArticuloHashMap(CodArticulo);
+        //Esto para utilizarlo en el metodo SetPrecio
+        Articulo articulo = ArticulosH.BuscarArticulo(CodArticulo);
+        boolean AplicarPrecioDetalle  =Boolean.parseBoolean( articulo.getAplicaPrecioDetalle());
+        int ModCantidadCajas, cantidadItems=0, FaltaParaCaja, cajas,UnidadCaja;
+        boolean PrecioCajas= false;
+        UnidadCaja = Integer.parseInt( articulo.getUnidadCaja());
+        if (item!=null){
+            if( (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()){
+                cantidadItems = 0;
+            }else{
+                cantidadItems = Integer.parseInt( item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
             }
         }
 
-        //Si es cliente Mayorista foraneo
-        if (cliente.getTipo().equals("Foraneo")) {
-            if (subTotalPrecioSuper < valorPolitica) {
-                txtPrecioArticulo.setText(articulo.getPrecioSuper());
-                PrecioItem = Double.parseDouble(articulo.getPrecioSuper());
-                TipoPrecio = "PrecioSuper";
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioForaneo());
-                PrecioItem = Double.parseDouble(articulo.getPrecioForaneo());
-                TipoPrecio = "PrecioForaneo";
-            }
+        UnidadCaja =UnidadCaja == 0 ? 1 : Integer.parseInt( articulo.getUnidadCaja());
+        ModCantidadCajas = (cantidadItems % UnidadCaja);
+        if( cantidadItems >= UnidadCaja) {
+            PrecioCajas = true;
         }
-        //Si es cliente Mayorista
-        if (cliente.getTipo().equals("Mayorista")) {
-            if (subTotalPrecioSuper < valorPolitica) {
-                txtPrecioArticulo.setText(articulo.getPrecioDetalle());
-                PrecioItem = Double.parseDouble(articulo.getPrecioDetalle());
-                TipoPrecio = "PrecioDetalle";
-            } else {
-                txtPrecioArticulo.setText(articulo.getPrecioMayorista());
-                PrecioItem = Double.parseDouble(articulo.getPrecioMayorista());
-                TipoPrecio = "PrecioMayorista";
+        FaltaParaCaja = UnidadCaja - ModCantidadCajas;
+        cajas = cantidadItems / UnidadCaja + 1;
+
+        String tipoprecio = "Super";
+        if( Integer.parseInt(vendedor.getCODIGO()) == 9){  //Ventas Oficina
+            IdDepartamento = 6;
+        }
+        if (cliente.getTipo().equalsIgnoreCase( "Detalle") ){
+            if(Boolean.parseBoolean( cliente.getRutaForanea()) && ! AplicarPrecioDetalle) {
+                tipoprecio = "Super";
+            }else
+            {
+                tipoprecio = "Detalle";
+            }
+            //Si es ruta no determinada y departamento managua
+            if (cliente.getRuta() == "No Determinada" && IdDepartamento == 6 ){
+                tipoprecio = "Detalle";
+            }else{
+                tipoprecio = "Super";
+            }
+
+            if (Integer.parseInt(vendedor.getCODIGO())==9){
+                tipoprecio = "Detalle";
+            }
+        }else if (cliente.getTipo().equalsIgnoreCase("Super") ) {
+
+            String TipoForaneo = "Precio" + (Arrays.asList(lstDepartamentosForaneo1).contains(cliente.getIdDepartamento()) ? "Foraneo" : "Foraneo2");
+
+            if (cliente.getTipo().equalsIgnoreCase("Foraneo")) {
+                if (subTotalPrecioSuper < valorPolitica) {
+                    tipoprecio = "Super";
+                } else {
+                    tipoprecio = TipoForaneo.replace("Precio", "");
+                }
+            }
+
+            if (cliente.getTipo().equalsIgnoreCase("Mayorista")) {
+                if (subTotalPrecioSuper < valorPolitica) {
+                    if (IdDepartamento == 6) { //Managua
+                        tipoprecio = "Detalle";
+                    } else {
+                        tipoprecio = "Super";
+                    }
+                } else {
+                    if (IdDepartamento == 6) { //Managua
+                        tipoprecio = "Mayorista";
+                    } else {
+                        tipoprecio = TipoForaneo.replace("Precio", "");
+                    }
+                }
             }
         }
 
-        //Validamos que si es empleado, damos a precio mayorista
-        if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) {
-            txtPrecioArticulo.setText(articulo.getPrecioMayorista());
-            TipoPrecio = "PrecioMayorista";
+        if(Boolean.parseBoolean( variables_publicas.AplicarPrecioMayoristaXCaja) ){
+            if(cantidadItems > 0 ){
+                if(PrecioCajas && cliente.getTipo() != "Super" ){
+                    if( FaltaParaCaja > 0 && ModCantidadCajas > 0 ){
+                        MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas) + " cajas, Desea continuar ? ");
+                        final String finalTipoprecio = tipoprecio;
+                        new AlertDialog.Builder(this)
+                                .setTitle("Confirmación Requerida")
+                                .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas) + " cajas, Desea continuar ? ")
+                                .setCancelable(false)
+                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        setPrecio(art, finalTipoprecio,0);
+                                    }
+                                })
+                                .setNegativeButton("No", null)
+                                .show();
+                    }else{
+                        if((cliente.getTipo().equalsIgnoreCase("Detalle") && Boolean.parseBoolean(cliente.getRutaForanea()) && ! AplicarPrecioDetalle) || cliente.getTipo().equalsIgnoreCase( "Foraneo")){
+                            tipoprecio = "Foraneo";
+                        }else{
+                            tipoprecio = "Mayorista";
+                        }
+                    }
+                }else{
+                    if(! Boolean.parseBoolean(variables_publicas.PermitirVentaDetAMayoristaXCaja )){
+                        setPrecio(art, tipoprecio,0);
+                    }
+                }
+
+            }else{
+                //Si itemDetalle.cantidad=0 entonces le damos el precio mas alto
+                if(cliente.getTipo().equalsIgnoreCase( "Foraneo" )){
+                    tipoprecio = "Super"; //Super es : Detalle Foraneo
+                }else if (cliente.getTipo().equalsIgnoreCase("Mayorista")){
+                    tipoprecio = "Detalle";
+                }else{
+                    tipoprecio = cliente.getTipo();
+                }
+            }
+
+
         }
 
-        if (cliente.getPrecioEspecial().equals("true") && (cliente.getTipo().equals("Super") || cliente.getTipo().equals("Mayorista"))) {
+        if(Boolean.parseBoolean(cliente.getEmpleado()) && Integer.parseInt(condicion.getCODIGO()) != 127 ){ // esto para validar que no sea producto abordo --Tramite de CK
+            tipoprecio = "Mayorista";
+        }
+        double precioE = 0;
+
+        if( Boolean.parseBoolean(cliente.getPrecioEspecial()) &&  (cliente.getTipo().equalsIgnoreCase( "Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) ){
             txtDescuento.setEnabled(false);
-            PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(String.valueOf(IdCliente), articulo.getCodigo());
+            txtDescuento.setText("0.00");
+            //Si existe precio especial
+            tipoprecio = "Especial";
+            PrecioEspecial precioEspecial =  PrecioEspecialH.BuscarPrecioEspecial(String.valueOf(IdCliente), articulo.getCodigo());
             if (precioEspecial != null) {
                 if (precioEspecial.getFacturar().equals("0")) {
                     MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
                     return;
                 }
-                txtPrecioArticulo.setText(precioEspecial.getPrecio());
-                txtDescuento.setText(precioEspecial.getDescuento());
-                TipoPrecio = "PrecioEspecial";
+                precioE= Double.parseDouble(precioEspecial.getPrecio());
+                item.put("Precio", precioEspecial.getPrecio());
+                item.put("TipoPrecio", "Especial");
             }
+
         }
 
+        if(!ActualizarItem){
+            setPrecio(art, tipoprecio,0);
+        }else{
+            if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) {
+                if(tipoprecio.equalsIgnoreCase("Especial")) {
+                    item.put("Precio", String.valueOf(precioE));
+                }else{
+                    item.put("Precio", art.get("Precio"+tipoprecio));
+                }
+            }else{
+                tipoprecio = "Bonificacion";
+            }
+            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio,  tipoprecio);
+            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento ,
+                    String.valueOf(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100)));
+            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal,
+                    String.valueOf(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) - ((Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio))) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100))));
+            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva ,
+                    String.valueOf( Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal)) * Double.parseDouble(articulo.getPorIva())));
+            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total,String.valueOf( Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal)) +Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva))));
+        }
     }
 
     private void RecalcularDetalle() {
         subTotalPrecioSuper = 0;
-        String[] lstDepartamentosForaneo1 = variables_publicas.lstDepartamentosForaneo1 ;
-
         for (HashMap<String, String> item : listaArticulos) {
             subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
         }
+        for ( HashMap<String, String> item : listaArticulos) {
 
-        for (final HashMap<String, String> item : listaArticulos) {
-            //Esto para utilizarlo en el metodo SetPrecio
-            final HashMap<String,String> art = ArticulosH.BuscarArticuloHashMap(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
-            //Repetimos esto para utilizarlo en este metodo por comodidad
-            Articulo articulo = ArticulosH.BuscarArticulo(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
-            boolean AplicarPrecioDetalle  =Boolean.parseBoolean( articulo.getAplicaPrecioDetalle());
-            int ModCantidadCajas, cantidadItems, FaltaParaCaja, cajas,UnidadCaja;
-            boolean PrecioCajas= false;
-            UnidadCaja = Integer.parseInt( articulo.getUnidadCaja());
-            if((item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()){
-                cantidadItems = 0;
-            }else{
-                cantidadItems = Integer.parseInt( item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
-            }
-            UnidadCaja =UnidadCaja == 0 ? 1 : Integer.parseInt( articulo.getUnidadCaja());
-            ModCantidadCajas = (cantidadItems % UnidadCaja);
-            if( cantidadItems >= UnidadCaja) {
-                PrecioCajas = true;
-            }
-            FaltaParaCaja = UnidadCaja - ModCantidadCajas;
-            cajas = cantidadItems / UnidadCaja + 1;
-
-            String tipoprecio = "Super";
-            if( Integer.parseInt(vendedor.getCODIGO()) == 9){  //Ventas Oficina
-                IdDepartamento = 6;
-            }
-            if (cliente.getTipo().equalsIgnoreCase( "Detalle") ){
-                if(Boolean.parseBoolean( cliente.getRutaForanea()) && ! AplicarPrecioDetalle) {
-                    tipoprecio = "Super";
-                }else
-                {
-                    tipoprecio = "Detalle";
-                }
-                //Si es ruta no determinada y departamento managua
-                if (cliente.getRuta() == "No Determinada" && IdDepartamento == 6 ){
-                    tipoprecio = "Detalle";
-                }else{
-                    tipoprecio = "Super";
-                }
-
-                if (Integer.parseInt(vendedor.getCODIGO())==9){
-                    tipoprecio = "Detalle";
-                }
-            }else if (cliente.getTipo() != "Super" ) {
-
-                String TipoForaneo = "Precio" + (Arrays.asList(lstDepartamentosForaneo1).contains(cliente.getIdDepartamento()) ? "Foraneo" : "Foraneo2");
-
-                if (cliente.getTipo().equalsIgnoreCase("Foraneo")) {
-                    if (subTotalPrecioSuper < valorPolitica) {
-                        tipoprecio = "Super";
-                    } else {
-                        tipoprecio = TipoForaneo.replace("Precio", "");
-                    }
-                }
-
-                if (cliente.getTipo().equalsIgnoreCase("Mayorista")) {
-                    if (subTotalPrecioSuper < valorPolitica) {
-                        if (IdDepartamento == 6) { //Managua
-                            tipoprecio = "Detalle";
-                        } else {
-                            tipoprecio = "Super";
-                        }
-                    } else {
-                        if (IdDepartamento == 6) { //Managua
-                            tipoprecio = "Mayorista";
-                        } else {
-                            tipoprecio = TipoForaneo.replace("Precio", "");
-                        }
-                    }
-                }
-            }
-
-            if(Boolean.parseBoolean( variables_publicas.AplicarPrecioMayoristaXCaja) ){
-                if(cantidadItems > 0 ){
-                    if(PrecioCajas && cliente.getTipo() != "Super" ){
-                        if( FaltaParaCaja > 0 && ModCantidadCajas > 0 ){
-                            MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas) + " cajas, Desea continuar ? ");
-                            final String finalTipoprecio = tipoprecio;
-                            new AlertDialog.Builder(this)
-                                    .setTitle("Confirmación Requerida")
-                                    .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas) + " cajas, Desea continuar ? ")
-                                    .setCancelable(false)
-                                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            setPrecio(art,item, finalTipoprecio);
-                                        }
-                                    })
-                                    .setNegativeButton("No", null)
-                                    .show();
-                        }else{
-                            if((cliente.getTipo().equalsIgnoreCase("Detalle") && Boolean.parseBoolean(cliente.getRutaForanea()) && ! AplicarPrecioDetalle) || cliente.getTipo().equalsIgnoreCase( "Foraneo")){
-                                tipoprecio = "Foraneo";
-                            }else{
-                                tipoprecio = "Mayorista";
-                            }
-                        }
-                    }else{
-                        if(! Boolean.parseBoolean(variables_publicas.PermitirVentaDetAMayoristaXCaja )){
-                            setPrecio(art,item, tipoprecio);
-                        }
-                    }
-
-                }else{
-                    //Si itemDetalle.cantidad=0 entonces le damos el precio mas alto
-                    if(cliente.getTipo().equalsIgnoreCase( "Foraneo" )){
-                        tipoprecio = "Super"; //Super es : Detalle Foraneo
-                    }else if (cliente.getTipo().equalsIgnoreCase("Mayorista")){
-                        tipoprecio = "Detalle";
-                    }else{
-                        tipoprecio = cliente.getTipo();
-                    }
-                }
-
-
-            }
-
-            if(Boolean.parseBoolean(cliente.getEmpleado()) && Integer.parseInt(condicion.getCODIGO()) != 127 ){ // esto para validar cuando es producto abordo --Tramite de CK
-                //precio de Mayorista
-                tipoprecio = "Mayorista";
-            }
-            double precioEspecial  = 0;
-
-            if( Boolean.parseBoolean(articulo.getAplicaPrecioDetalle()) &&  (txttipo.Text = "Super" Or txttipo.Text = "Mayorista" Or txttipo.Text = "Foraneo") Then
-            txtdescuento.Enabled = False
-            sql = String.Format("Exec _GetPrecioEspecial {0},'{1}'", ncliente, itemDetalle.coditem)
-            oConeccion.Open()
-            Dim odatasetPE As New DataSet
-                    rspedidos = New OleDb.OleDbDataAdapter(sql, oConeccion)
-            rspedidos.Fill(odatasetPE, "articulos")
-            oConeccion.Close()
-            contar = Me.BindingContext(odatasetPE, "articulos")
-            i = contar.Count
-            txtdescuento.Text = "0.00"
-            'Si existe precio especial
-            If i > 0 Then
-            Dim odatarowPE = odatasetPE.Tables("articulos").Rows(i - 1)
-            Dim facturar = CBool(odatarowPE("Facturar"))
-            Dim descuento = CDbl(odatarowPE("Descuento"))
-            If Not facturar Then
-            MessageBoxEx.Show("El Codigo de Articulo Ingresado no esta habilitado para la venta, para el cliente seleccionado", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Exit Sub
-            End If
-            tipoprecio = "Especial"
-            precioACT = Format(CDbl(odatarowPE("Precio")), "#,##0.00")
-            precioEspecial = Format(CDbl(odatarowPE("Precio")), "#,##0.00")
-            If (descuento > 0) Then
-            txtdescuento.Text = descuento
-            End If
-
-
-
-
-            End If
-            End If
-
-
-
-
-
-          /*  //Si es cliente Mayorista foraneo
-            if (cliente.getTipo().equals("Foraneo")) {
-                if (subTotalPrecioSuper < valorPolitica) {
-                    item.put("Precio", articulo.getPrecioSuper());
-                    item.put("TipoPrecio", "PrecioSuper");
-                } else {
-                    item.put("Precio", articulo.getPrecioForaneo());
-                    item.put("TipoPrecio", "PrecioForaneo");
-                }
-            }
-            //Si es cliente Mayorista
-            if (cliente.getTipo().equals("Mayorista")) {
-                if (subTotalPrecioSuper < valorPolitica) {
-                    item.put("Precio", articulo.getPrecioSuper());
-                    item.put("TipoPrecio", "PrecioDetalle");
-                } else {
-                    item.put("Precio", articulo.getPrecioMayorista());
-                    item.put("TipoPrecio", "PrecioMayorista");
-                }
-            }
-
-            //Validamos que si es empleado, damos a precio mayorista
-            if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) {
-                item.put("Precio", articulo.getPrecioMayorista());
-                item.put("TipoPrecio", "PrecioMayorista");
-            }
-
-            if (cliente.getPrecioEspecial().equals("true") && (cliente.getTipo().equals("Super") || cliente.getTipo().equals("Mayorista"))) {
-                PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(String.valueOf(IdCliente), articulo.getCodigo());
-                if (precioEspecial != null) {
-                    if (precioEspecial.getFacturar().equals("0")) {
-                        MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
-                        return;
-                    }
-                    item.put("Precio", precioEspecial.getPrecio());
-                    item.put("TipoPrecio", "PrecioEspecial");
-                }
-            }*/
-
+            ObtenerPrecio(item,item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo),true);
         }
-
-
     }
 
 
@@ -901,9 +796,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
         return false;
     }
-    private void setPrecio(HashMap<String,String> articulo,HashMap<String, String> item,String tipoPrecio){
+    private void setPrecio(HashMap<String,String> articulo, String pTipoPrecio,double precio){
+        if (pTipoPrecio.equalsIgnoreCase("Especial")) {
+            txtPrecioArticulo.setText(String.valueOf(precio));
+            PrecioItem = precio;
+        }else{
+            txtPrecioArticulo.setText(articulo.get(pTipoPrecio));
+            PrecioItem = Double.parseDouble(articulo.get(pTipoPrecio));
+        }
+        TipoPrecio = pTipoPrecio;
 
-        double subtotal, iva, total, descuento, porIva,precio;
+      /*  double subtotal, iva, total, descuento, porIva,precio;
         precio=Double.parseDouble(articulo.get(tipoPrecio));
         subtotal = precio * Double.parseDouble(item.get("Cantidad"));
         descuento = subtotal * (Double.parseDouble(item.get("PorDescuento")) / 100);
@@ -911,13 +814,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         porIva = Double.parseDouble(articulo.get(variables_publicas.ARTICULO_COLUMN_PorIva));
         iva = subtotal * porIva;
         total = subtotal + iva;
+        if(tipoPrecio!="Especial"){
+            item.put("Precio",df.format(precio));
+        }
         item.put("Descuento", df.format(descuento));
         item.put("PorcentajeIva", articulo.get(variables_publicas.ARTICULO_COLUMN_PorIva));
         item.put("Um", articulo.get(variables_publicas.ARTICULO_COLUMN_Unidad));
         item.put("Iva", df.format(iva));
         item.put("SubTotal", df.format(subtotal));
         item.put("Total", df.format(total));
-        subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
+        subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));*/
 
     }
 
@@ -1172,8 +1078,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                         ListAdapter adapter = new SimpleAdapter(
                                 getApplicationContext(), listaArticulosItem,
-                                R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                                R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioMayorista});
+                                R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioForaneo2","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                                R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioForaneo2,R.id.PrecioMayorista});
 
                         lvItem.setAdapter(adapter);
                         lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
@@ -1192,10 +1098,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
 
                 articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
-
+                HashMap<String,String> art =  ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
-                ObtenerPrecio();
+                ObtenerPrecio(null,CodigoArticulo,false);
 
                 alertDialog.dismiss();
             }
