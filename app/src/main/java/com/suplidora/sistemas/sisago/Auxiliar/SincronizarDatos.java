@@ -410,6 +410,21 @@ public class SincronizarDatos {
                 String Valor = c.getString("Valor");
                 String Activo = c.getString("Activo");
 
+                if(Configuracion.equalsIgnoreCase("VersionDatos"))
+                {
+                    variables_publicas.ValorConfigServ = Valor;
+                }
+                if(Configuracion.equalsIgnoreCase("AplicarPrecioMayoristaXCaja")){
+                    variables_publicas.AplicarPrecioMayoristaXCaja = Valor;
+                }
+                if(Configuracion.equalsIgnoreCase("PermitirVentaDetAMayoristaXCaja")){
+                    variables_publicas.PermitirVentaDetAMayoristaXCaja = Valor;
+                }
+                if(Configuracion.equalsIgnoreCase("lstDepartamentosForaneo1")){
+                    variables_publicas.lstDepartamentosForaneo1= Valor.split(",");
+                }
+
+
                 ConfigSistemasH.GuardarConfiguracionSistema(Id, Sistema, Configuracion, Valor, Activo);
             }
             DbOpenHelper.database.setTransactionSuccessful();
