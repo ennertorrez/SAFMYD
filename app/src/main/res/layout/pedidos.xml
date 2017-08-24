@@ -11,7 +11,9 @@
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
 
         <LinearLayout
@@ -299,7 +301,7 @@
 
                         <LinearLayout
                             android:id="@+id/layout_list_header"
-                            android:layout_width="980dp"
+                            android:layout_width="940dp"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
@@ -351,11 +353,11 @@
 
                             <TextView
                                 android:id="@+id/lblColTipoPrecio"
-                                android:layout_width="140dp"
+                                android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top"
                                 android:background="@drawable/borde_campos_pedidos"
-                                android:text="Tipo Precio"
+                                android:text="T.Precio"
                                 android:gravity="right"
                                 android:textAppearance="?android:attr/textAppearanceMedium"
                                 android:textColor="#000000"
@@ -435,7 +437,7 @@
 
                             <ListView
                                 android:id="@+id/listPedido"
-                                android:layout_width="980dp"
+                                android:layout_width="930dp"
                                 android:layout_height="125dp"
                                 android:layout_alignParentLeft="true"
                                 android:layout_alignParentStart="true"
@@ -456,7 +458,7 @@
 
                             <TextView
                                 android:id="@+id/lblFooter"
-                                android:layout_width="980dp"
+                                android:layout_width="940dp"
                                 android:layout_height="20dp"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:text="Total items: 0"

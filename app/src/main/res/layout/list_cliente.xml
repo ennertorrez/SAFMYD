@@ -8,26 +8,40 @@
     android:padding="@dimen/activity_horizontal_margin"
     app:menu = "@menu/main"
     tools:context=".Menu.ClientesFragment" >
-   >
 
-    <TextView
-        android:id="@+id/IdCliente"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="2dip"
-        android:paddingTop="6dip"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
- <TextView
-     android:id="@+id/CodCv"
-     android:layout_width="match_parent"
-     android:layout_height="wrap_content"
-     android:paddingBottom="2dip"
-     android:paddingTop="6dip"
-     android:textColor="@color/colorPrimaryDark"
-     android:textSize="16sp"
-     android:textStyle="bold"/>
+        android:weightSum="2"
+        android:id="@+id/layoutNombres">
+        <TextView
+            android:id="@+id/IdCliente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dip"
+            android:paddingTop="6dip"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            />
+        <TextView
+            android:id="@+id/CodCv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="2dip"
+            android:paddingTop="6dip"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/IdCliente"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+
 
     <TextView
         android:id="@+id/Nombre"
@@ -35,8 +49,9 @@
         android:layout_height="wrap_content"
         android:paddingBottom="2dip"
         android:textColor="@color/colorAccent"
-        android:layout_below="@id/IdCliente"
+        android:layout_below="@+id/layoutNombres"
         />
+
     <TextView
         android:id="@+id/Direccion"
         android:layout_width="wrap_content"
@@ -55,17 +70,6 @@
     </FrameLayout>
     
 
-
-    <!--<ImageView-->
-        <!--android:id="@+id/btnOpciones2"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:background="@color/wallet_link_text_light"-->
-        <!--android:src="@drawable/quantum_ic_keyboard_arrow_down_white_36"-->
-        <!--android:contentDescription="@string/content_open_popup"-->
-        <!--android:layout_alignBottom="@+id/Codigo"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true" />-->
 
 
 </RelativeLayout>

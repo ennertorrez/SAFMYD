@@ -29,6 +29,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.text.Text;
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
@@ -76,7 +77,8 @@ public class ListaPedidosFragment extends Fragment {
     private String fecha = "";
     private ProgressDialog pDialog;
     private ListView lv;
-    private TextView lblFooter;
+    private TextView lblFooterCantidad;
+    private TextView lblFooterSubtotal;
     private TextView tvSincroniza;
     private TextView tvEstado;
     private EditText txtBusqueda;
@@ -96,19 +98,21 @@ public class ListaPedidosFragment extends Fragment {
     private Cliente Clientes;
     private String IdVendedor;
     private boolean guardadoOK = true;
+    private DecimalFormat df;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.listapedidos_layout, container, false);
+        df = new DecimalFormat("#0.00");
         getActivity().setTitle("Lista de Pedidos");
         lv = (ListView) myView.findViewById(R.id.listpedidosdia);
         registerForContextMenu(lv);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
         btnSincronizar = (Button) myView.findViewById(R.id.btnSincronizar);
         txtFechaPedido = (EditText) myView.findViewById(R.id.txtFechaPedido);
-        lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
-
+        lblFooterCantidad = (TextView) myView.findViewById(R.id.lblFooterCantidad);
+        lblFooterSubtotal = (TextView) myView.findViewById(R.id.lblFooterSubtotal);
         LayoutInflater inflate = getActivity().getLayoutInflater();
         View dialogView = inflate.inflate(R.layout.list_pedidos_guardados, null);
         tvSincroniza = (TextView) dialogView.findViewById(R.id.tvSincronizar);
@@ -188,12 +192,24 @@ public class ListaPedidosFragment extends Fragment {
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
                 new GetListaPedidos().execute();
-                lblFooter.setText("Pedidos encontrados: " + String.valueOf(listapedidos.size()));
+                ActualizarFooter();
+
             }
         });
 
         return myView;
     }
+
+    private void ActualizarFooter() {
+        lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
+        double subtotal = 0.00;
+        for(HashMap<String,String>pedido : listapedidos){
+            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal));
+        }
+
+        lblFooterSubtotal.setText("Subtotal: C$" + df.format(subtotal));
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -277,7 +293,7 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
+           ActualizarFooter();
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
@@ -327,7 +343,7 @@ public class ListaPedidosFragment extends Fragment {
             };
 
             lv.setAdapter(adapter);
-            lblFooter.setText("Pedidos Encontrados: " + String.valueOf(listapedidos.size()));
+            ActualizarFooter();
         }
     }
 
@@ -408,7 +424,7 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            lblFooter.setText("Cliente encontrados: " + String.valueOf(listapedidos.size()));
+            ActualizarFooter();
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();

@@ -78,14 +78,35 @@
             android:layout_alignParentStart="true"
             />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
+
+
         <TextView
-            android:id="@+id/lblFooter"
+            android:id="@+id/lblFooterCantidad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:background="@color/colorPrimary"
-            android:text="Total pedidos: 0"
-            android:textColor="@color/White" />
+            android:text="Cantidad: 0"
+            android:textColor="@color/White"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/lblFooterSubtotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="Subtotal: C$0.00"
+            android:gravity="right"
+            android:textColor="@color/White"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+
 
 
 </RelativeLayout>

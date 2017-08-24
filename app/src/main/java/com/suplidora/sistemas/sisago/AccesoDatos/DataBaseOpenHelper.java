@@ -30,6 +30,7 @@ public class DataBaseOpenHelper {
                             + variables_publicas.CLIENTES_COLUMN_IdCliente + " TEXT , "
                             + variables_publicas.CLIENTES_COLUMN_CodCv + " TEXT , "
                             + variables_publicas.CLIENTES_COLUMN_Nombre + " TEXT , "
+                            + variables_publicas.CLIENTES_COLUMN_NombreCliente + " TEXT , "
                             + variables_publicas.CLIENTES_COLUMN_FechaCreacion + " TEXT , "
                             + variables_publicas.CLIENTES_COLUMN_Telefono + " TEXT , "
                             + variables_publicas.CLIENTES_COLUMN_Direccion + " TEXT , "

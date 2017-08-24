@@ -156,6 +156,7 @@ public class SincronizarDatos {
                 String IdCliente = c.getString("IdCliente");
                 String CodCv = c.getString("CodCv");
                 String Nombre = c.getString("Nombre");
+                String NombreCliente = c.getString("NombreCliente");
                 String FechaCreacion = c.getString("FechaCreacion");
                 String Telefono = c.getString("Telefono");
                 String Direccion = c.getString("Direccion");
@@ -179,7 +180,7 @@ public class SincronizarDatos {
                 String Empleado = c.getString("Empleado");
                 String Detallista =c.getString("Detallista");
                 String RutaForanea =c.getString("RutaForanea");
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado,Detallista,RutaForanea);
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre,NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado,Detallista,RutaForanea);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         } finally {

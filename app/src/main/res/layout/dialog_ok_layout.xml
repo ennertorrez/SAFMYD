@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="110dp"
-    android:minHeight="110dp"
+    android:layout_height="150dp"
+    android:minHeight="150dp"
     android:orientation="vertical"
-
     >
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="#0e6e05" />
+
 
     <TextView
         android:id="@+id/lblHeader"
@@ -18,27 +14,35 @@
         android:layout_height="wrap_content"
         android:text="PEDIDO GUARDADO EXITOSAMENTE"
         android:textAlignment="center"
-        android:textColor="#0e6e05"
-        android:textStyle="bold" />
+        android:textColor="#6f6f6f"
+        android:background="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_below="@+id/btnOkDialogo"
+        android:layout_alignParentStart="true"
+        android:textSize="28sp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_below="@+id/lblHeader"
-        android:layout_marginTop="5dp"
-        android:background="#0e6e05">
 
-    </View>
+
+    <ImageView
+        android:id="@+id/imgOK"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@mipmap/ic_check_circle_black_24dp"
+        android:backgroundTint="#6ec543"
+        android:layout_centerHorizontal="true"
+        />
 
     <Button
-        android:id="@+id/btnOkDialogo"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:background="#6ec543"
+        android:text="OK"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:layout_below="@+id/lblHeader"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:background="@mipmap/ic_check_circle_black_24dp"
-        android:backgroundTint="#0e6e05"
-        android:onClick="Agregar" />
+        android:layout_marginTop="14dp"
+        android:id="@+id/btnOkDialogo"/>
 
 
 

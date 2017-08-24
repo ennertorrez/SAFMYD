@@ -194,7 +194,7 @@ public class PedidosFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente, variables_publicas.CLIENTES_COLUMN_Nombre, variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente, R.id.Nombre,
+                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodCv, R.id.Nombre,
                     R.id.Direccion});
             lv.setAdapter(adapter);
             lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));

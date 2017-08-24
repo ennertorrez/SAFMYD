@@ -9,6 +9,7 @@ public class Cliente {
     String IdCliente = "";
     String CodCv= "";
     String Nombre= "";
+    String NombreCliente="";
     String FechaCreacion = "";
     String Telefono = "";
     String Direccion = "";
@@ -36,10 +37,11 @@ public class Cliente {
 
     }
 
-    public Cliente(String idCliente, String codCv, String nombre, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista,String rutaForanea) {
+    public Cliente(String idCliente, String codCv, String nombre,String nombreCliente, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista,String rutaForanea) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
+        NombreCliente=nombreCliente;
         FechaCreacion = fechaCreacion;
         Telefono = telefono;
         Direccion = direccion;
@@ -276,5 +278,13 @@ public class Cliente {
     public String toString(){
 
         return  this.getNombre();
+    }
+
+    public String getNombreCliente() {
+        return NombreCliente;
+    }
+
+    public void setNombreCliente(String nombreCliente) {
+        NombreCliente = nombreCliente;
     }
 }

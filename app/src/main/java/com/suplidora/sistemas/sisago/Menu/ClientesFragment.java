@@ -175,6 +175,7 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString("IdCliente"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString("CodCv"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString("Nombre"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString("NombreCliente"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString("FechaCreacion"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString("Direccion"));

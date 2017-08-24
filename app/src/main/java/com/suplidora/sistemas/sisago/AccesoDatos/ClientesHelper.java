@@ -27,6 +27,7 @@ public class ClientesHelper {
     public boolean GuardarTotalClientes( String IdCliente ,
                                       String CodCv ,
                                       String Nombre ,
+                                         String NombreCliente ,
                                       String FechaCreacion ,
                                       String Telefono ,
                                       String Direccion ,
@@ -51,6 +52,7 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_IdCliente ,IdCliente );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_CodCv ,CodCv );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Nombre , Nombre );
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_NombreCliente , NombreCliente );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion ,FechaCreacion );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Telefono ,Telefono );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Direccion ,Direccion );
@@ -91,6 +93,7 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_IdCliente ,cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_CodCv ,cliente.get(variables_publicas.CLIENTES_COLUMN_CodCv) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Nombre , cliente.get(variables_publicas.CLIENTES_COLUMN_Nombre)  );
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_NombreCliente , cliente.get(variables_publicas.CLIENTES_COLUMN_NombreCliente)  );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion ,cliente.get(variables_publicas.CLIENTES_COLUMN_FechaCreacion) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Telefono ,cliente.get(variables_publicas.CLIENTES_COLUMN_Telefono)  );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Direccion ,cliente.get(variables_publicas.CLIENTES_COLUMN_Direccion) );
@@ -125,7 +128,8 @@ public class ClientesHelper {
 
     public ArrayList<HashMap<String, String>>  BuscarClientesNombre(String Busqueda) {
         Busqueda= Busqueda.replace(" ","%");
-        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_Nombre+" like '%"+Busqueda+"%'", null);
+        Cursor c= database.rawQuery("SELECT *,CASE WHEN CodCv='' THEN CodCv ELSE ('Cod_Cv: ' || CodCv) END AS CodCv2, CASE WHEN Nombre = NombreCliente THEN Nombre ELSE  (Nombre || ' / ' || ifnull(NombreCliente,'') ) END AS NombreCompleto FROM "
+                + variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_NombreCliente+" like '%"+Busqueda+"%' AND NOT("+variables_publicas.CLIENTES_COLUMN_Nombre+"  LIKE 'CLIENTES VARIOS%' AND CodCv= '' )", null);
         ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
 
         if(c.moveToFirst()){
@@ -133,7 +137,10 @@ public class ClientesHelper {
                 HashMap<String,String> cliente= new HashMap<>();
                 cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString(c.getColumnIndex("CodCv")));
+                cliente.put("CodCv2", c.getString(c.getColumnIndex("CodCv2")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString(c.getColumnIndex("NombreCliente")));
+                cliente.put("NombreCompleto", c.getString(c.getColumnIndex("NombreCompleto")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString(c.getColumnIndex("FechaCreacion")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString(c.getColumnIndex("Telefono")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString(c.getColumnIndex("Direccion")));
@@ -165,7 +172,10 @@ public class ClientesHelper {
     }
 
     public ArrayList<HashMap<String, String>>  BuscarClientesCodigo(String Busqueda) {
-        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES+" where "+variables_publicas.CLIENTES_COLUMN_IdCliente+" = '"+Busqueda+"'", null);
+        Cursor c= database.rawQuery("SELECT *,CASE WHEN CodCv='' THEN CodCv ELSE ('Cod_Cv: ' || CodCv) END AS CodCv2, CASE WHEN Nombre = NombreCliente THEN Nombre ELSE  (Nombre || ' / ' || ifnull(NombreCliente,'') ) END AS NombreCompleto FROM "
+                + variables_publicas.TABLE_CLIENTES+" WHERE (("+variables_publicas.CLIENTES_COLUMN_IdCliente+" = CASE WHEN '' = '"+Busqueda+"' THEN "+variables_publicas.CLIENTES_COLUMN_IdCliente+" ELSE '"+Busqueda+"' END) "+
+                "OR (CodCv = CASE WHEN '"+Busqueda+"' = '' THEN CodCv ELSE '"+ Busqueda +"' END ) )"+
+                " AND NOT("+variables_publicas.CLIENTES_COLUMN_Nombre+"  LIKE 'CLIENTES VARIOS%' AND CodCv= '' )", null);
         ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
 
         if(c.moveToFirst()){
@@ -173,7 +183,10 @@ public class ClientesHelper {
                 HashMap<String,String> cliente= new HashMap<>();
                 cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString(c.getColumnIndex("CodCv")));
+                cliente.put("CodCv2", c.getString(c.getColumnIndex("CodCv2")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString(c.getColumnIndex("NombreCliente")));
+                cliente.put("NombreCompleto", c.getString(c.getColumnIndex("NombreCompleto")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString(c.getColumnIndex("FechaCreacion")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString(c.getColumnIndex("Telefono")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString(c.getColumnIndex("Direccion")));
@@ -225,6 +238,7 @@ public class ClientesHelper {
                 cli = new Cliente(c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdCliente)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodCv)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Nombre)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_NombreCliente)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_FechaCreacion)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Telefono)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Direccion)),
