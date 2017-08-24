@@ -105,6 +105,11 @@ public class ListaPedidosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         myView = inflater.inflate(R.layout.listapedidos_layout, container, false);
         df = new DecimalFormat("#0.00");
+        DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+        fmts.setGroupingSeparator(',');
+        df.setGroupingSize(3);
+        df.setGroupingUsed(true);
+        df.setDecimalFormatSymbols(fmts);
         getActivity().setTitle("Lista de Pedidos");
         lv = (ListView) myView.findViewById(R.id.listpedidosdia);
         registerForContextMenu(lv);
@@ -204,10 +209,10 @@ public class ListaPedidosFragment extends Fragment {
         lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
         double subtotal = 0.00;
         for(HashMap<String,String>pedido : listapedidos){
-            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal));
+            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total).replace("C$","").replace(",",""));
         }
 
-        lblFooterSubtotal.setText("Subtotal: C$" + df.format(subtotal));
+        lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
     }
 
 
