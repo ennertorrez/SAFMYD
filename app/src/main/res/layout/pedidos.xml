@@ -261,7 +261,7 @@
                         android:id="@+id/btnAgregar"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
-                        android:background="@mipmap/ic_check_circle_black_24dp"
+                        android:background="@mipmap/ic_check_circle_black_48dp"
                         android:backgroundTint="#1cd100"
                         android:onClick="Agregar" />
                 </LinearLayout>

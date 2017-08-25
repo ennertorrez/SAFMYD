@@ -1032,6 +1032,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 // ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = null;
+        dialogBuilder.setCancelable(false);
         if (guardadoOK) {
             dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
 

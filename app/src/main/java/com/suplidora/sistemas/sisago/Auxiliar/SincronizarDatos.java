@@ -551,8 +551,9 @@ public class SincronizarDatos {
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrPedido);
-                String NoPedido = (String) result.get("SincronizarPedidoTotalResult");
-                if (NoPedido.equals("false")) {
+                String resultState = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[0];
+                String NoPedido = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
+                if (resultState.equals("false")) {
                     return false;
                 }
                 PedidoH.ActualizarPedido(IdPedido, NoPedido);
