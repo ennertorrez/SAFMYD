@@ -1,5 +1,6 @@
 package com.suplidora.sistemas.sisago.Principal;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -12,6 +13,11 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -57,11 +63,14 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutionException;
 
+
 /**
  * Created by usuario on 20/3/2017.
  */
 
 public class Login extends Activity {
+    private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     private String TAG = Login.class.getSimpleName();
     private Button btnIngresar;
     private EditText txtUsuario;
@@ -106,6 +115,7 @@ public class Login extends Activity {
             mensajeAviso(MsjLoging);
         }
 
+
         DbOpenHelper = new DataBaseOpenHelper(Login.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
@@ -132,8 +142,7 @@ public class Login extends Activity {
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
 
         lblVersion.setText("Versión " + getCurrentVersion());
-        if(variables_publicas.direccionIp == "http://186.1.18.75:8085")
-        {
+        if (variables_publicas.direccionIp == "http://186.1.18.75:8085") {
             lblVersion.setText("Versión " + getCurrentVersion() + " Desarrollo");
         }
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -170,7 +179,7 @@ public class Login extends Activity {
                     return;
                 }
 
-                boolean isOnline = checkInternetConnection();
+                boolean isOnline = Funciones.checkInternetConnection(Login.this);
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
@@ -211,10 +220,102 @@ public class Login extends Activity {
             }
         });
         ValidarUltimaVersion();
+        loadIMEI();
     }
 
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+            requestReadPhoneStatePermission();
+        } else {
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
+        }
+    }
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            new AlertDialog.Builder(Login.this)
+                    .setTitle("Permission Request")
+                    .setMessage("Se necesita permiso para acceder al estado del telefono")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //re-request
+                            ActivityCompat.requestPermissions(Login.this,
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_PHONE_STATE) {
+            // Received permission result for READ_PHONE_STATE permission.est.");
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
+                //alertAlert(getString(R.string.permision_available_read_phone_state));
+                doPermissionGrantedStuffs();
+            } else {
+                alertAlert("Se necesita permiso para acceder al estado del telefono");
+            }
+        }
+    }
+
+    private void alertAlert(String msg) {
+        new AlertDialog.Builder(Login.this)
+                .setTitle("Permission Request")
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do somthing here
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+
+    public void doPermissionGrantedStuffs() {
+        //Have an  object of TelephonyManager
+        TelephonyManager tm =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
+        variables_publicas.IMEI =tm.getDeviceId();
+
+
+    }
+
+
+/*
+
+    public String getIMEI(Activity activity) {
+        TelephonyManager telephonyManager = (TelephonyManager) activity
+                .getSystemService(Context.TELEPHONY_SERVICE);
+        return telephonyManager.getDeviceId();
+    }
+*/
+
     private void ValidarUltimaVersion() {
-        if (checkInternetConnection()) {
+        boolean isOnline=Funciones.checkInternetConnection(Login.this);
+
+        if (isOnline) {
             String latestVersion = "";
             String currentVersion = getCurrentVersion();
             try {
@@ -463,18 +564,18 @@ public class Login extends Activity {
         return false;
     }
 
-    private boolean checkInternetConnection() {
+/*    private boolean checkInternetConnection() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         // test for connection
-        if (cm.getActiveNetworkInfo() != null
-                && cm.getActiveNetworkInfo().isAvailable()
-                && cm.getActiveNetworkInfo().isConnected()) {
+        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
             return true;
         } else {
-            Log.v(TAG, "No tiene conexión a internet");
+            Log.e(TAG, "No tiene conexión a internet");
             return false;
         }
-    }
+    }*/
+
+
 
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);

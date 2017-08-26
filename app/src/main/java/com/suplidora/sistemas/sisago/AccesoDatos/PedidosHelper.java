@@ -89,7 +89,7 @@ public class PedidosHelper {
         return lst;
     }
 
-    public void EliminaPedidos(String IdPedido) {
+    public void EliminaPedido(String IdPedido) {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS + " WHERE" +
                 " "+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" = '" + IdPedido + "' ;");
         Log.d("pedido_eliminado", "Datos eliminados");
@@ -127,6 +127,31 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+
+            } while (c.moveToNext());
+        }
+        c.close();
+        return pedido;
+    }
+
+    public Pedido GetPedido(String CodigoPedido) {
+
+        Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS + " Where " + variables_publicas.PEDIDOS_COLUMN_CodigoPedido + " = ?", new String[]{CodigoPedido});
+        Pedido pedido = null;
+        if (c.moveToFirst()) {
+            do {
+                pedido = new Pedido();
+                pedido.setCodigoPedido(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+                pedido.setIdVendedor(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdVendedor)));
+                pedido.setIdCliente(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
+                pedido.setCod_cv(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
+                pedido.setTipo(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
+                pedido.setObservacion(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
+                pedido.setIdFormaPago(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
+                pedido.setIdSucursal(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
+                pedido.setFecha(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
+                pedido.setUsuario(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
+                pedido.setIMEI(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
 
             } while (c.moveToNext());
         }

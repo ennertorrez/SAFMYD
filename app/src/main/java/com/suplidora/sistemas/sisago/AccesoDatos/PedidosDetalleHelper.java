@@ -116,6 +116,36 @@ public class PedidosDetalleHelper {
         return lst;
     }
 
+    public ArrayList<HashMap<String, String>> ObtenerPedidoDetalleArrayList(String CodigoPedido) {
+        ArrayList<HashMap<String,String>> lst= new ArrayList<>();
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_PEDIDOS_DETALLE + " WHERE " + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " = ? ", new String[]{CodigoPedido});
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> detalle = new HashMap<>();
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Isc)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Costo)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorcentajeIva)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Um)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal)));
+                detalle.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total)));
+                lst.add(detalle);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+
     public void LimpiarPedidosDetalle() {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS_DETALLE + ";");
         Log.d("pedidos detalle_elimina", "Datos eliminados");

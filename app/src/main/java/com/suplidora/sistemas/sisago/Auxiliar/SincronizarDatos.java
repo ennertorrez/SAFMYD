@@ -515,7 +515,7 @@ public class SincronizarDatos {
         SincronizarConfiguracionSistema();
     }
 
-    public static boolean SincronizarPedido(Context context, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido){
+    public static boolean SincronizarPedido(Context context, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido,boolean Editar){
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -532,7 +532,7 @@ public class SincronizarDatos {
         }
         String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoTotal/";
-        String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + vendedor.getCODIGO() + "/" + jsonPedido+ "/" + jsonPedidoDetalle;
+        String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + String.valueOf(Editar) + "/" + vendedor.getCODIGO() + "/" + jsonPedido+ "/" + jsonPedidoDetalle;
 
         try {
             URL Url = new URL(urlStringDetalle);

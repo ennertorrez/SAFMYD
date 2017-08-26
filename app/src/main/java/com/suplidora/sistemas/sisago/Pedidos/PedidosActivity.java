@@ -1,6 +1,5 @@
 package com.suplidora.sistemas.sisago.Pedidos;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -13,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -54,7 +52,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
-import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
@@ -67,7 +64,6 @@ import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.R;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -80,7 +76,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private String TAG = PedidosActivity.class.getSimpleName();
     private boolean MensajeCaja;
-    private static final int REQUEST_READ_PHONE_STATE = 1;
+    private static final int REQUEST_READ_PHONE_STATE = 0;
     //region Declaracion de controles
     private EditText txtCodigoArticulo;
     private EditText txtDescuento;
@@ -122,7 +118,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String focusedControl = "";
     static final String KEY_IdCliente = "IdCliente";
     static final String KEY_NombreCliente = "Nombre";
-    private String IdPedido;
+
     private Articulo articulo;
     private DecimalFormat df;
     private FormaPago condicion;
@@ -133,11 +129,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     public boolean Estado;
     public double total;
     private Cliente cliente;
-    private int IdCliente;
     private double tasaCambio = 0;
     private double subTotalPrecioSuper = 0;
-    private String Nombre;
-    private int IdVendedor;
     private Pedido pedido;
     private DataBaseOpenHelper DbOpenHelper;
     private VendedoresHelper VendedoresH;
@@ -158,12 +151,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private boolean guardadoOK = false;
     private Vendedor vendedor = null;
     private double PrecioItem = 0;
-    private String Tipo = "";
+
     private String busqueda = "1";
-    private int tipoBusqueda =1;
+    private int tipoBusqueda = 1;
     private boolean validarTipoBusqueda;
     private int IdDepartamento;
+    private String Nombre;
+    private boolean editar=false;
+    //private HashMap<String,String> pedido=null;
     //endregion
+
 
     //region OnCreate
     @Override
@@ -186,6 +183,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
+
         listaArticulos = new ArrayList<HashMap<String, String>>();
         listaArticulosItem = new ArrayList<HashMap<String, String>>();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
@@ -199,7 +197,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
-        ConfiguracionSistemaH= new ConfiguracionSistemaHelper(DbOpenHelper.database);
+        ConfiguracionSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         cboSucursal = (Spinner) findViewById(R.id.cboSucursal);
         cboCondicion = (Spinner) findViewById(R.id.cboCondicion);
@@ -297,9 +295,18 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
         // Get XML values from previous intent
-        IdCliente = Integer.parseInt(in.getStringExtra(KEY_IdCliente));
+        pedido.setIdCliente(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
-
+        if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido) != null) {
+            editar=true;
+            pedido = PedidoH.GetPedido(in.getStringExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+            listaArticulos = PedidoDetalleH.ObtenerPedidoDetalleArrayList(pedido.getCodigoPedido());
+            for (HashMap<String,String> item:listaArticulos){
+                item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
+            }
+            RefrescarGrid();
+            CalcularTotales();
+        }
 
         // Loading spinner data from database
         CargaDatosCombo();
@@ -327,14 +334,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         lblCodigoCliente.setText(cliente.getCodigoLetra());
         lblNombre.setText(Nombre);
-        lblRuta.setText(variables_publicas.usuario.getRuta());
-        lblCanal.setText(variables_publicas.usuario.getCanal());
+        lblRuta.setText(cliente.getRuta());
+        lblCanal.setText(cliente.getTipo());
 
         btnBuscar.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
 //
                 BuscarArticulo();
-                validarTipoBusqueda =true;
+                validarTipoBusqueda = true;
                 btnOK.performClick();
                 txtCantidad.requestFocus();
                 focusedControl = "";
@@ -376,12 +383,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                                                   double cantidad = Double.parseDouble(txtCantidad.getText().toString());
                                                   AgregarDetalle();
-                                                  MensajeCaja=true;
-                                                  ObtenerPrecio(null,articulo.getCodigo(),false);
+                                                  MensajeCaja = true;
+                                                  ObtenerPrecio(listaArticulos.get(listaArticulos.size()-1), articulo.getCodigo(), true);
                                                   subTotalPrecioSuper = 0;
                                                   for (HashMap<String, String> item : listaArticulos) {
                                                       subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
                                                   }
+
                                                   CalcularTotales();
 
 
@@ -391,7 +399,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                                           InputMethodManager.RESULT_SHOWN);
 
-                                                LimipiarDatos();
+                                                  LimipiarDatos();
                                               } catch (Exception e) {
                                                   MensajeAviso(e.getMessage());
                                               }
@@ -412,8 +420,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         });
 
-        variables_publicas.PermitirVentaDetAMayoristaXCaja= ConfiguracionSistemaH.BuscarValorConfig("PermitirVentaDetAMayoristaXCaja").getValor();
-        variables_publicas.AplicarPrecioMayoristaXCaja= ConfiguracionSistemaH.BuscarValorConfig("AplicarPrecioMayoristaXCaja").getValor();
+        variables_publicas.PermitirVentaDetAMayoristaXCaja = ConfiguracionSistemaH.BuscarValorConfig("PermitirVentaDetAMayoristaXCaja").getValor();
+        variables_publicas.AplicarPrecioMayoristaXCaja = ConfiguracionSistemaH.BuscarValorConfig("AplicarPrecioMayoristaXCaja").getValor();
     }
 
     private boolean ValidarDescuento() {
@@ -473,11 +481,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
         String mensaje = "";
-        if (Double.parseDouble(lblSubTotalCor.getText().toString().replace(",", "")) < valorPolitica && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") ) ) {
+        if (Double.parseDouble(lblSubTotalCor.getText().toString().replace(",", "")) < valorPolitica && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
             mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
-            Tipo = "Detalle";
+            pedido.setTipo("Detalle");
         } else {
-            Tipo = cliente.getTipo();
+            pedido.setTipo(cliente.getTipo());
             mensaje = "Esta seguro que desea guardar el pedido?";
         }
         new AlertDialog.Builder(this)
@@ -490,9 +498,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         if (GuardarPedido()) {
                             DbOpenHelper.database.setTransactionSuccessful();
                             DbOpenHelper.database.endTransaction();
-                            SincronizarPedido(PedidoH.ObtenerPedido(IdPedido));
-                        }
-                        else{
+                            SincronizarPedido(PedidoH.ObtenerPedido(pedido.getCodigoPedido()));
+                        } else {
                             DbOpenHelper.database.endTransaction();
                         }
 
@@ -511,18 +518,22 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private boolean GuardarPedido() {
         String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
-
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, REQUEST_READ_PHONE_STATE);
-        } else {
-            IMEI = getIMEI(PedidosActivity.this);
-        }
-
-
+        pedido.setIdSucursal(codSuc);
+        IMEI = variables_publicas.IMEI;
         //Guardamos el Header
-        boolean saved = PedidoH.GuardarPedido(IdPedido, String.valueOf(IdVendedor), String.valueOf(IdCliente), cliente.getCodCv(), Tipo,
+
+
+        pedido.setIdVendedor(String.valueOf(pedido.getIdVendedor()));
+        pedido.setIdCliente(String.valueOf(pedido.getIdCliente()));
+        pedido.setCod_cv(cliente.getCodCv());
+        pedido.setObservacion(txtObservaciones.getText().toString());
+        pedido.setIdFormaPago(condicion.getCODIGO());
+        pedido.setIdSucursal(codSuc);
+        pedido.setFecha(variables_publicas.FechaActual);
+        pedido.setUsuario(variables_publicas.usuario.getUsuario());
+        pedido.setIMEI(IMEI);
+
+        boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                 variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(total));
 
@@ -546,22 +557,22 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapterVendedor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboVendedor.setAdapter(adapterVendedor);
 
-        cliente = ClientesH.BuscarCliente(String.valueOf(IdCliente));
-        IdDepartamento= Integer.parseInt(cliente.getIdDepartamento());
+        cliente = ClientesH.BuscarCliente(pedido.getIdCliente());
+        IdDepartamento = Integer.parseInt(cliente.getIdDepartamento());
         if (variables_publicas.usuario.getCodigo().equals("0")) {
-            IdVendedor = Integer.parseInt(cliente.getIdVendedor());
+            pedido.setIdVendedor(cliente.getIdVendedor());
         } else {
-            IdVendedor = Integer.parseInt(variables_publicas.usuario.getCodigo());
+            pedido.setIdVendedor(variables_publicas.usuario.getCodigo());
         }
 
         if (cliente == null) {
             MensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
         }
-        IdPedido = "-" + cliente.getIdCliente() + String.valueOf(IdVendedor) + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido());
+        pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
-            for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != IdVendedor; i++)
+            for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != Integer.parseInt(pedido.getIdVendedor()); i++)
                 vendedor = vendedores.get(i);
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
@@ -584,7 +595,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         });
 
-        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(String.valueOf(IdCliente));
+        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(pedido.getIdCliente());
         ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
         adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboSucursal.setAdapter(adapterSucursal);
@@ -613,50 +624,49 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void ObtenerPrecio(final HashMap<String, String> item, String CodArticulo, final boolean ActualizarItem) {
         variables_publicas.lstDepartamentosForaneo1 = ConfiguracionSistemaH.BuscarValorConfig("lstDepartamentosForaneo1").getValor().split(",");
-       String[] lstDepartamentosForaneo1 = variables_publicas.lstDepartamentosForaneo1;
-        final HashMap<String,String> art = ArticulosH.BuscarArticuloHashMap(CodArticulo);
+        String[] lstDepartamentosForaneo1 = variables_publicas.lstDepartamentosForaneo1;
+        final HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodArticulo);
         //Esto para utilizarlo en el metodo SetPrecio
         Articulo articulo = ArticulosH.BuscarArticulo(CodArticulo);
-        boolean AplicarPrecioDetalle  =Boolean.parseBoolean( articulo.getAplicaPrecioDetalle());
-        int ModCantidadCajas, cantidadItems=0, FaltaParaCaja, cajas,UnidadCaja;
-        boolean PrecioCajas= false;
-        UnidadCaja = Integer.parseInt( articulo.getUnidadCaja());
-        if (item!=null){
-            if( (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()){
+        boolean AplicarPrecioDetalle = Boolean.parseBoolean(articulo.getAplicaPrecioDetalle());
+        int ModCantidadCajas, cantidadItems = 0, FaltaParaCaja, cajas, UnidadCaja;
+        boolean PrecioCajas = false;
+        UnidadCaja = Integer.parseInt(articulo.getUnidadCaja());
+        if (item != null) {
+            if ((item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()) {
                 cantidadItems = 0;
-            }else{
-                cantidadItems = Integer.parseInt( item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+            } else {
+                cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
             }
-        }else{
+        } else {
             try {
-                cantidadItems= Integer.parseInt( txtCantidad.getText().toString().isEmpty() ? "0" : txtCantidad.getText().toString());
-            }catch (Exception e){
-                cantidadItems=0;
+                cantidadItems = Integer.parseInt(txtCantidad.getText().toString().isEmpty() ? "0" : txtCantidad.getText().toString());
+            } catch (Exception e) {
+                cantidadItems = 0;
             }
 
         }
 
-        UnidadCaja =UnidadCaja == 0 ? 1 : Integer.parseInt( articulo.getUnidadCaja());
+        UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCaja());
         ModCantidadCajas = (cantidadItems % UnidadCaja);
-        if( cantidadItems >= UnidadCaja) {
+        if (cantidadItems >= UnidadCaja) {
             PrecioCajas = true;
         }
-        FaltaParaCaja = UnidadCaja - ModCantidadCajas;
-        cajas = cantidadItems / UnidadCaja ;
+        FaltaParaCaja = ModCantidadCajas==0? 0 : (UnidadCaja - ModCantidadCajas);
+        cajas = cantidadItems / UnidadCaja;
 
         String tipoprecio = "Super";
-        if( Integer.parseInt(vendedor.getCODIGO()) == 9){  //Ventas Oficina
+        if (Integer.parseInt(vendedor.getCODIGO()) == 9) {  //Ventas Oficina
             IdDepartamento = 6;
         }
-        if (cliente.getTipo().equalsIgnoreCase( "Detalle") ){
-            if(Boolean.parseBoolean( cliente.getRutaForanea()) && ! AplicarPrecioDetalle) {
+        if (cliente.getTipo().equalsIgnoreCase("Detalle")) {
+            if (Boolean.parseBoolean(cliente.getRutaForanea()) && !AplicarPrecioDetalle) {
                 tipoprecio = "Super";
-            }else
-            {
+            } else {
                 tipoprecio = "Detalle";
             }
             //Si es ruta no determinada y departamento managua
-            if (cliente.getRuta().equalsIgnoreCase("No Determinada" )) {
+            if (cliente.getRuta().equalsIgnoreCase("No Determinada")) {
                 if (IdDepartamento == 6) {
                     tipoprecio = "Detalle";
                 } else {
@@ -664,10 +674,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
             }
 
-            if (Integer.parseInt(vendedor.getCODIGO())==9){
+            if (Integer.parseInt(vendedor.getCODIGO()) == 9) {
                 tipoprecio = "Detalle";
             }
-        }else if (!cliente.getTipo().equalsIgnoreCase("Super") ) {
+        } else if (!cliente.getTipo().equalsIgnoreCase("Super")) {
 
             String TipoForaneo = "Precio" + (Arrays.asList(lstDepartamentosForaneo1).contains(cliente.getIdDepartamento()) ? "Foraneo" : "Foraneo2");
 
@@ -696,83 +706,83 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         }
 
-        if(variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") ){
-            if(cantidadItems > 0 ){
-                if(PrecioCajas && cliente.getTipo() != "Super" ){
-                    if( FaltaParaCaja > 0 && ModCantidadCajas > 0 ){
-                        if(variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
-                            if(MensajeCaja){
+        if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equalsIgnoreCase("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
+            if (cantidadItems > 0) {
+                if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
+                    if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
+                            if (MensajeCaja) {
                                 final String finalTipoprecio = tipoprecio;
-                                MensajeCaja=false;
-                                new AlertDialog.Builder(this)
-                                .setTitle("Confirmación Requerida")
-                                .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas+1) + " cajas, Desea continuar ? ")
-                                .setCancelable(false)
-                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        if(!ActualizarItem){
-                                            MensajeCaja=true;
-                                            setPrecio(art, finalTipoprecio,0);
-                                            LimipiarDatos();
-                                        }
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                        if(!ActualizarItem){
-                                            setPrecio(art, finalTipoprecio,0);
-                                            if(listaArticulos.size()>0) {
-                                                listaArticulos.remove(listaArticulos.size() - 1);
-                                                RefrescarGrid();
-                                            }
-                                            txtCantidad.requestFocus();
-                                        }
-                                    }
-                                })
-                                .show();
-                            }
-                        }else{
-                            if( MensajeCaja){
                                 MensajeCaja = false;
-                                listaArticulos.remove(listaArticulos.size()-1);
-                                MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf( FaltaParaCaja )+ " unidades para completar " + String.valueOf( cajas+1 )+ " cajas");
+                                new AlertDialog.Builder(this)
+                                        .setTitle("Confirmación Requerida")
+                                        .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas, Desea continuar ? ")
+                                        .setCancelable(false)
+                                        .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                if (!ActualizarItem) {
+                                                    MensajeCaja = true;
+                                                    setPrecio(art, finalTipoprecio, 0);
+                                                    LimipiarDatos();
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+
+                                                if (!ActualizarItem) {
+                                                    setPrecio(art, finalTipoprecio, 0);
+                                                    if (listaArticulos.size() > 0) {
+                                                        listaArticulos.remove(listaArticulos.size() - 1);
+                                                        RefrescarGrid();
+                                                    }
+                                                    txtCantidad.requestFocus();
+                                                }
+                                            }
+                                        })
+                                        .show();
+                            }
+                        } else {
+                            if (MensajeCaja) {
+                                MensajeCaja = false;
+                                listaArticulos.remove(listaArticulos.size() - 1);
+                                MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                                 txtCantidad.requestFocus();
                             }
                         }
 
-                    }else{
-                        if((cliente.getTipo().equalsIgnoreCase("Detalle") && Boolean.parseBoolean(cliente.getRutaForanea()) && ! AplicarPrecioDetalle) || cliente.getTipo().equalsIgnoreCase( "Foraneo")){
+                    } else {
+                        if ((cliente.getTipo().equalsIgnoreCase("Detalle") && Boolean.parseBoolean(cliente.getRutaForanea()) && !AplicarPrecioDetalle) || cliente.getTipo().equalsIgnoreCase("Foraneo")) {
                             tipoprecio = "Foraneo";
-                        }else{
+                        } else {
                             tipoprecio = "Mayorista";
                         }
                     }
-                }else{
+                } else {
                     if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) {
-                        if(! variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("1")  && MensajeCaja ){
-                            setPrecio(art,tipoprecio,0);
+                        if (!variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("1") && MensajeCaja) {
+                            setPrecio(art, tipoprecio, 0);
                             MensajeCaja = false;
-                            listaArticulos.remove(listaArticulos.size()-1);
-                            MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja)+ " unidades para completar " + String.valueOf( cajas +1)+ " cajas");
+                            listaArticulos.remove(listaArticulos.size() - 1);
+                            MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                             txtCantidad.requestFocus();
-                        }else {
-                            setPrecio(art,tipoprecio,0);
+                        } else {
+                            setPrecio(art, tipoprecio, 0);
                             MensajeCaja = true;
                         }
 
-                    }else{
-                        setPrecio(art,tipoprecio,0);
+                    } else {
+                        setPrecio(art, tipoprecio, 0);
                         MensajeCaja = true;
                     }
                 }
-            }else{
+            } else {
                 //Si itemDetalle.cantidad=0 entonces le damos el precio mas alto
-                if(cliente.getTipo().equalsIgnoreCase( "Foraneo" )){
+                if (cliente.getTipo().equalsIgnoreCase("Foraneo")) {
                     tipoprecio = "Super"; //Super es : Detalle Foraneo
-                }else if (cliente.getTipo().equalsIgnoreCase("Mayorista")){
+                } else if (cliente.getTipo().equalsIgnoreCase("Mayorista")) {
                     tipoprecio = "Detalle";
-                }else{
+                } else {
                     tipoprecio = cliente.getTipo();
                 }
             }
@@ -780,58 +790,58 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
 
-        if(Boolean.parseBoolean(cliente.getEmpleado()) && Integer.parseInt(condicion.getCODIGO()) != 127 ){ // esto para validar que no sea producto abordo --Tramite de CK
+        if (Boolean.parseBoolean(cliente.getEmpleado()) && Integer.parseInt(condicion.getCODIGO()) != 127) { // esto para validar que no sea producto abordo --Tramite de CK
             tipoprecio = "Mayorista";
         }
         double precioE = 0;
 
-        if( Boolean.parseBoolean(cliente.getPrecioEspecial()) &&  (cliente.getTipo().equalsIgnoreCase( "Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) ){
+        if (Boolean.parseBoolean(cliente.getPrecioEspecial()) && (cliente.getTipo().equalsIgnoreCase("Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
             txtDescuento.setEnabled(false);
             txtDescuento.setText("0.00");
             //Si existe precio especial
             tipoprecio = "Especial";
-            PrecioEspecial precioEspecial =  PrecioEspecialH.BuscarPrecioEspecial(String.valueOf(IdCliente), articulo.getCodigo());
+            PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(pedido.getIdCliente(), articulo.getCodigo());
             if (precioEspecial != null) {
                 if (precioEspecial.getFacturar().equals("0")) {
                     MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
                     return;
                 }
-                precioE= Double.parseDouble(precioEspecial.getPrecio());
+                precioE = Double.parseDouble(precioEspecial.getPrecio());
                 item.put("Precio", precioEspecial.getPrecio());
                 item.put("TipoPrecio", "Especial");
             }
 
         }
 
-        if(!ActualizarItem){
-            setPrecio(art, tipoprecio,0);
-        }else{
-            if(item!=null){
-                if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) {
-                    if(tipoprecio.equalsIgnoreCase("Especial")) {
+        if (!ActualizarItem) {
+            setPrecio(art, tipoprecio, 0);
+        } else {
+            if (item != null) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) {
+                    if (tipoprecio.equalsIgnoreCase("Especial")) {
                         item.put("Precio", String.valueOf(precioE));
-                    }else{
-                        item.put("Precio", art.get("Precio"+tipoprecio));
+                    } else {
+                        item.put("Precio", art.get("Precio" + tipoprecio));
                     }
-                }else{
+                } else {
                     tipoprecio = "Bonificacion";
                 }
 
-                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio,  tipoprecio);
-                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento ,
+                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, tipoprecio);
+                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento,
                         df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100)));
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal,
                         df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) - ((Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio))) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100))));
-                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva ,
-                        df.format( Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",","")) * Double.parseDouble(articulo.getPorIva())));
-                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total,df.format( Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",","")) +Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva).replace(",",""))));
+                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva,
+                        df.format(Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",", "")) * Double.parseDouble(articulo.getPorIva())));
+                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total, df.format(Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",", "")) + Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva).replace(",", ""))));
             }
 
         }
     }
 
-    private void LimipiarDatos(){
-        if(MensajeCaja){
+    private void LimipiarDatos() {
+        if (MensajeCaja) {
             txtPrecioArticulo.setText("0.00");
             articulo = null;
             txtCodigoArticulo.setText(null);
@@ -848,9 +858,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void RecalcularDetalle() {
 
-        MensajeCaja=false;
-        for ( HashMap<String, String> item : listaArticulos) {
-            ObtenerPrecio(item,item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo),true);
+        MensajeCaja = false;
+        for (HashMap<String, String> item : listaArticulos) {
+            ObtenerPrecio(item, item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), true);
         }
 
     }
@@ -865,13 +875,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
         return false;
     }
-    private void setPrecio(HashMap<String,String> articulo, String pTipoPrecio,double precio){
+
+    private void setPrecio(HashMap<String, String> articulo, String pTipoPrecio, double precio) {
         if (pTipoPrecio.equalsIgnoreCase("Especial")) {
             txtPrecioArticulo.setText(String.valueOf(precio));
             PrecioItem = precio;
-        }else{
-            txtPrecioArticulo.setText(articulo.get("Precio"+pTipoPrecio));
-            PrecioItem = Double.parseDouble(articulo.get("Precio"+pTipoPrecio));
+        } else {
+            txtPrecioArticulo.setText(articulo.get("Precio" + pTipoPrecio));
+            PrecioItem = Double.parseDouble(articulo.get("Precio" + pTipoPrecio));
         }
         TipoPrecio = pTipoPrecio;
 
@@ -881,7 +892,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double Precio = PrecioItem;
         String DescripcionArt = lblDescripcionArticulo.getText().toString();
         HashMap<String, String> itemPedidos = new HashMap<>();
-        itemPedidos.put("CodigoPedido", IdPedido);
+        itemPedidos.put("CodigoPedido", pedido.getCodigoPedido());
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
         itemPedidos.put("Cod", articulo.getCodigo().substring(articulo.getCodigo().length() - 3));
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
@@ -919,7 +930,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             listaArticulos.add(itemPedidos);
             HashMap<String, String> articuloBonificado = new HashMap<>();
-            articuloBonificado.put("CodigoPedido", IdPedido);
+            articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
             articuloBonificado.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).substring(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).length() - 3));
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
             articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
@@ -966,8 +977,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.pedidos_list_item, new
-                String[]{"Cod", "Cantidad", "Precio","TipoPrecio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio,R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
+                String[]{"Cod", "Cantidad", "Precio", "TipoPrecio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -1064,8 +1075,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = null;
 
-            dialogView = inflater.inflate(R.layout.masterproductos_layout, null);
-            btnOK = (Button) dialogView.findViewById(R.id.btnBuscar);
+        dialogView = inflater.inflate(R.layout.masterproductos_layout, null);
+        btnOK = (Button) dialogView.findViewById(R.id.btnBuscar);
         final RadioGroup rgGrupo = (RadioGroup) dialogView.findViewById(R.id.rgGrupo);
         rgGrupo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -1074,69 +1085,68 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         });
 
-            final EditText txtBusquedaItem = (EditText) dialogView.findViewById(R.id.txtBusqueda);
-            lvItem = (ListView) dialogView.findViewById(R.id.list);
-            lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
-            txtBusquedaItem.setText(txtCodigoArticulo.getText());
-            btnOK.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        final EditText txtBusquedaItem = (EditText) dialogView.findViewById(R.id.txtBusqueda);
+        lvItem = (ListView) dialogView.findViewById(R.id.list);
+        lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
+        txtBusquedaItem.setText(txtCodigoArticulo.getText());
+        btnOK.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager inputMethodManager = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                    inputMethodManager.hideSoftInputFromWindow(txtBusquedaItem.getWindowToken(), 0);
-                    busqueda = txtBusquedaItem.getText().toString();
-                  if(validarTipoBusqueda){
-                      try {
-                          int busquedaText= Integer.parseInt( busqueda);
-                          rgGrupo.check(R.id.rbCodigo);
-
-                      } catch (Exception ex) {
-
-                          if(busqueda.contains("-"))
-                          {
-                              rgGrupo.check(R.id.rbCodigo);
-                          }
-                          else{
-                              rgGrupo.check(R.id.rbDescripcion);}
-                      }
-                      validarTipoBusqueda=false;
-                  }
-                    int boton = rgGrupo.getCheckedRadioButtonId();// == R.id.rbCodigo ? "1" : "2";
-                    switch (boton) {
-                        case R.id.rbCodigo:
-                            tipoBusqueda =1;
-                            break;
-                        case R.id.rbDescripcion:
-                            tipoBusqueda =2;
-                            break;
-                    }
+                inputMethodManager.hideSoftInputFromWindow(txtBusquedaItem.getWindowToken(), 0);
+                busqueda = txtBusquedaItem.getText().toString();
+                if (validarTipoBusqueda) {
                     try {
-                        switch (tipoBusqueda){
-                            case 1:
-                                listaArticulosItem=ArticulosH.BuscarArticuloCodigo(busqueda);
-                                break;
-                            case  2:
-                                listaArticulosItem=ArticulosH.BuscarArticuloNombre(busqueda);
-                                break;
-                        }
+                        int busquedaText = Integer.parseInt(busqueda);
+                        rgGrupo.check(R.id.rbCodigo);
+
                     } catch (Exception ex) {
-                        MensajeAviso(ex.getMessage());
+
+                        if (busqueda.contains("-")) {
+                            rgGrupo.check(R.id.rbCodigo);
+                        } else {
+                            rgGrupo.check(R.id.rbDescripcion);
+                        }
                     }
-                    if (listaArticulosItem.size() == 0) {
-                        MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
-                    }
-
-                        ListAdapter adapter = new SimpleAdapter(
-                                getApplicationContext(), listaArticulosItem,
-                                R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioForaneo2","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                                R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioForaneo2,R.id.PrecioMayorista});
-
-                        lvItem.setAdapter(adapter);
-                        lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
-
-
+                    validarTipoBusqueda = false;
                 }
-            });
+                int boton = rgGrupo.getCheckedRadioButtonId();// == R.id.rbCodigo ? "1" : "2";
+                switch (boton) {
+                    case R.id.rbCodigo:
+                        tipoBusqueda = 1;
+                        break;
+                    case R.id.rbDescripcion:
+                        tipoBusqueda = 2;
+                        break;
+                }
+                try {
+                    switch (tipoBusqueda) {
+                        case 1:
+                            listaArticulosItem = ArticulosH.BuscarArticuloCodigo(busqueda);
+                            break;
+                        case 2:
+                            listaArticulosItem = ArticulosH.BuscarArticuloNombre(busqueda);
+                            break;
+                    }
+                } catch (Exception ex) {
+                    MensajeAviso(ex.getMessage());
+                }
+                if (listaArticulosItem.size() == 0) {
+                    MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
+                }
+
+                ListAdapter adapter = new SimpleAdapter(
+                        getApplicationContext(), listaArticulosItem,
+                        R.layout.list_item, new String[]{"Codigo", "Nombre", "PrecioSuper", "PrecioDetalle", "PrecioForaneo", "PrecioForaneo2", "PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
+                        R.id.PrecioSuper, R.id.PrecioDetalle, R.id.PrecioForaneo, R.id.PrecioForaneo2, R.id.PrecioMayorista});
+
+                lvItem.setAdapter(adapter);
+                lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
+
+
+            }
+        });
         lvItem.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -1148,11 +1158,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
 
                 articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
-                HashMap<String,String> art =  ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
+                HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
-                MensajeCaja=true;
-                ObtenerPrecio(null,CodigoArticulo,false);
+                MensajeCaja = true;
+                ObtenerPrecio(null, CodigoArticulo, false);
 
                 alertDialog.dismiss();
             }
@@ -1277,7 +1287,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         @Override
         protected Void doInBackground(Void... params) {
 
-           if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, IdPedido, jsonPedido)) {
+            if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, editar)) {
                 guardadoOK = true;
             }
             return null;
