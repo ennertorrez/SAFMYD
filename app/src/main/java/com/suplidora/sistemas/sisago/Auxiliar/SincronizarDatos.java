@@ -1,7 +1,9 @@
 package com.suplidora.sistemas.sisago.Auxiliar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
@@ -19,6 +21,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Principal.Login;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
+import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.MensajeAviso;
 import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.jd2d;
 
 /**
@@ -513,9 +517,10 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
+
     }
 
-    public static boolean SincronizarPedido(Context context, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido,boolean Editar){
+    public static boolean SincronizarPedido(final Activity activity, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar){
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -546,14 +551,22 @@ public class SincronizarDatos {
 
         String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrPedido == null) {
-            //Funciones.MensajeAviso(context,"Ha ocurrido un error al sincronizar el detalle del pedido");
+            Funciones.MensajeAviso(activity.getApplicationContext(),"Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula");
             return  false;
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrPedido);
                 String resultState = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[0];
-                String NoPedido = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
+                final String NoPedido = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
                 if (resultState.equals("false")) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity.getApplicationContext(),
+                                   NoPedido,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
                     return false;
                 }
                 PedidoH.ActualizarPedido(IdPedido, NoPedido);

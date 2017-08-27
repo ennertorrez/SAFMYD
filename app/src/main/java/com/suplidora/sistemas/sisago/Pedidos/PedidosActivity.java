@@ -481,7 +481,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
         String mensaje = "";
-        if (Double.parseDouble(lblSubTotalCor.getText().toString().replace(",", "")) < valorPolitica && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
+        if (Double.parseDouble(lblSubTotalCor.getText().toString().replace(",", "")) < valorPolitica && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) && variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("0")) {
             mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
             pedido.setTipo("Detalle");
         } else {
@@ -569,7 +569,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             MensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
         }
-        pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        if(editar==false){
+            pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        }
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
             for (int i = 0; Integer.parseInt(vendedor.getCODIGO()) != Integer.parseInt(pedido.getIdVendedor()); i++)

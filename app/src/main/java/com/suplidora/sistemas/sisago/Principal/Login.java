@@ -362,7 +362,7 @@ public class Login extends Activity {
     }
 
     //region ObtieneUsuario
-    private class GetUser extends AsyncTask<Void, Void, Void> {
+    public class GetUser extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

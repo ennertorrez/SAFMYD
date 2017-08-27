@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.R;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -98,14 +100,27 @@ public class Funciones {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) { // connected to the internet
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                return true;
+              return  isInternetAvailable();
             } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                // connected to the mobile provider's data plan
-                return true;
+                return  isInternetAvailable();
             }
         } else {
            return false;
         }
         return false;
+    }
+
+    public static boolean isInternetAvailable() {
+        try {
+            return isConnected();
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+    public static boolean isConnected() throws InterruptedException, IOException
+    {
+        String command = "ping -c 1 google.com";
+        return (Runtime.getRuntime().exec (command).waitFor() == 0);
     }
 }

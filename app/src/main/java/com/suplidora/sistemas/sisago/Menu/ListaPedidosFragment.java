@@ -139,7 +139,7 @@ public class ListaPedidosFragment extends Fragment {
                 HashMap<String,String> obj = (HashMap<String, String>) lv.getItemAtPosition(position);
                 String CodigoPedido= obj.get("CodigoPedido");
                 if(obj.get("Factura").equalsIgnoreCase("")){
-                    if((obj.get("FormaPago").equalsIgnoreCase("Contado") && obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("No Sincronizado")){
+                    if((obj.get("FormaPago").equalsIgnoreCase("Contado") && obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO")){
 
                         HashMap<String,String> pedido= PedidosH.ObtenerPedido(CodigoPedido);
                         if (pedido==null){
@@ -491,7 +491,7 @@ public class ListaPedidosFragment extends Fragment {
                 Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
                 Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));
                 String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
-                guardadoOK = SincronizarDatos.SincronizarPedido(getActivity().getApplicationContext(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido,false);
+                guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido,false);
             }
             return null;
         }
