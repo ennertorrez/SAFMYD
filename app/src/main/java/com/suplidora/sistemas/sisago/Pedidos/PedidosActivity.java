@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -644,6 +645,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void GenerarCodigoPedido() {
+        pedido.setIdVendedor(vendedor.toString());
         pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
         lblNoPedido.setText("PEDIDO N°: "+pedido.getCodigoPedido());
     }
