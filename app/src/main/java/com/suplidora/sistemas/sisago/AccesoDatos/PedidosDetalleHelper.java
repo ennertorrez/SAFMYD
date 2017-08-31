@@ -151,14 +151,14 @@ public class PedidosDetalleHelper {
         Log.d("pedidos detalle_elimina", "Datos eliminados");
     }
     public void EliminarDetallePedido(String CodigoPedido) {
-        database.rawQuery("DELETE FROM " + variables_publicas.TABLE_PEDIDOS_DETALLE + " where "+variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido+ " = ? ",new String[]{CodigoPedido});
+        int rowsAffected =database.delete( variables_publicas.TABLE_PEDIDOS_DETALLE, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido+ "='" +CodigoPedido+"'",null) ;
         Log.d("Det. pedido eliminado: "+CodigoPedido, "Datos eliminados");
     }
 
     public boolean ActualizarCodigoPedido(String CodigoPedido, String NoPedido){
         ContentValues con = new ContentValues();
         con.put("CodigoPedido", NoPedido);
-        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS_DETALLE, con, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido +" = '"+CodigoPedido+"'", null );
+        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS_DETALLE, con, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido +"="+CodigoPedido, null );
         if(rowInserted != -1)
             return true;
         else return false;

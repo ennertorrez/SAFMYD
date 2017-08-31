@@ -34,10 +34,21 @@
 
 
                 <TextView
+                    android:id="@+id/lblNoPedido"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No. Pedido: 00000000"
+                    android:background="@drawable/borde_campos_pedidos"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="13dp"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/lblNombreCliente"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="NombreCliente"
+                    android:background="@drawable/borde_campos_pedidos"
                     android:textColor="@color/colorPrimaryDark"
                     android:textSize="13dp"
                     android:textStyle="bold" />
@@ -52,7 +63,7 @@
                         android:layout_width="140dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
-                        android:layout_marginLeft="3dp"
+
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="1102-01-01-000024"
                         android:textColor="@color/colorAccent"
@@ -141,7 +152,7 @@
                         android:id="@+id/btnBuscar"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
-                        android:background="@drawable/places_ic_search"
+                        android:background="@mipmap/ic_search_black_48dp"
                         android:backgroundTint="@color/colorPrimaryDark" />
                 </LinearLayout>
 
@@ -671,7 +682,7 @@
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_marginRight="240dp"
-                        android:background="@mipmap/ic_save_black_24dp"
+                        android:background="@mipmap/ic_save_black_48dp"
                         android:backgroundTint="@color/colorPrimaryDark" />
 
                     <Button
@@ -679,7 +690,7 @@
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
                         android:layout_alignParentRight="true"
-                        android:background="@mipmap/ic_cancel_black_24dp"
+                        android:background="@mipmap/ic_cancel_black_48dp"
                         android:backgroundTint="#ff0000" />
                 </RelativeLayout>
             </LinearLayout>

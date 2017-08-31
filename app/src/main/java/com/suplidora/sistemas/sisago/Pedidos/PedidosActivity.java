@@ -86,6 +86,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private TextView lblDescripcion;
     private TextView lblNombCliente;
     private TextView lblCodCliente;
+    private TextView lblNoPedido;
     private TextView lblDescripcionArticulo;
     private TextView lblTc;
     private TextView lblSubTotalCor;
@@ -110,6 +111,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private SimpleAdapter adapter;
     private ProgressDialog pDialog;
     AlertDialog alertDialog;
+
     //endregion
 
     //region Declaracion de variables
@@ -215,6 +217,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombreCliente);
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescripcionArticulo);
+        lblNoPedido =(TextView) findViewById(R.id.lblNoPedido);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
         txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -299,11 +302,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         Nombre = in.getStringExtra(KEY_NombreCliente);
         if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido) != null) {
             editar=true;
+            listaArticulos.clear();
             pedido = PedidoH.GetPedido(in.getStringExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
             listaArticulos = PedidoDetalleH.ObtenerPedidoDetalleArrayList(pedido.getCodigoPedido());
             for (HashMap<String,String> item:listaArticulos){
                 item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
             }
+            txtObservaciones.setText(pedido.getObservacion());
+            lblNoPedido.setText("PEDIDO N°: "+pedido.getCodigoPedido());
             RefrescarGrid();
             CalcularTotales();
         }
@@ -382,16 +388,22 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                   }
 
                                                   double cantidad = Double.parseDouble(txtCantidad.getText().toString());
-                                                  AgregarDetalle();
+
+                                                  if(PrecioItem==0){
+                                                      MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
+                                                      return;
+                                                  }
+                                                  HashMap<String, String> itemPedidos= new HashMap<>();
+                                                  AgregarDetalle(itemPedidos);
                                                   MensajeCaja = true;
-                                                  ObtenerPrecio(listaArticulos.get(listaArticulos.size()-1), articulo.getCodigo(), true);
+                                                  ObtenerPrecio(itemPedidos, articulo.getCodigo(), false);
+                                                  LimipiarDatos(MensajeCaja);
                                                   subTotalPrecioSuper = 0;
                                                   for (HashMap<String, String> item : listaArticulos) {
                                                       subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
                                                   }
-
+                                                  RecalcularDetalle();
                                                   CalcularTotales();
-
 
                                                   InputMethodManager inputManager = (InputMethodManager)
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -399,7 +411,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                                           InputMethodManager.RESULT_SHOWN);
 
-                                                  LimipiarDatos();
+
                                               } catch (Exception e) {
                                                   MensajeAviso(e.getMessage());
                                               }
@@ -533,6 +545,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         pedido.setUsuario(variables_publicas.usuario.getUsuario());
         pedido.setIMEI(IMEI);
 
+        //Esto lo ponemos para cuando es editar
+        PedidoH.EliminaPedido(pedido.getCodigoPedido());
+        PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
+
+
         boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                 variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(total));
@@ -548,6 +565,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 break;
             }
         }
+
         return true;
     }
 
@@ -570,7 +588,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             finish();
         }
         if(editar==false){
-            pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+          GenerarCodigoPedido();
         }
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
@@ -590,6 +608,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
                 vendedor = (Vendedor) adapter.getItemAtPosition(position);
+                 if(!editar){ GenerarCodigoPedido();}
             }
 
             @Override
@@ -622,6 +641,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             condicion = lstFormasPago.get(i);
         cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
         cboCondicion.setEnabled(false);
+    }
+
+    private void GenerarCodigoPedido() {
+        pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        lblNoPedido.setText("PEDIDO N°: "+pedido.getCodigoPedido());
     }
 
     private void ObtenerPrecio(final HashMap<String, String> item, String CodArticulo, final boolean ActualizarItem) {
@@ -715,7 +739,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
                             if (MensajeCaja) {
                                 final String finalTipoprecio = tipoprecio;
-                                MensajeCaja = false;
+                                if(!ActualizarItem){
+                                    MensajeCaja = false;
+                                }
                                 new AlertDialog.Builder(this)
                                         .setTitle("Confirmación Requerida")
                                         .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas, Desea continuar ? ")
@@ -725,7 +751,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                 if (!ActualizarItem) {
                                                     MensajeCaja = true;
                                                     setPrecio(art, finalTipoprecio, 0);
-                                                    LimipiarDatos();
+                                                    LimipiarDatos(true);
                                                 }
                                             }
                                         })
@@ -842,7 +868,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
     }
 
-    private void LimipiarDatos() {
+    private void LimipiarDatos(boolean MensajeCaja) {
         if (MensajeCaja) {
             txtPrecioArticulo.setText("0.00");
             articulo = null;
@@ -854,6 +880,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             txtDescuento.setText("");
             lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
             txtCodigoArticulo.requestFocus();
+
         }
 
     }
@@ -890,10 +917,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     }
 
-    private void AgregarDetalle() {
+    private void AgregarDetalle(HashMap<String, String> itemPedidos) {
         double Precio = PrecioItem;
         String DescripcionArt = lblDescripcionArticulo.getText().toString();
-        HashMap<String, String> itemPedidos = new HashMap<>();
+
         itemPedidos.put("CodigoPedido", pedido.getCodigoPedido());
         itemPedidos.put("CodigoArticulo", articulo.getCodigo());
         itemPedidos.put("Cod", articulo.getCodigo().substring(articulo.getCodigo().length() - 3));
@@ -944,20 +971,21 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             articuloBonificado.put("Costo", "0");
             articuloBonificado.put("PorDescuento", "0");
             articuloBonificado.put("TipoArt", "B");
-            articuloBonificado.put("BonificaA", "");
+            articuloBonificado.put("BonificaA", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV));
             articuloBonificado.put("Isc", "0");
             articuloBonificado.put("PorcentajeIva", "0");
             articuloBonificado.put("Descuento", "0");
             articuloBonificado.put("Iva", "0");
             articuloBonificado.put("SubTotal", "0");
             articuloBonificado.put("Total", "0");
-            //Actualizamos el campo BonificaA del item que lo bonifica
+            articuloBonificado.put("TipoPrecio", "Bonificacion");
+           /* //Actualizamos el campo BonificaA del item que lo bonifica
             for (HashMap<String, String> item : listaArticulos) {
                 if (item.get("CodigoArticulo").equals(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV)) && item.get("TipoArt").equals("P")) {
                     item.put("BonificaA", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
                     break;
                 }
-            }
+            }*/
             listaArticulos.add(articuloBonificado);
         } else {
             //Validamos que solamente se puedan ingresar 18 articulos
@@ -1225,16 +1253,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             switch (item.getItemId()) {
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
-                    listaArticulos.remove(info.position);
-
-                    if (!itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals("")) {
+                    listaArticulos.remove(itemArticulo);
                         for (int i = 0; i < listaArticulos.size(); i++) {
                             HashMap<String, String> a = listaArticulos.get(i);
-                            if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA))) {
+                            if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
                                 listaArticulos.remove(a);
                             }
                         }
-                    }
+
                     adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
 

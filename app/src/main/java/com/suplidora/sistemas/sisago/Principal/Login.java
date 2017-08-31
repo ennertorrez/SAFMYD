@@ -179,7 +179,7 @@ public class Login extends Activity {
                     return;
                 }
 
-                boolean isOnline = Funciones.checkInternetConnection(Login.this);
+                boolean isOnline = new Funciones().checkInternetConnection(Login.this);
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
@@ -215,7 +215,7 @@ public class Login extends Activity {
                     startActivity(intent);
                     finish();
                 } else if (!isOnline && variables_publicas.usuario == null) {
-                    mensajeAviso("Usuario o contraseña invalido\nVerifique la conexion a internet");
+                    mensajeAviso("Usuario o contraseña invalido\n O para conectar un nuevo usuario debe conectarse a internet");
                 }
             }
         });
@@ -313,7 +313,7 @@ public class Login extends Activity {
 */
 
     private void ValidarUltimaVersion() {
-        boolean isOnline=Funciones.checkInternetConnection(Login.this);
+        boolean isOnline=new Funciones().checkInternetConnection(Login.this);
 
         if (isOnline) {
             String latestVersion = "";

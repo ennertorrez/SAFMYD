@@ -1,7 +1,6 @@
 package com.suplidora.sistemas.sisago.Auxiliar;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,7 +20,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Principal.Login;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,16 +27,10 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.Codificar;
-import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.MensajeAviso;
-import static com.suplidora.sistemas.sisago.Auxiliar.Funciones.jd2d;
 
 /**
  * Created by usuario on 5/5/2017.
@@ -125,7 +117,7 @@ public class SincronizarDatos {
                 String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                 String detallista = c.getString("detallista");
 
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo,PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         } finally {
@@ -139,7 +131,7 @@ public class SincronizarDatos {
         /*******************************CLIENTES******************************/
         //************CLIENTES
         HttpHandler shC = new HttpHandler();
-        String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo()+ "/" + 3;
+        String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 3;
         String jsonStrC = shC.makeServiceCall(urlStringC);
 
         if (jsonStrC == null)
@@ -182,9 +174,9 @@ public class SincronizarDatos {
                 String CodigoGalatea = c.getString("CodigoGalatea");
                 String Descuento = c.getString("Descuento");
                 String Empleado = c.getString("Empleado");
-                String Detallista =c.getString("Detallista");
-                String RutaForanea =c.getString("RutaForanea");
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre,NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado,Detallista,RutaForanea);
+                String Detallista = c.getString("Detallista");
+                String RutaForanea = c.getString("RutaForanea");
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado, Detallista, RutaForanea);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         } finally {
@@ -263,8 +255,8 @@ public class SincronizarDatos {
 
                 String id = c.getString("id");
                 String codigo = c.getString("codigo");
-                String fechaini=c.getString("fechaini");
-                String fechafinal =c.getString("fechafinal");
+                String fechaini = c.getString("fechaini");
+                String fechafinal = c.getString("fechafinal");
                 String tipo = c.getString("tipo");
                 String aprobado = c.getString("aprobado");
 
@@ -276,7 +268,6 @@ public class SincronizarDatos {
         }
         return jsonStrCartillas;
     }
-
 
 
     //CartillasBcDetalle
@@ -415,18 +406,17 @@ public class SincronizarDatos {
                 String Valor = c.getString("Valor");
                 String Activo = c.getString("Activo");
 
-                if(Configuracion.equalsIgnoreCase("VersionDatos"))
-                {
+                if (Configuracion.equalsIgnoreCase("VersionDatos")) {
                     variables_publicas.ValorConfigServ = Valor;
                 }
-                if(Configuracion.equalsIgnoreCase("AplicarPrecioMayoristaXCaja")){
+                if (Configuracion.equalsIgnoreCase("AplicarPrecioMayoristaXCaja")) {
                     variables_publicas.AplicarPrecioMayoristaXCaja = Valor;
                 }
-                if(Configuracion.equalsIgnoreCase("PermitirVentaDetAMayoristaXCaja")){
+                if (Configuracion.equalsIgnoreCase("PermitirVentaDetAMayoristaXCaja")) {
                     variables_publicas.PermitirVentaDetAMayoristaXCaja = Valor;
                 }
-                if(Configuracion.equalsIgnoreCase("lstDepartamentosForaneo1")){
-                    variables_publicas.lstDepartamentosForaneo1= Valor.split(",");
+                if (Configuracion.equalsIgnoreCase("lstDepartamentosForaneo1")) {
+                    variables_publicas.lstDepartamentosForaneo1 = Valor.split(",");
                 }
 
 
@@ -438,6 +428,7 @@ public class SincronizarDatos {
         }
         return jsonStrConfiguracionSistema;
     }
+
     public String ObtenerValorConfigDatos() throws JSONException {
         HttpHandler shConfigSistema = new HttpHandler();
         String urlStringConfigSistema = urlGetConfiguraciones;
@@ -453,18 +444,17 @@ public class SincronizarDatos {
             JSONObject c = ValorConfig.getJSONObject(i);
             String Valor = c.getString("Valor");
             String Configuracion = c.getString("Configuracion");
-            if(Configuracion == "VersionDatos")
-            {
+            if (Configuracion == "VersionDatos") {
                 variables_publicas.ValorConfigServ = Valor;
             }
-            if(Configuracion=="AplicarPrecioMayoristaXCaja"){
+            if (Configuracion == "AplicarPrecioMayoristaXCaja") {
                 variables_publicas.AplicarPrecioMayoristaXCaja = Valor;
             }
-            if(Configuracion=="PermitirVentaDetAMayoristaXCaja"){
+            if (Configuracion == "PermitirVentaDetAMayoristaXCaja") {
                 variables_publicas.PermitirVentaDetAMayoristaXCaja = Valor;
             }
-            if(Configuracion=="lstDepartamentosForaneo1"){
-                variables_publicas.lstDepartamentosForaneo1= Valor.split(",");
+            if (Configuracion == "lstDepartamentosForaneo1") {
+                variables_publicas.lstDepartamentosForaneo1 = Valor.split(",");
             }
         }
         return jsonStrConfiguracionSistema;
@@ -520,7 +510,7 @@ public class SincronizarDatos {
 
     }
 
-    public static boolean SincronizarPedido(final Activity activity, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar){
+    public static boolean SincronizarPedido(final Activity activity, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -537,7 +527,7 @@ public class SincronizarDatos {
         }
         String jsonPedidoDetalle = gson.toJson(pedidoDetalle);
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoTotal/";
-        String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + String.valueOf(Editar) + "/" + vendedor.getCODIGO() + "/" + jsonPedido+ "/" + jsonPedidoDetalle;
+        String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + String.valueOf(Editar) + "/" + vendedor.getCODIGO() + "/" + jsonPedido + "/" + jsonPedidoDetalle;
 
         try {
             URL Url = new URL(urlStringDetalle);
@@ -551,8 +541,8 @@ public class SincronizarDatos {
 
         String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrPedido == null) {
-            Funciones.MensajeAviso(activity.getApplicationContext(),"Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula");
-            return  false;
+            Funciones.MensajeAviso(activity.getApplicationContext(), "Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula");
+            return false;
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrPedido);
@@ -563,14 +553,16 @@ public class SincronizarDatos {
                         @Override
                         public void run() {
                             Toast.makeText(activity.getApplicationContext(),
-                                   NoPedido,
+                                    NoPedido,
                                     Toast.LENGTH_LONG).show();
                         }
                     });
                     return false;
                 }
+
                 PedidoH.ActualizarPedido(IdPedido, NoPedido);
                 PedidoDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
+
                 return true;
             } catch (Exception ex) {
                 Log.e("Error", ex.getMessage());

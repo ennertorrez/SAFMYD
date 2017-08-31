@@ -6,15 +6,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.suplidora.sistemas.sisago.R;
 
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +31,7 @@ import java.util.regex.Pattern;
  */
 
 public class Funciones {
-
+private  static boolean connectionOK=false;
 
     public static String Codificar(String text) {
         return text.replace("+","(plus)")
@@ -95,7 +102,7 @@ public class Funciones {
         }
     }*/
 
-    public static boolean checkInternetConnection(Activity activity) {
+    public boolean checkInternetConnection(Activity activity) {
         ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) { // connected to the internet
@@ -110,9 +117,10 @@ public class Funciones {
         return false;
     }
 
-    public static boolean isInternetAvailable() {
+    private  boolean isInternetAvailable() {
         try {
-            return isConnected();
+             new TestConnectivity().execute().get();
+            return connectionOK;
         } catch (Exception e) {
             return false;
         }
@@ -122,5 +130,65 @@ public class Funciones {
     {
         String command = "ping -c 1 google.com";
         return (Runtime.getRuntime().exec (command).waitFor() == 0);
+    }
+
+    public static boolean TestInternetConectivity(){
+        try
+        {
+
+            URL url = new URL("http://www.google.com.ni");
+            URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(2000);
+            conn.setReadTimeout(2000);
+            conn.setUseCaches(false);
+            conn.connect();
+            InputStream is =   conn.getInputStream();
+            if(is!=null){
+                return true;
+            }
+            return false;
+
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+
+    class TestConnectivity extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            try
+            {
+                connectionOK=false;
+                URL url = new URL("http://www.google.com.ni");
+                URLConnection conn = url.openConnection();
+                conn.setConnectTimeout(1000);
+                conn.setReadTimeout(1000);
+                conn.setUseCaches(false);
+                conn.connect();
+                InputStream is =   conn.getInputStream();
+                if(is!=null){
+                    connectionOK=true;
+                }
+
+            }
+            catch (Exception e)
+            {
+                connectionOK=false;
+            }
+            return null;
+        }
+
+        @Override
+
+
+        protected void onPostExecute(Boolean result) {
+
+        }
+
     }
 }

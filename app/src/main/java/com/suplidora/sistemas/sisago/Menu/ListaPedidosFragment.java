@@ -118,49 +118,7 @@ public class ListaPedidosFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                fecha = txtFechaPedido.getText().toString();
-                listapedidos.clear();
-                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
-                busqueda = txtBusqueda.getText().toString();
-                try{
-                    new GetListaPedidos().execute().get();
-                }catch (Exception e){
-
-                }
-                ActualizarFooter();
-
-                if(listapedidos.size()==0){
-                    return;
-                }
-
-                //Editar
-                HashMap<String,String> obj = (HashMap<String, String>) lv.getItemAtPosition(position);
-                String CodigoPedido= obj.get("CodigoPedido");
-                if(obj.get("Factura").equalsIgnoreCase("")){
-                    if((obj.get("FormaPago").equalsIgnoreCase("Contado") && obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO")){
-
-                        HashMap<String,String> pedido= PedidosH.ObtenerPedido(CodigoPedido);
-                        if (pedido==null){
-                            Funciones.MensajeAviso(getActivity(),"Este pedido no se puede editar ya que no se encuentra sincronizado en este celular");
-                            return;
-                        }
-
-                        String IdCliente = pedido.get("IdCliente");
-                        Cliente cliente = ClientesH.BuscarCliente(IdCliente);
-                        String Nombre = cliente.getNombreCliente();
-                        // Starting new intent
-                        Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
-
-                        in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
-                        in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
-                        in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido );
-                        startActivity(in);
-                    }
-                }else{
-                    Funciones.MensajeAviso(getActivity(),"Este pedido no se puede anular, ya que fue facturado");
-                }
 
 
             }
@@ -230,7 +188,7 @@ public class ListaPedidosFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (Funciones.checkInternetConnection(getActivity())) {
+                if (new Funciones().checkInternetConnection(getActivity())) {
                     SincronizarPedido();
 
                 } else {
@@ -334,7 +292,7 @@ public class ListaPedidosFragment extends Fragment {
                     itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Total));
                     listapedidos.add(item);
                 }
-                boolean connectionOK=Funciones.checkInternetConnection(getActivity());
+                boolean connectionOK=Funciones.TestInternetConectivity();
                 if (connectionOK){
                     GetPedidosService();
                 }else{
@@ -406,6 +364,9 @@ public class ListaPedidosFragment extends Fragment {
                     }
                     if (currItem.get("Estado").equals("PENDIENTE")) {
                         tvEstado.setTextColor(Color.parseColor("#FFBF5300"));
+                    }
+                    if (currItem.get("Estado").equals("APROBADO")) {
+                        tvEstado.setTextColor(Color.parseColor("#303F9F"));
                     }
                     if (currItem.get("Estado").equals("ANULADO")) {
                         tvEstado.setTextColor(Color.parseColor("#FFFF0000"));
@@ -515,12 +476,13 @@ public class ListaPedidosFragment extends Fragment {
 
         private String NoPedido;
 
+
         @Override
         protected Void doInBackground(Void... params) {
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdPedido + "/" + variables_publicas.usuario.getUsuario();
 
-            String urlString = url + jsonAnulaPedido;
+            String urlString = url ;
             String urlStr = urlString;
             String encodeUrl = "";
             try {
@@ -530,12 +492,24 @@ public class ListaPedidosFragment extends Fragment {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String jsonStr = sh.makeServiceCallPost(encodeUrl);
+            String jsonStr = sh.makeServiceCall(encodeUrl);
 
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
-                    // Getting JSON Array node
+                    String resultState =  ((String) result.get("AnularPedidoResult")).split(",")[0];
+                    final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
+                    if (resultState.equals("false")) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        mensaje,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
 
 
                 } catch (final Exception ex) {
@@ -565,6 +539,7 @@ public class ListaPedidosFragment extends Fragment {
             }
             return null;
         }
+
     }
 
     //endregion
@@ -582,20 +557,22 @@ public class ListaPedidosFragment extends Fragment {
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getActivity().getMenuInflater();
 
-            inflater.inflate(R.menu.eliminar_pedido, menu);
-            MenuItem tv = menu.getItem(0);
+            inflater.inflate(R.menu.pedidos_list_menu_context, menu);
+            MenuItem tv = menu.getItem(1); //Boton Eliminar
             if (!obj.get("CodigoPedido").startsWith("-"))
                 tv.setTitle("Anular Pedido");
 
-            if(!obj.get("Factura").equalsIgnoreCase("")){
-                menu.removeItem(0);
+            if(!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")){
+                tv.setEnabled(false);
+                if(obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")){
+                    //Ponemos el boton Editar en falso
+                    ((MenuItem)   menu.getItem(0)).setEnabled(false);
+                }
+            }else{
+                tv.setEnabled(true);
             }
 
-       /*     if (obj.get("FormaPago").equalsIgnoreCase("CONTADO")){
-                if(obj.get("Estado").equalsIgnoreCase("APROBADO") ){ //Pendiente de facturar
 
-                }
-            }*/
 
         } catch (Exception e) {
             mensajeAviso(e.getMessage());
@@ -609,26 +586,100 @@ public class ListaPedidosFragment extends Fragment {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
             switch (item.getItemId()) {
-                case R.id.Elimina_pedido:
-                    CargarPedidos();
+                case R.id.itemEliminarPedido:
+                    fecha = txtFechaPedido.getText().toString();
+                    listapedidos.clear();
+                    InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
+                    busqueda = txtBusqueda.getText().toString();
+                    new GetListaPedidos().execute().get();
+                    ActualizarFooter();
 
                     HashMap<String, String> itemPedido = listapedidos.get(info.position);
+                    pedido = PedidosH.ObtenerPedido(itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+
+                    IdPedido = itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
                     if (itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).startsWith("-")) {
-                        pedido = PedidosH.ObtenerPedido(itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
-                        IdPedido = pedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
                         PedidosH.EliminaPedido(IdPedido);
                         PedidosDetalleH.EliminarDetallePedido(IdPedido);
-                    } else if (Funciones.checkInternetConnection(getActivity())) {
-                                AnularPedido(pedido);
+                    } else if (new Funciones().checkInternetConnection(getActivity())) {
+
+                        final HashMap<String, String> finalPedido = pedido;
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Confirmación Requerida")
+                                .setMessage("Esta seguro que desea anular el pedido?")
+                                .setCancelable(false)
+                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        AnularPedido(finalPedido);
+                                        btnBuscar.performClick();
+                                        adapter.notifyDataSetChanged();
+                                        lv.setAdapter(adapter);
+
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if (pDialog.isShowing())
+                                            pDialog.dismiss();
+                                    }
+                                })
+                                .show();
+
                     }else{
                         mensajeAviso("No es posible connectarse con el servidor, por favor verifique su conexión a internet");
                     }
 
-                    btnBuscar.performClick();
-                    adapter.notifyDataSetChanged();
-                    lv.setAdapter(adapter);
                     return true;
 
+                case R.id.itemEditarPedido: {
+                    fecha = txtFechaPedido.getText().toString();
+                    listapedidos.clear();
+                    inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
+                    busqueda = txtBusqueda.getText().toString();
+                    try {
+                        new GetListaPedidos().execute().get();
+                    } catch (Exception e) {
+
+                    }
+                    ActualizarFooter();
+
+                    if (listapedidos.size() == 0) {
+                        return true;
+                    }
+
+                    //Editar
+                    HashMap<String, String> obj =  listapedidos.get(info.position);
+                    String CodigoPedido = obj.get("CodigoPedido");
+                    if (obj.get("Factura").equalsIgnoreCase("")) {
+                        if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)") ) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
+
+                            pedido = PedidosH.ObtenerPedido(CodigoPedido);
+                            if (pedido == null) {
+                                Funciones.MensajeAviso(getActivity(), "Este pedido no se puede editar ya que no se encuentra sincronizado en este celular");
+                                return true;
+                            }
+
+                            String IdCliente = pedido.get("IdCliente");
+                            Cliente cliente = ClientesH.BuscarCliente(IdCliente);
+                            String Nombre = cliente.getNombreCliente();
+                            // Starting new intent
+                            Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+
+                            in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
+                            in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
+                            in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
+                            startActivity(in);
+                        }
+                    } else {
+                        Funciones.MensajeAviso(getActivity(), "Este pedido no se puede anular, ya que fue facturado");
+                    }
+
+
+                    return true;
+                }
                 default:
                     return super.onContextItemSelected(item);
             }
@@ -665,5 +716,13 @@ public class ListaPedidosFragment extends Fragment {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formatteDate = df.format(date);
         return formatteDate;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter!=null){
+            CargarPedidos();
+        }
     }
 }
