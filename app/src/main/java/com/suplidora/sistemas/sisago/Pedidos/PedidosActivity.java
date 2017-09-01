@@ -1,5 +1,6 @@
 package com.suplidora.sistemas.sisago.Pedidos;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,11 +9,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -63,6 +65,7 @@ import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
+import com.suplidora.sistemas.sisago.Principal.Login;
 import com.suplidora.sistemas.sisago.R;
 
 import java.text.DecimalFormat;
@@ -78,6 +81,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String TAG = PedidosActivity.class.getSimpleName();
     private boolean MensajeCaja;
     private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     //region Declaracion de controles
     private EditText txtCodigoArticulo;
     private EditText txtDescuento;
@@ -160,7 +164,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private boolean validarTipoBusqueda;
     private int IdDepartamento;
     private String Nombre;
-    private boolean editar=false;
+    private boolean editar = false;
     //private HashMap<String,String> pedido=null;
     //endregion
 
@@ -218,7 +222,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombreCliente);
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescripcionArticulo);
-        lblNoPedido =(TextView) findViewById(R.id.lblNoPedido);
+        lblNoPedido = (TextView) findViewById(R.id.lblNoPedido);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
         txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -302,15 +306,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         pedido.setIdCliente(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
         if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido) != null) {
-            editar=true;
+            editar = true;
             listaArticulos.clear();
             pedido = PedidoH.GetPedido(in.getStringExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
             listaArticulos = PedidoDetalleH.ObtenerPedidoDetalleArrayList(pedido.getCodigoPedido());
-            for (HashMap<String,String> item:listaArticulos){
+            for (HashMap<String, String> item : listaArticulos) {
                 item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
             }
             txtObservaciones.setText(pedido.getObservacion());
-            lblNoPedido.setText("PEDIDO N°: "+pedido.getCodigoPedido());
+            lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
             RefrescarGrid();
             CalcularTotales();
         }
@@ -390,11 +394,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                                                   double cantidad = Double.parseDouble(txtCantidad.getText().toString());
 
-                                                  if(PrecioItem==0){
+                                                  if (PrecioItem == 0) {
                                                       MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
                                                       return;
                                                   }
-                                                  HashMap<String, String> itemPedidos= new HashMap<>();
+                                                  HashMap<String, String> itemPedidos = new HashMap<>();
                                                   AgregarDetalle(itemPedidos);
                                                   MensajeCaja = true;
                                                   ObtenerPrecio(itemPedidos, articulo.getCodigo(), false);
@@ -551,6 +555,29 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
 
 
+        if(IMEI==null){
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmación Requerida")
+                    .setMessage("Es necesario configurar el permiso \"Administrar llamadas telefonicas\" para porder guardar un pedido, Desea continuar ? ")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                            loadIMEI();
+                        }
+                    })
+                    .setNegativeButton("No",null)
+                    .show();
+
+            return false;
+
+        }
+
         boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                 variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(total));
@@ -568,6 +595,52 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
         return true;
+    }
+
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+            requestReadPhoneStatePermission();
+        } else {
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
+        }
+    }
+    public void doPermissionGrantedStuffs() {
+        //Have an  object of TelephonyManager
+        TelephonyManager tm =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
+        variables_publicas.IMEI =tm.getDeviceId();
+
+
+    }
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            new AlertDialog.Builder(PedidosActivity.this)
+                    .setTitle("Permission Request")
+                    .setMessage("Se necesita permiso para acceder al estado del telefono")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //re-request
+                            ActivityCompat.requestPermissions(PedidosActivity.this,
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
     }
 
     private void CargaDatosCombo() {
@@ -588,8 +661,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             MensajeAviso("El cliente no se encuentra en la base de datos");
             finish();
         }
-        if(editar==false){
-          GenerarCodigoPedido();
+        if (editar == false) {
+            GenerarCodigoPedido();
         }
         if (!variables_publicas.TipoUsuario.equals("Vendedor")) {
             Vendedor vendedor = vendedores.get(0);
@@ -609,7 +682,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
                 vendedor = (Vendedor) adapter.getItemAtPosition(position);
-                 if(!editar){ GenerarCodigoPedido();}
+                if (!editar) {
+                    pedido.setIdVendedor(vendedor.getCODIGO().toString());
+                    GenerarCodigoPedido();
+                }
             }
 
             @Override
@@ -645,9 +721,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void GenerarCodigoPedido() {
-        pedido.setIdVendedor(vendedor.toString());
         pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
-        lblNoPedido.setText("PEDIDO N°: "+pedido.getCodigoPedido());
+        lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
     }
 
     private void ObtenerPrecio(final HashMap<String, String> item, String CodArticulo, final boolean ActualizarItem) {
@@ -680,7 +755,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         if (cantidadItems >= UnidadCaja) {
             PrecioCajas = true;
         }
-        FaltaParaCaja = ModCantidadCajas==0? 0 : (UnidadCaja - ModCantidadCajas);
+        FaltaParaCaja = ModCantidadCajas == 0 ? 0 : (UnidadCaja - ModCantidadCajas);
         cajas = cantidadItems / UnidadCaja;
 
         String tipoprecio = "Super";
@@ -741,7 +816,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
                             if (MensajeCaja) {
                                 final String finalTipoprecio = tipoprecio;
-                                if(!ActualizarItem){
+                                if (!ActualizarItem) {
                                     MensajeCaja = false;
                                 }
                                 new AlertDialog.Builder(this)
@@ -1256,12 +1331,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
                     listaArticulos.remove(itemArticulo);
-                        for (int i = 0; i < listaArticulos.size(); i++) {
-                            HashMap<String, String> a = listaArticulos.get(i);
-                            if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
-                                listaArticulos.remove(a);
-                            }
+                    for (int i = 0; i < listaArticulos.size(); i++) {
+                        HashMap<String, String> a = listaArticulos.get(i);
+                        if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
+                            listaArticulos.remove(a);
                         }
+                    }
 
                     adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
