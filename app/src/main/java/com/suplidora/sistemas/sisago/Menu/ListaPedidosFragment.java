@@ -601,8 +601,29 @@ public class ListaPedidosFragment extends Fragment {
 
                     IdPedido = itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
                     if (itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).startsWith("-")) {
-                        PedidosH.EliminaPedido(IdPedido);
-                        PedidosDetalleH.EliminarDetallePedido(IdPedido);
+                        final HashMap<String, String> finalPedido = pedido;
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Confirmación Requerida")
+                                .setMessage("Esta seguro que desea eliminar el pedido?")
+                                .setCancelable(false)
+                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        PedidosH.EliminaPedido(IdPedido);
+                                        PedidosDetalleH.EliminarDetallePedido(IdPedido);
+                                        btnBuscar.performClick();
+                                        adapter.notifyDataSetChanged();
+                                        lv.setAdapter(adapter);
+
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if (pDialog.isShowing())
+                                            pDialog.dismiss();
+                                    }
+                                })
+                                .show();
+
                     } else if (new Funciones().checkInternetConnection(getActivity())) {
 
                         final HashMap<String, String> finalPedido = pedido;

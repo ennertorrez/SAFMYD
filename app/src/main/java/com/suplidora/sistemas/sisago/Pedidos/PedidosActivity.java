@@ -55,6 +55,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
@@ -1162,14 +1163,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
             });
         } else {
-            dialogView = inflater.inflate(R.layout.offline_layout, null);
-            dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-        }
+
+                dialogView = inflater.inflate(R.layout.offline_layout, null);
+                dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+            }
         dialogBuilder.setView(dialogView);
 
         AlertDialog alertDialog = dialogBuilder.create();

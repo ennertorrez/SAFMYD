@@ -16,6 +16,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
@@ -48,13 +49,14 @@ public class SincronizarDatos {
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
-
+    final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
 
     private String TAG = SincronizarDatos.class.getSimpleName();
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
     private ArticulosHelper ArticulosH;
+    private UsuariosHelper UsuariosH;
 
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
@@ -67,7 +69,7 @@ public class SincronizarDatos {
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh) {
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -78,6 +80,7 @@ public class SincronizarDatos {
         ConfigSistemasH = ConfigSistemah;
         ClientesSucH = ClientesSuch;
         ArticulosH = Articulosh;
+        UsuariosH = usuariosH;
     }
 
     private String SincronizarArticulos() throws JSONException {
@@ -498,6 +501,7 @@ public class SincronizarDatos {
     }
 
     public void SincronizarTodo() throws JSONException {
+        ActualizarUsuario();
         SincronizarArticulos();
         SincronizarClientes();
         SincronizarVendedores();
@@ -508,6 +512,62 @@ public class SincronizarDatos {
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
 
+    }
+
+    private boolean ActualizarUsuario() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = url + variables_publicas.usuario.getUsuario() + "/" + Funciones.Codificar(variables_publicas.usuario.getContrasenia());
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************USUARIOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray Usuarios = jsonObj.getJSONArray("BuscarUsuarioResult");
+                if (Usuarios.length() == 0) {
+                    return false;
+                }
+                UsuariosH.EliminaUsuarios();
+                // looping through All Contacts
+
+                for (int i = 0; i < Usuarios.length(); i++) {
+                    JSONObject c = Usuarios.getJSONObject(i);
+                    variables_publicas.CodigoVendedor = c.getString("Codigo");
+                    variables_publicas.NombreVendedor = c.getString("Nombre");
+                    variables_publicas.UsuarioLogin = c.getString("Usuario");
+                    variables_publicas.TipoUsuario = c.getString("Tipo");
+                    String Contrasenia = c.getString("Contrasenia");
+                    String Tipo = c.getString("Tipo");
+                    variables_publicas.RutaCliente = c.getString("Ruta");
+                    variables_publicas.Canal = c.getString("Canal");
+                    String TasaCambio = c.getString("TasaCambio");
+                    String RutaForanea = c.getString("RutaForanea");
+                    String FechaActualiza = Funciones.getDatePhone();
+                    UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
+                            variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza);
+
+                    variables_publicas.usuario = UsuariosH.BuscarUsuarios(variables_publicas.usuario.getUsuario(), Contrasenia);
+                }
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static boolean SincronizarPedido(final Activity activity, PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
@@ -552,6 +612,7 @@ public class SincronizarDatos {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            variables_publicas.MensajeError = NoPedido;
                             Toast.makeText(activity.getApplicationContext(),
                                     NoPedido,
                                     Toast.LENGTH_LONG).show();

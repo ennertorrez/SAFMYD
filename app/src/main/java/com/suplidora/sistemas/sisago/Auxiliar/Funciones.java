@@ -22,7 +22,10 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,31 +79,6 @@ private  static boolean connectionOK=false;
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
-/*    public static boolean checkInternetConnection(Activity activity) {
-        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        // test for connection
-        if (cm.getActiveNetworkInfo() != null
-                && cm.getActiveNetworkInfo().isAvailable()
-                && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            return false;
-        }
-    }*/
-/*
-    public static boolean checkInternetConnection() {
-        try{
-            // ping to googlevto check internet connectivity
-            Socket socket = new Socket();
-            SocketAddress socketAddress = new InetSocketAddress("8.8.8.8", 80);
-            socket.connect(socketAddress, 2000);
-            socket.close();
-            return true;
-        } catch (Exception e) {
-            // internet not working
-            return false;
-        }
-    }*/
 
     public boolean checkInternetConnection(Activity activity) {
         ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -153,6 +131,14 @@ private  static boolean connectionOK=false;
         {
             return false;
         }
+    }
+
+    public static String getDatePhone() {
+        Calendar cal = new GregorianCalendar();
+        Date date = cal.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formatteDate = df.format(date);
+        return formatteDate;
     }
 
 

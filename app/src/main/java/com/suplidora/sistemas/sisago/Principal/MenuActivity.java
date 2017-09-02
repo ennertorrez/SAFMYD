@@ -102,10 +102,11 @@ public class MenuActivity extends AppCompatActivity
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+        UsuariosH= new UsuariosHelper(DbOpenHelper.database);
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
 
     }
 

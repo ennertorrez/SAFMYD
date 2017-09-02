@@ -127,10 +127,12 @@ public class Login extends Activity {
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+        UsuariosH = new  UsuariosHelper(DbOpenHelper.database);
+
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -192,7 +194,7 @@ public class Login extends Activity {
                         mensajeAviso(e.getMessage());
                     }
                     String FechaLocal = variables_publicas.usuario.getFechaActualiza();
-                    String FechaActual = getDatePhone();
+                    String FechaActual = Funciones.getDatePhone();
                     int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
                     int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
 
@@ -419,7 +421,7 @@ public class Login extends Activity {
                         variables_publicas.Canal = c.getString("Canal");
                         String TasaCambio = c.getString("TasaCambio");
                         String RutaForanea = c.getString("RutaForanea");
-                        String FechaActualiza = getDatePhone();
+                        String FechaActualiza = Funciones.getDatePhone();
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
                                 variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza);
 
@@ -588,13 +590,7 @@ public class Login extends Activity {
         dlgAlert.create().show();
     }
 
-    private String getDatePhone() {
-        Calendar cal = new GregorianCalendar();
-        Date date = cal.getTime();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String formatteDate = df.format(date);
-        return formatteDate;
-    }
+
 
     public static String getHourPhone() {
         Date dt = new Date();
