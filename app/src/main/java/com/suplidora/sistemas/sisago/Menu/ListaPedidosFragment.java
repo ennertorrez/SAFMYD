@@ -289,7 +289,7 @@ public class ListaPedidosFragment extends Fragment {
                     itempedido.put("FormaPago", item.get("FormaPago"));
                     itempedido.put("Fecha", item.get("Fecha"));
                     itempedido.put("CodigoPedido", item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
-                    itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Total));
+                    itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));
                     listapedidos.add(item);
                 }
                 boolean connectionOK=Funciones.TestInternetConectivity();
@@ -346,7 +346,7 @@ public class ListaPedidosFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
                     R.layout.list_pedidos_guardados, new String[]{"Factura", "Estado",
-                    "NombreCliente", "FormaPago", "Fecha", variables_publicas.PEDIDOS_COLUMN_CodigoPedido, variables_publicas.PEDIDOS_COLUMN_Total},
+                    "NombreCliente", "FormaPago", "Fecha", variables_publicas.PEDIDOS_COLUMN_CodigoPedido, variables_publicas.PEDIDOS_COLUMN_Subtotal},
                     new int[]{R.id.Factura, R.id.Estado, R.id.Cliente, R.id.CondicionPago, R.id.Fecha,
                             R.id.CodigoPedido, R.id.TotalPedido}) {
                 @Override
@@ -411,6 +411,7 @@ public class ListaPedidosFragment extends Fragment {
             String condicion = c.getString("condicion");
             String fecha = c.getString("fecha");
             String pedido = c.getString("pedido");
+            String subtotal = c.getString("subtotal");
             String total = c.getString("total");
 
             HashMap<String, String> pedidos = new HashMap<>();
@@ -421,6 +422,7 @@ public class ListaPedidosFragment extends Fragment {
             pedidos.put("FormaPago", condicion);
             pedidos.put("Fecha", fecha);
             pedidos.put("CodigoPedido", pedido);
+            pedidos.put("subtotal",subtotal);
             pedidos.put("Total", total);
             listapedidos.add(pedidos);
         }

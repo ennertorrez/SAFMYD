@@ -16,12 +16,13 @@ public class Pedido {
    String Fecha = "";
    String Usuario = "";
    String IMEI ="" ;
-   //String TasaCambio ="";
+   String Subtotal="";
+    String Total="";
 
     public Pedido() {
     }
 
-    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv,String tipo, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI) {
+    public Pedido(String codigoPedido,String idVendedor, String idCliente, String cod_cv,String tipo, String observacion, String idFormaPago, String idSucursal, String fecha, String usuario, String IMEI,String subtotal,String total) {
         CodigoPedido=codigoPedido;
         IdVendedor = idVendedor;
         IdCliente = idCliente;
@@ -33,7 +34,9 @@ public class Pedido {
         Fecha = fecha;
         Usuario = usuario;
         this.IMEI = IMEI;
-        //this.TasaCambio=tasaCambio;
+        this.Subtotal=subtotal;
+        this.Total=subtotal;
+
     }
 
     public String getTipo() {
@@ -120,18 +123,27 @@ public class Pedido {
         return CodigoPedido;
     }
 
-//    public String getTasaCambio() {
-//        return TasaCambio;
-//    }
-//
-//    public void setTasaCambio(String tasaCambio) {
-//        TasaCambio = tasaCambio;
-//    }
 
     public void setCodigoPedido(String codigoPedido) {
 
 
         CodigoPedido = codigoPedido;
+    }
+
+    public String getSubtotal() {
+        return Subtotal;
+    }
+
+    public void setSubtotal(String subtotal) {
+        Subtotal = subtotal;
+    }
+
+    public String getTotal() {
+        return Total;
+    }
+
+    public void setTotal(String total) {
+        Total = total;
     }
 
     public String toString(){

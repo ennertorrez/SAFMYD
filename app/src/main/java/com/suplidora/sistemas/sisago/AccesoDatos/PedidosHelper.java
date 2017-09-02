@@ -33,7 +33,7 @@ public class PedidosHelper {
                                  String IdSucursal,
                                  String Fecha,
                                  String Usuario,
-                                 String IMEI,String Total) {
+                                 String IMEI,String Subtotal,String Total) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
@@ -47,6 +47,7 @@ public class PedidosHelper {
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Fecha, Fecha);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Usuario, Usuario);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IMEI, IMEI);
+        contentValues.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal,Subtotal);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Total, Total);
         long rowInserted = database.insert(variables_publicas.TABLE_PEDIDOS, null, contentValues);
         if (rowInserted != -1)
@@ -82,6 +83,8 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Subtotal,c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Subtotal)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Total,c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));
                 lst.add(pedido);
             } while (c.moveToNext());
         }
@@ -127,7 +130,8 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
-
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Subtotal,c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Subtotal)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Total,c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));
             } while (c.moveToNext());
         }
         c.close();
@@ -152,7 +156,8 @@ public class PedidosHelper {
                 pedido.setFecha(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
                 pedido.setUsuario(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.setIMEI(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
-
+                pedido.setSubtotal(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Subtotal)));
+                pedido.setTotal(c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));
             } while (c.moveToNext());
         }
         c.close();
@@ -188,6 +193,7 @@ public class PedidosHelper {
                 pedido.put("Fecha", c.getString(c.getColumnIndex("Fecha")));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Subtotal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Subtotal)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total)));
                 lst.add(pedido);
             } while (c.moveToNext());
@@ -211,7 +217,9 @@ public class PedidosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)),
                         c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Usuario)),
-                        c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI))
+                        c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IMEI)),
+                        c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Subtotal)),
+                        c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Total))
                 ));
             } while (c.moveToNext());
         }

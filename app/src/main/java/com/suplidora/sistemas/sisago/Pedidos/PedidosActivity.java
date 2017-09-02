@@ -136,6 +136,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     public static ArrayList<HashMap<String, String>> listaArticulosItem;
     public boolean Estado;
     public double total;
+    public double subtotal;
     private Cliente cliente;
     private double tasaCambio = 0;
     private double subTotalPrecioSuper = 0;
@@ -581,7 +582,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
-                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(total));
+                variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI,String.valueOf(subtotal), String.valueOf(total));
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -1106,8 +1107,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void CalcularTotales() {
 
-        double subtotal = 0, iva = 0, descuento = 0;
+        double iva = 0, descuento = 0;
         total = 0;
+        subtotal=0;
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
 

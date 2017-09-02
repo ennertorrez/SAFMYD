@@ -28,7 +28,7 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
     //Variables BD
-    public static final int DATABASE_VERSION = 35;
+    public static final int DATABASE_VERSION = 40;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -105,6 +105,7 @@ public class variables_publicas {
     public static final String PEDIDOS_COLUMN_Usuario = "Usuario";
     public static final String PEDIDOS_COLUMN_IMEI = "IMEI";
     public static final String PEDIDOS_COLUMN_Total = "Total";
+    public static final String PEDIDOS_COLUMN_Subtotal="subtotal";
 
 
     public static final String PEDIDOS_DETALLE_COLUMN_CodigoPedido = "CodigoPedido";
