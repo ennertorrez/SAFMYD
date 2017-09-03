@@ -223,7 +223,7 @@ public class ListaPedidosFragment extends Fragment {
         lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
         double subtotal = 0.00;
         for(HashMap<String,String>pedido : listapedidos){
-            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total).replace("C$","").replace(",",""));
+            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$","").replace(",",""));
         }
 
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
@@ -340,8 +340,8 @@ public class ListaPedidosFragment extends Fragment {
             df.setGroupingUsed(true);
             df.setDecimalFormatSymbols(fmts);
             for (HashMap<String, String> item : listapedidos) {
-                double total = Double.parseDouble(item.get(variables_publicas.PEDIDOS_COLUMN_Total));
-                item.put(variables_publicas.PEDIDOS_COLUMN_Total, df.format(total));
+                double subtotal = Double.parseDouble(item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));
+                item.put(variables_publicas.PEDIDOS_COLUMN_Subtotal, df.format(subtotal));
             }
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
