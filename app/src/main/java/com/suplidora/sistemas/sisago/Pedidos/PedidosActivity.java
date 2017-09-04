@@ -557,7 +557,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
 
 
-/*        if(IMEI==null){
+       /* if(IMEI==null){
 
             new AlertDialog.Builder(this)
                     .setTitle("Confirmación Requerida")
@@ -728,6 +728,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void ObtenerPrecio(final HashMap<String, String> item, String CodArticulo, final boolean ActualizarItem) {
+        double precio=0;
         variables_publicas.lstDepartamentosForaneo1 = ConfiguracionSistemaH.BuscarValorConfig("lstDepartamentosForaneo1").getValor().split(",");
         String[] lstDepartamentosForaneo1 = variables_publicas.lstDepartamentosForaneo1;
         final HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodArticulo);
@@ -811,7 +812,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         }
 
-        if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equalsIgnoreCase("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
+        if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equals("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
             if (cantidadItems > 0) {
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
@@ -879,7 +880,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         }
 
                     } else {
-                        setPrecio(art, tipoprecio, 0);
+                        setPrecio(art, tipoprecio, precio);
                         MensajeCaja = true;
                     }
                 }
@@ -897,7 +898,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
 
-        if (Boolean.parseBoolean(cliente.getEmpleado()) && Integer.parseInt(condicion.getCODIGO()) != 127) { // esto para validar que no sea producto abordo --Tramite de CK
+        if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) { // esto para validar que no sea producto abordo --Tramite de CK
             tipoprecio = "Mayorista";
         }
         double precioE = 0;
@@ -906,22 +907,36 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             txtDescuento.setEnabled(false);
             txtDescuento.setText("0.00");
             //Si existe precio especial
-            tipoprecio = "Especial";
+
             PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(pedido.getIdCliente(), articulo.getCodigo());
             if (precioEspecial != null) {
+                tipoprecio = "Especial";
                 if (precioEspecial.getFacturar().equals("0")) {
                     MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
                     return;
                 }
                 precioE = Double.parseDouble(precioEspecial.getPrecio());
-                item.put("Precio", precioEspecial.getPrecio());
-                item.put("TipoPrecio", "Especial");
+
+                if(ActualizarItem){
+                    item.put("Precio", precioEspecial.getPrecio());
+                    item.put("TipoPrecio", "Especial");
+                }else{
+                    tipoprecio="Especial";
+                    precio = Double.parseDouble(precioEspecial.getPrecio());
+                    setPrecio(art,tipoprecio,precio);
+                    MensajeCaja = true;
+                }
+
+            }else {
+                tipoprecio=cliente.getTipo();
+                setPrecio(art,tipoprecio,precio);
+                MensajeCaja = true;
             }
 
         }
 
         if (!ActualizarItem) {
-            setPrecio(art, tipoprecio, 0);
+            setPrecio(art, tipoprecio, precio);
         } else {
             if (item != null) {
                 if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) {
