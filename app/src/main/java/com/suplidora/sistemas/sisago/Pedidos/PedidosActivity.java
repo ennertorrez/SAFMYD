@@ -557,7 +557,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
 
 
-       /* if(IMEI==null){
+        if(IMEI==null){
 
             new AlertDialog.Builder(this)
                     .setTitle("Confirmación Requerida")
@@ -578,7 +578,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             return false;
 
-        }*/
+        }
 
         boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
