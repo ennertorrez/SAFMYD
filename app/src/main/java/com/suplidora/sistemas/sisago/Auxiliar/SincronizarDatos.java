@@ -601,7 +601,15 @@ public class SincronizarDatos {
 
         String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrPedido == null) {
-            Funciones.MensajeAviso(activity.getApplicationContext(), "Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula");
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    variables_publicas.MensajeError = "Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula";
+                    Toast.makeText(activity.getApplicationContext(),
+                            "Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
             return false;
         } else {
             try {

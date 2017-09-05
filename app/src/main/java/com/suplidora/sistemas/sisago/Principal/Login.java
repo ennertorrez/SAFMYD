@@ -9,9 +9,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -19,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -61,6 +65,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 
@@ -223,6 +228,27 @@ public class Login extends Activity {
         });
         ValidarUltimaVersion();
         loadIMEI();
+        try{
+            Configuration config = getResources().getConfiguration();
+            restartInLocale(config.locale);
+        }catch (Exception ex){
+            Funciones.MensajeAviso(getApplicationContext(),ex.getMessage());
+        }
+
+    }
+    private void restartInLocale(Locale locale)
+    {
+        if (!locale.getDisplayName().equalsIgnoreCase("español (Estados Unidos)")){
+            locale = new Locale("es","US");
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            Resources resources = getResources();
+            resources.updateConfiguration(config, resources.getDisplayMetrics());
+            recreate();
+        }
+
+
     }
 
     public void loadIMEI() {

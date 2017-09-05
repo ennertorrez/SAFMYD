@@ -557,7 +557,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
 
 
-       /* if(IMEI==null){
+        if(IMEI==null){
 
             new AlertDialog.Builder(this)
                     .setTitle("Confirmación Requerida")
@@ -578,7 +578,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             return false;
 
-        }*/
+        }
 
         boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
@@ -926,15 +926,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     setPrecio(art,tipoprecio,precio);
                     MensajeCaja = true;
                 }
-
             }else {
                 tipoprecio=cliente.getTipo();
                 setPrecio(art,tipoprecio,precio);
                 MensajeCaja = true;
             }
-
         }
-
         if (!ActualizarItem) {
             setPrecio(art, tipoprecio, precio);
         } else {
@@ -974,11 +971,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             txtDescuento.setText("");
             lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
             txtCodigoArticulo.requestFocus();
-
         }
-
     }
-
     private void RecalcularDetalle() {
 
         MensajeCaja = false;
@@ -987,7 +981,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
     }
-
 
     private boolean EsArticuloRepetido(String s) {
 
@@ -1073,13 +1066,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             articuloBonificado.put("SubTotal", "0");
             articuloBonificado.put("Total", "0");
             articuloBonificado.put("TipoPrecio", "Bonificacion");
-           /* //Actualizamos el campo BonificaA del item que lo bonifica
-            for (HashMap<String, String> item : listaArticulos) {
-                if (item.get("CodigoArticulo").equals(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV)) && item.get("TipoArt").equals("P")) {
-                    item.put("BonificaA", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-                    break;
-                }
-            }*/
             listaArticulos.add(articuloBonificado);
         } else {
             //Validamos que solamente se puedan ingresar 18 articulos
@@ -1091,7 +1077,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
         PrecioItem = 0;
         RefrescarGrid();
-
         CalcularTotales();
 
 
@@ -1299,14 +1284,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         alertDialog.show();
     }
 
-    public String getIMEI(Activity activity) {
-        TelephonyManager telephonyManager = (TelephonyManager) activity
-                .getSystemService(Context.TELEPHONY_SERVICE);
-        return telephonyManager.getDeviceId();
-    }
-    //endregion
 
-    //region Eventos
 
 
     @Override
@@ -1314,7 +1292,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         switch (requestCode) {
             case REQUEST_READ_PHONE_STATE:
                 if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    IMEI = getIMEI(PedidosActivity.this);
+                    loadIMEI();
                 }
                 break;
 
@@ -1411,8 +1389,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         @Override
         protected Void doInBackground(Void... params) {
 
-            if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, editar)) {
-                guardadoOK = true;
+            if(Funciones.TestInternetConectivity()){
+                if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, editar)) {
+                    guardadoOK = true;
+                }
+            }
+            else{
+                guardadoOK=false;
             }
             return null;
         }

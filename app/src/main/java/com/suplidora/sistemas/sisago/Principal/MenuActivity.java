@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -43,6 +44,8 @@ import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
+
+import static android.R.id.toggle;
 /*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
 import com.suplidora.sistemas.sisago.app.ControladorSincronizacion;*/
 
@@ -69,6 +72,7 @@ public class MenuActivity extends AppCompatActivity
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +85,7 @@ public class MenuActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -235,15 +240,22 @@ public class MenuActivity extends AppCompatActivity
                         .commit();
                 break;
             case R.id.btnMapa:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new MapViewFragment())
-                        .commit();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.content_frame, new MapViewFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
+
                 break;
             case R.id.btnMaestroClientes:
                 fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
                 break;
             case R.id.btnListadoPedidos:
-                fragmentManager.beginTransaction().replace(R.id.content_frame, new ListaPedidosFragment()).commit();
+
+                fragmentManager.executePendingTransactions();
+                android.app.FragmentTransaction tran = getFragmentManager().beginTransaction();
+                tran.replace(R.id.content_frame, new ListaPedidosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
                 break;
             case R.id.btnDevoluciones:
               /*  Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
@@ -264,6 +276,12 @@ public class MenuActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private static void removeAllFragments(FragmentManager fragmentManager) {
+        while (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStackImmediate();
+        }
     }
 
 
