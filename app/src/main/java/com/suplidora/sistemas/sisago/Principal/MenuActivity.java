@@ -39,6 +39,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
+import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
@@ -56,7 +57,7 @@ public class MenuActivity extends AppCompatActivity
     private String TAG = ClientesFragment.class.getSimpleName();
     private ProgressDialog pDialog;
     TextView lblUsuarioHeader;
-
+    TextView lblUsuarioHeaderCodigo;
     private DataBaseOpenHelper DbOpenHelper;
 
     private SincronizarDatos sd;
@@ -93,8 +94,11 @@ public class MenuActivity extends AppCompatActivity
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
         navigationView.addHeaderView(header);
          lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
-        String Userheader = variables_publicas.usuario.getNombre();
-        lblUsuarioHeader.setText(Userheader);
+        lblUsuarioHeaderCodigo = (TextView) header.findViewById(R.id.UsuarioHeaderCodigo);
+        String userHeader = variables_publicas.usuario.getNombre();
+        String userHeaderCodigo = variables_publicas.usuario.getCodigo();
+        lblUsuarioHeader.setText(userHeader);
+        lblUsuarioHeaderCodigo.setText("Codigo: "+ userHeaderCodigo);
 
         DbOpenHelper = new DataBaseOpenHelper(MenuActivity.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
@@ -121,21 +125,8 @@ public class MenuActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            //super.onBackPressed();
-            new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmación requerida")
-                    .setMessage("Está seguro que desea salir de la aplicación?")
-                    .setPositiveButton("Si", new DialogInterface.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
 
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+                    removeAllFragments(getFragmentManager());
         }
     }
 
@@ -230,30 +221,38 @@ public class MenuActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        android.app.FragmentTransaction tran;
         FragmentManager fragmentManager = getFragmentManager();
 
         switch (id) {
 
             case R.id.btnMaestroProductos:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, new com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment())
-                        .commit();
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new MaestroProductoFragment());
+                tran.addToBackStack(null);
+                tran.commit();
                 break;
             case R.id.btnMapa:
+                fragmentManager.executePendingTransactions();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.content_frame, new MapViewFragment());
+                transaction.add(R.id.content_frame, new MapViewFragment());
                 transaction.addToBackStack(null);
                 transaction.commit();
 
                 break;
             case R.id.btnMaestroClientes:
-                fragmentManager.beginTransaction().replace(R.id.content_frame, new ClientesFragment()).commit();
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ClientesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
                 break;
             case R.id.btnListadoPedidos:
 
                 fragmentManager.executePendingTransactions();
-                android.app.FragmentTransaction tran = getFragmentManager().beginTransaction();
-                tran.replace(R.id.content_frame, new ListaPedidosFragment());
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaPedidosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
@@ -270,7 +269,11 @@ public class MenuActivity extends AppCompatActivity
                 Intent newActi = new Intent(getApplicationContext(), ConsultaArticulosActivity.class);
                 startActivity(newActi);
 */
-                fragmentManager.beginTransaction().replace(R.id.content_frame, new PedidosFragment()).commit();
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new PedidosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -278,9 +281,33 @@ public class MenuActivity extends AppCompatActivity
         return true;
     }
 
-    private static void removeAllFragments(FragmentManager fragmentManager) {
-        while (fragmentManager.getBackStackEntryCount() > 0) {
-            fragmentManager.popBackStackImmediate();
+    private  void removeAllFragments(FragmentManager fragmentManager) {
+
+        if(fragmentManager.getBackStackEntryCount() > 0 || getSupportFragmentManager().getBackStackEntryCount()>0) {
+
+            while (fragmentManager.getBackStackEntryCount() > 0) {
+                fragmentManager.popBackStackImmediate();
+            }
+
+            while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStackImmediate();
+            }
+
+        }else{
+               new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Confirmación requerida")
+                    .setMessage("Está seguro que desea salir de la aplicación?")
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         }
     }
 

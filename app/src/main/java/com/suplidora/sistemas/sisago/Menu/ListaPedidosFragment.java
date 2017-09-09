@@ -681,7 +681,7 @@ public class ListaPedidosFragment extends Fragment {
 
                             pedido = PedidosH.ObtenerPedido(CodigoPedido);
                             if (pedido == null) {
-                                Funciones.MensajeAviso(getActivity(), "Este pedido no se puede editar ya que no se encuentra sincronizado en este celular");
+                                Funciones.MensajeAviso(getActivity(), "Este pedido no se puede editar, ya que no fue creado en este dispositivo");
                                 return true;
                             }
 

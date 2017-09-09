@@ -28,7 +28,7 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
     //Variables BD
-    public static final int DATABASE_VERSION = 40;
+    public static final int DATABASE_VERSION = 41;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
