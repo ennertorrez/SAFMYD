@@ -359,8 +359,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 focusedControl = "";
                 // }
 
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_FORCED);
 
             }
         });
@@ -415,7 +413,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
 
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                          InputMethodManager.HIDE_IMPLICIT_ONLY);
+                                                          InputMethodManager.RESULT_SHOWN);
 
 
                                               } catch (Exception e) {
