@@ -820,7 +820,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
-                            if (MensajeCaja) {
+                            if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;
                                 if (!ActualizarItem) {
                                     MensajeCaja = false;
@@ -908,7 +908,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
                     if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) {
-                        if (!variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("1") && MensajeCaja) {
+                        if ( (variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("0") ||variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) && MensajeCaja) {
                             setPrecio(art, tipoprecio, 0);
                             MensajeCaja = false;
                             listaArticulos.remove(listaArticulos.size() - 1);
