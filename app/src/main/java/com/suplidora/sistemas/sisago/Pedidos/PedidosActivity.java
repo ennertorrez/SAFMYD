@@ -360,7 +360,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 // }
 
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_IMPLICIT);
+                imm.showSoftInput(txtCantidad, InputMethodManager.SHOW_FORCED);
 
             }
         });
@@ -415,7 +415,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                           getSystemService(Context.INPUT_METHOD_SERVICE);
 
                                                   inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                          InputMethodManager.RESULT_SHOWN);
+                                                          InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
                                               } catch (Exception e) {
@@ -849,6 +849,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         CalcularTotales();
                                                     }
                                                     txtCantidad.requestFocus();
+
                                                 }
                                             }
                                         })
@@ -908,7 +909,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
                     if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) {
-                        if ( (variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("0") ||variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) && MensajeCaja) {
+                        if ( (variables_publicas.PermitirVentaDetAMayoristaXCaja.equals("0") && !variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) && MensajeCaja) {
                             setPrecio(art, tipoprecio, 0);
                             MensajeCaja = false;
                             listaArticulos.remove(listaArticulos.size() - 1);
@@ -1011,6 +1012,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             txtDescuento.setText("");
             lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
             txtCodigoArticulo.requestFocus();
+
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+
         }
     }
 
