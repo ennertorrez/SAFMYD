@@ -819,7 +819,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             if (cantidadItems > 0) {
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
-                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle")) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") ) {
                             if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;
                                 if (!ActualizarItem) {
