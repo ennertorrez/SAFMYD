@@ -29,8 +29,8 @@ public class HttpHandler {
             conn.setRequestProperty("Accept","*/*");
             conn.setRequestProperty("Accept","*+*");
             conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(20000);
+            conn.setReadTimeout(20000);
             InputStream in = new BufferedInputStream(conn.getInputStream());
             response = convertStreamToString(in);
         } catch (MalformedURLException e) {
@@ -56,8 +56,8 @@ public class HttpHandler {
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept","*/*");
             conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(20000);
+            conn.setReadTimeout(20000);
             InputStream in = new BufferedInputStream(conn.getInputStream());
             response = convertStreamToString(in);
         } catch (MalformedURLException e) {

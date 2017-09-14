@@ -224,7 +224,6 @@ public class ListaPedidosFragment extends Fragment {
         for (HashMap<String, String> pedido : listapedidos) {
             subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
         }
-
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
     }
 
@@ -325,6 +324,13 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            ActualizarLista();
+
+        }
+    }
+
+    private void ActualizarLista() {
+        try {
             ActualizarFooter();
             // Dismiss the progress dialog
             if (pDialog.isShowing())
@@ -339,7 +345,7 @@ public class ListaPedidosFragment extends Fragment {
             df.setGroupingUsed(true);
             df.setDecimalFormatSymbols(fmts);
             for (HashMap<String, String> item : listapedidos) {
-                double subtotal = Double.parseDouble(item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));
+                double subtotal = Double.parseDouble(item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
                 item.put(variables_publicas.PEDIDOS_COLUMN_Subtotal, df.format(subtotal));
             }
             adapter = new SimpleAdapter(
@@ -379,6 +385,16 @@ public class ListaPedidosFragment extends Fragment {
 
             lv.setAdapter(adapter);
             ActualizarFooter();
+
+        } catch (final Exception ex) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "GetListaPedidos OnPostExecute:" + ex.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+            });
         }
     }
 
@@ -472,22 +488,41 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            ActualizarFooter();
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            if (guardadoOK) {
-                btnBuscar.performClick();
-            }
+            try {
+                ActualizarFooter();
+                // Dismiss the progress dialog
+                if (pDialog.isShowing())
+                    pDialog.dismiss();
+                if (guardadoOK) {
+                    btnBuscar.performClick();
+                }
 
+            } catch (final Exception ex) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "SincronizarPedidos onPostExecute: " + ex.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         }
     }
 
     //region ServiceAnularPedido
     private class AnulaPedido extends AsyncTask<Void, Void, Void> {
-
         private String NoPedido;
 
+        /*@Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(getActivity());
+            pDialog.setMessage("Anulando Pedido...Por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }*/
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -521,10 +556,13 @@ public class ListaPedidosFragment extends Fragment {
                             }
                         });
 
+                    } else {
+                        guardadoOK = true;
                     }
 
 
                 } catch (final Exception ex) {
+                    guardadoOK=false;
                     new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -553,6 +591,30 @@ public class ListaPedidosFragment extends Fragment {
             }
             return null;
         }
+
+    /*    @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            try {
+                ActualizarFooter();
+                // Dismiss the progress dialog
+                if (pDialog.isShowing())
+                    pDialog.dismiss();
+                if (guardadoOK) {
+                    btnBuscar.performClick();
+                }
+
+            } catch (final Exception ex) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "SincronizarPedidos onPostExecute: " + ex.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }*/
 
     }
 
@@ -648,8 +710,6 @@ public class ListaPedidosFragment extends Fragment {
                                     public void onClick(DialogInterface dialog, int id) {
                                         AnularPedido(finalPedido);
                                         btnBuscar.performClick();
-                                        adapter.notifyDataSetChanged();
-                                        lv.setAdapter(adapter);
 
                                     }
                                 })
@@ -754,8 +814,12 @@ public class ListaPedidosFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (adapter != null) {
-            CargarPedidos();
+        try {
+            if (adapter != null) {
+                CargarPedidos();
+            }
+        } catch (Exception ex) {
+
         }
     }
 }

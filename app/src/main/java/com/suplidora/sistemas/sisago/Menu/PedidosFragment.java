@@ -107,15 +107,9 @@ public class PedidosFragment extends Fragment {
             public void onClick(View v) {
 
                 InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
                 tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbCodigo ? "1" : "2";
-
-               /* if(TextUtils.isEmpty(busqueda)) {
-                    txtBusqueda.setError("Ingrese un valor");
-                    return;
-                }*/
                 new GetClientesPedidos().execute();
                 lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
             }
@@ -186,18 +180,32 @@ public class PedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
-            ListAdapter adapter = new SimpleAdapter(
-                    getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodCv, R.id.Nombre,
-                    R.id.Direccion});
-            lv.setAdapter(adapter);
-            lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
+           try{
+               // Dismiss the progress dialog
+               if (pDialog.isShowing())
+                   pDialog.dismiss();
+               /**
+                * Updating parsed JSON data into ListView
+                * */
+               ListAdapter adapter = new SimpleAdapter(
+                       getActivity(), listaClientes,
+                       R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodCv, R.id.Nombre,
+                       R.id.Direccion});
+               if(adapter!=null){
+                   lv.setAdapter(adapter);
+               }
+               lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
+           }catch (final Exception ex){
+               getActivity().runOnUiThread(new Runnable() {
+                   @Override
+                   public void run() {
+                       Toast.makeText(getActivity().getApplicationContext(),
+                               "error: " + ex.getMessage(),
+                               Toast.LENGTH_LONG)
+                               .show();
+                   }
+               });
+           }
         }
     }
 }
