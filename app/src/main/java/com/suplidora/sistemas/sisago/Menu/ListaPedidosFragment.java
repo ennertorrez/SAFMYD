@@ -120,7 +120,6 @@ public class ListaPedidosFragment extends Fragment {
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 
 
-
             }
         });
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
@@ -222,8 +221,8 @@ public class ListaPedidosFragment extends Fragment {
     private void ActualizarFooter() {
         lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
         double subtotal = 0.00;
-        for(HashMap<String,String>pedido : listapedidos){
-            subtotal += Double.parseDouble( pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$","").replace(",",""));
+        for (HashMap<String, String> pedido : listapedidos) {
+            subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
         }
 
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
@@ -292,10 +291,10 @@ public class ListaPedidosFragment extends Fragment {
                     itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));
                     listapedidos.add(item);
                 }
-                boolean connectionOK=Funciones.TestInternetConectivity();
-                if (connectionOK){
+                boolean connectionOK = Funciones.TestInternetConectivity();
+                if (connectionOK) {
                     GetPedidosService();
-                }else{
+                } else {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -326,7 +325,7 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-           ActualizarFooter();
+            ActualizarFooter();
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
@@ -396,35 +395,46 @@ public class ListaPedidosFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String jsonStr = sh.makeServiceCall(encodeUrl);
-        Log.e(TAG, "Response from url: " + jsonStr);
 
-        JSONObject jsonObj = new JSONObject(jsonStr);
-        // Getting JSON Array node
-        JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
+        try {
 
-        for (int i = 0; i < Pedidos.length(); i++) {
-            JSONObject c = Pedidos.getJSONObject(i);
-            String FACTURA = c.getString("FACTURA");
-            String StatusPedido = c.getString("StatusPedido");
-            String cliente = c.getString("cliente");
-            String condicion = c.getString("condicion");
-            String fecha = c.getString("fecha");
-            String pedido = c.getString("pedido");
-            String subtotal = c.getString("subtotal");
-            String total = c.getString("total");
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+            if (jsonStr == null) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Respuesta nula", "null", "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            } else {
+                Log.e(TAG, "Response from url: " + jsonStr);
 
-            HashMap<String, String> pedidos = new HashMap<>();
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
 
-            pedidos.put("Factura", FACTURA);
-            pedidos.put("Estado", StatusPedido);
-            pedidos.put("NombreCliente", cliente);
-            pedidos.put("FormaPago", condicion);
-            pedidos.put("Fecha", fecha);
-            pedidos.put("CodigoPedido", pedido);
-            pedidos.put("subtotal",subtotal);
-            pedidos.put("Total", total);
-            listapedidos.add(pedidos);
+                for (int i = 0; i < Pedidos.length(); i++) {
+                    JSONObject c = Pedidos.getJSONObject(i);
+                    String FACTURA = c.getString("FACTURA");
+                    String StatusPedido = c.getString("StatusPedido");
+                    String cliente = c.getString("cliente");
+                    String condicion = c.getString("condicion");
+                    String fecha = c.getString("fecha");
+                    String pedido = c.getString("pedido");
+                    String subtotal = c.getString("subtotal");
+                    String total = c.getString("total");
+
+                    HashMap<String, String> pedidos = new HashMap<>();
+
+                    pedidos.put("Factura", FACTURA);
+                    pedidos.put("Estado", StatusPedido);
+                    pedidos.put("NombreCliente", cliente);
+                    pedidos.put("FormaPago", condicion);
+                    pedidos.put("Fecha", fecha);
+                    pedidos.put("CodigoPedido", pedido);
+                    pedidos.put("subtotal", subtotal);
+                    pedidos.put("Total", total);
+                    listapedidos.add(pedidos);
+                }
+            }
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Excepcion controlada", ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+
         }
     }
     //endregion
@@ -454,7 +464,7 @@ public class ListaPedidosFragment extends Fragment {
                 Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
                 Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));
                 String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
-                guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido,false);
+                guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false);
             }
             return null;
         }
@@ -484,7 +494,7 @@ public class ListaPedidosFragment extends Fragment {
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdPedido + "/" + variables_publicas.usuario.getUsuario();
 
-            String urlString = url ;
+            String urlString = url;
             String urlStr = urlString;
             String encodeUrl = "";
             try {
@@ -499,7 +509,7 @@ public class ListaPedidosFragment extends Fragment {
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
-                    String resultState =  ((String) result.get("AnularPedidoResult")).split(",")[0];
+                    String resultState = ((String) result.get("AnularPedidoResult")).split(",")[0];
                     final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
                     if (resultState.equals("false")) {
                         getActivity().runOnUiThread(new Runnable() {
@@ -515,6 +525,7 @@ public class ListaPedidosFragment extends Fragment {
 
 
                 } catch (final Exception ex) {
+                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -527,6 +538,7 @@ public class ListaPedidosFragment extends Fragment {
                     });
                 }
             } else {
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla", "null", "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -564,16 +576,15 @@ public class ListaPedidosFragment extends Fragment {
             if (!obj.get("CodigoPedido").startsWith("-"))
                 tv.setTitle("Anular Pedido");
 
-            if(!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")){
+            if (!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")) {
                 tv.setEnabled(false);
-                if(obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")){
+                if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")) {
                     //Ponemos el boton Editar en falso
-                    ((MenuItem)   menu.getItem(0)).setEnabled(false);
+                    ((MenuItem) menu.getItem(0)).setEnabled(false);
                 }
-            }else{
+            } else {
                 tv.setEnabled(true);
             }
-
 
 
         } catch (Exception e) {
@@ -583,7 +594,7 @@ public class ListaPedidosFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        HashMap<String, String> pedido=null;
+        HashMap<String, String> pedido = null;
         try {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
@@ -650,7 +661,7 @@ public class ListaPedidosFragment extends Fragment {
                                 })
                                 .show();
 
-                    }else{
+                    } else {
                         mensajeAviso("No es posible connectarse con el servidor, por favor verifique su conexión a internet");
                     }
 
@@ -674,10 +685,10 @@ public class ListaPedidosFragment extends Fragment {
                     }
 
                     //Editar
-                    HashMap<String, String> obj =  listapedidos.get(info.position);
+                    HashMap<String, String> obj = listapedidos.get(info.position);
                     String CodigoPedido = obj.get("CodigoPedido");
                     if (obj.get("Factura").equalsIgnoreCase("")) {
-                        if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)") ) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
+                        if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)")) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
 
                             pedido = PedidosH.ObtenerPedido(CodigoPedido);
                             if (pedido == null) {
@@ -713,7 +724,6 @@ public class ListaPedidosFragment extends Fragment {
     }
 
 
-
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(getActivity());
         dlgAlert.setMessage(texto);
@@ -744,7 +754,7 @@ public class ListaPedidosFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (adapter!=null){
+        if (adapter != null) {
             CargarPedidos();
         }
     }

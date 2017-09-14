@@ -48,6 +48,8 @@ private  static boolean connectionOK=false;
                 .replace("!","(exclamation)")
                 .replace("?","(question)")
                 .replace("/","(slash)")
+                .replace("\\","(backslash)")
+                .replace("'","(sigleQuote)")
                 .replace("~","(tilde)");
     }
 
@@ -141,6 +143,22 @@ private  static boolean connectionOK=false;
         return formatteDate;
     }
 
+    public boolean SendMail(String subject, String body,String from,String recipients){
+
+        try {
+            GMailSender sender = new GMailSender("suplidorainternacional@gmail.com", "Suplisa2016");
+            sender.sendMail(subject,
+                    body,
+                    from,
+                    recipients);
+            return  true;
+        } catch (Exception e) {
+            Log.e("SendMail", e.getMessage(), e);
+            return false;
+        }
+
+    }
+
 
     class TestConnectivity extends AsyncTask<Void, Void, Boolean> {
 
@@ -152,8 +170,8 @@ private  static boolean connectionOK=false;
                 connectionOK=false;
                 URL url = new URL("http://www.google.com.ni");
                 URLConnection conn = url.openConnection();
-                conn.setConnectTimeout(1000);
-                conn.setReadTimeout(1000);
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
                 conn.setUseCaches(false);
                 conn.connect();
                 InputStream is =   conn.getInputStream();
