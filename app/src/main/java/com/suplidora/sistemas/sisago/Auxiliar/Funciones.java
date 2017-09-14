@@ -106,11 +106,11 @@ private  static boolean connectionOK=false;
         }
 
     }
-    public static boolean isConnected() throws InterruptedException, IOException
+ /*   public static boolean isConnected() throws InterruptedException, IOException
     {
         String command = "ping -c 1 google.com";
         return (Runtime.getRuntime().exec (command).waitFor() == 0);
-    }
+    }*/
 
     public static boolean TestInternetConectivity(){
         try
