@@ -11,18 +11,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -49,7 +44,6 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
@@ -64,7 +58,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
@@ -132,12 +125,12 @@ public class Login extends Activity {
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
-        UsuariosH = new  UsuariosHelper(DbOpenHelper.database);
+        UsuariosH = new UsuariosHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -147,8 +140,8 @@ public class Login extends Activity {
             txtPassword.requestFocus();
         }
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
-
         lblVersion.setText("Versión " + getCurrentVersion());
+        /*NO CAMBIAR ESTA DIRECCION: VERIFICA SI ES SERVIDOR DE PRUEBAS*/
         if (variables_publicas.direccionIp == "http://186.1.18.75:8085") {
             lblVersion.setText("Versión " + getCurrentVersion() + " Desarrollo");
         }
@@ -228,18 +221,18 @@ public class Login extends Activity {
         });
         ValidarUltimaVersion();
         loadIMEI();
-        try{
+        try {
             Configuration config = getResources().getConfiguration();
             restartInLocale(config.locale);
-        }catch (Exception ex){
-            Funciones.MensajeAviso(getApplicationContext(),ex.getMessage());
+        } catch (Exception ex) {
+            Funciones.MensajeAviso(getApplicationContext(), ex.getMessage());
         }
 
     }
-    private void restartInLocale(Locale locale)
-    {
-        if (!locale.getDisplayName().equalsIgnoreCase("español (Estados Unidos)")){
-            locale = new Locale("es","US");
+
+    private void restartInLocale(Locale locale) {
+        if (!locale.getDisplayName().equalsIgnoreCase("español (Estados Unidos)")) {
+            locale = new Locale("es", "US");
             Locale.setDefault(locale);
             Configuration config = new Configuration();
             config.locale = locale;
@@ -262,6 +255,7 @@ public class Login extends Activity {
             doPermissionGrantedStuffs();
         }
     }
+
     private void requestReadPhoneStatePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.READ_PHONE_STATE)) {
@@ -323,9 +317,9 @@ public class Login extends Activity {
 
     public void doPermissionGrantedStuffs() {
         //Have an  object of TelephonyManager
-        TelephonyManager tm =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
-        variables_publicas.IMEI =tm.getDeviceId();
+        variables_publicas.IMEI = tm.getDeviceId();
 
 
     }
@@ -341,7 +335,7 @@ public class Login extends Activity {
 */
 
     private void ValidarUltimaVersion() {
-        boolean isOnline=new Funciones().checkInternetConnection(Login.this);
+        boolean isOnline = new Funciones().checkInternetConnection(Login.this);
 
         if (isOnline) {
             String latestVersion = "";
@@ -471,7 +465,7 @@ public class Login extends Activity {
 //                                }
 //                            });
                             variables_publicas.LoginOk = false;
-                                variables_publicas.MensajeLogin = "Ha ocurrido un error al sincronizar los datos. Por favor intente nuevamente";
+                            variables_publicas.MensajeLogin = "Ha ocurrido un error al sincronizar los datos. Por favor intente nuevamente";
                             UsuariosH.EliminaUsuarios();
                         }
                     }
@@ -508,7 +502,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog!=null && pDialog.isShowing())
+            if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
         }
     }
@@ -604,7 +598,6 @@ public class Login extends Activity {
     }*/
 
 
-
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setMessage(texto);
@@ -615,7 +608,6 @@ public class Login extends Activity {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
-
 
 
     public static String getHourPhone() {
