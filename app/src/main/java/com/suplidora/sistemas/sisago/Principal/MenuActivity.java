@@ -47,6 +47,7 @@ import com.suplidora.sistemas.sisago.R;
 import org.json.JSONException;
 
 import static android.R.id.toggle;
+import static com.suplidora.sistemas.sisago.Auxiliar.variables_publicas.VersionSistema;
 /*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
 import com.suplidora.sistemas.sisago.app.ControladorSincronizacion;*/
 
@@ -116,6 +117,8 @@ public class MenuActivity extends AppCompatActivity
                 CartillasBcDetalleH,
                 FormaPagoH,
                 PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
+
+        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + "/ IMEI: "+variables_publicas.IMEI + " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
 
     }
 

@@ -340,6 +340,7 @@ public class Login extends Activity {
         if (isOnline) {
             String latestVersion = "";
             String currentVersion = getCurrentVersion();
+            variables_publicas.VersionSistema=currentVersion;
             try {
                 latestVersion = new GetLatestVersion().execute().get();
 

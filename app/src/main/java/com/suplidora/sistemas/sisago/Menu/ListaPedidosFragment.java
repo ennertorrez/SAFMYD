@@ -89,7 +89,6 @@ public class ListaPedidosFragment extends Fragment {
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
     private SimpleAdapter adapter;
-
     final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
     final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
     //AnularPedido/{Pedido}/{Usuario}
@@ -416,7 +415,7 @@ public class ListaPedidosFragment extends Fragment {
 
             String jsonStr = sh.makeServiceCall(encodeUrl);
             if (jsonStr == null) {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Respuesta nula", "null", "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Respuesta nula GET", variables_publicas.info+urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             } else {
                 Log.e(TAG, "Response from url: " + jsonStr);
 
@@ -449,7 +448,7 @@ public class ListaPedidosFragment extends Fragment {
                 }
             }
         } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Excepcion controlada", ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Excepcion controlada", variables_publicas.info+ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
 
         }
     }
@@ -563,7 +562,7 @@ public class ListaPedidosFragment extends Fragment {
 
                 } catch (final Exception ex) {
                     guardadoOK=false;
-                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info+ ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -576,7 +575,7 @@ public class ListaPedidosFragment extends Fragment {
                     });
                 }
             } else {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla", "null", "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET",variables_publicas.info+urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

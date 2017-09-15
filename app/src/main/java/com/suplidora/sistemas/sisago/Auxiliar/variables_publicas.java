@@ -7,10 +7,10 @@ import com.suplidora.sistemas.sisago.Entidades.Usuario;
 
 public class variables_publicas {
 
-    public static Usuario usuario=null;
-    public static Configuraciones Configuracion=null;
-    public static Pedido Pedidos=null;
-    public static String ValorConfigServ="";
+    public static Usuario usuario = null;
+    public static Configuraciones Configuracion = null;
+    public static Pedido Pedidos = null;
+    public static String ValorConfigServ = "";
     public static String AplicarPrecioMayoristaXCaja;
     public static String PermitirVentaDetAMayoristaXCaja;
     public static String[] lstDepartamentosForaneo1;
@@ -24,10 +24,10 @@ public class variables_publicas {
     public static String RutaCliente = "";
     public static String Canal = "";
     public static String direccionIp = "http://186.1.18.75:8080";
-    public static String FechaActual="";
+    public static String FechaActual = "";
     public static String IMEI;
     public static String MensajeError;
-    public static final String correosErrores ="informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
+    public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     //Variables BD
     public static final int DATABASE_VERSION = 41;
     public static final String DATABASE_NAME = "SysContabv3.db";
@@ -61,7 +61,7 @@ public class variables_publicas {
     public static final String ARTICULO_COLUMN_PrecioMayorista = "PrecioMayorista";
     public static final String ARTICULO_COLUMN_Bonificable = "Bonificable";
     public static final String ARTICULO_COLUMN_AplicaPrecioDetalle = "AplicaPrecioDetalle";
-    public static final String ARTICULO_COLUMN_DescuentoMaximo= "DescuentoMaximo";
+    public static final String ARTICULO_COLUMN_DescuentoMaximo = "DescuentoMaximo";
     public static final String ARTICULO_COLUMN_Detallista = "Detallista";
 
     //Variables CamposTbClientes
@@ -87,18 +87,19 @@ public class variables_publicas {
     public static final String CLIENTES_COLUMN_PrecioEspecial = "PrecioEspecial";
     public static final String CLIENTES_COLUMN_FechaUltimaCompra = "FechaUltimaCompra";
     public static final String CLIENTES_COLUMN_Tipo = "Tipo";
-    public static final String CLIENTES_COLUMN_CodigoGalatea="CodigoGalatea";
-    public static final String CLIENTES_COLUMN_Descuento="Descuento";
-    public static final String CLIENTES_COLUMN_Empleado="Empleado";
-    public static final String CLIENTES_COLUMN_Detallista="Detallista";
-    public static final String CLIENTES_COLUMN_RutaForanea="RutaForanea";
-
+    public static final String CLIENTES_COLUMN_CodigoGalatea = "CodigoGalatea";
+    public static final String CLIENTES_COLUMN_Descuento = "Descuento";
+    public static final String CLIENTES_COLUMN_Empleado = "Empleado";
+    public static final String CLIENTES_COLUMN_Detallista = "Detallista";
+    public static final String CLIENTES_COLUMN_RutaForanea = "RutaForanea";
+    public static String VersionSistema = "";
+    public static String info = "";
     //Variables CamposTbPedidos
     public static final String PEDIDOS_COLUMN_CodigoPedido = "CodigoPedido";
     public static final String PEDIDOS_COLUMN_IdVendedor = "IdVendedor";
     public static final String PEDIDOS_COLUMN_IdCliente = "IdCliente";
     public static final String PEDIDOS_COLUMN_Cod_cv = "Cod_cv";
-    public static final String PEDIDOS_COLUMN_Tipo= "Tipo";
+    public static final String PEDIDOS_COLUMN_Tipo = "Tipo";
     public static final String PEDIDOS_COLUMN_Observacion = "Observacion";
     public static final String PEDIDOS_COLUMN_IdFormaPago = "IdFormaPago";
     public static final String PEDIDOS_COLUMN_IdSucursal = "IdSucursal";
@@ -106,7 +107,7 @@ public class variables_publicas {
     public static final String PEDIDOS_COLUMN_Usuario = "Usuario";
     public static final String PEDIDOS_COLUMN_IMEI = "IMEI";
     public static final String PEDIDOS_COLUMN_Total = "Total";
-    public static final String PEDIDOS_COLUMN_Subtotal="subtotal";
+    public static final String PEDIDOS_COLUMN_Subtotal = "subtotal";
 
 
     public static final String PEDIDOS_DETALLE_COLUMN_CodigoPedido = "CodigoPedido";
@@ -120,7 +121,7 @@ public class variables_publicas {
     public static final String PEDIDOS_DETALLE_COLUMN_Isc = "Isc";
     public static final String PEDIDOS_DETALLE_COLUMN_Costo = "Costo";
     public static final String PEDIDOS_DETALLE_COLUMN_Precio = "Precio";
-    public static final String PEDIDOS_DETALLE_COLUMN_TipoPrecio="TipoPrecio";
+    public static final String PEDIDOS_DETALLE_COLUMN_TipoPrecio = "TipoPrecio";
     public static final String PEDIDOS_DETALLE_COLUMN_PorcentajeIva = "PorcentajeIva";
     public static final String PEDIDOS_DETALLE_COLUMN_Iva = "Iva";
     public static final String PEDIDOS_DETALLE_COLUMN_Um = "Um";

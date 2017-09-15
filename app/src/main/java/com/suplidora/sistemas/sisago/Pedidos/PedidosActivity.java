@@ -166,7 +166,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private int IdDepartamento;
     private String Nombre;
     private boolean editar = false;
-    //private HashMap<String,String> pedido=null;
+
+
     //endregion
 
 
