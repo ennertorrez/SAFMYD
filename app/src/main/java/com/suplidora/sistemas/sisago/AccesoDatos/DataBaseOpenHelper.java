@@ -53,7 +53,8 @@ public class DataBaseOpenHelper {
                             + variables_publicas.CLIENTES_COLUMN_Descuento + " TEXT ,  "
                             + variables_publicas.CLIENTES_COLUMN_Empleado + " TEXT ,"
                             + variables_publicas.CLIENTES_COLUMN_Detallista + " TEXT , "
-                            + variables_publicas.CLIENTES_COLUMN_RutaForanea + " TEXT )");
+                            + variables_publicas.CLIENTES_COLUMN_RutaForanea + " TEXT ,"
+                            + variables_publicas.CLIENTES_COLUMN_EsClienteVarios + " TEXT )");
 
                     db.execSQL("CREATE TABLE " + variables_publicas.TABLE_USUARIOS + "( "
                             + variables_publicas.USUARIOS_COLUMN_Codigo + " TEXT , "

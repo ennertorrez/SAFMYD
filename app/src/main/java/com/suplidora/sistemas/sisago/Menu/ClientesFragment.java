@@ -129,7 +129,7 @@ public class ClientesFragment extends Fragment {
     }
 
     // URL to get contacts JSON
-    private static String url = variables_publicas.direccionIp+"/ServicioClientes.svc/BuscarClientes/";
+    private static String url = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes/";
     public static ArrayList<HashMap<String, String>> listaClientes;
 
     @Override
@@ -197,6 +197,14 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
+                        if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
+                            cliente.put("CodCv2", "");
+                            cliente.put("NombreCompleto", c.getString("NombreCliente"));
+                        } else {
+                            cliente.put("CodCv2","Cod_Cv: "+ c.getString("CodCv"));
+                            cliente.put("NombreCompleto",c.getString("Nombre")+ " / " + c.getString("NombreCliente"));
+                        }
+
 
                         listaClientes.add(cliente);
                     }
@@ -239,7 +247,7 @@ public class ClientesFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodCv, R.id.Nombre,
+                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente, "CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente, R.id.CodCv, R.id.Nombre,
                     R.id.Direccion});
 
             lv.setAdapter(adapter);

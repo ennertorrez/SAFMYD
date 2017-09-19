@@ -1,5 +1,7 @@
 package com.suplidora.sistemas.sisago.Entidades;
 
+import org.jsoup.nodes.Entities;
+
 /**
  * Created by Sistemas on 6/5/2017.
  */
@@ -33,11 +35,20 @@ public class Cliente {
     String Empleado="";
     String Detallista="";
     String RutaForanea="";
+    String EsClienteVarios="";
     public Cliente() {
 
     }
 
-    public Cliente(String idCliente, String codCv, String nombre,String nombreCliente, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra,String tipo, String codigoGalatea, String descuento, String empleado,String detallista,String rutaForanea) {
+    public String getEsClienteVarios() {
+        return EsClienteVarios;
+    }
+
+    public void setEsClienteVarios(String esClienteVarios) {
+        EsClienteVarios = esClienteVarios;
+    }
+
+    public Cliente(String idCliente, String codCv, String nombre, String nombreCliente, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra, String tipo, String codigoGalatea, String descuento, String empleado, String detallista, String rutaForanea, String esClienteVarios) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
@@ -65,6 +76,8 @@ public class Cliente {
         Empleado = empleado;
         Detallista=detallista;
         RutaForanea=rutaForanea;
+        EsClienteVarios=esClienteVarios;
+
     }
 
     public String getIdCliente() {

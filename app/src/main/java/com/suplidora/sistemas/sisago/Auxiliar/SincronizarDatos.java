@@ -52,6 +52,7 @@ public class SincronizarDatos {
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
+    static final String urlConsultarExistencias =variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerInventarioArticulo/";
     private String TAG = SincronizarDatos.class.getSimpleName();
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
@@ -123,8 +124,9 @@ public class SincronizarDatos {
                 String AplicaPrecioDetalle = c.getString("AplicaPrecioDetalle");
                 String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                 String detallista = c.getString("detallista");
+                String existencia = c.getString("Existencia");
 
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista);
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista,existencia);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){
@@ -190,7 +192,8 @@ public class SincronizarDatos {
                 String Empleado = c.getString("Empleado");
                 String Detallista = c.getString("Detallista");
                 String RutaForanea = c.getString("RutaForanea");
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado, Detallista, RutaForanea);
+                String EsClienteVarios = c.getString("EsClienteVarios");
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado, Detallista, RutaForanea,EsClienteVarios);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){
@@ -700,6 +703,67 @@ public class SincronizarDatos {
                 new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido, Excepcion controlada ",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());
                 return false;
+            }
+
+        }
+
+    }
+
+    public static String ConsultarExistencias(final Activity activity,PedidosHelper PedidoH,String CodigoArticulo){
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+
+        final String urlConsulta = urlConsultarExistencias+CodigoArticulo;
+
+        try {
+            URL Url = new URL(urlConsulta);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Codificar URL",variables_publicas.info+e.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            e.printStackTrace();
+            return "N/A";
+        }
+
+        String jsonExistencia = sh.makeServiceCall(encodeUrl);
+        if (jsonExistencia == null) {
+            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias,Respuesta nula POST",variables_publicas.info+urlConsulta,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    variables_publicas.MensajeError = "Ha ocurrido un error al obtener las existencias,Respuesta nula";
+                    Toast.makeText(activity.getApplicationContext(),
+                            "Ha ocurrido un error al obtener las existencias,Respuesta nula",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+            return "N/A";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonExistencia);
+                String resultState = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[0];
+                final String exitencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
+                if (resultState.equals("false")) {
+                    new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false",variables_publicas.info+exitencia,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            variables_publicas.MensajeError = exitencia;
+                            Toast.makeText(activity.getApplicationContext(),
+                                    exitencia,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    return "N/A";
+                }
+
+
+                return exitencia;
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "N/A";
             }
 
         }

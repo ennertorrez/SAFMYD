@@ -44,7 +44,7 @@ public class ClientesHelper {
                                       String Ruta ,
                                       String Frecuencia ,
                                       String PrecioEspecial ,
-                                      String FechaUltimaCompra,String Tipo,String CodigoGalatea,String Descuento,String Empleado,String Detallista, String RutaForanea) {
+                                      String FechaUltimaCompra,String Tipo,String CodigoGalatea,String Descuento,String Empleado,String Detallista, String RutaForanea,String EsClienteVarios) {
         long rows =0;
 
         ContentValues contentValues = new ContentValues();
@@ -76,7 +76,8 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Empleado, Empleado);
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Detallista, Detallista) ;
         contentValues.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, RutaForanea );
-        //rows = database.insertWithOnConflict(TABLE_NAME,null,contentValues,SQLiteDatabase.CONFLICT_REPLACE);
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, EsClienteVarios );
+
        long inserted= database.insert(variables_publicas.TABLE_CLIENTES, null, contentValues);
         if(inserted!=-1)
             return true;
@@ -117,6 +118,7 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Empleado, cliente.get(variables_publicas.CLIENTES_COLUMN_Empleado) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Detallista, cliente.get(variables_publicas.CLIENTES_COLUMN_Detallista) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, cliente.get(variables_publicas.CLIENTES_COLUMN_RutaForanea) );
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, cliente.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios));
         database.insert(variables_publicas.TABLE_CLIENTES, null, contentValues);
     }
     public Cursor ObtenerListaClientesCodigo(String Busqueda) {
@@ -164,6 +166,7 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString(c.getColumnIndex("Empleado")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString(c.getColumnIndex("RutaForanea")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString(c.getColumnIndex("EsClienteVarios")));
                         lst.add(cliente);
 
             }while (c.moveToNext());
@@ -210,6 +213,7 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString(c.getColumnIndex("Empleado")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString(c.getColumnIndex("RutaForanea")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString(c.getColumnIndex("EsClienteVarios")));
                 lst.add(cliente);
 
             }while (c.moveToNext());
@@ -261,7 +265,8 @@ public class ClientesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Descuento)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Empleado)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Detallista)),
-                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_RutaForanea))
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_RutaForanea)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_EsClienteVarios))
                 );
             }while (c.moveToNext());
         }

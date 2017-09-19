@@ -215,7 +215,7 @@ public class ListaPedidosFragment extends Fragment {
         busqueda = txtBusqueda.getText().toString();
         new GetListaPedidos().execute();
         ActualizarFooter();
-        adapter.notifyDataSetChanged();
+        if (adapter!=null) adapter.notifyDataSetChanged();
     }
 
     private void ActualizarFooter() {
@@ -225,6 +225,7 @@ public class ListaPedidosFragment extends Fragment {
             subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
         }
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
+        if (adapter!=null) adapter.notifyDataSetChanged();
     }
 
 
@@ -263,6 +264,8 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
+            if (pDialog!=null && pDialog.isShowing())
+                pDialog.dismiss();
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Por favor espere...");
             pDialog.setCancelable(false);
@@ -274,7 +277,7 @@ public class ListaPedidosFragment extends Fragment {
             try {
                 DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                 PedidosH = new PedidosHelper(DbOpenHelper.database);
-
+                listapedidos.clear();
                 List<HashMap<String, String>> ListaLocal = null;
 
                 ListaLocal = PedidosH.ObtenerPedidosLocales(fecha, busqueda);
@@ -815,9 +818,9 @@ public class ListaPedidosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         try {
-            if (adapter != null) {
+//            if (adapter != null) {
                 CargarPedidos();
-            }
+//            }
         } catch (Exception ex) {
 
         }

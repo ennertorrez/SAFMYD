@@ -93,6 +93,7 @@ public class variables_publicas {
     public static final String CLIENTES_COLUMN_Empleado = "Empleado";
     public static final String CLIENTES_COLUMN_Detallista = "Detallista";
     public static final String CLIENTES_COLUMN_RutaForanea = "RutaForanea";
+    public static final String CLIENTES_COLUMN_EsClienteVarios="EsClienteVarios";
     public static String VersionSistema = "";
     public static String info = "";
     //Variables CamposTbPedidos
