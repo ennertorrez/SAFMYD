@@ -22,11 +22,12 @@ public class Articulo {
     String AplicaPrecioDetalle = "";
     String DescuentoMaximo = "";
     String Detallista = "";
+    String Existencia="";
 
     public Articulo() {
     }
 
-    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo,String precioForaneo2, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista) {
+    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo,String precioForaneo2, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista,String existencia) {
         Codigo = codigo;
         Nombre = nombre;
         Costo = costo;
@@ -43,6 +44,7 @@ public class Articulo {
         AplicaPrecioDetalle = aplicaPrecioDetalle;
         DescuentoMaximo = descuentoMaximo;
         Detallista = detallista;
+        Existencia=existencia;
     }
 
     public String getCodigo() {
@@ -79,6 +81,14 @@ public class Articulo {
 
     public String getUnidadCaja() {
         return UnidadCaja;
+    }
+
+    public String getExistencia() {
+        return Existencia;
+    }
+
+    public void setExistencia(String existencia) {
+        Existencia = existencia;
     }
 
     public void setUnidadCaja(String unidadCaja) {

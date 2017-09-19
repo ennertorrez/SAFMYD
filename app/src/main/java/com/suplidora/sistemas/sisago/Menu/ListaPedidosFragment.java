@@ -178,7 +178,7 @@ public class ListaPedidosFragment extends Fragment {
                 return false;
             }
         });
-        listapedidos = new ArrayList<>();
+            listapedidos = new ArrayList<>();
 
         new GetListaPedidos().execute();
 
@@ -215,6 +215,7 @@ public class ListaPedidosFragment extends Fragment {
         busqueda = txtBusqueda.getText().toString();
         new GetListaPedidos().execute();
         ActualizarFooter();
+        adapter.notifyDataSetChanged();
     }
 
     private void ActualizarFooter() {

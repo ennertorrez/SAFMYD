@@ -31,6 +31,7 @@ public class HttpHandler {
             conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
             conn.setConnectTimeout(20000);
             conn.setReadTimeout(20000);
+            conn.setUseCaches(false);
             InputStream in = new BufferedInputStream(conn.getInputStream());
             response = convertStreamToString(in);
         } catch (MalformedURLException e) {

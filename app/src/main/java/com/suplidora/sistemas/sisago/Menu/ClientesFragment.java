@@ -239,7 +239,7 @@ public class ClientesFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{"IdCliente", "Nombre", "Direccion"}, new int[]{R.id.IdCliente, R.id.Nombre,
+                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodCv2", "NombreCompleto", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodCv, R.id.Nombre,
                     R.id.Direccion});
 
             lv.setAdapter(adapter);

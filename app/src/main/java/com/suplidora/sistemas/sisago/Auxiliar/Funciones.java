@@ -40,7 +40,7 @@ private  static boolean connectionOK=false;
         return text.replace("+","(plus)")
                 .replace("#","(hash)")
                 .replace(".","(dot)")
-                .replace("@","at")
+                .replace("@","(at)")
                 .replace("*","(star)")
                 .replace("-","(minus)")
                 .replace(",","(comma)")
@@ -50,6 +50,7 @@ private  static boolean connectionOK=false;
                 .replace("/","(slash)")
                 .replace("\\","(backslash)")
                 .replace("'","(sigleQuote)")
+                .replace("\"","(doubleQuote)")
                 .replace("~","(tilde)");
     }
 

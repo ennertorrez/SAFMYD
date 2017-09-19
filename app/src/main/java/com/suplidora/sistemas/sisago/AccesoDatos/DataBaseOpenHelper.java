@@ -84,7 +84,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.ARTICULO_COLUMN_Bonificable + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_DescuentoMaximo + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_Detallista + " TEXT )");
+                    + variables_publicas.ARTICULO_COLUMN_Detallista + " TEXT, "
+                    + variables_publicas.ARTICULO_COLUMN_Existencia + " TEXT )");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_VENDEDORES + "( "
                     + variables_publicas.VENDEDORES_COLUMN_CODIGO + " TEXT , "
