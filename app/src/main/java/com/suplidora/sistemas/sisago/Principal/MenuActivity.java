@@ -96,8 +96,14 @@ public class MenuActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
          lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
         lblUsuarioHeaderCodigo = (TextView) header.findViewById(R.id.UsuarioHeaderCodigo);
-        String userHeader = variables_publicas.usuario.getNombre();
-        String userHeaderCodigo = variables_publicas.usuario.getCodigo();
+        String userHeader="";
+        String userHeaderCodigo="";
+      try{
+          userHeader = variables_publicas.usuario.getNombre();
+          userHeaderCodigo = variables_publicas.usuario.getCodigo();
+      }catch (Exception ex){
+          Log.e("Error:",ex.getMessage());
+      }
         lblUsuarioHeader.setText(userHeader);
         lblUsuarioHeaderCodigo.setText("Codigo: "+ userHeaderCodigo);
 
