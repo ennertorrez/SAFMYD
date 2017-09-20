@@ -89,11 +89,13 @@ public class ClientesFragment extends Fragment {
                 // getting values from selected ListItem
                 String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
                 String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
+                String CodCV = ((TextView) view.findViewById(R.id.CodCv)).getText().toString();
                 // Starting new intent
                 Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
 
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCV );
 
                 /*Guardamos el cliente seleccionado*/
                 for (HashMap<String, String> cliente : listaClientes) {

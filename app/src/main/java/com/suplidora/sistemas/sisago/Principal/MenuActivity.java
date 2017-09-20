@@ -118,7 +118,7 @@ public class MenuActivity extends AppCompatActivity
                 FormaPagoH,
                 PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
 
-        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + "/ IMEI: "+variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI + " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
 
     }
 

@@ -68,13 +68,17 @@ import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.R;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
@@ -130,6 +134,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String focusedControl = "";
     static final String KEY_IdCliente = "IdCliente";
     static final String KEY_NombreCliente = "Nombre";
+    static final String KEY_NombreCodCv = "CodCv";
 
     private Articulo articulo;
     private DecimalFormat df;
@@ -279,7 +284,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         });
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
-        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) {
             txtDescuento.setEnabled(false);
         }
         txtDescuento.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -314,8 +319,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         // Get XML values from previous intent
         pedido.setIdCliente(in.getStringExtra(KEY_IdCliente));
         Nombre = in.getStringExtra(KEY_NombreCliente);
+        pedido.setCod_cv(in.getStringExtra(variables_publicas.CLIENTES_COLUMN_CodCv).toString().replace("Cod_Cv: ",""));
         if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido) != null) {
-            editar = true;
+
+            if(in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).toString().startsWith("-")){
+                editar = false;
+            }else{
+                editar = true;
+            }
+
             listaArticulos.clear();
             pedido = PedidoH.GetPedido(in.getStringExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
             listaArticulos = PedidoDetalleH.ObtenerPedidoDetalleArrayList(pedido.getCodigoPedido());
@@ -457,9 +469,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double descuentoCliente = Double.parseDouble(cliente.getDescuento());
         double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
         if (descuento > descuentoMayor) {
-            MensajeAviso("El descuento maximo permitido para este producto es de: " + String.valueOf(descuentoArticulo));
+            MensajeAviso("El descuento maximo permitido para este producto es de: " + String.valueOf(descuentoMayor));
             txtDescuento.setText("");
-            txtDescuento.requestFocus();
+//            txtDescuento.requestFocus();
             return false;
         }
         return true;
@@ -551,7 +563,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         pedido.setIdVendedor(String.valueOf(pedido.getIdVendedor()));
         pedido.setIdCliente(String.valueOf(pedido.getIdCliente()));
-        pedido.setCod_cv(cliente.getCodCv());
+//        pedido.setCod_cv(cliente.getCodCv());
         pedido.setObservacion(txtObservaciones.getText().toString());
         pedido.setIdFormaPago(condicion.getCODIGO());
         pedido.setIdSucursal(codSuc);
@@ -587,7 +599,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
 
-        boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), cliente.getCodCv(), pedido.getTipo(),
+        boolean saved = PedidoH.GuardarPedido(pedido.getCodigoPedido(), pedido.getIdVendedor(), pedido.getIdCliente(), pedido.getCod_cv(), pedido.getTipo(),
                 txtObservaciones.getText().toString(), condicion.getCODIGO(), codSuc,
                 variables_publicas.FechaActual, variables_publicas.usuario.getUsuario(), IMEI, String.valueOf(subtotal), String.valueOf(total));
 
@@ -660,9 +672,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         adapterVendedor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboVendedor.setAdapter(adapterVendedor);
 
-        cliente = ClientesH.BuscarCliente(pedido.getIdCliente());
+        cliente = ClientesH.BuscarCliente(pedido.getIdCliente(),pedido.getCod_cv());
         IdDepartamento = Integer.parseInt(cliente.getIdDepartamento());
-        if (variables_publicas.usuario.getCodigo().equals("0")) {
+        /*Si no es vendedor o es ventas oficina*/
+        if (variables_publicas.usuario.getCodigo().equals("0") || cliente.getIdVendedor().equals("9") ||  cliente.getEmpleado().equals("1") ) {
             pedido.setIdVendedor(cliente.getIdVendedor());
         } else {
             pedido.setIdVendedor(variables_publicas.usuario.getCodigo());
@@ -713,6 +726,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
                 sucursal = (ClienteSucursal) adapter.getItemAtPosition(position);
+                cliente.setIdDepartamento(sucursal.getDeptoID());
+                IdDepartamento= Integer.parseInt( sucursal.getDeptoID());
             }
 
             @Override
@@ -732,8 +747,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void GenerarCodigoPedido() {
-        pedido.setCodigoPedido("-" + cliente.getIdCliente() + pedido.getIdVendedor() + String.valueOf(PedidoH.ObtenerNuevoCodigoPedido()));
+        pedido.setCodigoPedido("-"+ GetFechaISO()  + cliente.getIdCliente()+ cliente.getCodCv() + pedido.getIdVendedor());
         lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
+    }
+
+    private String GetFechaISO(){
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyMMddHHmms");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        return nowAsISO;
     }
 
     private void ObtenerPrecio(final HashMap<String, String> item, String CodArticulo, final boolean ActualizarItem) {
@@ -1512,7 +1535,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                existencia= SincronizarDatos.ConsultarExistencias(PedidosActivity.this,PedidoH,CodigoArticulo);
+                existencia= SincronizarDatos.ConsultarExistencias(PedidosActivity.this,PedidoH,articulo.getCodigo());
             }
             return null;
         }
@@ -1523,12 +1546,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            if(existencia!="N/A"){
-                lblExistentias.setText( Integer.parseInt( existencia));
-            }
-            else{
-                lblExistentias.setText(articulo.getExistencia());
-            }
+
+              if(existencia!="N/A"){
+                  lblExistentias.setText(String.valueOf( (int) (Double.parseDouble( existencia))));
+              }
+              else{
+                  lblExistentias.setText(articulo.getExistencia());
+              }
         }
     }
 

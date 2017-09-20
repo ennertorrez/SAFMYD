@@ -219,11 +219,16 @@ public class ListaPedidosFragment extends Fragment {
     }
 
     private void ActualizarFooter() {
-        lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
+
         double subtotal = 0.00;
+        int cantidad=0;
         for (HashMap<String, String> pedido : listapedidos) {
             subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
+            if(pedido.get("Estado").equalsIgnoreCase("Aprobado") || pedido.get("Estado").equalsIgnoreCase("Facturado") || pedido.get("Estado").equalsIgnoreCase("Pendiente")){
+                cantidad+=1;
+            }
         }
+        lblFooterCantidad.setText("Cantidad: " + String.valueOf(cantidad));
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
         if (adapter!=null) adapter.notifyDataSetChanged();
     }
@@ -336,11 +341,12 @@ public class ListaPedidosFragment extends Fragment {
         try {
             ActualizarFooter();
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
+            if (pDialog!=null && pDialog.isShowing())
                 pDialog.dismiss();
             /**
              * Updating parsed JSON data into ListView
              * */
+
             DecimalFormat df = new DecimalFormat("C$ #0.00");
             DecimalFormatSymbols fmts = new DecimalFormatSymbols();
             fmts.setGroupingSeparator(',');
@@ -481,7 +487,7 @@ public class ListaPedidosFragment extends Fragment {
                 }
                 Gson gson = new Gson();
                 Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
-                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));
+                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente),item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
                 String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
                 guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false);
             }
@@ -494,7 +500,7 @@ public class ListaPedidosFragment extends Fragment {
             try {
                 ActualizarFooter();
                 // Dismiss the progress dialog
-                if (pDialog.isShowing())
+                if (pDialog!=null && pDialog.isShowing())
                     pDialog.dismiss();
                 if (guardadoOK) {
                     btnBuscar.performClick();
@@ -595,13 +601,13 @@ public class ListaPedidosFragment extends Fragment {
             return null;
         }
 
-    /*    @Override
+        @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             try {
                 ActualizarFooter();
                 // Dismiss the progress dialog
-                if (pDialog.isShowing())
+                if (pDialog!=null && pDialog.isShowing())
                     pDialog.dismiss();
                 if (guardadoOK) {
                     btnBuscar.performClick();
@@ -612,12 +618,12 @@ public class ListaPedidosFragment extends Fragment {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "SincronizarPedidos onPostExecute: " + ex.getMessage(),
+                                "Anular Pedido onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
             }
-        }*/
+        }
 
     }
 
@@ -704,7 +710,7 @@ public class ListaPedidosFragment extends Fragment {
 
                     } else if (new Funciones().checkInternetConnection(getActivity())) {
 
-                        final HashMap<String, String> finalPedido = pedido;
+                        final HashMap<String, String> finalPedido = itemPedido;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
                                 .setMessage("Esta seguro que desea anular el pedido?")
@@ -760,7 +766,8 @@ public class ListaPedidosFragment extends Fragment {
                             }
 
                             String IdCliente = pedido.get("IdCliente");
-                            Cliente cliente = ClientesH.BuscarCliente(IdCliente);
+                            String CodCv = pedido.get("Cod_cv");
+                            Cliente cliente = ClientesH.BuscarCliente(IdCliente,CodCv);
                             String Nombre = cliente.getNombreCliente();
                             // Starting new intent
                             Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
@@ -768,6 +775,7 @@ public class ListaPedidosFragment extends Fragment {
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
                             in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
+                            in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
                             startActivity(in);
                         }
                     } else {
@@ -818,9 +826,9 @@ public class ListaPedidosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         try {
-//            if (adapter != null) {
+            if (adapter != null) {
                 CargarPedidos();
-//            }
+            }
         } catch (Exception ex) {
 
         }

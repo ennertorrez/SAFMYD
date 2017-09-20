@@ -58,7 +58,7 @@ public class PedidosHelper {
     public boolean ActualizarPedido(String CodigoPedido, String NoPedido) {
         ContentValues con = new ContentValues();
         con.put("CodigoPedido", NoPedido);
-        long rowInserted = database.update(variables_publicas.TABLE_PEDIDOS, con, variables_publicas.PEDIDOS_COLUMN_CodigoPedido + "=" + CodigoPedido, null);
+        long rowInserted = database.update(variables_publicas.TABLE_PEDIDOS, con, variables_publicas.PEDIDOS_COLUMN_CodigoPedido + "= '" + CodigoPedido+"'", null);
         if (rowInserted != -1)
             return true;
         else return false;
@@ -167,10 +167,10 @@ public class PedidosHelper {
     public ArrayList<HashMap<String, String>> ObtenerPedidosLocales(String Fecha, String Nombre) {
 
         String selectQuery = "SELECT P.*,DATE(P.Fecha) as Fecha,'' as Factura,'NO ENVIADO' as Estado,Cl.Nombre as NombreCliente,Fp.NOMBRE as FormaPago FROM " + variables_publicas.TABLE_PEDIDOS +
-                " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente +
-                " AS INT) INNER JOIN "+variables_publicas.TABLE_FORMA_PAGO+" " +
+                " P INNER JOIN " + variables_publicas.TABLE_CLIENTES + " Cl ON CAST( Cl." + variables_publicas.CLIENTES_COLUMN_IdCliente + " AS INT) = cast(P." + variables_publicas.PEDIDOS_COLUMN_IdCliente + " AS INT) AND Cl."+variables_publicas.CLIENTES_COLUMN_CodCv+" = P."+variables_publicas.PEDIDOS_COLUMN_Cod_cv+
+                " INNER JOIN "+variables_publicas.TABLE_FORMA_PAGO+" " +
                 "Fp ON Fp."+variables_publicas.FORMA_PAGO_COLUMN_CODIGO+" = P."+variables_publicas.PEDIDOS_COLUMN_IdFormaPago+""+
-                " WHERE P."+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" LIKE '-%' AND Cl." + variables_publicas.CLIENTES_COLUMN_Nombre + " LIKE '%" + Nombre + "%' AND DATE(P." + variables_publicas.PEDIDOS_COLUMN_Fecha + ") = DATE('" + Fecha + "')"+
+                " WHERE P."+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" LIKE '-%' AND Cl." + variables_publicas.CLIENTES_COLUMN_NombreCliente + " LIKE '%" + Nombre + "%' AND DATE(P." + variables_publicas.PEDIDOS_COLUMN_Fecha + ") = DATE('" + Fecha + "')"+
                 " AND P."+ variables_publicas.PEDIDOS_COLUMN_IdVendedor+ " = "+variables_publicas.usuario.getCodigo();
 
         Cursor c = database.rawQuery(selectQuery, null);
