@@ -179,6 +179,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private int IdDepartamento;
     private String Nombre;
     private boolean editar = false;
+    private boolean pedidoLocal;
 
 
     //endregion
@@ -329,12 +330,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido) != null) {
 
             if (in.getSerializableExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).toString().startsWith("-")) {
-                editar = false;
+                pedidoLocal = true;
 
             } else {
-                editar = true;
 
+                pedidoLocal=false;
             }
+
+            editar = true;
 
             listaArticulos.clear();
             pedido = PedidoH.GetPedido(in.getStringExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
@@ -1508,12 +1511,21 @@ return true;
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
                 txtCodigoArticulo.setText("");
                 lblDescripcionArticulo.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
 
                 articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
+                /*Validamos que permita vender codigo 1052*/
+                List<String> lstDeptoAutorizado = Arrays.asList(  ConfiguracionSistemaH.BuscarValorConfig("Venta Autorizada 1052").getValor().split(","));
+                if(CodigoArticulo.equals("4000-01-01-04-1052")  && !lstDeptoAutorizado.contains(String.valueOf( IdDepartamento)) && cliente.getTipo().equalsIgnoreCase("Detalle")    ){
+                    alertDialog.dismiss();
+                    MensajeAviso("Este producto no esta autorizado para venderlo a este cliente");
+                    return;
+                }
+
+
+
                 HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
@@ -1645,7 +1657,7 @@ return true;
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, editar)) {
+                if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, (editar==true && pedidoLocal==false)  )) {
                     guardadoOK = true;
                 }
             } else {
