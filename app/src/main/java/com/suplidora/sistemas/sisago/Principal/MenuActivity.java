@@ -59,6 +59,8 @@ public class MenuActivity extends AppCompatActivity
     private ProgressDialog pDialog;
     TextView lblUsuarioHeader;
     TextView lblUsuarioHeaderCodigo;
+    TextView lblVersion;
+    TextView lblServidor;
     private DataBaseOpenHelper DbOpenHelper;
 
     private SincronizarDatos sd;
@@ -96,16 +98,24 @@ public class MenuActivity extends AppCompatActivity
         navigationView.addHeaderView(header);
          lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
         lblUsuarioHeaderCodigo = (TextView) header.findViewById(R.id.UsuarioHeaderCodigo);
+        lblVersion =(TextView) header.findViewById(R.id.lblVersionSistema);
+        lblServidor = (TextView) header.findViewById(R.id.lblServidor);
         String userHeader="";
         String userHeaderCodigo="";
+        String VersionSistema="";
+        String Servidor="";
       try{
           userHeader = variables_publicas.usuario.getNombre();
           userHeaderCodigo = variables_publicas.usuario.getCodigo();
+          VersionSistema = "Version: " +variables_publicas.VersionSistema;
+          Servidor = variables_publicas.direccionIp.equals("http://186.1.18.75:8080")? "SERVIDOR: PRODUCCION" : "SERVIDOR: DESARROLLO";
       }catch (Exception ex){
           Log.e("Error:",ex.getMessage());
       }
         lblUsuarioHeader.setText(userHeader);
         lblUsuarioHeaderCodigo.setText("Codigo: "+ userHeaderCodigo);
+        lblVersion.setText(VersionSistema);
+        lblServidor.setText(Servidor);
 
         DbOpenHelper = new DataBaseOpenHelper(MenuActivity.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);

@@ -15,8 +15,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 33
-        versionName "1.32"
+        versionCode 34
+        versionName "1.33"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -56,4 +56,5 @@ dependencies {
     compile files('lib/activation.jar')
     compile files('lib/mail.jar')
     compile files('lib/additionnal.jar')
+    compile files('lib/commons-net-3.6.jar')
 }

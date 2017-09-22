@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -291,6 +290,7 @@ public class ListaPedidosFragment extends Fragment {
                     HashMap<String, String> itempedido = new HashMap<>();
                     itempedido.put("Factura", item.get("Factura"));
                     itempedido.put("Estado", item.get("Estado"));
+                    itempedido.put("Detallista", item.get("Detallista"));
                     itempedido.put("NombreCliente", item.get("NombreCliente"));
                     itempedido.put("FormaPago", item.get("FormaPago"));
                     itempedido.put("Fecha", item.get("Fecha"));
@@ -392,9 +392,9 @@ public class ListaPedidosFragment extends Fragment {
                 }
             };
 
-                lv.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                ActualizarFooter();
+            lv.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+            ActualizarFooter();
 
         } catch (final Exception ex) {
             getActivity().runOnUiThread(new Runnable() {
@@ -444,6 +444,8 @@ public class ListaPedidosFragment extends Fragment {
                     String pedido = c.getString("pedido");
                     String subtotal = c.getString("subtotal");
                     String total = c.getString("total");
+                    String detallista = c.getString("detallista");
+
 
                     HashMap<String, String> pedidos = new HashMap<>();
 
@@ -455,6 +457,7 @@ public class ListaPedidosFragment extends Fragment {
                     pedidos.put("CodigoPedido", pedido);
                     pedidos.put("subtotal", subtotal);
                     pedidos.put("Total", total);
+                    pedidos.put("Detallista", detallista);
                     listapedidos.add(pedidos);
                 }
             }
@@ -615,7 +618,7 @@ public class ListaPedidosFragment extends Fragment {
                 // Dismiss the progress dialog
                 if (pDialog != null && pDialog.isShowing())
                     pDialog.dismiss();
-               btnBuscar.performClick();
+                btnBuscar.performClick();
 
 
             } catch (final Exception ex) {
@@ -654,12 +657,17 @@ public class ListaPedidosFragment extends Fragment {
 
             if (!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")) {
                 tv.setEnabled(false);
-                if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")) {
-                    //Ponemos el boton Editar en falso
-                    ((MenuItem) menu.getItem(0)).setEnabled(false);
-                }
+
             } else {
                 tv.setEnabled(true);
+            }
+            if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")
+                    || (obj.get("Estado").equalsIgnoreCase("APROBADO") && obj.get("Detallista").equalsIgnoreCase("false")) )
+            {
+                //Ponemos el boton Editar en falso
+                ((MenuItem) menu.getItem(0)).setEnabled(false);
+            }else{
+                ((MenuItem) menu.getItem(0)).setEnabled(true);
             }
 
 

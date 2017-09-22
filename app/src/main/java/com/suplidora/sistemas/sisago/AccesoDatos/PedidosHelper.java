@@ -185,6 +185,7 @@ public class PedidosHelper {
                 pedido.put("FormaPago", c.getString(c.getColumnIndex("FormaPago")));
                 pedido.put("Factura", c.getString(c.getColumnIndex("Factura")));
                 pedido.put("Estado", c.getString(c.getColumnIndex("Estado")));
+                pedido.put("Detallista" , c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Detallista)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));

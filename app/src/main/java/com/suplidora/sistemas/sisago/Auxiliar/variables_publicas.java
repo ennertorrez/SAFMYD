@@ -23,10 +23,11 @@ public class variables_publicas {
     public static String IdCliente = "";
     public static String RutaCliente = "";
     public static String Canal = "";
-    public static String direccionIp = "http://186.1.18.75:8085";
     public static String FechaActual = "";
     public static String IMEI;
     public static String MensajeError;
+
+    public static final String direccionIp = "http://186.1.18.75:8085";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     //Variables BD
     public static final int DATABASE_VERSION = 47;
