@@ -117,6 +117,30 @@ public class VendedoresHelper {
         return list;
     }
 
+    public List<Ruta> ObtenerTodasRutas() {
+        List<Ruta> list = new ArrayList<Ruta>();
+
+        String selectQuery = "SELECT DISTINCT "+variables_publicas.VENDEDORES_COLUMN_RUTA+" FROM " + variables_publicas.TABLE_VENDEDORES+ " ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_RUTA ;
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            list.add(new Ruta("TODOS"));
+            do {
+                list.add(new Ruta(
+                        cursor.getString(cursor.getColumnIndex("RUTA"))
+                ));
+
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        // database.close();
+
+        return list;
+    }
+
     public Vendedor ObtenerVendedor(String Codigo) {
         Vendedor vendedor= null;
         String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE "+variables_publicas.VENDEDORES_COLUMN_CODIGO+ " = "+Codigo;

@@ -240,7 +240,12 @@ public class ListaPedidosSupFragment extends Fragment {
     /**CARGAR COMBOS**/
     private void CargaDatosCombo() {
 
-        final List<Ruta> rutas = VendedoresH.ObtenerListaRutas(CodigoSupervisor);
+        final List<Ruta> rutas;
+        if (CodigoSupervisor.equals("0")){
+            rutas= VendedoresH.ObtenerTodasRutas();
+        }else{
+            rutas= VendedoresH.ObtenerListaRutas(CodigoSupervisor);
+        }
 
         //ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(),android.R.layout.simple_spinner_item,rutas);
         ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(),android.R.layout.simple_spinner_item,rutas);

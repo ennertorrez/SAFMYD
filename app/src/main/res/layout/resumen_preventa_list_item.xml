@@ -14,7 +14,7 @@
 
         <TextView
             android:id="@+id/lblDetRuta"
-            android:layout_width="170dp"
+            android:layout_width="135dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:ellipsize="end"
@@ -29,12 +29,12 @@
 
         <TextView
             android:id="@+id/lblDetCantidad"
-            android:layout_width="75dp"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:ellipsize="end"
             android:focusable="false"
-            android:gravity="left"
+            android:gravity="right"
             android:maxLines="1"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
@@ -44,7 +44,7 @@
 
         <TextView
             android:id="@+id/lblDetSubtotal"
-            android:layout_width="110dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"

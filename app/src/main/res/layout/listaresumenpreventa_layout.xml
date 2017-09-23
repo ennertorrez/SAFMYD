@@ -99,19 +99,19 @@
 
                     <TextView
                         android:id="@+id/lblColRuta"
-                        android:layout_width="170dp"
+                        android:layout_width="135dp"
                         android:layout_height="wrap_content"
                         android:background="@drawable/borde_campos_pedidos"
                         android:paddingLeft="0dp"
                         android:text="Ruta"
-                        android:textAlignment="center"
+                       android:gravity="left"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="#000000"
                         android:typeface="monospace" />
 
                     <TextView
                         android:id="@+id/lblColCantidad"
-                        android:layout_width="75dp"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="left"
                         android:background="@drawable/borde_campos_pedidos"
@@ -123,7 +123,7 @@
 
                     <TextView
                         android:id="@+id/lblColSubtotal"
-                        android:layout_width="110dp"
+                        android:layout_width="152dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:background="@drawable/borde_campos_pedidos"
@@ -164,16 +164,18 @@
         android:layout_height="wrap_content"
         android:id="@+id/Rlfooter"
         android:layout_alignParentBottom="true"
-        android:weightSum="2">
+       >
 
 
         <TextView
             android:id="@+id/lblFooterCantidad"
-            android:layout_width="match_parent"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="Cantidad: 0"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="@color/White" />
 
         <TextView
@@ -184,6 +186,8 @@
             android:background="@color/colorPrimary"
             android:gravity="right"
             android:text="Total: C$0.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="@color/White" />
 
     </LinearLayout>

@@ -1016,7 +1016,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         CalcularTotales();
                                                     }
                                                     txtCantidad.requestFocus();
-
                                                 }
                                             }
                                         })
