@@ -56,10 +56,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -163,9 +161,7 @@ public class Login extends Activity {
                 inputMethodManager.hideSoftInputFromWindow(txtUsuario.getWindowToken(), 0);
                 inputMethodManager.hideSoftInputFromWindow(txtPassword.getWindowToken(), 0);
 
-                Calendar c = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                variables_publicas.FechaActual = sdf.format(c.getTime());
+               Funciones.GetLocalDateTime();
 
                 Usuario = txtUsuario.getText().toString();
                 Contrasenia = txtPassword.getText().toString();
@@ -342,28 +338,11 @@ public class Login extends Activity {
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema=currentVersion;
             try {
-                latestVersion = new GetLatestVersion().execute().get();
-
-                if (latestVersion != null && !currentVersion.equals(latestVersion)) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Nueva version disponible");
-                    builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
-                    builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //Click button action
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
-                            dialog.dismiss();
-                        }
-                    });
-                    builder.setCancelable(false);
-                    builder.show();
-                }
+                new GetLatestVersion().execute();
 
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+
+            }  catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -619,12 +598,22 @@ public class Login extends Activity {
     }
 
 
-    private class GetLatestVersion extends AsyncTask<String, String, String> {
+    private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
-
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+            pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("consultando version del sistema, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
         @Override
-        protected String doInBackground(String... params) {
+        protected Void doInBackground(Void... params) {
             try {
                 //It retrieves the latest version by scraping the content of current version from play store at runtime
                 String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
@@ -637,7 +626,32 @@ public class Login extends Activity {
 
             }
 
-            return latestVersion;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            String currentVersion = getCurrentVersion();
+            variables_publicas.VersionSistema=currentVersion;
+            if (latestVersion != null && !currentVersion.equals(latestVersion)) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
+                builder.setTitle("Nueva version disponible");
+                builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
+                builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Click button action
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
+                        dialog.dismiss();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
+            }
         }
 
 

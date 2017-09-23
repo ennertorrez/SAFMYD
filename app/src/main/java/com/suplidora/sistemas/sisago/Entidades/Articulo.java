@@ -23,11 +23,15 @@ public class Articulo {
     String DescuentoMaximo = "";
     String Detallista = "";
     String Existencia="";
+    String UnidadCajaVenta="";
+    String IdProveedor="";
 
     public Articulo() {
     }
 
-    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo,String precioForaneo2, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista,String existencia) {
+    public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String isc, String porIva, String precioSuper, String precioDetalle, String precioForaneo,
+                    String precioForaneo2, String precioMayorista, String bonificable, String aplicaPrecioDetalle, String descuentoMaximo, String detallista,String existencia,
+                    String unidadCajaVenta,String idProveedor) {
         Codigo = codigo;
         Nombre = nombre;
         Costo = costo;
@@ -45,6 +49,8 @@ public class Articulo {
         DescuentoMaximo = descuentoMaximo;
         Detallista = detallista;
         Existencia=existencia;
+        UnidadCajaVenta=unidadCajaVenta;
+        IdProveedor=idProveedor;
     }
 
     public String getCodigo() {
@@ -93,6 +99,22 @@ public class Articulo {
 
     public void setUnidadCaja(String unidadCaja) {
         UnidadCaja = unidadCaja;
+    }
+
+    public String getUnidadCajaVenta() {
+        return UnidadCajaVenta;
+    }
+
+    public void setUnidadCajaVenta(String unidadCajaVenta) {
+        UnidadCajaVenta = unidadCajaVenta;
+    }
+
+    public String getIdProveedor() {
+        return IdProveedor;
+    }
+
+    public void setIdProveedor(String idProveedor) {
+        IdProveedor = idProveedor;
     }
 
     public String getIsc() {

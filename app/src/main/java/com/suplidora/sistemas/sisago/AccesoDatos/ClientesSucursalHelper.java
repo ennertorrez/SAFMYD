@@ -85,6 +85,7 @@ public class ClientesSucursalHelper {
         String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_CLIENTES_SUCURSALES+" where "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente+" = "+IdCliente+ " ORDER BY "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal;
         Cursor cursor = database.rawQuery(selectQuery, null);
         // looping through all rows and adding to list
+        list.add(new ClienteSucursal("0",IdCliente,"[SIN SUCURSAL]","","","",""));
         if (cursor.moveToFirst()) {
             do {
                 list.add(new ClienteSucursal(cursor.getString(cursor.getColumnIndex("CodSuc")),

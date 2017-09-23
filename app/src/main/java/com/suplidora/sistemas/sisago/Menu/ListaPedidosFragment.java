@@ -86,9 +86,10 @@ public class ListaPedidosFragment extends Fragment {
     private Button btnBuscar;
     private Button btnSincronizar;
     private TextView txtFechaPedido;
+    private SimpleAdapter adapter;
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
-    private SimpleAdapter adapter;
+    //  private SimpleAdapter adapter;
     final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
     final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
     //AnularPedido/{Pedido}/{Usuario}
@@ -159,11 +160,12 @@ public class ListaPedidosFragment extends Fragment {
                 new DatePickerDialog(getActivity(), date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-                InputMethodManager inputManager = (InputMethodManager)
+
+                /*InputMethodManager inputManager = (InputMethodManager)
                         getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
                 inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                        InputMethodManager.RESULT_HIDDEN);*/
             }
         });
 
@@ -178,7 +180,7 @@ public class ListaPedidosFragment extends Fragment {
                 return false;
             }
         });
-            listapedidos = new ArrayList<>();
+        listapedidos = new ArrayList<>();
 
         new GetListaPedidos().execute();
 
@@ -215,17 +217,21 @@ public class ListaPedidosFragment extends Fragment {
         busqueda = txtBusqueda.getText().toString();
         new GetListaPedidos().execute();
         ActualizarFooter();
-        if (adapter!=null) adapter.notifyDataSetChanged();
     }
 
     private void ActualizarFooter() {
-        lblFooterCantidad.setText("Cantidad: " + String.valueOf(listapedidos.size()));
+
         double subtotal = 0.00;
+        int cantidad = 0;
         for (HashMap<String, String> pedido : listapedidos) {
             subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
+            if (pedido.get("Estado").equalsIgnoreCase("Aprobado") || pedido.get("Estado").equalsIgnoreCase("Facturado") || pedido.get("Estado").equalsIgnoreCase("Pendiente")) {
+                cantidad += 1;
+            }
         }
+        lblFooterCantidad.setText("Cantidad: " + String.valueOf(cantidad));
         lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
-        if (adapter!=null) adapter.notifyDataSetChanged();
+
     }
 
 
@@ -250,11 +256,10 @@ public class ListaPedidosFragment extends Fragment {
 
         jsonAnulaPedido = gson.toJson(pedido);
         try {
-            new AnulaPedido().execute().get();
+            new AnulaPedido().execute();
         } catch (Exception ex) {
             Funciones.MensajeAviso(getActivity().getApplicationContext(), ex.getMessage());
         }
-
         return false;
     }
 
@@ -264,7 +269,7 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog!=null && pDialog.isShowing())
+            if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Por favor espere...");
@@ -286,6 +291,7 @@ public class ListaPedidosFragment extends Fragment {
                     HashMap<String, String> itempedido = new HashMap<>();
                     itempedido.put("Factura", item.get("Factura"));
                     itempedido.put("Estado", item.get("Estado"));
+                    itempedido.put("Detallista", item.get("Detallista"));
                     itempedido.put("NombreCliente", item.get("NombreCliente"));
                     itempedido.put("FormaPago", item.get("FormaPago"));
                     itempedido.put("Fecha", item.get("Fecha"));
@@ -334,13 +340,14 @@ public class ListaPedidosFragment extends Fragment {
 
     private void ActualizarLista() {
         try {
-            ActualizarFooter();
+            //ActualizarFooter();
             // Dismiss the progress dialog
-            if (pDialog.isShowing())
+            if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
             /**
              * Updating parsed JSON data into ListView
              * */
+
             DecimalFormat df = new DecimalFormat("C$ #0.00");
             DecimalFormatSymbols fmts = new DecimalFormatSymbols();
             fmts.setGroupingSeparator(',');
@@ -387,6 +394,7 @@ public class ListaPedidosFragment extends Fragment {
             };
 
             lv.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
             ActualizarFooter();
 
         } catch (final Exception ex) {
@@ -419,7 +427,7 @@ public class ListaPedidosFragment extends Fragment {
 
             String jsonStr = sh.makeServiceCall(encodeUrl);
             if (jsonStr == null) {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Respuesta nula GET", variables_publicas.info+urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Respuesta nula GET", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             } else {
                 Log.e(TAG, "Response from url: " + jsonStr);
 
@@ -437,6 +445,8 @@ public class ListaPedidosFragment extends Fragment {
                     String pedido = c.getString("pedido");
                     String subtotal = c.getString("subtotal");
                     String total = c.getString("total");
+                    String detallista = c.getString("detallista");
+
 
                     HashMap<String, String> pedidos = new HashMap<>();
 
@@ -448,11 +458,12 @@ public class ListaPedidosFragment extends Fragment {
                     pedidos.put("CodigoPedido", pedido);
                     pedidos.put("subtotal", subtotal);
                     pedidos.put("Total", total);
+                    pedidos.put("Detallista", detallista);
                     listapedidos.add(pedidos);
                 }
             }
         } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Excepcion controlada", variables_publicas.info+ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
 
         }
     }
@@ -465,6 +476,9 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Sincronizando datos...Por favor espere...");
             pDialog.setCancelable(false);
@@ -481,7 +495,7 @@ public class ListaPedidosFragment extends Fragment {
                 }
                 Gson gson = new Gson();
                 Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
-                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));
+                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
                 String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
                 guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false);
             }
@@ -494,11 +508,11 @@ public class ListaPedidosFragment extends Fragment {
             try {
                 ActualizarFooter();
                 // Dismiss the progress dialog
-                if (pDialog.isShowing())
+                if (pDialog != null && pDialog.isShowing())
                     pDialog.dismiss();
-                if (guardadoOK) {
-                    btnBuscar.performClick();
-                }
+
+                btnBuscar.performClick();
+
 
             } catch (final Exception ex) {
                 getActivity().runOnUiThread(new Runnable() {
@@ -517,15 +531,18 @@ public class ListaPedidosFragment extends Fragment {
     private class AnulaPedido extends AsyncTask<Void, Void, Void> {
         private String NoPedido;
 
-        /*@Override
+        @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Anulando Pedido...Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
-        }*/
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -565,8 +582,8 @@ public class ListaPedidosFragment extends Fragment {
 
 
                 } catch (final Exception ex) {
-                    guardadoOK=false;
-                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info+ ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    guardadoOK = false;
+                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -579,7 +596,7 @@ public class ListaPedidosFragment extends Fragment {
                     });
                 }
             } else {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET",variables_publicas.info+urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -590,34 +607,32 @@ public class ListaPedidosFragment extends Fragment {
                         }
                     }
                 });
-                guardadoOK = false;
             }
             return null;
         }
 
-    /*    @Override
+        @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             try {
-                ActualizarFooter();
+                //ActualizarFooter();
                 // Dismiss the progress dialog
-                if (pDialog.isShowing())
+                if (pDialog != null && pDialog.isShowing())
                     pDialog.dismiss();
-                if (guardadoOK) {
-                    btnBuscar.performClick();
-                }
+                btnBuscar.performClick();
+
 
             } catch (final Exception ex) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "SincronizarPedidos onPostExecute: " + ex.getMessage(),
+                                "Anular Pedido onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
             }
-        }*/
+        }
 
     }
 
@@ -643,12 +658,17 @@ public class ListaPedidosFragment extends Fragment {
 
             if (!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")) {
                 tv.setEnabled(false);
-                if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")) {
-                    //Ponemos el boton Editar en falso
-                    ((MenuItem) menu.getItem(0)).setEnabled(false);
-                }
+
             } else {
                 tv.setEnabled(true);
+            }
+            if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")
+                    || (obj.get("Estado").equalsIgnoreCase("APROBADO") && obj.get("Detallista").equalsIgnoreCase("false")) )
+            {
+                //Ponemos el boton Editar en falso
+                ((MenuItem) menu.getItem(0)).setEnabled(false);
+            }else{
+                ((MenuItem) menu.getItem(0)).setEnabled(true);
             }
 
 
@@ -689,9 +709,6 @@ public class ListaPedidosFragment extends Fragment {
                                         PedidosH.EliminaPedido(IdPedido);
                                         PedidosDetalleH.EliminarDetallePedido(IdPedido);
                                         btnBuscar.performClick();
-                                        adapter.notifyDataSetChanged();
-                                        lv.setAdapter(adapter);
-
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -704,7 +721,7 @@ public class ListaPedidosFragment extends Fragment {
 
                     } else if (new Funciones().checkInternetConnection(getActivity())) {
 
-                        final HashMap<String, String> finalPedido = pedido;
+                        final HashMap<String, String> finalPedido = itemPedido;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
                                 .setMessage("Esta seguro que desea anular el pedido?")
@@ -712,8 +729,6 @@ public class ListaPedidosFragment extends Fragment {
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         AnularPedido(finalPedido);
-                                        btnBuscar.performClick();
-
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -760,7 +775,8 @@ public class ListaPedidosFragment extends Fragment {
                             }
 
                             String IdCliente = pedido.get("IdCliente");
-                            Cliente cliente = ClientesH.BuscarCliente(IdCliente);
+                            String CodCv = pedido.get("Cod_cv");
+                            Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
                             String Nombre = cliente.getNombreCliente();
                             // Starting new intent
                             Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
@@ -768,6 +784,7 @@ public class ListaPedidosFragment extends Fragment {
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
                             in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
+                            in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
                             startActivity(in);
                         }
                     } else {
@@ -818,9 +835,8 @@ public class ListaPedidosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         try {
-//            if (adapter != null) {
-                CargarPedidos();
-//            }
+            CargarPedidos();
+
         } catch (Exception ex) {
 
         }

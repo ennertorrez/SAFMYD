@@ -56,4 +56,5 @@ dependencies {
     compile files('lib/activation.jar')
     compile files('lib/mail.jar')
     compile files('lib/additionnal.jar')
+    compile files('lib/commons-net-3.6.jar')
 }

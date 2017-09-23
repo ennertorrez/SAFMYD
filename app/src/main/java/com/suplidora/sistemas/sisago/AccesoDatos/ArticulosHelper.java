@@ -23,7 +23,7 @@ public class ArticulosHelper {
     public void GuardarTotalArticulos(String Codigo, String Nombre,
                                       String COSTO,String UNIDAD,String UnidadCaja,String ISC,String PorIVA,String PrecioSuper,
                                    String PrecioDetalle, String PrecioForaneo,String PrecioForaneo2, String PrecioMayorista,
-                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista,String existencia
+                                      String Bonificable,String AplicaPrecioDetalle,String DESCUENTO_MAXIMO,String detallista,String existencia,String UnidadCajaVenta,String IdProveedor
                                       ) {
         long rows =0;
         ContentValues contentValues = new ContentValues();
@@ -44,6 +44,8 @@ public class ArticulosHelper {
          contentValues.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, DESCUENTO_MAXIMO);
          contentValues.put(variables_publicas.ARTICULO_COLUMN_Detallista, detallista);
         contentValues.put(variables_publicas.ARTICULO_COLUMN_Existencia, existencia);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta , UnidadCajaVenta);
+        contentValues.put(variables_publicas.ARTICULO_COLUMN_IdProveedor , IdProveedor);
 
         database.insert(variables_publicas.TABLE_ARTICULOS, null, contentValues);
     }
@@ -71,7 +73,9 @@ public class ArticulosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Detallista)),
-                                c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Existencia))
+                                c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Existencia)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_IdProveedor))
                 ));
             } while (c.moveToNext());
         }

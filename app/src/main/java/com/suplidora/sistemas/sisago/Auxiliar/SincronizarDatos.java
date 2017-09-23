@@ -125,8 +125,10 @@ public class SincronizarDatos {
                 String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                 String detallista = c.getString("detallista");
                 String existencia = c.getString("Existencia");
-
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioForaneo2, PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista,existencia);
+                String UnidadCajaVenta = c.getString("UnidadCajaVenta");
+                String IdProveedor = c.getString("IdProveedor");
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, ISC, PorIVA, PrecioSuper, PrecioDetalle, PrecioForaneo, PrecioForaneo2,
+                        PrecioMayorista, Bonificable, AplicaPrecioDetalle, DESCUENTO_MAXIMO, detallista,existencia,UnidadCajaVenta,IdProveedor);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){
