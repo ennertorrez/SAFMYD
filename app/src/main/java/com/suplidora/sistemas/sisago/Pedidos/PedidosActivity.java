@@ -1047,7 +1047,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 txtCantidad.requestFocus();
                             }
                         }
-
                     } else {
                         /*Damos precio Mayorista*/
                         if (cliente.getTipo().equalsIgnoreCase("Detalle")) {
