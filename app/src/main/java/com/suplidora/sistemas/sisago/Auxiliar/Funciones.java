@@ -11,21 +11,18 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.R;
 
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.commons.net.ntp.NTPUDPClient;
+import org.apache.commons.net.ntp.TimeInfo;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,24 +31,25 @@ import java.util.regex.Pattern;
  */
 
 public class Funciones {
-private  static boolean connectionOK=false;
+    private static boolean connectionOK = false;
+    private static String fechaActual="";
 
     public static String Codificar(String text) {
-        return text.replace("+","(plus)")
-                .replace("#","(hash)")
-                .replace(".","(dot)")
-                .replace("@","(at)")
-                .replace("*","(star)")
-                .replace("-","(minus)")
-                .replace(",","(comma)")
-                .replace(":","(semicolon)")
-                .replace("!","(exclamation)")
-                .replace("?","(question)")
-                .replace("/","(slash)")
-                .replace("\\","(backslash)")
-                .replace("'","(sigleQuote)")
-                .replace("\"","(doubleQuote)")
-                .replace("~","(tilde)");
+        return text.replace("+", "(plus)")
+                .replace("#", "(hash)")
+                .replace(".", "(dot)")
+                .replace("@", "(at)")
+                .replace("*", "(star)")
+                .replace("-", "(minus)")
+                .replace(",", "(comma)")
+                .replace(":", "(semicolon)")
+                .replace("!", "(exclamation)")
+                .replace("?", "(question)")
+                .replace("/", "(slash)")
+                .replace("\\", "(backslash)")
+                .replace("'", "(sigleQuote)")
+                .replace("\"", "(doubleQuote)")
+                .replace("~", "(tilde)");
     }
 
     private static Pattern p = Pattern.compile("\\((\\d+)([+-]\\d{2})(\\d{2})\\)");
@@ -71,6 +69,7 @@ private  static boolean connectionOK=false;
         }
         return null;
     }
+
     public static void MensajeAviso(final Context context, String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
         dlgAlert.setMessage(texto);
@@ -88,19 +87,19 @@ private  static boolean connectionOK=false;
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) { // connected to the internet
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-              return  isInternetAvailable();
+                return isInternetAvailable();
             } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                return  isInternetAvailable();
+                return isInternetAvailable();
             }
         } else {
-           return false;
+            return false;
         }
         return false;
     }
 
-    private  boolean isInternetAvailable() {
+    private boolean isInternetAvailable() {
         try {
-             new TestConnectivity().execute().get();
+            new TestConnectivity().execute().get();
             return connectionOK;
         } catch (Exception e) {
             return false;
@@ -113,9 +112,8 @@ private  static boolean connectionOK=false;
         return (Runtime.getRuntime().exec (command).waitFor() == 0);
     }*/
 
-    public static boolean TestInternetConectivity(){
-        try
-        {
+    public static boolean TestInternetConectivity() {
+        try {
 
             URL url = new URL("http://www.google.com.ni");
             URLConnection conn = url.openConnection();
@@ -123,15 +121,13 @@ private  static boolean connectionOK=false;
             conn.setReadTimeout(10000);
             conn.setUseCaches(false);
             conn.connect();
-            InputStream is =   conn.getInputStream();
-            if(is!=null){
+            InputStream is = conn.getInputStream();
+            if (is != null) {
                 return true;
             }
             return false;
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -144,7 +140,7 @@ private  static boolean connectionOK=false;
         return formatteDate;
     }
 
-    public boolean SendMail(String subject, String body,String from,String recipients){
+    public boolean SendMail(String subject, String body, String from, String recipients) {
 
         try {
             GMailSender sender = new GMailSender("suplidorainternacional@gmail.com", "Suplisa2016");
@@ -152,12 +148,30 @@ private  static boolean connectionOK=false;
                     body,
                     from,
                     recipients);
-            return  true;
+            return true;
         } catch (Exception e) {
             Log.e("SendMail", e.getMessage(), e);
             return false;
         }
 
+    }
+
+    public static String GetLocalDateTime() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        variables_publicas.FechaActual = sdf.format(c.getTime());
+        return variables_publicas.FechaActual;
+    }
+
+    public String GetInternetTime() {
+        try {
+            new GetDateTime().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return fechaActual;
     }
 
 
@@ -166,24 +180,21 @@ private  static boolean connectionOK=false;
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            try
-            {
-                connectionOK=false;
+            try {
+                connectionOK = false;
                 URL url = new URL("http://www.google.com.ni");
                 URLConnection conn = url.openConnection();
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
                 conn.setUseCaches(false);
                 conn.connect();
-                InputStream is =   conn.getInputStream();
-                if(is!=null){
-                    connectionOK=true;
+                InputStream is = conn.getInputStream();
+                if (is != null) {
+                    connectionOK = true;
                 }
 
-            }
-            catch (Exception e)
-            {
-                connectionOK=false;
+            } catch (Exception e) {
+                connectionOK = false;
             }
             return null;
         }
@@ -194,6 +205,39 @@ private  static boolean connectionOK=false;
         protected void onPostExecute(Boolean result) {
 
         }
+
+    }
+
+
+    class GetDateTime extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+            try {
+                String timeServer = "server 0.pool.ntp.org";
+                Calendar cal = Calendar.getInstance();
+                try {
+                    NTPUDPClient timeClient = new NTPUDPClient();
+                    InetAddress inetAddress = InetAddress.getByName(timeServer);
+                    TimeInfo timeInfo = timeClient.getTime(inetAddress);
+                    long returnTime = timeInfo.getReturnTime();
+
+                    cal.setTimeInMillis(returnTime);
+                } catch (Exception ex) {
+                    Log.e("Get Time Error: ", ex.getMessage());
+                }
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                variables_publicas.FechaActual = sdf.format(cal.getTime());
+                fechaActual= variables_publicas.FechaActual;
+
+            } catch (Exception e) {
+
+            }
+            return null;
+        }
+
+
 
     }
 }

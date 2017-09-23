@@ -158,7 +158,7 @@ public class PedidosDetalleHelper {
     public boolean ActualizarCodigoPedido(String CodigoPedido, String NoPedido){
         ContentValues con = new ContentValues();
         con.put("CodigoPedido", NoPedido);
-        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS_DETALLE, con, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido +"="+CodigoPedido, null );
+        long rowInserted= database.update(variables_publicas.TABLE_PEDIDOS_DETALLE, con, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido +"='"+CodigoPedido+"'", null );
         if(rowInserted != -1)
             return true;
         else return false;

@@ -361,6 +361,7 @@ public class ListaPedidosSupFragment extends Fragment {
             for (HashMap<String, String> item : listapedidos) {
                 double subtotal = Double.parseDouble(item.get("SubTotal").replace("C$", "").replace(",", ""));
                 item.put("SubTotal", df.format(subtotal));
+
             }
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,

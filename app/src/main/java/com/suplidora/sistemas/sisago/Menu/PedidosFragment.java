@@ -123,14 +123,25 @@ public class PedidosFragment extends Fragment {
                 // getting values from selected ListItem
                 String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
                 String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
+                String CodCV = ((TextView) view.findViewById(R.id.CodCv)).getText().toString();
                 // Starting new intent
                 Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
 
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
+                in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCV );
                 startActivity(in);
             }
         });
+
+        if(rgGrupo.getCheckedRadioButtonId()== R.id.rbCodigo){
+            txtBusqueda.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
+        else {
+            txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
+
+
         return myView;
     }
     @Override

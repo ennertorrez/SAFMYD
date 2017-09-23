@@ -234,9 +234,10 @@ public class ClientesHelper {
         Log.d("clientes_elimina", "Datos eliminados");
     }
 
-    public Cliente BuscarCliente(String Codigo){
+    public Cliente BuscarCliente(String Codigo,String CodCv){
         Cliente cli= new Cliente();
-        Cursor c= database.rawQuery("select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente = "+Codigo +"", null);
+        String sql="select * from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente = "+Codigo +" AND CodCv = '"+CodCv.replace("Cod_Cv: ","")+"' ";
+        Cursor c= database.rawQuery(sql, null);
         if(c.moveToFirst()){
             do {
                 cli = new Cliente(c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdCliente)),
