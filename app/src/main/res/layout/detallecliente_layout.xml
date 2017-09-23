@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/Rl1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/lblCodigoCliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Codigo Cliente:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/CodigoCliente"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@+id/lblCodigoCliente"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl1">
+
+        <TextView
+            android:id="@+id/lblNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Nombre:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblNombre" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl2">
+
+        <TextView
+            android:id="@+id/lblTelefono"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Telefono:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/txtTelefono"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblTelefono"
+            android:text="00-0000-00" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl3">
+
+        <TextView
+            android:id="@+id/lblDireccion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Direccion:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/txtDireccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblDireccion" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl4">
+
+        <Spinner
+            android:id="@+id/cboDepartamento"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"></Spinner>
+
+        <Spinner
+            android:id="@+id/cboCiudad"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/cboDepartamento"></Spinner>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl5">
+
+        <TextView
+            android:id="@+id/lblCedula"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Cedula:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/txtCedula"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblCedula"
+            android:text="001-301290-0019S" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl6">
+
+        <TextView
+            android:id="@+id/lblRuc"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Ruc:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/txtRuc"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblRuc" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl7">
+
+        <TextView
+            android:id="@+id/lblLimiteCredito"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Limite de credito:"
+            android:textColor="#000000"
+            android:textSize="15dp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/txtLimiteCredito"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblLimiteCredito" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/Rl9"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Rl8">
+
+        <Spinner
+            android:id="@+id/cboFormaPago"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"></Spinner>
+
+    </RelativeLayout>
+
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:layout_above="@id/rlBotones1"-->
+        <!--android:background="@color/colorPrimaryDark">-->
+
+    <!--</View>-->
+    <RelativeLayout
+        android:id="@+id/rlBotones1"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_above="@+id/rlBotones2"
+        >
+        <Button
+            android:id="@+id/btnNuevoPedido"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_corner_blue"
+            android:textColor="#fff"
+            android:textSize="15sp"
+            android:text="Nuevo Pedido" />
+
+        <Button
+            android:id="@+id/btnNuevoPedidoProv"
+            android:layout_width="215dp"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/btnNuevoPedido"
+            android:background="@drawable/rounded_corner_blue"
+            android:textColor="#fff"
+            android:textSize="15sp"
+            android:text="Nuevo Pedido Provisional" />
+        </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/rlBotones2"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btnListaPedidos"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_corner_blue"
+            android:textColor="#fff"
+            android:textSize="15sp"
+            android:text="Lista de Pedido" />
+        <Button
+            android:id="@+id/btnEditaFicha"
+            android:layout_width="215dp"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/btnListaPedidos"
+            android:background="@drawable/rounded_corner_blue"
+            android:textColor="#fff"
+            android:textSize="15sp"
+            android:text="EDITAR FICHA DEL CLIENTE" />
+    </RelativeLayout>
+
+</RelativeLayout>

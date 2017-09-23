@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Ruta;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 
 import java.util.ArrayList;
@@ -82,6 +83,30 @@ public class VendedoresHelper {
                         cursor.getString(cursor.getColumnIndex("horeca")),
                         cursor.getString(cursor.getColumnIndex("mayorista")
                         )));
+
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        // database.close();
+
+        return list;
+    }
+
+    public List<Ruta> ObtenerListaRutas(String CodigoSupervisor) {
+        List<Ruta> list = new ArrayList<Ruta>();
+
+        String selectQuery = "SELECT DISTINCT "+variables_publicas.VENDEDORES_COLUMN_RUTA+" FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE "+ variables_publicas.VENDEDORES_COLUMN_codsuper + "= '" + CodigoSupervisor + "' ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_RUTA ;
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            list.add(new Ruta("TODOS"));
+            do {
+                list.add(new Ruta(
+                        cursor.getString(cursor.getColumnIndex("RUTA"))
+                        ));
 
             } while (cursor.moveToNext());
         }

@@ -703,32 +703,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-
-        List<ClienteSucursal> sucursales = ClientesSucursalH.ObtenerClienteSucursales(pedido.getIdCliente());
-        ArrayAdapter<ClienteSucursal> adapterSucursal = new ArrayAdapter<ClienteSucursal>(this, android.R.layout.simple_spinner_item, sucursales);
-        adapterSucursal.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboSucursal.setAdapter(adapterSucursal);
-        cboSucursal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-                sucursal = (ClienteSucursal) adapter.getItemAtPosition(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
-        cboSucursal.setSelection(0);
-        List<FormaPago> lstFormasPago = FormaPagoH.ObtenerListaFormaPago();
-        ArrayAdapter<FormaPago> adapterFormaPago = new ArrayAdapter<FormaPago>(this, android.R.layout.simple_spinner_item, lstFormasPago);
-        adapterFormaPago.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboCondicion.setAdapter(adapterFormaPago);
-        condicion = lstFormasPago.get(0);
-        for (int i = 0; !(condicion.getCODIGO().equals(cliente.getIdFormaPago())); i++)
-            condicion = lstFormasPago.get(i);
-        cboCondicion.setSelection(adapterFormaPago.getPosition(condicion));
-        cboCondicion.setEnabled(false);
     }
 
     private void GenerarCodigoPedido() {

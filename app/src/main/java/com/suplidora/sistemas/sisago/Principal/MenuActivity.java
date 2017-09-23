@@ -39,6 +39,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
@@ -275,6 +276,14 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new PedidosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+            case R.id.btnReporteVentasAlDia:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaPedidosSupFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
