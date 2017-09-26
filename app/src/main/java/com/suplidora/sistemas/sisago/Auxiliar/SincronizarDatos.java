@@ -59,7 +59,8 @@ public class SincronizarDatos {
     private VendedoresHelper VendedoresH;
     private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
-
+    private PedidosHelper PedidosH;
+    private PedidosDetalleHelper PedidosDetalleH;
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
     private FormaPagoHelper FormaPagoH;
@@ -71,7 +72,7 @@ public class SincronizarDatos {
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH) {
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -83,6 +84,8 @@ public class SincronizarDatos {
         ClientesSucH = ClientesSuch;
         ArticulosH = Articulosh;
         UsuariosH = usuariosH;
+        PedidosH=pedidoH;
+        PedidosDetalleH =pedidosDetalleH;
     }
 
     private String SincronizarArticulos() throws JSONException {
@@ -574,7 +577,24 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
+        SincronizarPedidosLocales();
+    }
 
+    public boolean SincronizarPedidosLocales() {
+
+        boolean guardadoOK=true;
+        List<HashMap<String, String>> PedidosLocal = PedidosH.ObtenerPedidosLocales(Funciones.GetDateTime(), "");
+        for (HashMap<String, String> item : PedidosLocal) {
+            if (guardadoOK == false) {
+                break ;
+            }
+            Gson gson = new Gson();
+            Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
+            Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
+            String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+            guardadoOK = Boolean.parseBoolean(SincronizarDatos.SincronizarPedido( PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false).split(",")[0]);
+        }
+        return guardadoOK;
     }
 
     private boolean ActualizarUsuario() {
@@ -635,7 +655,7 @@ public class SincronizarDatos {
         }
     }
 
-    public static boolean SincronizarPedido(final Activity activity,PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
+    public static String SincronizarPedido(PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -662,22 +682,13 @@ public class SincronizarDatos {
             Log.e("Error", e.getMessage());
             new Funciones().SendMail("Ha ocurrido un error al sincronizar pedido, Codificar URL",variables_publicas.info+e.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
             e.printStackTrace();
-            return false;
+            return "false,"+e.getMessage();
         }
 
         String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrPedido == null) {
            new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido,Respuesta nula POST",variables_publicas.info+urlStringDetalle,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    variables_publicas.MensajeError = "Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula";
-                    Toast.makeText(activity.getApplicationContext(),
-                            "Ha ocurrido un error al sincronizar el pedido,Respuesta nula",
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-            return false;
+            return "false,Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula";
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrPedido);
@@ -685,26 +696,17 @@ public class SincronizarDatos {
                 final String NoPedido = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
                 if (resultState.equals("false")) {
                     new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido ,Respuesta false",variables_publicas.info+NoPedido,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            variables_publicas.MensajeError = NoPedido;
-                            Toast.makeText(activity.getApplicationContext(),
-                                    NoPedido,
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return false;
+                    return "false,"+ NoPedido;
                 }
 
                 PedidoH.ActualizarPedido(IdPedido, NoPedido);
                 PedidoDetalleH.ActualizarCodigoPedido(IdPedido, NoPedido);
 
-                return true;
+                return "true";
             } catch (Exception ex) {
                 new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido, Excepcion controlada ",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());
-                return false;
+                return "false,"+ex.getMessage()+"";
             }
 
         }
@@ -730,7 +732,7 @@ public class SincronizarDatos {
 
         String jsonExistencia = sh.makeServiceCall(encodeUrl);
         if (jsonExistencia == null) {
-            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias,Respuesta nula POST",variables_publicas.info+urlConsulta,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias,Respuesta nula GET",variables_publicas.info+urlConsulta,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -763,7 +765,7 @@ public class SincronizarDatos {
 
                 return exitencia;
             } catch (Exception ex) {
-                new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ",variables_publicas.info+ex.getMessage()+" ---json: "+urlConsulta+" ---Response: "+jsonExistencia,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());
                 return "N/A";
             }

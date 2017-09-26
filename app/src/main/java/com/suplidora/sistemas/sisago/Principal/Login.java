@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
@@ -36,13 +37,17 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
+import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -57,7 +62,10 @@ import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -75,7 +83,7 @@ public class Login extends Activity {
     private String Contrasenia = "";
     private ProgressDialog pDialog;
     private String tipoBusqueda = "3";
-
+    private Boolean guardadoOK = true;
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
@@ -97,7 +105,10 @@ public class Login extends Activity {
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
+    private PedidosHelper PedidosH;
+    private PedidosDetalleHelper PedidosDetalleH;
     private SincronizarDatos sd;
+    private boolean isOnline;
     String MsjLoging = "";
 
     @Override
@@ -124,11 +135,13 @@ public class Login extends Activity {
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
+        PedidosH = new PedidosHelper(DbOpenHelper.database);
+        PedidosDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, PedidosH, PedidosDetalleH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -161,7 +174,7 @@ public class Login extends Activity {
                 inputMethodManager.hideSoftInputFromWindow(txtUsuario.getWindowToken(), 0);
                 inputMethodManager.hideSoftInputFromWindow(txtPassword.getWindowToken(), 0);
 
-               Funciones.GetLocalDateTime();
+                Funciones.GetLocalDateTime();
 
                 Usuario = txtUsuario.getText().toString();
                 Contrasenia = txtPassword.getText().toString();
@@ -175,11 +188,11 @@ public class Login extends Activity {
                     return;
                 }
 
-                boolean isOnline = new Funciones().checkInternetConnection(Login.this);
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
 
+                boolean isOnline = new Funciones().checkInternetConnection(Login.this);
 
                 if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
                     try {
@@ -191,7 +204,7 @@ public class Login extends Activity {
                     String FechaActual = Funciones.getDatePhone();
                     int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
                     int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
-
+                    new SincronizardorPedidos().execute();
                     if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
                         new GetUser().execute();
                     } else {
@@ -215,6 +228,14 @@ public class Login extends Activity {
                 }
             }
         });
+        variables_publicas.usuario = UltimoUsuario;
+        isOnline= new Funciones().checkInternetConnection(Login.this);
+        if (variables_publicas.usuario != null) {
+            if (isOnline) {
+                new SincronizardorPedidos().execute();
+            }
+        }
+
         ValidarUltimaVersion();
         loadIMEI();
         try {
@@ -223,6 +244,8 @@ public class Login extends Activity {
         } catch (Exception ex) {
             Funciones.MensajeAviso(getApplicationContext(), ex.getMessage());
         }
+
+
 
     }
 
@@ -331,18 +354,14 @@ public class Login extends Activity {
 */
 
     private void ValidarUltimaVersion() {
-        boolean isOnline = new Funciones().checkInternetConnection(Login.this);
-
         if (isOnline) {
             String latestVersion = "";
             String currentVersion = getCurrentVersion();
-            variables_publicas.VersionSistema=currentVersion;
+            variables_publicas.VersionSistema = currentVersion;
             try {
                 new GetLatestVersion().execute();
 
-
-
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -600,16 +619,17 @@ public class Login extends Activity {
 
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
+          /*  if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
         }
 
         @Override
@@ -632,11 +652,11 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+        /*    if (pDialog.isShowing())
+                pDialog.dismiss();*/
 
             String currentVersion = getCurrentVersion();
-            variables_publicas.VersionSistema=currentVersion;
+            variables_publicas.VersionSistema = currentVersion;
             if (latestVersion != null && !currentVersion.equals(latestVersion)) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
                 builder.setTitle("Nueva version disponible");
@@ -655,6 +675,36 @@ public class Login extends Activity {
         }
 
 
+    }
+
+    private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+            pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Sincronizando pedidos locales, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try{
+                sd.SincronizarPedidosLocales();
+            }catch (Exception e){
+                Log.e("Error:", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (pDialog!=null && pDialog.isShowing())
+                pDialog.dismiss();
+        }
     }
 
 

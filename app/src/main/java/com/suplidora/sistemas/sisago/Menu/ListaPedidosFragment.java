@@ -182,7 +182,11 @@ public class ListaPedidosFragment extends Fragment {
         });
         listapedidos = new ArrayList<>();
 
-        new GetListaPedidos().execute();
+        try{
+            new GetListaPedidos().execute();
+        }catch (Exception e){
+            Log.e("Error",e.getMessage());
+        }
 
         btnSincronizar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -392,7 +396,6 @@ public class ListaPedidosFragment extends Fragment {
                     return currView;
                 }
             };
-
             lv.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             ActualizarFooter();
@@ -497,7 +500,7 @@ public class ListaPedidosFragment extends Fragment {
                 Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
                 Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
                 String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
-                guardadoOK = SincronizarDatos.SincronizarPedido(getActivity(), PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false);
+                guardadoOK = Boolean.parseBoolean(SincronizarDatos.SincronizarPedido( PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false).split(",")[0]);
             }
             return null;
         }
@@ -838,7 +841,7 @@ public class ListaPedidosFragment extends Fragment {
             CargarPedidos();
 
         } catch (Exception ex) {
-
+                Log.e("Error",ex.getMessage());
         }
     }
 }

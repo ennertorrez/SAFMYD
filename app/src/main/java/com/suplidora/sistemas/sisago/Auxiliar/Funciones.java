@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 public class Funciones {
     private static boolean connectionOK = false;
-    private static String fechaActual="";
+    private static String fechaActual = "";
 
     public static String Codificar(String text) {
         return text.replace("+", "(plus)")
@@ -102,6 +102,7 @@ public class Funciones {
             new TestConnectivity().execute().get();
             return connectionOK;
         } catch (Exception e) {
+            Log.e("Error: ", e.getMessage());
             return false;
         }
 
@@ -175,10 +176,37 @@ public class Funciones {
     }
 
 
-    class TestConnectivity extends AsyncTask<Void, Void, Boolean> {
+    public static String GetDateTime() {
+        try {
+            String timeServer = "0.north-america.pool.ntp.org";
+            Calendar cal = Calendar.getInstance();
+
+            NTPUDPClient timeClient = new NTPUDPClient();
+            InetAddress inetAddress = InetAddress.getByName(timeServer);
+            TimeInfo timeInfo = timeClient.getTime(inetAddress);
+            long returnTime = timeInfo.getReturnTime();
+            cal.setTimeInMillis(returnTime);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            variables_publicas.FechaActual = sdf.format(cal.getTime());
+            fechaActual = variables_publicas.FechaActual;
+            return fechaActual;
+        } catch (Exception e) {
+            Log.e("Error:", e.getMessage());
+            return GetLocalDateTime();
+        }
+
+    }
+
+    class TestConnectivity extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
 
             try {
                 connectionOK = false;
@@ -200,12 +228,9 @@ public class Funciones {
         }
 
         @Override
-
-
-        protected void onPostExecute(Boolean result) {
-
+        protected void onPostExecute(Void param) {
+            super.onPostExecute(param);
         }
-
     }
 
 
@@ -229,14 +254,13 @@ public class Funciones {
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 variables_publicas.FechaActual = sdf.format(cal.getTime());
-                fechaActual= variables_publicas.FechaActual;
+                fechaActual = variables_publicas.FechaActual;
 
             } catch (Exception e) {
 
             }
             return null;
         }
-
 
 
     }

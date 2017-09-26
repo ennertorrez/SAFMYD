@@ -128,6 +128,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     AlertDialog alertDialog;
     private String CodigoArticulo;
     private String existencia = "N/A";
+    private boolean BonificacionAgregada;
 
     //endregion
 
@@ -694,7 +695,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         pedido.setIdVendedor(String.valueOf(pedido.getIdVendedor()));
         pedido.setIdCliente(String.valueOf(pedido.getIdCliente()));
 //        pedido.setCod_cv(cliente.getCodCv());
-        pedido.setObservacion(txtObservaciones.getText().toString());
+        pedido.setObservacion( Funciones.Codificar(txtObservaciones.getText().toString()));
         pedido.setIdFormaPago(condicion.getCODIGO());
         pedido.setFecha(variables_publicas.FechaActual);
         pedido.setUsuario(variables_publicas.usuario.getUsuario());
@@ -1012,6 +1013,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                     setPrecio(art, finalTipoprecio, 0,item==null);
                                                     if (listaArticulos.size() > 0) {
                                                         listaArticulos.remove(listaArticulos.size() - 1);
+                                                        if (BonificacionAgregada){
+                                                            listaArticulos.remove(listaArticulos.size() - 1);
+                                                            BonificacionAgregada=false;
+                                                        }
                                                         RefrescarGrid();
                                                         CalcularTotales();
                                                     }
@@ -1042,6 +1047,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             if (MensajeCaja) {
                                 MensajeCaja = false;
                                 listaArticulos.remove(listaArticulos.size() - 1);
+                                /*Si acabamos de agregar una bonificacion la quitarmos tambien*/
+                                if (BonificacionAgregada){
+                                    listaArticulos.remove(listaArticulos.size() - 1);
+                                    BonificacionAgregada=false;
+                                }
                                 MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                                 txtCantidad.requestFocus();
                             }
@@ -1093,6 +1103,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             setPrecio(art, tipoprecio, 0,item==null);
                             MensajeCaja = false;
                             listaArticulos.remove(listaArticulos.size() - 1);
+                             /*Si acabamos de agregar una bonificacion la quitarmos tambien*/
+                            if (BonificacionAgregada){
+                                listaArticulos.remove(listaArticulos.size() - 1);
+                                BonificacionAgregada=false;
+                            }
                             MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                             txtCantidad.requestFocus();
                         } else {
@@ -1115,10 +1130,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     tipoprecio = cliente.getTipo();
                 }
             }
-
-
         }
-
         if (cliente.getEmpleado().equals("1") && Integer.parseInt(condicion.getCODIGO()) != 127) { // esto para validar que no sea producto abordo --Tramite de CK
             tipoprecio = "Mayorista";
         }
@@ -1313,7 +1325,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
             articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
             listaArticulos.add(articuloBonificado);
+            BonificacionAgregada=true;
         } else {
+            BonificacionAgregada=false;
             //Validamos que solamente se puedan ingresar 18 articulos
             if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que excede el limite de 18 productos para un pedido Mayorista");
@@ -1530,11 +1544,11 @@ return true;
                 lblUM.setText(articulo.getUnidadCajaVenta());
 
 
-                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
+//                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
                     new ConsultarExistencias().execute();
-                } else {
-                    lblExistentias.setText("N/A");
-                }
+//                } else {
+//                    lblExistentias.setText("N/A");
+//                }
 
 
                 MensajeCaja = true;
@@ -1655,7 +1669,7 @@ return true;
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                if (SincronizarDatos.SincronizarPedido(PedidosActivity.this, PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, (editar==true && pedidoLocal==false)  )) {
+                if ( Boolean.parseBoolean(SincronizarDatos.SincronizarPedido( PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, (editar==true && pedidoLocal==false) ).split(",")[0] )) {
                     guardadoOK = true;
                 }
             } else {

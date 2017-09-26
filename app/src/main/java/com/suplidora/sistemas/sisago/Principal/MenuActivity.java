@@ -33,6 +33,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -78,7 +80,8 @@ public class MenuActivity extends AppCompatActivity
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
-
+    private PedidosHelper PedidosH;
+    private PedidosDetalleHelper PedidosDetalleH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,10 +135,12 @@ public class MenuActivity extends AppCompatActivity
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH= new UsuariosHelper(DbOpenHelper.database);
+        PedidosH= new PedidosHelper(DbOpenHelper.database);
+        PedidosDetalleH= new PedidosDetalleHelper(DbOpenHelper.database);
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH,PedidosH,PedidosDetalleH);
 
         variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
 

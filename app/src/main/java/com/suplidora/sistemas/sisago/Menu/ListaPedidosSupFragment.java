@@ -374,8 +374,7 @@ public class ListaPedidosSupFragment extends Fragment {
             }
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
-                    R.layout.resumen_preventa_list_item, new String[]{"Ruta", "Cantidad",
-                    "SubTotal","Municipio"},
+                    R.layout.resumen_preventa_list_item, new String[]{"Ruta", "Cantidad","SubTotal","Municipio"},
                     new int[]{R.id.lblDetRuta, R.id.lblDetCantidad, R.id.lblDetSubtotal,R.id.lblDetMuni}) {
             };
 
