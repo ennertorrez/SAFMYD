@@ -17,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -160,6 +162,8 @@ public class ListaPedidosSupFragment extends Fragment {
         }
 
         CargaDatosCombo();
+
+
 
 
         /***DatePickerDesde***/
@@ -371,8 +375,8 @@ public class ListaPedidosSupFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
                     R.layout.resumen_preventa_list_item, new String[]{"Ruta", "Cantidad",
-                    "SubTotal"},
-                    new int[]{R.id.lblDetRuta, R.id.lblDetCantidad, R.id.lblDetSubtotal}) {
+                    "SubTotal","Municipio"},
+                    new int[]{R.id.lblDetRuta, R.id.lblDetCantidad, R.id.lblDetSubtotal,R.id.lblDetMuni}) {
             };
 
             lv.setAdapter(adapter);
@@ -408,6 +412,7 @@ public class ListaPedidosSupFragment extends Fragment {
             e.printStackTrace();
         }
 
+
         try {
 
             String jsonStr = sh.makeServiceCall(encodeUrl);
@@ -426,12 +431,14 @@ public class ListaPedidosSupFragment extends Fragment {
                     String Cantidad = c.getString("Cantidad");
                     String Ruta = c.getString("Ruta");
                     String SubTotal = c.getString("SubTotal");
+                    String Municipio = c.getString("Municipio");
 
                     HashMap<String, String> pedidos = new HashMap<>();
 
                     pedidos.put("Cantidad", Cantidad);
                     pedidos.put("Ruta", Ruta);
                     pedidos.put("SubTotal", SubTotal);
+                    pedidos.put("Municipio", Municipio);
                     listapedidos.add(pedidos);
                 }
             }
