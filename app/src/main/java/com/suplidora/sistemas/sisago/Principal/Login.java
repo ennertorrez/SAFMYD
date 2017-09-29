@@ -3,6 +3,8 @@ package com.suplidora.sistemas.sisago.Principal;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -109,6 +111,7 @@ public class Login extends Activity {
     private PedidosDetalleHelper PedidosDetalleH;
     private SincronizarDatos sd;
     private boolean isOnline;
+    private String VersionDatos = "VersionDatos";
     String MsjLoging = "";
 
     @Override
@@ -189,14 +192,21 @@ public class Login extends Activity {
                 }
 
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
-                String VersionDatos = "VersionDatos";
+
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
 
                 boolean isOnline = new Funciones().checkInternetConnection(Login.this);
 
-                if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
+                if(isOnline){
                     try {
                         new GetValorConfig().execute().get();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
+                    try {
+
                         String FechaLocal = variables_publicas.usuario.getFechaActualiza();
                         String FechaActual = Funciones.getDatePhone();
                         int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
@@ -448,9 +458,11 @@ public class Login extends Activity {
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin = "";
                         variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
+
                         //SINCRONIZAR DATOS
                         try {
                             sd.SincronizarTodo();
+
                         } catch (final JSONException e) {
                             Log.e(TAG, "Json parsing error: " + e.getMessage());
 //                            runOnUiThread(new Runnable() {
@@ -502,7 +514,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog != null && pDialog.isShowing())
+            if (pDialog.isShowing())
                 pDialog.dismiss();
         }
     }
@@ -515,8 +527,6 @@ public class Login extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
-                pDialog.dismiss();
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("Verificando última version del sistema, por favor espere...");
             pDialog.setCancelable(false);
@@ -533,7 +543,7 @@ public class Login extends Activity {
 
             Log.e(TAG, "Response from url: " + jsonStr);
 
-            /**********************************USUARIOS**************************************/
+
             if (jsonStr != null) {
 
                 try {
@@ -583,10 +593,8 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (pDialog != null && pDialog.isShowing())
+            if (pDialog.isShowing())
                 pDialog.dismiss();
-
-
 
         }
     }
@@ -606,61 +614,7 @@ public class Login extends Activity {
         dlgAlert.create().show();
     }
 
-    public void GetConfiguraciones(){
 
-        HttpHandler sh = new HttpHandler();
-        String urlString = urlGetConfiguraciones;
-
-        String jsonStr = sh.makeServiceCall(urlString);
-
-        Log.e(TAG, "Response from url: " + jsonStr);
-
-        /**********************************USUARIOS**************************************/
-        if (jsonStr != null) {
-
-            try {
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray Usuarios = jsonObj.getJSONArray("GetConfiguracionesResult");
-
-                for (int i = 0; i < Usuarios.length(); i++) {
-                    JSONObject c = Usuarios.getJSONObject(i);
-                    String Valor = c.getString("Valor");
-                    String Configuracion = c.getString("Configuracion");
-                    String ConfigVDatos = "VersionDatos";
-                    if (Configuracion.equals(ConfigVDatos)) {
-                        variables_publicas.ValorConfigServ = Valor;
-                    }
-                }
-
-            } catch (final JSONException e) {
-                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(),
-                                "No se ha podido establecer contacto con el servidor",
-                                Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
-            }
-        } else {
-
-            Log.e(TAG, "No se ha podido establecer contacto con el servidor");
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getApplicationContext(),
-                            "No se ha podido establecer contacto con el servidor",
-                            Toast.LENGTH_LONG)
-                            .show();
-                }
-            });
-        }
-
-
-    }
 
 
 
@@ -671,8 +625,7 @@ public class Login extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
-                pDialog.dismiss();
+
             /*
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
@@ -700,8 +653,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-        /*    if (pDialog.isShowing())
-                pDialog.dismiss();*/
+
 
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
@@ -730,8 +682,6 @@ public class Login extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (pDialog != null && pDialog.isShowing())
-                pDialog.dismiss();
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("Sincronizando pedidos locales, por favor espere...");
             pDialog.setCancelable(false);
@@ -756,5 +706,11 @@ public class Login extends Activity {
         }
     }
 
-
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (pDialog!= null) {
+            pDialog.dismiss();
+        }
+    }
 }

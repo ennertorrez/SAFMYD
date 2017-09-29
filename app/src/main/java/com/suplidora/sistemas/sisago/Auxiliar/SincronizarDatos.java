@@ -480,6 +480,7 @@ public class SincronizarDatos {
 
 
                 ConfigSistemasH.GuardarConfiguracionSistema(Id, Sistema, Configuracion, Valor, Activo);
+                variables_publicas.Configuracion = ConfigSistemasH.BuscarValorConfig("VersionDatos");
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){

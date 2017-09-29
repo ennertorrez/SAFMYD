@@ -295,7 +295,7 @@ addLines();
                     }
 
                 } else {
-
+                    if(getActivity()==null) return ;
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();

@@ -152,6 +152,7 @@ public class ClientesFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+            if(getActivity()==null) return null;
             HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
@@ -214,6 +215,7 @@ public class ClientesFragment extends Fragment {
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -227,6 +229,7 @@ public class ClientesFragment extends Fragment {
                 }
             } else {
                 Log.e(TAG, "Couldn't get json from server.");
+                if(getActivity()==null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -302,11 +302,12 @@ public class ListaPedidosSupFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-
+                if(getActivity()==null) return null;
                 boolean connectionOK = Funciones.TestInternetConectivity();
                 if (connectionOK) {
                     GetPedidosService();
                 } else {
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -319,6 +320,7 @@ public class ListaPedidosSupFragment extends Fragment {
                     });
                 }
             } catch (final Exception e) {
+                if(getActivity()==null) return null;
                 //Log.e(TAG, "Json parsing error: " + e.getMessage());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -383,6 +385,7 @@ public class ListaPedidosSupFragment extends Fragment {
             ActualizarFooter();
 
         } catch (final Exception ex) {
+            if(getActivity()==null) return ;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

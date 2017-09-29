@@ -288,6 +288,7 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
+                if(getActivity()==null) return null;
                 DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                 PedidosH = new PedidosHelper(DbOpenHelper.database);
                 listapedidos.clear();
@@ -311,9 +312,11 @@ public class ListaPedidosFragment extends Fragment {
                 if (connectionOK) {
                     GetPedidosService();
                 } else {
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             //   for (int i = 0; i < 2; i++) {
                             Toast.makeText(getActivity().getApplicationContext(),
                                     "No es posible conectarse al servidor. \n Solo se mostraran los pedidos locales que no se han sincronizados! ",
@@ -323,10 +326,12 @@ public class ListaPedidosFragment extends Fragment {
                     });
                 }
             } catch (final Exception e) {
+                if(getActivity()==null) return null;
                 //Log.e(TAG, "Json parsing error: " + e.getMessage());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         //   for (int i = 0; i < 2; i++) {
                         Toast.makeText(getActivity().getApplicationContext(),
                                 "No es posible conectarse al servidor. \n Solo se mostraran los pedidos locales que no se han sincronizados! ",
@@ -407,6 +412,7 @@ public class ListaPedidosFragment extends Fragment {
             ActualizarFooter();
 
         } catch (final Exception ex) {
+            if(getActivity()==null) return ;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -485,8 +491,6 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
-                pDialog.dismiss();
 
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Sincronizando datos...Por favor espere...");
@@ -497,6 +501,7 @@ public class ListaPedidosFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
+            if(getActivity()==null) return null;
             List<HashMap<String, String>> PedidosLocal = PedidosH.ObtenerPedidosLocales(fecha, "");
             for (HashMap<String, String> item : PedidosLocal) {
                 if (guardadoOK == false) {
@@ -517,16 +522,18 @@ public class ListaPedidosFragment extends Fragment {
             try {
 
                 // Dismiss the progress dialog
-                if (pDialog != null && pDialog.isShowing())
+                if ( pDialog.isShowing())
                     pDialog.dismiss();
 
                 btnBuscar.performClick();
 
 
             } catch (final Exception ex) {
+                if(getActivity()==null) return ;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if(getActivity().isFinishing()) return;
                         Toast.makeText(getActivity().getApplicationContext(),
                                 "SincronizarPedidos onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
@@ -555,6 +562,7 @@ public class ListaPedidosFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
+            if(getActivity()==null) return null;
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdPedido + "/" + variables_publicas.usuario.getUsuario();
 
@@ -576,9 +584,11 @@ public class ListaPedidosFragment extends Fragment {
                     String resultState = ((String) result.get("AnularPedidoResult")).split(",")[0];
                     final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
                     if (resultState.equals("false")) {
+                        if(getActivity()==null) return null;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         mensaje,
                                         Toast.LENGTH_LONG).show();
@@ -593,9 +603,11 @@ public class ListaPedidosFragment extends Fragment {
                 } catch (final Exception ex) {
                     guardadoOK = false;
                     new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             for (int i = 0; i < 2; i++) {
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         ex.getMessage(),
@@ -606,10 +618,12 @@ public class ListaPedidosFragment extends Fragment {
                 }
             } else {
                 new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                if(getActivity()==null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         for (int i = 0; i < 2; i++) {
+
                             Toast.makeText(getActivity().getApplicationContext(),
                                     "No se ha podido obtener los datos del servidor ",
                                     Toast.LENGTH_LONG).show();
@@ -632,9 +646,11 @@ public class ListaPedidosFragment extends Fragment {
 
 
             } catch (final Exception ex) {
+                if(getActivity()==null) return ;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         Toast.makeText(getActivity().getApplicationContext(),
                                 "Anular Pedido onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();

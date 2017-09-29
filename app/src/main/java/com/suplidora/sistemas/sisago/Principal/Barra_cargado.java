@@ -99,15 +99,6 @@ public class Barra_cargado extends Activity {
 		getMenuInflater().inflate(R.menu.barra_cargado, menu);
 		return true;
 	}
-    public void mensajeAviso(String texto){
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-        dlgAlert.setMessage(texto);
-        dlgAlert.setPositiveButton(R.string.aceptar,new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-        dlgAlert.setCancelable(true);
-        dlgAlert.create().show();
-    }
+
 
 }
