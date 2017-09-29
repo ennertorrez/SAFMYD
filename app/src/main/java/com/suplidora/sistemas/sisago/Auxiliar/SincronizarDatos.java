@@ -580,6 +580,16 @@ public class SincronizarDatos {
         SincronizarPedidosLocales();
     }
 
+    public void SincronizarTablas() throws JSONException {
+        SincronizarArticulos();
+        SincronizarClientes();
+        SincronizarCartillasBc();
+        SincronizarCartillasBcDetalle();
+        SincronizarPrecioEspecial();
+        SincronizarClientesSucursal();
+        SincronizarConfiguracionSistema();
+    }
+
     public boolean SincronizarPedidosLocales() {
 
         boolean guardadoOK=true;
@@ -713,7 +723,7 @@ public class SincronizarDatos {
 
     }
 
-    public static String ConsultarExistencias(final Activity activity,PedidosHelper PedidoH,String CodigoArticulo){
+    public static String ConsultarExistencias(final Activity activity,PedidosHelper PedidoH,ArticulosHelper ArticulosH,String CodigoArticulo){
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
 
@@ -732,7 +742,7 @@ public class SincronizarDatos {
 
         String jsonExistencia = sh.makeServiceCall(encodeUrl);
         if (jsonExistencia == null) {
-            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias,Respuesta nula GET",variables_publicas.info+urlConsulta,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias,Respuesta nula GET",variables_publicas.info+" --- "+urlConsulta,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -747,23 +757,23 @@ public class SincronizarDatos {
             try {
                 JSONObject result = new JSONObject(jsonExistencia);
                 String resultState = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[0];
-                final String exitencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
+                final String existencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
                 if (resultState.equals("false")) {
-                    new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false",variables_publicas.info+exitencia,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false",variables_publicas.info+" --- "+existencia,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            variables_publicas.MensajeError = exitencia;
+                            variables_publicas.MensajeError = existencia;
                             Toast.makeText(activity.getApplicationContext(),
-                                    exitencia,
+                                    existencia,
                                     Toast.LENGTH_LONG).show();
                         }
                     });
                     return "N/A";
                 }
-
-
-                return exitencia;
+                /*Si no hubo ningun problema procedemos a actualizar las existencias locales*/
+                ArticulosH.ActualizarExistencias(CodigoArticulo,existencia);
+                return existencia;
             } catch (Exception ex) {
                 new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ",variables_publicas.info+ex.getMessage()+" ---json: "+urlConsulta+" ---Response: "+jsonExistencia,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());

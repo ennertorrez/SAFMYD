@@ -99,7 +99,7 @@ public class ClientesFragment extends Fragment {
 
                 /*Guardamos el cliente seleccionado*/
                 for (HashMap<String, String> cliente : listaClientes) {
-                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente)) {
+                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente) && cliente.get(variables_publicas.CLIENTES_COLUMN_CodCv).equals(CodCV.replace("Cod_Cv: ",""))) {
                         ClienteH.EliminaCliente(IdCliente);
                         ClienteH.GuardarTotalClientes(cliente);
 
@@ -199,6 +199,8 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString("EsClienteVarios"));
+
                         if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
                             cliente.put("CodCv2", "");
                             cliente.put("NombreCompleto", c.getString("NombreCliente"));

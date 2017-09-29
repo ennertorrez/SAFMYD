@@ -136,7 +136,7 @@ public class ArticulosHelper {
                 articulos.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, c.getString(c.getColumnIndex("AplicaPrecioDetalle")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, c.getString(c.getColumnIndex("Existencia")));
+                articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, String.valueOf((int) Double.parseDouble( c.getString(c.getColumnIndex("Existencia")) ) ) );
                 lst.add(articulos);
 
             }while (c.moveToNext());
@@ -168,7 +168,7 @@ public class ArticulosHelper {
                 articulos.put(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle, c.getString(c.getColumnIndex("AplicaPrecioDetalle")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
-                articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, c.getString(c.getColumnIndex("Existencia")));
+                articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, String.valueOf((int) Double.parseDouble( c.getString(c.getColumnIndex("Existencia")) ) ) );
                 lst.add(articulos);
 
             }while (c.moveToNext());
@@ -178,5 +178,14 @@ public class ArticulosHelper {
     public  void EliminaArticulos() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_ARTICULOS+";");
         Log.d("Articulo_elimina", "Datos eliminados");
+    }
+
+    public  boolean ActualizarExistencias(String CodigoArticulo,String existencia) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.ARTICULO_COLUMN_Existencia, existencia);
+        long rowUpdated = database.update(variables_publicas.TABLE_ARTICULOS, con, variables_publicas.ARTICULO_COLUMN_Codigo + "= '" + CodigoArticulo+"'", null);
+        if (rowUpdated != -1)
+            return true;
+        else return false;
     }
 }

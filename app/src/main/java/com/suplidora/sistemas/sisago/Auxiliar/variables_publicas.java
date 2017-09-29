@@ -29,6 +29,7 @@ public class variables_publicas {
 
     public static final String direccionIp = "http://186.1.18.75:8080";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
+    public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
     public static final int DATABASE_VERSION = 47;
     public static final String DATABASE_NAME = "SysContabv3.db";

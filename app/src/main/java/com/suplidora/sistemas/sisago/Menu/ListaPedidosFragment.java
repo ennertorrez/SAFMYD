@@ -220,21 +220,27 @@ public class ListaPedidosFragment extends Fragment {
         inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
         busqueda = txtBusqueda.getText().toString();
         new GetListaPedidos().execute();
-        ActualizarFooter();
     }
 
     private void ActualizarFooter() {
 
-        double subtotal = 0.00;
-        int cantidad = 0;
-        for (HashMap<String, String> pedido : listapedidos) {
-            subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
-            if (pedido.get("Estado").equalsIgnoreCase("Aprobado") || pedido.get("Estado").equalsIgnoreCase("Facturado") || pedido.get("Estado").equalsIgnoreCase("Pendiente")) {
-                cantidad += 1;
+        try{
+            double subtotal = 0.00;
+            int cantidad = 0;
+            for (HashMap<String, String> pedido : listapedidos) {
+                subtotal += Double.parseDouble(pedido.get(variables_publicas.PEDIDOS_COLUMN_Subtotal).replace("C$", "").replace(",", ""));
+                if (pedido.get("Estado").equalsIgnoreCase("Aprobado") || pedido.get("Estado").equalsIgnoreCase("Facturado") || pedido.get("Estado").equalsIgnoreCase("Pendiente")) {
+                    cantidad += 1;
+                }
             }
+            lblFooterCantidad.setText("Cantidad: " + String.valueOf(cantidad));
+            lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
+        }catch (Exception ex){
+            new Funciones().SendMail("Ha ocurrido un error al actualizar footer en la lista de pedidos, Excepcion controlada",variables_publicas.info+" --- "+ex.getMessage(),variables_publicas.correoError,variables_publicas.correosErrores );
+            Log.e("Error:",ex.getMessage());
+            ex.printStackTrace();
         }
-        lblFooterCantidad.setText("Cantidad: " + String.valueOf(cantidad));
-        lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
+
 
     }
 
@@ -245,13 +251,11 @@ public class ListaPedidosFragment extends Fragment {
     }
 
     private boolean SincronizarPedido() {
-
         try {
             new SincronizardorPedidos().execute();
         } catch (Exception ex) {
             Funciones.MensajeAviso(getActivity().getApplicationContext(), ex.getMessage());
         }
-
         return false;
     }
 
@@ -337,6 +341,8 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
             ActualizarLista();
 
         }
@@ -509,7 +515,7 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             try {
-                ActualizarFooter();
+
                 // Dismiss the progress dialog
                 if (pDialog != null && pDialog.isShowing())
                     pDialog.dismiss();
@@ -618,7 +624,7 @@ public class ListaPedidosFragment extends Fragment {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             try {
-                //ActualizarFooter();
+
                 // Dismiss the progress dialog
                 if (pDialog != null && pDialog.isShowing())
                     pDialog.dismiss();

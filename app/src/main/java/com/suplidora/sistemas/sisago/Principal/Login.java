@@ -197,23 +197,23 @@ public class Login extends Activity {
                 if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
                     try {
                         new GetValorConfig().execute().get();
+                        String FechaLocal = variables_publicas.usuario.getFechaActualiza();
+                        String FechaActual = Funciones.getDatePhone();
+                        int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
+                        int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
+                        if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
+                            new GetUser().execute();
+                        } else {
+                            variables_publicas.MensajeLogin = "";
+                            variables_publicas.LoginOk = true;
+                            Intent intent = new Intent("android.intent.action.Barra_cargado");
+                            startActivity(intent);
+                            finish();
+                        }
                     } catch (Exception e) {
                         mensajeAviso(e.getMessage());
                     }
-                    String FechaLocal = variables_publicas.usuario.getFechaActualiza();
-                    String FechaActual = Funciones.getDatePhone();
-                    int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
-                    int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
-                    new SincronizardorPedidos().execute();
-                    if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
-                        new GetUser().execute();
-                    } else {
-                        variables_publicas.MensajeLogin = "";
-                        variables_publicas.LoginOk = true;
-                        Intent intent = new Intent("android.intent.action.Barra_cargado");
-                        startActivity(intent);
-                        finish();
-                    }
+
                 } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
                     new GetUser().execute();
                 }
@@ -228,6 +228,7 @@ public class Login extends Activity {
                 }
             }
         });
+
         variables_publicas.usuario = UltimoUsuario;
         isOnline= new Funciones().checkInternetConnection(Login.this);
         if (variables_publicas.usuario != null) {
@@ -511,6 +512,18 @@ public class Login extends Activity {
     //region ObtieneValorConfiguracion
     private class GetValorConfig extends AsyncTask<Void, Void, Void> {
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+            pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Verificando última version del sistema, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
         protected Void doInBackground(Void... arg0) {
 
             HttpHandler sh = new HttpHandler();
@@ -566,35 +579,20 @@ public class Login extends Activity {
 
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+
+
+
+        }
     }
     //endregion
 
-    public Boolean isOnlineNet() {
 
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-/*    private boolean checkInternetConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        // test for connection
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            Log.e(TAG, "No tiene conexión a internet");
-            return false;
-        }
-    }*/
 
 
     public void mensajeAviso(String texto) {
@@ -608,13 +606,62 @@ public class Login extends Activity {
         dlgAlert.create().show();
     }
 
+    public void GetConfiguraciones(){
 
-    public static String getHourPhone() {
-        Date dt = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        String formatteHour = df.format(dt.getTime());
-        return formatteHour;
+        HttpHandler sh = new HttpHandler();
+        String urlString = urlGetConfiguraciones;
+
+        String jsonStr = sh.makeServiceCall(urlString);
+
+        Log.e(TAG, "Response from url: " + jsonStr);
+
+        /**********************************USUARIOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray Usuarios = jsonObj.getJSONArray("GetConfiguracionesResult");
+
+                for (int i = 0; i < Usuarios.length(); i++) {
+                    JSONObject c = Usuarios.getJSONObject(i);
+                    String Valor = c.getString("Valor");
+                    String Configuracion = c.getString("Configuracion");
+                    String ConfigVDatos = "VersionDatos";
+                    if (Configuracion.equals(ConfigVDatos)) {
+                        variables_publicas.ValorConfigServ = Valor;
+                    }
+                }
+
+            } catch (final JSONException e) {
+                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "No se ha podido establecer contacto con el servidor",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+        } else {
+
+            Log.e(TAG, "No se ha podido establecer contacto con el servidor");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            "No se ha podido establecer contacto con el servidor",
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+
+
     }
+
 
 
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
@@ -624,8 +671,9 @@ public class Login extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-          /*  if (pDialog != null && pDialog.isShowing())
+            if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
+            /*
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
             pDialog.setCancelable(false);
@@ -670,6 +718,7 @@ public class Login extends Activity {
                     }
                 });
                 builder.setCancelable(false);
+                if(isFinishing()){return;}
                 builder.show();
             }
         }
@@ -702,7 +751,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (pDialog!=null && pDialog.isShowing())
+            if (pDialog.isShowing())
                 pDialog.dismiss();
         }
     }

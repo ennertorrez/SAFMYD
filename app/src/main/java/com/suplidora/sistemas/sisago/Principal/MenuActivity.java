@@ -256,14 +256,14 @@ public class MenuActivity extends AppCompatActivity
             case R.id.btnMaestroProductos:
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new MaestroProductoFragment());
+                tran.replace(R.id.content_frame, new MaestroProductoFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
             case R.id.btnMapa:
                 fragmentManager.executePendingTransactions();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.content_frame, new MapViewFragment());
+                transaction.replace(R.id.content_frame, new MapViewFragment());
                 transaction.addToBackStack(null);
                 transaction.commit();
 
@@ -271,7 +271,7 @@ public class MenuActivity extends AppCompatActivity
             case R.id.btnMaestroClientes:
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ClientesFragment());
+                tran.replace(R.id.content_frame, new ClientesFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
@@ -279,7 +279,7 @@ public class MenuActivity extends AppCompatActivity
 
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ListaPedidosFragment());
+                tran.replace(R.id.content_frame, new ListaPedidosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
@@ -298,7 +298,7 @@ public class MenuActivity extends AppCompatActivity
 */
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new PedidosFragment());
+                tran.replace(R.id.content_frame, new PedidosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
@@ -306,7 +306,7 @@ public class MenuActivity extends AppCompatActivity
 
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ListaPedidosSupFragment());
+                tran.replace(R.id.content_frame, new ListaPedidosSupFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

@@ -155,7 +155,7 @@ public class PedidosFragment extends Fragment {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage("Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
