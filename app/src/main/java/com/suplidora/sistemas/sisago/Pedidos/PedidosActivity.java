@@ -224,7 +224,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         if (isOnline) {
             ValidarUltimaVersion();
-            SincronizarTodo();
+            SincronizarConfig();
         }
 
 
@@ -528,7 +528,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     }
 
-    private void SincronizarTodo() {
+    private void SincronizarConfig() {
         new GetValorConfig().execute();
 
     }
@@ -1585,19 +1585,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     return;
                 }
 
-
                 HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
                 lblUM.setText(articulo.getUnidadCajaVenta());
-
-
+                existencia=articulo.getExistencia();
+                lblExistentias.setText(String.valueOf((int) (Double.parseDouble(existencia))));
 //                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
                 new ConsultarExistencias().execute();
 //                } else {
 //                    lblExistentias.setText("N/A");
 //                }
-
 
                 MensajeCaja = true;
                 ObtenerPrecio(null, CodigoArticulo, false);
@@ -1722,6 +1720,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
             } else {
                 guardadoOK = false;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        variables_publicas.MensajeError = "Ha ocurrido un error al obtener las existencias,Respuesta nula";
+                        Toast.makeText(getApplicationContext(),
+                                "Ha ocurrido un error al obtener las existencias,Respuesta nula",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
             }
             return null;
         }
@@ -1740,29 +1747,35 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
+
+          /*  if (pDialog.isShowing())
                 pDialog.dismiss();
             pDialog = new ProgressDialog(PedidosActivity.this);
             pDialog.setMessage("consultando existencias, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
+
         }
 
         @Override
         protected Void doInBackground(Void... params) {
 
-            if (Funciones.TestInternetConectivity()) {
-                existencia = SincronizarDatos.ConsultarExistencias(PedidosActivity.this, PedidoH, ArticulosH, articulo.getCodigo());
+            try{
+                if (Funciones.TestInternetConectivity()) {
+                    existencia = SincronizarDatos.ConsultarExistencias(PedidosActivity.this, PedidoH, ArticulosH, articulo.getCodigo());
+                }
+            }catch (Exception ex){
+                Log.e("error",ex.getMessage());
             }
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-
+          /*  if (pDialog.isShowing())
+                pDialog.dismiss();*/
 
             if (existencia != "N/A") {
                 lblExistentias.setText(String.valueOf((int) (Double.parseDouble(existencia))));

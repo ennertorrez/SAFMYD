@@ -3,8 +3,6 @@ package com.suplidora.sistemas.sisago.Principal;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,7 +28,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
@@ -47,9 +44,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
-import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -59,15 +54,9 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -198,34 +187,7 @@ public class Login extends Activity {
                 boolean isOnline = new Funciones().checkInternetConnection(Login.this);
 
                 if(isOnline){
-                    try {
-                        new GetValorConfig().execute().get();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
-                    try {
-
-                        String FechaLocal = variables_publicas.usuario.getFechaActualiza();
-                        String FechaActual = Funciones.getDatePhone();
-                        int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
-                        int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
-                        if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
-                            new GetUser().execute();
-                        } else {
-                            variables_publicas.MensajeLogin = "";
-                            variables_publicas.LoginOk = true;
-                            Intent intent = new Intent("android.intent.action.Barra_cargado");
-                            startActivity(intent);
-                            finish();
-                        }
-                    } catch (Exception e) {
-                        mensajeAviso(e.getMessage());
-                    }
-
-                } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
-                    new GetUser().execute();
+                 new GetValorConfig().execute();
                 }
                 if (!isOnline && variables_publicas.usuario != null) {
                     variables_publicas.MensajeLogin = "";
@@ -236,6 +198,7 @@ public class Login extends Activity {
                 } else if (!isOnline && variables_publicas.usuario == null) {
                     mensajeAviso("Usuario o contraseña invalido\n O para conectar un nuevo usuario debe conectarse a internet");
                 }
+
             }
         });
 
@@ -527,10 +490,10 @@ public class Login extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            pDialog = new ProgressDialog(Login.this);
-            pDialog.setMessage("Verificando última version del sistema, por favor espere...");
+          /*  pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Inicializando el sistema, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
         }
 
         @Override
@@ -593,8 +556,34 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+           /* if (pDialog.isShowing())
+                pDialog.dismiss();*/
+
+            if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
+                try {
+
+                    String FechaLocal = variables_publicas.usuario.getFechaActualiza();
+                    String FechaActual = Funciones.getDatePhone();
+                    int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
+                    int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
+                    if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
+                        new GetUser().execute();
+                    } else {
+                        variables_publicas.MensajeLogin = "";
+                        variables_publicas.LoginOk = true;
+                        Intent intent = new Intent("android.intent.action.Barra_cargado");
+                        startActivity(intent);
+                        finish();
+                    }
+                } catch (Exception e) {
+                    mensajeAviso(e.getMessage());
+                }
+
+            } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
+                new GetUser().execute();
+            }
+
+
 
         }
     }
@@ -709,8 +698,7 @@ public class Login extends Activity {
     @Override
     public void onResume(){
         super.onResume();
-        if (pDialog!= null) {
+        if (pDialog.isShowing())
             pDialog.dismiss();
-        }
     }
 }

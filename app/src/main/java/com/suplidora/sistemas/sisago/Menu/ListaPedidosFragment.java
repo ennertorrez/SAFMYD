@@ -859,11 +859,11 @@ public class ListaPedidosFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        try {
+       /* try {
             CargarPedidos();
 
         } catch (Exception ex) {
                 Log.e("Error",ex.getMessage());
-        }
+        }*/
     }
 }

@@ -15,6 +15,7 @@ import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -114,10 +115,10 @@ public class Funciones {
     }*/
 
     public static boolean TestInternetConectivity() {
+        HttpURLConnection conn=null;
         try {
-
             URL url = new URL("http://www.google.com.ni");
-            URLConnection conn = url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             conn.setUseCaches(false);
@@ -127,9 +128,11 @@ public class Funciones {
                 return true;
             }
             return false;
-
         } catch (Exception e) {
             return false;
+        }
+        finally {
+            conn.disconnect();
         }
     }
 
@@ -207,11 +210,11 @@ public class Funciones {
 
         @Override
         protected Void doInBackground(Void... params) {
-
+            HttpURLConnection conn=null;
             try {
                 connectionOK = false;
                 URL url = new URL("http://www.google.com.ni");
-                URLConnection conn = url.openConnection();
+                 conn= (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
                 conn.setUseCaches(false);
@@ -220,9 +223,11 @@ public class Funciones {
                 if (is != null) {
                     connectionOK = true;
                 }
-
             } catch (Exception e) {
+
                 connectionOK = false;
+            }finally {
+                conn.disconnect();
             }
             return null;
         }

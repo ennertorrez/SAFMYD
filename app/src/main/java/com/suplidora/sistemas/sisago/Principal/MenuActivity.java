@@ -48,11 +48,6 @@ import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
-
-import org.json.JSONException;
-
-import static android.R.id.toggle;
-import static com.suplidora.sistemas.sisago.Auxiliar.variables_publicas.VersionSistema;
 /*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
 import com.suplidora.sistemas.sisago.app.ControladorSincronizacion;*/
 
@@ -82,6 +77,7 @@ public class MenuActivity extends AppCompatActivity
     private ArticulosHelper ArticulosH;
     private PedidosHelper PedidosH;
     private PedidosDetalleHelper PedidosDetalleH;
+    private boolean SyncOk = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,24 +98,24 @@ public class MenuActivity extends AppCompatActivity
 
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
         navigationView.addHeaderView(header);
-         lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
+        lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
         lblUsuarioHeaderCodigo = (TextView) header.findViewById(R.id.UsuarioHeaderCodigo);
-        lblVersion =(TextView) header.findViewById(R.id.lblVersionSistema);
+        lblVersion = (TextView) header.findViewById(R.id.lblVersionSistema);
         lblServidor = (TextView) header.findViewById(R.id.lblServidor);
-        String userHeader="";
-        String userHeaderCodigo="";
-        String VersionSistema="";
-        String Servidor="";
-      try{
-          userHeader = variables_publicas.usuario.getNombre();
-          userHeaderCodigo = variables_publicas.usuario.getCodigo();
-          VersionSistema = "Version: " +variables_publicas.VersionSistema;
-          Servidor = variables_publicas.direccionIp.equals("http://186.1.18.75:8080")? "SERVIDOR: PRODUCCION" : "SERVIDOR: DESARROLLO";
-      }catch (Exception ex){
-          Log.e("Error:",ex.getMessage());
-      }
+        String userHeader = "";
+        String userHeaderCodigo = "";
+        String VersionSistema = "";
+        String Servidor = "";
+        try {
+            userHeader = variables_publicas.usuario.getNombre();
+            userHeaderCodigo = variables_publicas.usuario.getCodigo();
+            VersionSistema = "Version: " + variables_publicas.VersionSistema;
+            Servidor = variables_publicas.direccionIp.equals("http://186.1.18.75:8080") ? "SERVIDOR: PRODUCCION" : "SERVIDOR: DESARROLLO";
+        } catch (Exception ex) {
+            Log.e("Error:", ex.getMessage());
+        }
         lblUsuarioHeader.setText(userHeader);
-        lblUsuarioHeaderCodigo.setText("Codigo: "+ userHeaderCodigo);
+        lblUsuarioHeaderCodigo.setText("Codigo: " + userHeaderCodigo);
         lblVersion.setText(VersionSistema);
         lblServidor.setText(Servidor);
 
@@ -134,15 +130,15 @@ public class MenuActivity extends AppCompatActivity
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
-        UsuariosH= new UsuariosHelper(DbOpenHelper.database);
-        PedidosH= new PedidosHelper(DbOpenHelper.database);
-        PedidosDetalleH= new PedidosDetalleHelper(DbOpenHelper.database);
+        UsuariosH = new UsuariosHelper(DbOpenHelper.database);
+        PedidosH = new PedidosHelper(DbOpenHelper.database);
+        PedidosDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH,PedidosH,PedidosDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, PedidosH, PedidosDetalleH);
 
-        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";
 
     }
 
@@ -153,7 +149,7 @@ public class MenuActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-                    removeAllFragments(getFragmentManager());
+            removeAllFragments(getFragmentManager());
         }
     }
 
@@ -163,13 +159,14 @@ public class MenuActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
     private class SincronizaDatos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(MenuActivity.this);
-            pDialog.setMessage("Cargando datos, por favor espere......");
+            pDialog.setMessage("Sincronizando datos, por favor espere......");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -179,14 +176,15 @@ public class MenuActivity extends AppCompatActivity
 
             //SINCRONIZAR DATOS
             try {
-                sd.SincronizarTodo();
-            } catch (final JSONException e) {
-                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                SyncOk = sd.SincronizarTodo();
+
+            } catch (final Exception e) {
+                Log.e(TAG, "error: " + e.getMessage());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getApplicationContext(),
-                                "Json parsing error: " + e.getMessage(),
+                                "error: " + e.getMessage(),
                                 Toast.LENGTH_LONG)
                                 .show();
                     }
@@ -195,16 +193,21 @@ public class MenuActivity extends AppCompatActivity
 
             return null;
         }
+
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            // Dismiss the progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            mensajeAviso("Datos actualizados correctamente");
+            pDialog.dismiss();
+            if (SyncOk) {
+                MensajeAviso("Datos actualizados correctamente");
+            } else {
+                MensajeAlert("Ha ocurrido un error al sincronizar los datos, por favor revise su conexion a internet");
+            }
+
         }
     }
-    public void mensajeAviso(String texto) {
+
+    public void MensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setMessage(texto);
         dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
@@ -215,32 +218,46 @@ public class MenuActivity extends AppCompatActivity
         dlgAlert.create().show();
     }
 
+    public void MensajeAlert(String mensaje) {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("!Importante")
+                .setMessage(mensaje)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+
+                })
+                .show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-       try{
-           int id = item.getItemId();
+        try {
+            int id = item.getItemId();
 
-           if (id == R.id.SincronizarDatos) {
-               new SincronizaDatos().execute();
-           }
-           //noinspection SimplifiableIfStatement
-           if (id == R.id.Salir) {
-               finish();//return true;
-           }
-           if (id == R.id.CerrarSesion) {
-               Intent newAct = new Intent(getApplicationContext(), Login.class);
-              newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-               startActivity(newAct);//return true;
-               finish();
-           }
-           return super.onOptionsItemSelected(item);
-       }catch (Exception e){
-           Funciones.MensajeAviso(getApplicationContext(), e.getMessage());
-       }
-       finally {
-           return super.onOptionsItemSelected(item);
-       }
+            if (id == R.id.SincronizarDatos) {
+                new SincronizaDatos().execute();
+            }
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.Salir) {
+                finish();//return true;
+            }
+            if (id == R.id.CerrarSesion) {
+                Intent newAct = new Intent(getApplicationContext(), Login.class);
+                newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(newAct);//return true;
+                finish();
+            }
+            return super.onOptionsItemSelected(item);
+        } catch (Exception e) {
+            Funciones.MensajeAviso(getApplicationContext(), e.getMessage());
+        } finally {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -290,12 +307,7 @@ public class MenuActivity extends AppCompatActivity
                 startActivity(newAct);*/
                 break;
             case R.id.btnNuevoPedido:
-               /* Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
-                startActivity(newAct);
-                //Para pruebas
-                Intent newActi = new Intent(getApplicationContext(), ConsultaArticulosActivity.class);
-                startActivity(newActi);
-*/
+
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.replace(R.id.content_frame, new PedidosFragment());
@@ -316,9 +328,9 @@ public class MenuActivity extends AppCompatActivity
         return true;
     }
 
-    private  void removeAllFragments(FragmentManager fragmentManager) {
+    private void removeAllFragments(FragmentManager fragmentManager) {
 
-        if(fragmentManager.getBackStackEntryCount() > 0 || getSupportFragmentManager().getBackStackEntryCount()>0) {
+        if (fragmentManager.getBackStackEntryCount() > 0 || getSupportFragmentManager().getBackStackEntryCount() > 0) {
 
             while (fragmentManager.getBackStackEntryCount() > 0) {
                 fragmentManager.popBackStackImmediate();
@@ -328,13 +340,12 @@ public class MenuActivity extends AppCompatActivity
                 getSupportFragmentManager().popBackStackImmediate();
             }
 
-        }else{
-               new AlertDialog.Builder(this)
+        } else {
+            new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmación requerida")
                     .setMessage("Está seguro que desea salir de la aplicación?")
-                    .setPositiveButton("Si", new DialogInterface.OnClickListener()
-                    {
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -345,11 +356,18 @@ public class MenuActivity extends AppCompatActivity
                     .show();
         }
     }
+
     @Override
-    protected void attachBaseContext(Context base)
-    {
+    protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(MenuActivity.this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*if (pDialog != null) {
+            pDialog.dismiss();
+        }*/
+    }
 }

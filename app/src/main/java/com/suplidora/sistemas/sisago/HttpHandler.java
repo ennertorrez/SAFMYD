@@ -1,7 +1,7 @@
 package com.suplidora.sistemas.sisago;
+
 import android.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,19 +21,31 @@ public class HttpHandler {
 
     public String makeServiceCall(String reqUrl) {
         String response = null;
-        HttpURLConnection conn=null;
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(reqUrl);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept","*/*");
-            conn.setRequestProperty("Accept","*+*");
-            conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
+            conn.setRequestProperty("Connection", "close");
             conn.setConnectTimeout(20000);
             conn.setReadTimeout(20000);
             conn.setUseCaches(false);
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-            response = convertStreamToString(in);
+            conn.setAllowUserInteraction(false);
+            conn.setDoOutput(false);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            int responceCode = conn.getResponseCode();
+
+            if (responceCode == HttpURLConnection.HTTP_OK) {
+                String line = "";
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                response = "";
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                    Log.i("response_line", response);
+                }
+            } else {
+                response = null;
+            }
         } catch (MalformedURLException e) {
             Log.e(TAG, "MalformedURLException: " + e.getMessage());
         } catch (ProtocolException e) {
@@ -43,24 +55,39 @@ public class HttpHandler {
             Log.e(TAG, "IOException: " + e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Exception: " + e.getMessage());
-        }finally {
-
+        } finally {
+            conn.disconnect();
         }
         return response;
     }
 
     public String makeServiceCallPost(String reqUrl) {
         String response = null;
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(reqUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Accept","*/*");
-            conn.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
+            conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("Accept", "*/*");
+            conn.setRequestProperty("Connection", "close");
             conn.setConnectTimeout(20000);
             conn.setReadTimeout(20000);
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-            response = convertStreamToString(in);
+            conn.setUseCaches(false);
+            conn.setDoOutput(true);
+            int responceCode = conn.getResponseCode();
+
+            if (responceCode == HttpURLConnection.HTTP_OK) {
+                String line;
+                response = "";
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                    Log.i("response_line", response);
+                }
+            } else {
+                response = null;
+            }
         } catch (MalformedURLException e) {
             Log.e(TAG, "MalformedURLException: " + e.getMessage());
         } catch (ProtocolException e) {
@@ -69,6 +96,8 @@ public class HttpHandler {
             Log.e(TAG, "IOException: " + e.getMessage());
         } catch (Exception e) {
             Log.e(TAG, "Exception: " + e.getMessage());
+        } finally {
+            conn.disconnect();
         }
         return response;
     }
@@ -93,4 +122,6 @@ public class HttpHandler {
         }
         return sb.toString();
     }
+
+
 }

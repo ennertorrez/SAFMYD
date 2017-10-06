@@ -50,7 +50,7 @@ public class Barra_cargado extends Activity {
          	
              try {
                      Thread.sleep(100);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
-                    
+
              } catch (InterruptedException e) {}
             
              publishProgress();//Actualizamos el progreso, es decir al llamar a este proceso en realidad estamos llamamos al m�todo onProgresssUpdate()

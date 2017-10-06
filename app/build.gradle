@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+
     signingConfigs {
         SISAGO {
             keyAlias 'SISAGO'
@@ -15,8 +16,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 40
-        versionName "1.39"
+        versionCode 43
+        versionName "1.42"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -57,4 +58,6 @@ dependencies {
     compile files('lib/mail.jar')
     compile files('lib/additionnal.jar')
     compile files('lib/commons-net-3.6.jar')
+
+
 }
