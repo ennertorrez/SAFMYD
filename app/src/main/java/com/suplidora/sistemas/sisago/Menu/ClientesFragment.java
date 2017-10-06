@@ -99,7 +99,7 @@ public class ClientesFragment extends Fragment {
 
                 /*Guardamos el cliente seleccionado*/
                 for (HashMap<String, String> cliente : listaClientes) {
-                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente)) {
+                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente) && cliente.get(variables_publicas.CLIENTES_COLUMN_CodCv).equals(CodCV.replace("Cod_Cv: ",""))) {
                         ClienteH.EliminaCliente(IdCliente);
                         ClienteH.GuardarTotalClientes(cliente);
 
@@ -152,6 +152,7 @@ public class ClientesFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+            if(getActivity()==null) return null;
             HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
@@ -199,6 +200,8 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString("EsClienteVarios"));
+
                         if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
                             cliente.put("CodCv2", "");
                             cliente.put("NombreCompleto", c.getString("NombreCliente"));
@@ -212,6 +215,7 @@ public class ClientesFragment extends Fragment {
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -225,6 +229,7 @@ public class ClientesFragment extends Fragment {
                 }
             } else {
                 Log.e(TAG, "Couldn't get json from server.");
+                if(getActivity()==null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

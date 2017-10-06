@@ -15,6 +15,7 @@ import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 
 public class Funciones {
     private static boolean connectionOK = false;
-    private static String fechaActual="";
+    private static String fechaActual = "";
 
     public static String Codificar(String text) {
         return text.replace("+", "(plus)")
@@ -102,6 +103,7 @@ public class Funciones {
             new TestConnectivity().execute().get();
             return connectionOK;
         } catch (Exception e) {
+            Log.e("Error: ", e.getMessage());
             return false;
         }
 
@@ -113,10 +115,10 @@ public class Funciones {
     }*/
 
     public static boolean TestInternetConectivity() {
+        HttpURLConnection conn=null;
         try {
-
             URL url = new URL("http://www.google.com.ni");
-            URLConnection conn = url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(10000);
             conn.setUseCaches(false);
@@ -126,9 +128,11 @@ public class Funciones {
                 return true;
             }
             return false;
-
         } catch (Exception e) {
             return false;
+        }
+        finally {
+            conn.disconnect();
         }
     }
 
@@ -175,15 +179,42 @@ public class Funciones {
     }
 
 
-    class TestConnectivity extends AsyncTask<Void, Void, Boolean> {
+    public static String GetDateTime() {
+        try {
+            String timeServer = "0.north-america.pool.ntp.org";
+            Calendar cal = Calendar.getInstance();
+
+            NTPUDPClient timeClient = new NTPUDPClient();
+            InetAddress inetAddress = InetAddress.getByName(timeServer);
+            TimeInfo timeInfo = timeClient.getTime(inetAddress);
+            long returnTime = timeInfo.getReturnTime();
+            cal.setTimeInMillis(returnTime);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            variables_publicas.FechaActual = sdf.format(cal.getTime());
+            fechaActual = variables_publicas.FechaActual;
+            return fechaActual;
+        } catch (Exception e) {
+            Log.e("Error:", e.getMessage());
+            return GetLocalDateTime();
+        }
+
+    }
+
+    class TestConnectivity extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection conn=null;
             try {
                 connectionOK = false;
                 URL url = new URL("http://www.google.com.ni");
-                URLConnection conn = url.openConnection();
+                 conn= (HttpURLConnection) url.openConnection();
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
                 conn.setUseCaches(false);
@@ -192,20 +223,19 @@ public class Funciones {
                 if (is != null) {
                     connectionOK = true;
                 }
-
             } catch (Exception e) {
+
                 connectionOK = false;
+            }finally {
+                conn.disconnect();
             }
             return null;
         }
 
         @Override
-
-
-        protected void onPostExecute(Boolean result) {
-
+        protected void onPostExecute(Void param) {
+            super.onPostExecute(param);
         }
-
     }
 
 
@@ -229,14 +259,13 @@ public class Funciones {
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 variables_publicas.FechaActual = sdf.format(cal.getTime());
-                fechaActual= variables_publicas.FechaActual;
+                fechaActual = variables_publicas.FechaActual;
 
             } catch (Exception e) {
 
             }
             return null;
         }
-
 
 
     }

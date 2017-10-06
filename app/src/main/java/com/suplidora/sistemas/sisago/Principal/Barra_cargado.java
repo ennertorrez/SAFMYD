@@ -50,7 +50,7 @@ public class Barra_cargado extends Activity {
          	
              try {
                      Thread.sleep(100);//Esto lo que hace es ralentizar este proceso un segundo (el tiempo que se pone entre par�ntesis es en milisegundos) tiene que ir entre try y catch
-                    
+
              } catch (InterruptedException e) {}
             
              publishProgress();//Actualizamos el progreso, es decir al llamar a este proceso en realidad estamos llamamos al m�todo onProgresssUpdate()
@@ -99,15 +99,6 @@ public class Barra_cargado extends Activity {
 		getMenuInflater().inflate(R.menu.barra_cargado, menu);
 		return true;
 	}
-    public void mensajeAviso(String texto){
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-        dlgAlert.setMessage(texto);
-        dlgAlert.setPositiveButton(R.string.aceptar,new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-        dlgAlert.setCancelable(true);
-        dlgAlert.create().show();
-    }
+
 
 }

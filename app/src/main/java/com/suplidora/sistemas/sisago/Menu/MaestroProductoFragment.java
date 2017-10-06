@@ -125,6 +125,7 @@ public class MaestroProductoFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
+                if(getActivity()==null) return null;
                 DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                 ArticulosH = new ArticulosHelper(DbOpenHelper.database);
                 switch (tipoBusqueda){
@@ -136,6 +137,7 @@ public class MaestroProductoFragment extends Fragment {
                         break;
                 }
             } catch (final Exception e) {
+                if(getActivity()==null) return null;
                 Log.e(TAG, "Json parsing error: " + e.getMessage());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -156,13 +158,14 @@ public class MaestroProductoFragment extends Fragment {
             // Dismiss the progress dialog
             if (pDialog.isShowing())
                 pDialog.dismiss();
+            if(getActivity()==null) return;
             /**
              * Updating parsed JSON data into ListView
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaArticulos,
-                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioForaneo2","PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioForaneo2,R.id.PrecioMayorista});
+                    R.layout.list_item, new String[]{"Codigo", "Nombre","PrecioSuper", "PrecioDetalle","PrecioForaneo","PrecioForaneo2","PrecioMayorista","Existencia"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.id.PrecioSuper, R.id.PrecioDetalle,R.id.PrecioForaneo,R.id.PrecioForaneo2,R.id.PrecioMayorista,R.id.Existencias});
 
             lv.setAdapter(adapter);
             lblFooter.setText("Articulos encontrados: " + String.valueOf(listaArticulos.size()));

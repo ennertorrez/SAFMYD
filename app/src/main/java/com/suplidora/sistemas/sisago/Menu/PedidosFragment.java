@@ -155,7 +155,7 @@ public class PedidosFragment extends Fragment {
             super.onPreExecute();
             // Showing progress dialog
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Please wait...");
+            pDialog.setMessage("Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -164,6 +164,7 @@ public class PedidosFragment extends Fragment {
         protected Void doInBackground(Void... arg0) {
 
                 try {
+                    if(getActivity().isFinishing()) return null;
                     DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                     ClientesH = new ClientesHelper(DbOpenHelper.database);
                     switch (tipoBusqueda){
@@ -176,9 +177,11 @@ public class PedidosFragment extends Fragment {
                     }
                 } catch (final Exception e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());
+                    if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             Toast.makeText(getActivity().getApplicationContext(),
                                     "Json parsing error: " + e.getMessage(),
                                     Toast.LENGTH_LONG)
@@ -207,9 +210,11 @@ public class PedidosFragment extends Fragment {
                }
                lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
            }catch (final Exception ex){
+               if(getActivity()==null) return ;
                getActivity().runOnUiThread(new Runnable() {
                    @Override
                    public void run() {
+
                        Toast.makeText(getActivity().getApplicationContext(),
                                "error: " + ex.getMessage(),
                                Toast.LENGTH_LONG)
