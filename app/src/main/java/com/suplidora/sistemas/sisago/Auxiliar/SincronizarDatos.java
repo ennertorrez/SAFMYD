@@ -12,6 +12,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
@@ -20,6 +22,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 
@@ -47,6 +50,8 @@ public class SincronizarDatos {
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
+    final String urlConsolidadoCarga = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/GetCarga/";
+    final String urlConsolidadoCargaDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/GetCargaDetalle/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
@@ -62,6 +67,8 @@ public class SincronizarDatos {
 
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private ConsolidadoCargaHelper ConsolidadoCargaH;
+    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
@@ -71,7 +78,8 @@ public class SincronizarDatos {
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH) {
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
+                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -83,6 +91,10 @@ public class SincronizarDatos {
         ClientesSucH = ClientesSuch;
         ArticulosH = Articulosh;
         UsuariosH = usuariosH;
+        ConsolidadoCargaH = ConsolidadoCargah;
+        ConsolidadoCargaDetalleH = ConsolidadoCargaDetalleh;
+        CartillasBcDetalleH = CartillasBcDetalleh;
+
     }
 
     private String SincronizarArticulos() throws JSONException {
@@ -575,6 +587,110 @@ public class SincronizarDatos {
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
 
+    }
+    public void SincronizarDevoluciones() throws JSONException {
+        ActualizarUsuario();
+        SincronizarArticulos();
+        SincronizarClientes();
+        SincronizarVendedores();
+        SincronizarCartillasBc();
+        SincronizarCartillasBcDetalle();
+        SincronizarFormaPago();
+        SincronizarPrecioEspecial();
+        SincronizarClientesSucursal();
+        SincronizarConfiguracionSistema();
+
+        SincronizarConsolidadoCarga();
+        SincronizarConsolidadoCargaDetalle();
+
+    }
+    //ConsolidadoCarga
+    public String SincronizarConsolidadoCarga() throws JSONException {
+        HttpHandler shCarga = new HttpHandler();
+        String urlStringCarga = urlConsolidadoCarga + variables_publicas.CodigoVendedor;
+        String jsonStrCarga = shCarga.makeServiceCall(urlStringCarga);
+
+        if (jsonStrCarga == null)
+        {
+            new Funciones().SendMail("Ha ocurrido un error al sincronicar ConsolidadoCarga, Respuesta nula GET", variables_publicas.info+urlStringCarga,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            return null;
+        }
+
+        ConsolidadoCargaH.EliminaConsolidadoCarga();
+
+        JSONObject jsonObjCarga = new JSONObject(jsonStrCarga);
+        // Getting JSON Array node
+        JSONArray carga = jsonObjCarga.getJSONArray("BuscarConsolidadoResult");
+
+        DbOpenHelper.database.beginTransaction();
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < carga.length(); i++) {
+                JSONObject c = carga.getJSONObject(i);
+
+                String IdConsolidado = c.getString("IdConsolidado");
+                String Factura = c.getString("Factura");
+                String Cliente = c.getString("Cliente");
+                String Vendedor = c.getString("Vendedor");
+                String Direccion = c.getString("Direccion");
+
+                ConsolidadoCargaH.GuardarConsolidadoCarga(IdConsolidado, Factura, Cliente, Vendedor, Direccion);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+        }catch (Exception ex){
+            new Funciones().SendMail("Ha ocurrido un error al sincronicar ConsolidadoCarga, Excepcion controlada",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+        }
+
+        finally {
+            DbOpenHelper.database.endTransaction();
+        }
+        return jsonStrCarga;
+    }
+
+
+    //ConsolidadoCargaDetalle
+    public String SincronizarConsolidadoCargaDetalle() throws JSONException {
+        HttpHandler shConsolidadoCargaD = new HttpHandler();
+        String urlStringConsolidadoD = urlConsolidadoCargaDetalle + variables_publicas.CodigoVendedor;
+        String jsonStrConsolidadoCargaD = shConsolidadoCargaD.makeServiceCall(urlStringConsolidadoD);
+
+        if (jsonStrConsolidadoCargaD == null)
+        {
+            new Funciones().SendMail("Ha ocurrido un error ConsolidadoCargaDetalle",variables_publicas.info+urlStringConsolidadoD,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+            return null;
+        }
+
+        ConsolidadoCargaDetalleH.EliminaConsolidadoCargaDetalle();
+
+        JSONObject jsonObjCargaD = new JSONObject(jsonStrConsolidadoCargaD);
+        // Getting JSON Array node
+        JSONArray cargaD = jsonObjCargaD.getJSONArray("BuscarConsolidadoDetalleResult");
+
+        DbOpenHelper.database.beginTransaction();
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < cargaD.length(); i++) {
+                JSONObject c = cargaD.getJSONObject(i);
+                String IdVehiculo = c.getString("IdVehiculo");
+                String Factura = c.getString("Factura");
+                String ITEM = c.getString("ITEM");
+                String Item_Descripcion = c.getString("Item_Descripcion");
+                String CANTIDAD = c.getString("CANTIDAD");
+                String PRECIO = c.getString("PRECIO");
+                String SUBTOTAL = c.getString("SUBTOTAL");
+                String IVA = c.getString("IVA");
+                String DESCUENTO = c.getString("DESCUENTO");
+                ConsolidadoCargaDetalleH.GuardarConsolidadoCargaDetalle(IdVehiculo, Factura, ITEM, Item_Descripcion, CANTIDAD, PRECIO, SUBTOTAL, IVA, DESCUENTO);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+        }catch (Exception ex){
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar ConsolidadoCargaDetalle, Excepcion controlada",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
+        }
+
+        finally {
+            DbOpenHelper.database.endTransaction();
+        }
+        return jsonStrConsolidadoCargaD;
     }
 
     private boolean ActualizarUsuario() {

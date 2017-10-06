@@ -187,6 +187,24 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Total + " TEXT )");
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA + "( "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE + "( "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_SUBTOTAL + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO + " TEXT ) ");
+
         }
 
         @Override
@@ -204,6 +222,8 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONFIGURACION_SISTEMA);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE);
 
             onCreate(db);
         }

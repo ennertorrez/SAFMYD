@@ -27,10 +27,10 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
 
-    public static final String direccionIp = "http://186.1.18.75:8080";
+    public static final String direccionIp = "http://186.1.18.75:8085";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 47;
+    public static final int DATABASE_VERSION = 52;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -41,6 +41,8 @@ public class variables_publicas {
     public static final String TABLE_VENDEDORES = "Vendedor";
     public static final String TABLE_CLIENTES_SUCURSALES = "ClientesSucursales";
     public static final String TABLE_FORMA_PAGO = "FormaPago";
+    public static final String TABLE_CONSOLIDADO_CARGA = "ConsolidadoCarga";
+    public static final String TABLE_CONSOLIDADO_CARGA_DETALLE = "ConsolidadoCargaDetalle";
     public static final String TABLE_CARTILLAS_BC = "CartillasBC";
     public static final String TABLE_DETALLE_CARTILLAS_BC = "DetalleCartillasBC";
     public static final String TABLE_PRECIO_ESPECIAL = "ListaPrecioEspeciales";
@@ -199,6 +201,24 @@ public class variables_publicas {
     public static final String CONFIGURACION_SISTEMA_COLUMN_Configuracion = "Configuracion";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Valor = "Valor";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Activo = "Activo";
+
+    //Variables CamposTbConsolidadoCarga
+    public static final String CONSOLIDADO_CARGA_COLUMN_IdConsolidado = "IdConsolidado";
+    public static final String CONSOLIDADO_CARGA_COLUMN_Factura = "Factura";
+    public static final String CONSOLIDADO_CARGA_COLUMN_Cliente = "Cliente";
+    public static final String CONSOLIDADO_CARGA_COLUMN_Vendedor = "Vendedor";
+    public static final String CONSOLIDADO_CARGA_COLUMN_Direccion = "Direccion";
+
+    //Variables CamposTbConsolidadoCargaDetalle
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo= "IdVehiculo";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura = "Factura";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM = "ITEM";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion = "Item_Descripcion";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD = "CANTIDAD";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO= "PRECIO";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_SUBTOTAL = "SUBTOTAL";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA= "IVA";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO = "DESCUENTO";
 
 
 }

@@ -34,6 +34,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
@@ -92,6 +94,8 @@ public class Login extends Activity {
 
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private ConsolidadoCargaHelper ConsolidadoCargaH;
+    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigH;
@@ -124,11 +128,13 @@ public class Login extends Activity {
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
+        ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
+        ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -430,7 +436,11 @@ public class Login extends Activity {
                         variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                         //SINCRONIZAR DATOS
                         try {
-                            sd.SincronizarTodo();
+                            if(variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo"))
+                            {
+                                sd.SincronizarDevoluciones();
+                            }
+                            else {sd.SincronizarTodo();}
                         } catch (final JSONException e) {
                             Log.e(TAG, "Json parsing error: " + e.getMessage());
 //                            runOnUiThread(new Runnable() {

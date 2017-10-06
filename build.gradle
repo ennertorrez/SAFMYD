@@ -16,6 +16,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        //Para listar un searchView con Spinner
+        maven { url "https://jitpack.io" }
+        maven { url "https://maven.google.com" }
     }
 
 }
