@@ -38,6 +38,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -77,7 +79,7 @@ public class Login extends Activity {
     private String Contrasenia = "";
     private ProgressDialog pDialog;
     private String tipoBusqueda = "3";
-
+private boolean isOnline=false;
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
@@ -101,6 +103,8 @@ public class Login extends Activity {
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
+    private PedidosDetalleHelper PedidoDetalleH;
+    private PedidosHelper PedidoH;
     private SincronizarDatos sd;
     String MsjLoging = "";
 
@@ -130,11 +134,13 @@ public class Login extends Activity {
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
+        PedidoH = new PedidosHelper(DbOpenHelper.database);
+        PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -187,28 +193,8 @@ public class Login extends Activity {
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
 
 
-                if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
-                    try {
-                        new GetValorConfig().execute().get();
-                    } catch (Exception e) {
-                        mensajeAviso(e.getMessage());
-                    }
-                    String FechaLocal = variables_publicas.usuario.getFechaActualiza();
-                    String FechaActual = Funciones.getDatePhone();
-                    int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
-                    int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
-
-                    if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
-                        new GetUser().execute();
-                    } else {
-                        variables_publicas.MensajeLogin = "";
-                        variables_publicas.LoginOk = true;
-                        Intent intent = new Intent("android.intent.action.Barra_cargado");
-                        startActivity(intent);
-                        finish();
-                    }
-                } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
-                    new GetUser().execute();
+                if(isOnline){
+                 new GetValorConfig().execute();
                 }
                 if (!isOnline && variables_publicas.usuario != null) {
                     variables_publicas.MensajeLogin = "";
@@ -219,8 +205,18 @@ public class Login extends Activity {
                 } else if (!isOnline && variables_publicas.usuario == null) {
                     mensajeAviso("Usuario o contraseña invalido\n O para conectar un nuevo usuario debe conectarse a internet");
                 }
+
             }
         });
+
+        variables_publicas.usuario = UltimoUsuario;
+        isOnline= new Funciones().checkInternetConnection(Login.this);
+        if (variables_publicas.usuario != null) {
+            if (isOnline) {
+                new SincronizardorPedidos().execute();
+            }
+        }
+
         ValidarUltimaVersion();
         loadIMEI();
         try {
@@ -229,6 +225,8 @@ public class Login extends Activity {
         } catch (Exception ex) {
             Funciones.MensajeAviso(getApplicationContext(), ex.getMessage());
         }
+
+
 
     }
 
@@ -337,18 +335,14 @@ public class Login extends Activity {
 */
 
     private void ValidarUltimaVersion() {
-        boolean isOnline = new Funciones().checkInternetConnection(Login.this);
-
         if (isOnline) {
             String latestVersion = "";
             String currentVersion = getCurrentVersion();
-            variables_publicas.VersionSistema=currentVersion;
+            variables_publicas.VersionSistema = currentVersion;
             try {
                 new GetLatestVersion().execute();
 
-
-
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -434,6 +428,7 @@ public class Login extends Activity {
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin = "";
                         variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
+
                         //SINCRONIZAR DATOS
                         try {
                             if(variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo"))
@@ -492,7 +487,7 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog != null && pDialog.isShowing())
+            if (pDialog!=null && pDialog.isShowing())
                 pDialog.dismiss();
         }
     }
@@ -501,6 +496,16 @@ public class Login extends Activity {
 
     //region ObtieneValorConfiguracion
     private class GetValorConfig extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+          /*  pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Inicializando el sistema, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();*/
+        }
+
         @Override
         protected Void doInBackground(Void... arg0) {
 
@@ -511,7 +516,7 @@ public class Login extends Activity {
 
             Log.e(TAG, "Response from url: " + jsonStr);
 
-            /**********************************USUARIOS**************************************/
+
             if (jsonStr != null) {
 
                 try {
@@ -557,35 +562,44 @@ public class Login extends Activity {
 
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+           /* if (pDialog.isShowing())
+                pDialog.dismiss();*/
+
+            if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
+                try {
+
+                    String FechaLocal = variables_publicas.usuario.getFechaActualiza();
+                    String FechaActual = Funciones.getDatePhone();
+                    int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
+                    int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
+                    if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
+                        new GetUser().execute();
+                    } else {
+                        variables_publicas.MensajeLogin = "";
+                        variables_publicas.LoginOk = true;
+                        Intent intent = new Intent("android.intent.action.Barra_cargado");
+                        startActivity(intent);
+                        finish();
+                    }
+                } catch (Exception e) {
+                    mensajeAviso(e.getMessage());
+                }
+
+            } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
+                new GetUser().execute();
+            }
+
+
+
+        }
     }
     //endregion
 
-    public Boolean isOnlineNet() {
 
-        Runtime runtime = Runtime.getRuntime();
-        try {
-            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-/*    private boolean checkInternetConnection() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        // test for connection
-        if (cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isAvailable() && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            Log.e(TAG, "No tiene conexión a internet");
-            return false;
-        }
-    }*/
 
 
     public void mensajeAviso(String texto) {
@@ -600,26 +614,22 @@ public class Login extends Activity {
     }
 
 
-    public static String getHourPhone() {
-        Date dt = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        String formatteHour = df.format(dt.getTime());
-        return formatteHour;
-    }
+
 
 
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
-                pDialog.dismiss();
+
+            /*
             pDialog = new ProgressDialog(Login.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
         }
 
         @Override
@@ -642,11 +652,10 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+
 
             String currentVersion = getCurrentVersion();
-            variables_publicas.VersionSistema=currentVersion;
+            variables_publicas.VersionSistema = currentVersion;
             if (latestVersion != null && !currentVersion.equals(latestVersion)) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
                 builder.setTitle("Nueva version disponible");
@@ -660,6 +669,7 @@ public class Login extends Activity {
                     }
                 });
                 builder.setCancelable(false);
+                if(isFinishing()){return;}
                 builder.show();
             }
         }
@@ -667,5 +677,38 @@ public class Login extends Activity {
 
     }
 
+    private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Sincronizando pedidos locales, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
+        @Override
+        protected Void doInBackground(Void... params) {
+            try{
+                sd.SincronizarPedidosLocales();
+            }catch (Exception e){
+                Log.e("Error:", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (pDialog!=null)
+            pDialog.dismiss();
+    }
 }
