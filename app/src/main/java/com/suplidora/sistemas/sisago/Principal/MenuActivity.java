@@ -148,7 +148,13 @@ public class MenuActivity extends AppCompatActivity
                 FormaPagoH,
                 PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH);
 
-        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        try{
+            variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        }catch (Exception ex){
+            Log.e("error",ex.getMessage());
+            ex.printStackTrace();
+        }
+
 
     }
 

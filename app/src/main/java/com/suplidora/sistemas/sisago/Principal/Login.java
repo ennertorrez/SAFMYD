@@ -211,11 +211,11 @@ private boolean isOnline=false;
 
         variables_publicas.usuario = UltimoUsuario;
         isOnline= new Funciones().checkInternetConnection(Login.this);
-        if (variables_publicas.usuario != null) {
+        /*if (variables_publicas.usuario != null) {
             if (isOnline) {
                 new SincronizardorPedidos().execute();
             }
-        }
+        }*/
 
         ValidarUltimaVersion();
         loadIMEI();
