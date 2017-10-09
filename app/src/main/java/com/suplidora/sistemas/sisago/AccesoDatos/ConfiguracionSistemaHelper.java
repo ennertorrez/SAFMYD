@@ -35,10 +35,10 @@ public class ConfiguracionSistemaHelper {
         else
             return false;
     }
-    public Configuraciones BuscarValorConfig(String VersionDatos) {
+    public Configuraciones BuscarValorConfig(String Configuracion) {
         Configuraciones configuraciones = null;
         String selectQuery="SELECT * FROM " + variables_publicas.TABLE_CONFIGURACION_SISTEMA
-                + " WHERE " + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion+"= '"+VersionDatos+"'";
+                + " WHERE " + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion+"= '"+Configuracion+"' LIMIT 1";
         Cursor c= database.rawQuery(selectQuery , null);
         if (c.moveToFirst()) {
             do {

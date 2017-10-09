@@ -268,10 +268,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                 lv.setAdapter(adapter);
             }
         });
-        txtDescuento = (EditText) findViewById(R.id.txtDescuento);
-        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) {
-            txtDescuento.setEnabled(false);
-        }
+
 
         txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
         txtPrecioArticulo = (TextView) findViewById(R.id.txtPrecioArticulo);

@@ -35,6 +35,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -82,7 +84,8 @@ public class MenuActivity extends AppCompatActivity
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
-
+    private PedidosDetalleHelper PedidoDetalleH;
+    private PedidosHelper PedidoH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,13 +141,20 @@ public class MenuActivity extends AppCompatActivity
         UsuariosH= new UsuariosHelper(DbOpenHelper.database);
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
-
+        PedidoH = new PedidosHelper(DbOpenHelper.database);
+        PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH);
 
-        variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        try{
+            variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
+        }catch (Exception ex){
+            Log.e("error",ex.getMessage());
+            ex.printStackTrace();
+        }
+
 
     }
 
@@ -287,8 +297,9 @@ public class MenuActivity extends AppCompatActivity
                 break;
             case R.id.btnDevoluciones:
 
-                Intent newActi = new Intent(getApplicationContext(), DevolucionesActivity.class);
-                startActivity(newActi);
+             /*   Intent newActi = new Intent(getApplicationContext(), DevolucionesActivity.class);
+                startActivity(newActi);*/
+
               /*  Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
                 startActivity(newAct);
                 Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);

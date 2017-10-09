@@ -80,8 +80,8 @@ public class SincronizarDatos {
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh) {
-                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH, PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH) {
+                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh,
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -273,7 +273,7 @@ public class SincronizarDatos {
         } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return jsonStrV;
+
     }
 
     //CartillasBc
@@ -315,7 +315,7 @@ public class SincronizarDatos {
         } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return jsonStrCartillas;
+
     }
 
 
@@ -441,7 +441,7 @@ public class SincronizarDatos {
         } finally {
             DbOpenHelper.database.endTransaction();
         }
-        return jsonStrPrecioEspecial;
+
     }
 
     //ConfiguracionSistema
@@ -775,6 +775,7 @@ public class SincronizarDatos {
                             variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza);
 
                     variables_publicas.usuario = UsuariosH.BuscarUsuarios(variables_publicas.usuario.getUsuario(), Contrasenia);
+                    return true;
                 }
             } catch (Exception ex) {
                 Log.e("Error", ex.getMessage());
@@ -786,6 +787,7 @@ public class SincronizarDatos {
             new Funciones().SendMail("Ha ocurrido un error al obtener los datos del usuario,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
+       return false;
     }
 
     public static String SincronizarPedido(PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
