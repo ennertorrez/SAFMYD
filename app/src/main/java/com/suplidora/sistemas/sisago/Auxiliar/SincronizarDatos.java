@@ -15,6 +15,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -23,6 +25,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
+import com.suplidora.sistemas.sisago.Entidades.Vehiculo;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 
@@ -853,6 +856,66 @@ public class SincronizarDatos {
 
         }
 
+    }
+
+    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH, Vehiculo vehiculo, Cliente cliente, String ndevolucion, String jsonDevolucion, boolean Editar) {
+
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+        Gson gson = new Gson();
+        List<HashMap<String, String>> devolucionDetalle = DevolucionesDetalleH.ObtenerDevolucionDetalle(ndevolucion);
+        for (HashMap<String, String> item : devolucionDetalle) {
+            item.put("SubTotal", item.get("SubTotal").replace(",", ""));
+            item.put("Costo", item.get("Costo").replace(",", ""));
+            item.put("Total", item.get("Total").replace(",", ""));
+            item.put("Iva", item.get("Iva").replace(",", ""));
+            item.put("Precio", item.get("Precio").replace(",", ""));
+            item.put("Descuento", item.get("Descuento").replace(",", ""));
+            item.put("Descripcion", Codificar(item.get("Descripcion")));
+        }
+        String jsonDevolucionDetalle = gson.toJson(devolucionDetalle);
+        final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoTotal/";
+        final String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + String.valueOf(Editar) + "/" + vehiculo.getIdVehiculo() + "/" + jsonDevolucion + "/" + jsonDevolucionDetalle;
+
+        try {
+            URL Url = new URL(urlStringDetalle);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar devolucion, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            e.printStackTrace();
+            return "false," + e.getMessage();
+        }
+
+        String jsonStrDevolucion = sh.makeServiceCallPost(encodeUrl);
+        if (jsonStrDevolucion == null) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion,Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return "false,Ha ocurrido un error al sincronizar el detalle de la devolucion,Respuesta nula";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrDevolucion);
+                String resultState = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[0];
+                String NoDevolucion = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    if (NoDevolucion.equalsIgnoreCase("Devolucion ya existe en base de datos")) {
+                        NoDevolucion = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[2];
+                    } else {
+                        new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion ,Respuesta false", variables_publicas.info + NoDevolucion, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                        return "false," + NoDevolucion;
+                    }
+                }
+                DevolucionesH.ActualizarDevoluciones(ndevolucion, NoDevolucion);
+                DevolucionesDetalleH.Actualizarndevolucion(ndevolucion, NoDevolucion);
+
+                return "true";
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "false," + ex.getMessage() + "";
+            }
+        }
     }
 
     public static String ConsultarExistencias(final Activity activity, PedidosHelper PedidoH, ArticulosHelper ArticulosH, String CodigoArticulo) {

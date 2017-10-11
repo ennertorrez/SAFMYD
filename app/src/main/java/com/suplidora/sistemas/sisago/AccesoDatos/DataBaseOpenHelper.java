@@ -205,6 +205,38 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO + " TEXT ) ");
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES + "( "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_cliente + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_usuario + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_subtotal + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_iva + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_total + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_estado + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_rango + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_motivo + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_factura + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_procesado + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_useranula + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_horaanula + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_tipo + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_ejecutada + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + "( "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_subtotal + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_total + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_poriva + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_descuento + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_numero + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_factura + " TEXT ) ");
+
         }
 
         @Override
@@ -224,6 +256,8 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE);
 
             onCreate(db);
         }

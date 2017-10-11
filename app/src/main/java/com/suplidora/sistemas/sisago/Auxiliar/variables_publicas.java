@@ -2,6 +2,7 @@ package com.suplidora.sistemas.sisago.Auxiliar;
 
 
 import com.suplidora.sistemas.sisago.Entidades.Configuraciones;
+import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 
@@ -10,6 +11,7 @@ public class variables_publicas {
     public static Usuario usuario = null;
     public static Configuraciones Configuracion = null;
     public static Pedido Pedidos = null;
+    public static Devoluciones Devoluciones = null;
     public static String ValorConfigServ = "";
     public static String AplicarPrecioMayoristaXCaja;
     public static String PermitirVentaDetAMayoristaXCaja;
@@ -241,5 +243,18 @@ public class variables_publicas {
     public static final String DEVOLUCIONES_COLUMN_tipo = "tipo";
     public static final String DEVOLUCIONES_COLUMN_ejecutada = "ejecutada";
 
+    //Variables CamposTbDevolucionesDetalle
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_ndevolucion= "ndevolucion";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_item = "item";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_cantidad = "cantidad";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_precio = "precio";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_iva = "iva";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_subtotal= "subtotal";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_total = "total";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_poriva= "poriva";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_descuento = "descuento";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_tipo = "tipo";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_numero = "numero";
+    public static final String DEVOLUCIONES_DETALLE_COLUMN_factura = "factura";
 
 }
