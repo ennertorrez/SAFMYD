@@ -1,5 +1,7 @@
 package com.suplidora.sistemas.sisago.Entidades;
 
+import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
+
 /**
  * Created by Sistemas on 6/5/2017.
  */
@@ -21,12 +23,14 @@ public class Devoluciones {
    String horaanula="";
     String   tipo ="";
     String ejecutada="";
+    String IMEI="";
+    String IdVehiculo="";
 
     public Devoluciones() {
     }
 
     public Devoluciones(String Ndevolucion, String Cliente, String Horagraba, String Usuario, String Subtotal, String Iva, String Total,
-                        String Estado, String Rango, String Motivo, String Factura,String Procesado,String Useranula,String Horaanula, String Tipo,String Ejecutada) {
+                        String Estado, String Rango, String Motivo, String Factura,String Procesado,String Useranula,String Horaanula, String Tipo,String Ejecutada,String IMEI,String IdVehiculo) {
         ndevolucion=Ndevolucion;
         cliente = Cliente;
         horagraba = Horagraba;
@@ -43,6 +47,8 @@ public class Devoluciones {
         horaanula = Horaanula;
         tipo=Tipo;
         ejecutada=Ejecutada;
+        this.IMEI = IMEI;
+        IdVehiculo = IdVehiculo;
 
     }
 
@@ -172,5 +178,25 @@ public class Devoluciones {
 
     public void setEjecutada(String ejecutada) {
         this.ejecutada = ejecutada;
+    }
+
+    public String getIMEI() {
+        return IMEI;
+    }
+
+    public void setIMEI(String IMEI) {
+        this.IMEI = IMEI;
+    }
+
+    public String getIdVehiculo() {
+        return IdVehiculo;
+    }
+
+    public void setIdVehiculo(String IdVehiculo) {
+        this.IdVehiculo = IdVehiculo;
+    }
+
+    public String toString(){
+        return  this.getNdevolucion();
     }
 }

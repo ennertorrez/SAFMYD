@@ -242,6 +242,8 @@ public class variables_publicas {
     public static final String DEVOLUCIONES_COLUMN_horaanula = "horaanula";
     public static final String DEVOLUCIONES_COLUMN_tipo = "tipo";
     public static final String DEVOLUCIONES_COLUMN_ejecutada = "ejecutada";
+    public static final String DEVOLUCIONES_COLUMN_IMEI = "IMEI";
+    public static final String DEVOLUCIONES_COLUMN_IdVehiculo = "IdVehiculo";
 
     //Variables CamposTbDevolucionesDetalle
     public static final String DEVOLUCIONES_DETALLE_COLUMN_ndevolucion= "ndevolucion";

@@ -97,7 +97,7 @@ public class ListaDevolucionesFragment extends Fragment {
     //AnularPedido/{Pedido}/{Usuario}
     private String jsonPedido;
     private String jsonAnulaDevolucion;
-    private String IdPedido;
+    private String IdDevolucion;
     private Cliente Clientes;
     private String IdVendedor;
     private boolean guardadoOK = true;
@@ -206,7 +206,7 @@ public class ListaDevolucionesFragment extends Fragment {
         btnBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CargarPedidos();
+                CargarDevoluciones();
 
             }
         });
@@ -214,7 +214,7 @@ public class ListaDevolucionesFragment extends Fragment {
         return myView;
     }
 
-    private void CargarPedidos() {
+    private void CargarDevoluciones() {
         fecha = txtFechaDevolucion.getText().toString();
         listadevoluciones.clear();
         InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -231,7 +231,7 @@ public class ListaDevolucionesFragment extends Fragment {
             int cantidad = 0;
             for (HashMap<String, String> devolucion : listadevoluciones) {
                 subtotal += Double.parseDouble(devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_subtotal).replace("C$", "").replace(",", ""));
-                if (devolucion.get("Estado").equalsIgnoreCase("Aprobado") || devolucion.get("Estado").equalsIgnoreCase("Facturado") || devolucion.get("Estado").equalsIgnoreCase("Pendiente")) {
+                if (devolucion.get("estado").equalsIgnoreCase("Aprobado") || devolucion.get("Estado").equalsIgnoreCase("Facturado") || devolucion.get("Estado").equalsIgnoreCase("Pendiente")) {
                     cantidad += 1;
                 }
             }
@@ -568,7 +568,7 @@ public class ListaDevolucionesFragment extends Fragment {
         protected Void doInBackground(Void... params) {
             if(getActivity()==null) return null;
             HttpHandler sh = new HttpHandler();
-            final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdPedido + "/" + variables_publicas.usuario.getUsuario();
+            final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdDevolucion + "/" + variables_publicas.usuario.getUsuario();
 
             String urlString = url;
             String urlStr = urlString;
@@ -708,12 +708,12 @@ public class ListaDevolucionesFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        HashMap<String, String> pedido = null;
+        HashMap<String, String> devolucion = null;
         try {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
             switch (item.getItemId()) {
-                case R.id.itemEliminarPedido:
+                case R.id.itemEliminarDevolucion:
                     fecha = txtFechaDevolucion.getText().toString();
                     listadevoluciones.clear();
                     InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -723,20 +723,20 @@ public class ListaDevolucionesFragment extends Fragment {
                     new GetListaDevoluciones().execute().get();
                     ActualizarFooter();
 
-                    HashMap<String, String> itemPedido = listadevoluciones.get(info.position);
-                    pedido = DevolucionesH.ObtenerDevolucion(itemPedido.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
+                    HashMap<String, String> itemDevolucion = listadevoluciones.get(info.position);
+                    devolucion = DevolucionesH.ObtenerDevolucion(itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
 
-                    IdPedido = itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
-                    if (itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).startsWith("-")) {
-                        final HashMap<String, String> finalPedido = pedido;
+                    IdDevolucion = itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion);
+                    if (itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion).startsWith("-")) {
+                        final HashMap<String, String> finalPedido = devolucion;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea eliminar el pedido?")
+                                .setMessage("Esta seguro que desea eliminar la devolucion ?")
                                 .setCancelable(false)
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        DevolucionesH.EliminaDevolucion(IdPedido);
-                                        DevolucionesDetalleH.EliminarDetalleDevolucion(IdPedido);
+                                        DevolucionesH.EliminaDevolucion(IdDevolucion);
+                                        DevolucionesDetalleH.EliminarDetalleDevolucion(IdDevolucion);
                                         btnBuscar.performClick();
                                     }
                                 })
@@ -750,14 +750,14 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     } else if (new Funciones().checkInternetConnection(getActivity())) {
 
-                        final HashMap<String, String> finalPedido = itemPedido;
+                        final HashMap<String, String> finalDevolucion = itemDevolucion;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea anular el pedido?")
+                                .setMessage("Esta seguro que desea anular la devolucion?")
                                 .setCancelable(false)
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        AnularDevolucion(finalPedido);
+                                        AnularDevolucion(finalDevolucion);
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -774,7 +774,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     return true;
 
-                case R.id.itemEditarPedido: {
+                case R.id.itemEditarDevolucion: {
                     fecha = txtFechaDevolucion.getText().toString();
                     listadevoluciones.clear();
                     inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -797,14 +797,14 @@ public class ListaDevolucionesFragment extends Fragment {
                     if (obj.get("Factura").equalsIgnoreCase("")) {
                         if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)")) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
 
-                            pedido = DevolucionesH.ObtenerDevolucion(ndevolucion);
-                            if (pedido == null) {
-                                Funciones.MensajeAviso(getActivity(), "Este pedido no se puede editar, ya que no fue creado en este dispositivo");
+                            devolucion = DevolucionesH.ObtenerDevolucion(ndevolucion);
+                            if (devolucion == null) {
+                                Funciones.MensajeAviso(getActivity(), "Esta devolucion no se puede editar, ya que no fue creado en este dispositivo");
                                 return true;
                             }
 
-                            String IdCliente = pedido.get("IdCliente");
-                            String CodCv = pedido.get("Cod_cv");
+                            String IdCliente = devolucion.get("IdCliente");
+                            String CodCv = devolucion.get("Cod_cv");
                             Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
                             String Nombre = cliente.getNombreCliente();
                             // Starting new intent
@@ -817,7 +817,7 @@ public class ListaDevolucionesFragment extends Fragment {
                             startActivity(in);
                         }
                     } else {
-                        Funciones.MensajeAviso(getActivity(), "Este pedido no se puede anular, ya que fue facturado");
+                        Funciones.MensajeAviso(getActivity(), "Esta devolucion no se puede anular, ya que fue Procesada");
                     }
 
 

@@ -32,7 +32,7 @@ public class DevolucionesHelper {
                                  String rango,
                                  String motivo,
                                  String factura,String procesado,String useranula,
-                                     String horaanula,String tipo,String ejecutada) {
+                                     String horaanula,String tipo,String ejecutada,String IMEI) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, ndevolucion);
@@ -51,6 +51,7 @@ public class DevolucionesHelper {
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_horaanula, horaanula);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo, tipo);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada, ejecutada);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI, IMEI);
         long rowInserted = database.insert(variables_publicas.TABLE_DEVOLUCIONES, null, contentValues);
         if (rowInserted != -1)
             return true;
@@ -90,6 +91,8 @@ public class DevolucionesHelper {
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_horaanula,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horaanula)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
                 lst.add(devoluciones);
             } while (c.moveToNext());
         }
@@ -140,6 +143,8 @@ public class DevolucionesHelper {
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_horaanula,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horaanula)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
             } while (c.moveToNext());
         }
         c.close();
@@ -169,6 +174,8 @@ public class DevolucionesHelper {
                 devolucion.setHoraanula(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horaanula)));
                 devolucion.setTipo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.setEjecutada(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devolucion.setEjecutada(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
+                devolucion.setEjecutada(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
             } while (c.moveToNext());
         }
         c.close();
@@ -235,7 +242,9 @@ public class DevolucionesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_useranula)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horaanula)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)),
-                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada))
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo))
                 ));
             } while (c.moveToNext());
         }

@@ -52,6 +52,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -65,6 +67,7 @@ import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
+import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCargaDetalle;
 import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
@@ -136,8 +139,9 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private FormaPago condicion;
     private ClienteSucursal sucursal;
     private ConsolidadoCarga carga = null;
+    private ConsolidadoCargaDetalle cargadetalle ;
     public static ArrayList<HashMap<String, String>> listaArticulos;
-    public static ArrayList<HashMap<String, String>> listaArticulosItem;
+    public static ArrayList<HashMap<String, String>> listaCCargaArticulosItem;
     public boolean Estado;
     public double total;
     public double subtotal;
@@ -149,7 +153,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private VendedoresHelper VendedoresH;
     private ClientesSucursalHelper ClientesSucursalH;
     private FormaPagoHelper FormaPagoH;
-    private ArticulosHelper ArticulosH;
+    //private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private ConsolidadoCargaHelper ConsolidadoCargaH;
@@ -157,9 +161,11 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private PrecioEspecialHelper PrecioEspecialH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
     private ConfiguracionSistemaHelper ConfiguracionSistemaH;
+    private DevolucionesHelper DevolucionH;
+    private DevolucionesDetalleHelper DevolucionDetalleH;
 
     private String CodigoLetra = "";
-    private String jsonPedido = "";
+    private String jsonDevolucion = "";
     private boolean finalizar = false;
     private String TipoPrecio = "";
     private boolean guardadoOK = false;
@@ -172,7 +178,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private int IdDepartamento;
     private String Nombre;
     private boolean editar = false;
-    private boolean pedidoLocal;
+    private boolean devolucionLocal;
 
 
     //endregion
@@ -196,13 +202,13 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         df.setDecimalFormatSymbols(fmts);
 
         listaArticulos = new ArrayList<HashMap<String, String>>();
-        listaArticulosItem = new ArrayList<HashMap<String, String>>();
+        listaCCargaArticulosItem = new ArrayList<HashMap<String, String>>();
 
         DbOpenHelper = new DataBaseOpenHelper(DevolucionesActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ClientesSucursalH = new ClientesSucursalHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
-        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+        ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
@@ -413,20 +419,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         return currentVersion;
     }
 
-    private boolean ValidarDescuento() {
-
-        double descuento = Double.parseDouble(txtDescuento.getText().toString().isEmpty() ? "0" : txtDescuento.getText().toString());
-        double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
-        double descuentoCliente = Double.parseDouble(cliente.getDescuento());
-        double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
-        if (descuento > descuentoMayor) {
-            MensajeAviso("El descuento maximo permitido para este producto es de: " + String.valueOf(descuentoMayor));
-            txtDescuento.setText("");
-//            txtDescuento.requestFocus();
-            return false;
-        }
-        return true;
-    }
 
     private void scrollMyListViewToBottom() {
         lv.post(new Runnable() {
@@ -441,12 +433,12 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     //region Metodos
 
-    private boolean SincronizarPedido(HashMap<String, String> pedido) {
+    private boolean SincronizarDevolucion(HashMap<String, String> devolucion) {
         Gson gson = new Gson();
 
-        jsonPedido = gson.toJson(pedido);
+        jsonDevolucion = gson.toJson(devolucion);
         try {
-            new SincronizardorPedidos().execute();
+            new SincronizardorDevoluciones().execute();
         } catch (final Exception ex) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -463,8 +455,113 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         return false;
     }
 
+    private boolean Guardar() {
+        if (lv.getCount() <= 0) {
+            MensajeAviso("No se puede guardar la devolucion, Debe ingresar al menos 1 item");
+            return false;
+        }
+
+        String mensaje = "";
+        if ( (cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
+            mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
+            devoluciones.setTipo("Detalle");
+
+        } else {
+            devoluciones.setTipo(cliente.getTipo());
+            mensaje = "Esta seguro que desea guardar la devolucion?";
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        DbOpenHelper.database.beginTransaction();
+                        if (GuardarDevolucion()) {
+                            DbOpenHelper.database.setTransactionSuccessful();
+                            DbOpenHelper.database.endTransaction();
+                            SincronizarDevolucion(DevolucionH.ObtenerDevolucion(devoluciones.getNdevolucion()));
+                        } else {
+                            DbOpenHelper.database.endTransaction();
+                        }
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+
+        return true;
+    }
+    private boolean GuardarDevolucion() {
+        String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
+        IMEI = variables_publicas.IMEI;
+        //Guardamos el Header
+
+        devoluciones.setFactura(String.valueOf(devoluciones.getFactura()));
+        devoluciones.setCliente(String.valueOf(devoluciones.getCliente()));
+        devoluciones.setMotivo(String.valueOf(devoluciones.getMotivo()));
+        devoluciones.setUsuario(String.valueOf(devoluciones.getUsuario()));
+        devoluciones.setHoragraba(String.valueOf(devoluciones.getHoragraba()));
+        devoluciones.setHoragraba(String.valueOf(devoluciones.getHoragraba()));
+        devoluciones.setIMEI(IMEI);
+
+        //Esto lo ponemos para cuando es editar
+
+        DevolucionH.EliminaDevolucion(devoluciones.getNdevolucion());
+        DevolucionDetalleH.EliminarDetalleDevolucion(devoluciones.getNdevolucion());
 
 
+        if (IMEI == null) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmación Requerida")
+                    .setMessage("Es necesario configurar el permiso \"Administrar llamadas telefonicas\" para porder guardar una devolucion, Desea continuar ? ")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                            loadIMEI();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return false;
+
+        }
+        if (new Funciones().checkInternetConnection(DevolucionesActivity.this)) {
+            new Funciones().GetInternetTime();
+        } else {
+            Funciones.GetLocalDateTime();
+        }
+
+        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(),devoluciones.getCliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
+                devoluciones.getSubtotal(),devoluciones.getIva(), String.valueOf(total),devoluciones.getEstado(), devoluciones.getRango(),devoluciones.getMotivo(),
+                devoluciones.getFactura(),devoluciones.getProcesado(),devoluciones.getUseranula(),devoluciones.getHoraanula(),devoluciones.getTipo(),devoluciones.getEjecutada(),IMEI);
+
+        if (!saved) {
+            MensajeAviso("Ha Ocurrido un error al guardar los datos");
+            return false;
+        }
+        //Guardamos el detalle de la devolucion
+        for (HashMap<String, String> item : listaArticulos) {
+            saved = DevolucionDetalleH.GuardarDetalleDevolucion(item);
+            if (!saved) {
+                break;
+            }
+        }
+
+        return true;
+    }
 
     public void loadIMEI() {
         // Check if the READ_PHONE_STATE permission is already available.
@@ -560,7 +657,9 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     }
 
     private void GenerarCodigoPedido() {
+        devoluciones.setNdevolucion("-" + GetFechaISO() + cliente.getIdCliente() + cliente.getCodCv() + devoluciones.getIdVehiculo());
 
+        //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
     }
 
     private String GetFechaISO() {
@@ -576,13 +675,14 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private void LimipiarDatos(boolean MensajeCaja) {
         if (MensajeCaja) {
             txtPrecioArticulo.setText("0.00");
-            articulo = null;
+            txtObservaciones.setText("");
+            cargadetalle = null;
             txtCodigoArticulo.setText(null);
             txtCantidad.setError(null);
             txtCodigoArticulo.setText("");
             lblDescripcionArticulo.setText("");
             txtCantidad.setText("");
-            txtDescuento.setText("");
+
             lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
             txtCodigoArticulo.requestFocus();
             InputMethodManager inputManager = (InputMethodManager)
@@ -599,65 +699,48 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     }
 
-
-    private void setPrecio(HashMap<String, String> articulo, String pTipoPrecio, double precio,boolean settxtPrecioArticulo) {
-        if (pTipoPrecio.equalsIgnoreCase("Especial")) {
-            if(settxtPrecioArticulo){
-                txtPrecioArticulo.setText(String.valueOf(precio));
-            }
-            PrecioItem = precio;
-        } else {
-            if(settxtPrecioArticulo){
-                txtPrecioArticulo.setText(articulo.get("Precio" + pTipoPrecio));
-            }
-            PrecioItem = Double.parseDouble(articulo.get("Precio" + pTipoPrecio));
-        }
-        TipoPrecio = pTipoPrecio;
-
-    }
-
     private boolean AgregarDetalle(HashMap<String, String> itemPedidos) {
         double Precio = PrecioItem;
         String DescripcionArt = lblDescripcionArticulo.getText().toString();
 
         //Validamos que solamente se puedan ingresar 18 articulos
-        if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
+        /*if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
             MensajeAviso("No se puede agregar el producto seleccionado,ha alcanzado el limite de 18 productos por pedido para factura grande (Mayorista)");
             return false;
-        }
+        }*/
 
 
-        itemPedidos.put("CodigoArticulo", articulo.getCodigo());
-        itemPedidos.put("Cod", articulo.getCodigo().split("-")[articulo.getCodigo().split("-").length - 1]);
+        itemPedidos.put("ITEM", cargadetalle.getITEM());
+        itemPedidos.put("Cod", cargadetalle.getCodigo().split("-")[cargadetalle.getCodigo().split("-").length - 1]);
         itemPedidos.put("Cantidad", txtCantidad.getText().toString());
         itemPedidos.put("Precio", String.valueOf(Precio));
         itemPedidos.put("TipoPrecio", TipoPrecio);
         itemPedidos.put("Descripcion", DescripcionArt);
-        itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
+        itemPedidos.put("Costo", String.valueOf(Double.parseDouble(cargadetalle.getCosto())));
         itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
         itemPedidos.put("TipoArt", "P");
         itemPedidos.put("BonificaA", "");
-        itemPedidos.put("Isc", articulo.getIsc());
-        itemPedidos.put("PorIva", articulo.getPorIva());
+        itemPedidos.put("Isc", cargadetalle.getIsc());
+        itemPedidos.put("PorIva", cargadetalle.getPorIva());
         double subtotal, iva, total, descuento, isc, porIva;
         subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
         descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
         subtotal = subtotal - descuento;
-        porIva = Double.parseDouble(articulo.getPorIva());
+        porIva = Double.parseDouble(cargadetalle.getPorIva());
         iva = subtotal * porIva;
         total = subtotal + iva;
         itemPedidos.put("Descuento", df.format(descuento));
-        itemPedidos.put("PorcentajeIva", articulo.getPorIva());
-        itemPedidos.put("Um", articulo.getUnidad());
+        itemPedidos.put("PorcentajeIva", cargadetalle.getPorIva());
+        itemPedidos.put("Um", cargadetalle.getUnidad());
         itemPedidos.put("Iva", df.format(iva));
         itemPedidos.put("SubTotal", df.format(subtotal));
         itemPedidos.put("Total", df.format(total));
-        itemPedidos.put("IdProveedor", articulo.getIdProveedor());
-        itemPedidos.put("UnidadCajaVenta", articulo.getUnidadCajaVenta());
+        itemPedidos.put("IdProveedor", cargadetalle.getIdProveedor());
+        itemPedidos.put("UnidadCajaVenta", cargadetalle.getUnidadCajaVenta());
 
 
         HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), variables_publicas.usuario.getCanal(), variables_publicas.FechaActual, itemPedidos.get("Cantidad"));
-        Articulo articuloB = ArticulosH.BuscarArticulo(itemBonificado.get("itemB"));
+        ConsolidadoCargaDetalle cargadetalleB = ConsolidadoCargaDetalleH.BuscarArticulo(itemBonificado.get("itemB"));
 
         if (itemBonificado.size() > 0) {
 
@@ -671,7 +754,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
             articuloBonificado.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-")[itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-").length - 1]);
             articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-            articuloBonificado.put("Um", articuloB == null ? "UNIDAD" : articuloB.getUnidad());
+            articuloBonificado.put("Um", cargadetalleB == null ? "UNIDAD" : cargadetalleB.getUnidad());
             int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
             articuloBonificado.put("Cantidad", String.valueOf((int) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
             articuloBonificado.put("Precio", "0");
@@ -688,8 +771,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             articuloBonificado.put("SubTotal", "0");
             articuloBonificado.put("Total", "0");
             articuloBonificado.put("TipoPrecio", "Bonificacion");
-            articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
-            articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
+            articuloBonificado.put("IdProveedor", cargadetalleB.getIdProveedor());
+            articuloBonificado.put("UnidadCajaVenta", cargadetalleB.getUnidadCajaVenta());
             listaArticulos.add(articuloBonificado);
         } else {
             //Validamos que solamente se puedan ingresar 18 articulos
@@ -855,26 +938,26 @@ return true;
                 try {
                     switch (tipoBusqueda) {
                         case 1:
-                            listaArticulosItem = ArticulosH.BuscarArticuloCodigo(busqueda);
+                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarArticuloCodigo(busqueda);
                             break;
                         case 2:
-                            listaArticulosItem = ArticulosH.BuscarArticuloNombre(busqueda);
+                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarArticuloNombre(busqueda);
                             break;
                     }
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
                 }
-                if (listaArticulosItem.size() == 0) {
-                    MensajeAviso("El codigo de articulo ingresado no existe en la base de datos o esta deshabilitado para su venta");
+                if (listaCCargaArticulosItem.size() == 0) {
+                    MensajeAviso("El codigo de articulo ingresado no existe en la lista del pedido");
                 }
 
                 ListAdapter adapter = new SimpleAdapter(
-                        getApplicationContext(), listaArticulosItem,
-                        R.layout.list_item, new String[]{"Codigo", "Nombre", "PrecioSuper", "PrecioDetalle", "PrecioForaneo", "PrecioForaneo2", "PrecioMayorista"}, new int[]{R.id.Codigo, R.id.Nombre,
-                        R.id.PrecioSuper, R.id.PrecioDetalle, R.id.PrecioForaneo, R.id.PrecioForaneo2, R.id.PrecioMayorista});
+                        getApplicationContext(), listaCCargaArticulosItem,
+                        R.layout.list_item_devolucion, new String[]{"Codigo", "Nombre", "Cantidad", "TotalItem"}, new int[]{R.id.Codigo, R.id.Nombre,
+                        R.id.Cantidad, R.id.TotalItem});
 
                 lvItem.setAdapter(adapter);
-                lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaArticulosItem.size()));
+                lblFooterItem.setText("Articulos encontrados: " + String.valueOf(listaCCargaArticulosItem.size()));
 
 
             }
@@ -888,10 +971,10 @@ return true;
                 lblDescripcionArticulo.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
 
-                articulo = ArticulosH.BuscarArticulo(CodigoArticulo);
+                cargadetalle = ConsolidadoCargaDetalleH.BuscarArticulo(CodigoArticulo);
                 /*Validamos que permita vender codigo 1052*/
 
-                HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
+                HashMap<String, String> art = ConsolidadoCargaDetalleH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
 
@@ -984,7 +1067,7 @@ return true;
     public void onBackPressed() {
         new AlertDialog.Builder(this)
                 .setTitle("Confirmación Requerida")
-                .setMessage("Esta seguro que desea cancelar el pedido actual?")
+                .setMessage("Esta seguro que desea cancelar la devolucion actual?")
                 .setCancelable(false)
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -997,7 +1080,7 @@ return true;
     //endregion
 
 
-    private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
+    private class SincronizardorDevoluciones extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -1012,7 +1095,9 @@ return true;
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH, vendedor, cliente, devoluciones.getNdevolucion(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
+                    guardadoOK = true;
+                }
             } else {
                 guardadoOK = false;
             }
@@ -1036,13 +1121,13 @@ return true;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-         /*   // Showing progress dialog
+            // Showing progress dialog
             if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
-            pDialog = new ProgressDialog(PedidosActivity.this);
+            pDialog = new ProgressDialog(DevolucionesActivity.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();*/
+            pDialog.show();
         }
 
         @Override
