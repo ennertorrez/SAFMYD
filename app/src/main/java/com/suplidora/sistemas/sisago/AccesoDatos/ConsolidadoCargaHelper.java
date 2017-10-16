@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
+import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,8 @@ public class ConsolidadoCargaHelper {
 
         return list;
     }
-    public List<ConsolidadoCarga> BuscarConsolidadoCargaFacturas() {
-        List<ConsolidadoCarga> list = new ArrayList<ConsolidadoCarga>();
+    public List<DtoConsolidadoCargaFacturas> BuscarConsolidadoCargaFacturas() {
+        List<DtoConsolidadoCargaFacturas> list = new ArrayList<DtoConsolidadoCargaFacturas>();
         String selectQuery = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA;
         Cursor cursor = database.rawQuery(selectQuery, null);
 
@@ -67,7 +68,7 @@ public class ConsolidadoCargaHelper {
         if (cursor.moveToFirst()) {
 
             do {
-                list.add(new ConsolidadoCarga(
+                list.add(new DtoConsolidadoCargaFacturas(
                         cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado)),
                         cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura)),
                         cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente)),

@@ -33,7 +33,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 53;
+    public static final int DATABASE_VERSION = 54;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -52,6 +52,7 @@ public class variables_publicas {
     public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
     public static final String TABLE_DEVOLUCIONES = "Devoluciones";
     public static final String TABLE_DEVOLUCIONES_DETALLE = "DevolucionesDetalle";
+    public static final String TABLE_MOTIVOS="Motivos";
 
     //Variables CamposTbArticulos
     //public static final String ARTICULO_COLUMN_Id= "Id";
@@ -221,7 +222,7 @@ public class variables_publicas {
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion = "Item_Descripcion";
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD = "CANTIDAD";
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO= "PRECIO";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_SUBTOTAL = "SUBTOTAL";
+    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL = "TOTAL";
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA= "IVA";
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO = "DESCUENTO";
 
@@ -258,5 +259,8 @@ public class variables_publicas {
     public static final String DEVOLUCIONES_DETALLE_COLUMN_tipo = "tipo";
     public static final String DEVOLUCIONES_DETALLE_COLUMN_numero = "numero";
     public static final String DEVOLUCIONES_DETALLE_COLUMN_factura = "factura";
+
+    public static  final String MOTIVOS_COLUMN_id = "id";
+    public static final String  MOTIVOS_COLUMN_motivo ="motivo";
 
 }

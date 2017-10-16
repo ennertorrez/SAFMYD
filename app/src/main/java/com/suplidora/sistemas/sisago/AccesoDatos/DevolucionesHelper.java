@@ -58,6 +58,17 @@ public class DevolucionesHelper {
         else return false;
     }
 
+    public boolean GuardarMotivos(String id, String motivo){
+        long rows = 0;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, id);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, motivo);
+        long rowInserted = database.insert(variables_publicas.TABLE_MOTIVOS, null, contentValues);
+        if (rowInserted != -1)
+            return true;
+        else return false;
+    }
+
     public boolean ActualizarDevoluciones(String ndevolucion , String CodigoDevolucion) {
         ContentValues con = new ContentValues();
         con.put("ndevolucion", CodigoDevolucion);
@@ -104,6 +115,12 @@ public class DevolucionesHelper {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_DEVOLUCIONES + " WHERE" +
                 " "+variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion+" = '" + ndevolucion + "' ;");
         Log.d("devolucion_deleted", "Datos eliminados");
+    }
+
+    public boolean EliminarMotivos() {
+      long deletedrows=  database.delete( variables_publicas.TABLE_MOTIVOS,null,null);
+        Log.d("devolucion_deleted", "Datos eliminados");
+        return deletedrows!=-1;
     }
 
     public int ObtenerNuevoCodigoDevolucion() {

@@ -55,8 +55,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -69,10 +67,9 @@ import com.suplidora.sistemas.sisago.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCargaDetalle;
 import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
+import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
-import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
-import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.R;
 
@@ -85,7 +82,6 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -139,7 +135,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private FormaPago condicion;
     private ClienteSucursal sucursal;
     private ConsolidadoCarga carga = null;
-    private ConsolidadoCargaDetalle cargadetalle ;
+    private ConsolidadoCargaDetalle cargadetalle;
     public static ArrayList<HashMap<String, String>> listaArticulos;
     public static ArrayList<HashMap<String, String>> listaCCargaArticulosItem;
     public boolean Estado;
@@ -153,7 +149,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private VendedoresHelper VendedoresH;
     private ClientesSucursalHelper ClientesSucursalH;
     private FormaPagoHelper FormaPagoH;
-    //private ArticulosHelper ArticulosH;
+    private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private ConsolidadoCargaHelper ConsolidadoCargaH;
@@ -179,6 +175,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private String Nombre;
     private boolean editar = false;
     private boolean devolucionLocal;
+    private DtoConsolidadoCargaFacturas Factura;
+
 
 
     //endregion
@@ -215,7 +213,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         ConfiguracionSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
-
+        ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         cboCarga = (Spinner) findViewById(R.id.cboCarga);
         cboNoFactura = (Spinner) findViewById(R.id.cboNoFactura);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
@@ -347,22 +345,21 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                                                       return;
                                                   }
                                                   HashMap<String, String> itemPedidos = new HashMap<>();
-                                                 if( AgregarDetalle(itemPedidos)){
-                                                     MensajeCaja = true;
+                                                  if (AgregarDetalle(itemPedidos)) {
+                                                      MensajeCaja = true;
 
-                                                     LimipiarDatos(MensajeCaja);
-                                                     for (HashMap<String, String> item : listaArticulos) {
-                                                     }
-                                                     RecalcularDetalle();
-                                                     CalcularTotales();
+                                                      LimipiarDatos(MensajeCaja);
+                                                      for (HashMap<String, String> item : listaArticulos) {
+                                                      }
+                                                      RecalcularDetalle();
+                                                      CalcularTotales();
 
-                                                     InputMethodManager inputManager = (InputMethodManager)
-                                                             getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                      InputMethodManager inputManager = (InputMethodManager)
+                                                              getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                                                     inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                                                             InputMethodManager.RESULT_SHOWN);
-                                                 }
-
+                                                      inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                                              InputMethodManager.RESULT_SHOWN);
+                                                  }
 
 
                                               } catch (Exception e) {
@@ -377,7 +374,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                 try {
                     CodigoLetra = lblCodigoCliente.getText().toString();
 
-                   // Guardar();
+                    // Guardar();
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
                     MensajeAviso(e.getMessage());
@@ -385,7 +382,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             }
         });
 
-       // cboVendedor.setEnabled(false);
+        // cboVendedor.setEnabled(false);
     }
 
     private void ValidarUltimaVersion() {
@@ -462,7 +459,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         }
 
         String mensaje = "";
-        if ( (cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
+        if ((cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
             mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
             devoluciones.setTipo("Detalle");
 
@@ -497,6 +494,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         return true;
     }
+
     private boolean GuardarDevolucion() {
         String codSuc = sucursal == null ? "0" : sucursal.getCodSuc();
         IMEI = variables_publicas.IMEI;
@@ -544,9 +542,9 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             Funciones.GetLocalDateTime();
         }
 
-        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(),devoluciones.getCliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
-                devoluciones.getSubtotal(),devoluciones.getIva(), String.valueOf(total),devoluciones.getEstado(), devoluciones.getRango(),devoluciones.getMotivo(),
-                devoluciones.getFactura(),devoluciones.getProcesado(),devoluciones.getUseranula(),devoluciones.getHoraanula(),devoluciones.getTipo(),devoluciones.getEjecutada(),IMEI);
+        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
+                devoluciones.getSubtotal(), devoluciones.getIva(), String.valueOf(total), devoluciones.getEstado(), devoluciones.getRango(), devoluciones.getMotivo(),
+                devoluciones.getFactura(), devoluciones.getProcesado(), devoluciones.getUseranula(), devoluciones.getHoraanula(), devoluciones.getTipo(), devoluciones.getEjecutada(), IMEI);
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -611,14 +609,16 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         }
     }
 
-    /**CARGAR COMBOS**/
+    /**
+     * CARGAR COMBOS
+     **/
     private void CargaDatosCombo() {
 
         //Combo Carga
         final List<ConsolidadoCarga> Ccarga;
-        Ccarga= ConsolidadoCargaH.BuscarConsolidadoCarga();
+        Ccarga = ConsolidadoCargaH.BuscarConsolidadoCarga();
 
-        ArrayAdapter<ConsolidadoCarga> adapterCarga = new ArrayAdapter<ConsolidadoCarga>(this,android.R.layout.simple_spinner_item,Ccarga);
+        ArrayAdapter<ConsolidadoCarga> adapterCarga = new ArrayAdapter<ConsolidadoCarga>(this, android.R.layout.simple_spinner_item, Ccarga);
         adapterCarga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboCarga.setAdapter(adapterCarga);
 
@@ -629,15 +629,16 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                 carga = (ConsolidadoCarga) adapter.getItemAtPosition(position);
 
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
         //Combo Carga Fact
-        /*final List<ConsolidadoCarga> CcargaFact;
+        final List<DtoConsolidadoCargaFacturas> CcargaFact;
         CcargaFact= ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
 
-        ArrayAdapter<ConsolidadoCarga> adapterCargaFact = new ArrayAdapter<ConsolidadoCarga>(this,android.R.layout.simple_spinner_item,CcargaFact);
+        ArrayAdapter<DtoConsolidadoCargaFacturas> adapterCargaFact = new ArrayAdapter<DtoConsolidadoCargaFacturas>(this,android.R.layout.simple_spinner_item,CcargaFact);
         adapterCargaFact.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboNoFactura.setAdapter(adapterCargaFact);
 
@@ -645,13 +646,14 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                carga = (ConsolidadoCarga) adapter.getItemAtPosition(position);
+
+                Factura = (DtoConsolidadoCargaFacturas) adapter.getItemAtPosition(position);
 
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
-        });*/
+        });
 
 
     }
@@ -669,7 +671,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         String nowAsISO = df.format(new Date());
         return nowAsISO;
     }
-
 
 
     private void LimipiarDatos(boolean MensajeCaja) {
@@ -699,102 +700,32 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     }
 
-    private boolean AgregarDetalle(HashMap<String, String> itemPedidos) {
-        double Precio = PrecioItem;
-        String DescripcionArt = lblDescripcionArticulo.getText().toString();
+    private boolean AgregarDetalle(HashMap<String, String> itemDevolucion) {
+        itemDevolucion.put("item", cargadetalle.getITEM());
+        itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
+        itemDevolucion.put("cantidad", txtCantidad.getText().toString());
+        itemDevolucion.put("precio", String.valueOf(cargadetalle.getPRECIO()));
+        itemDevolucion.put("TipoPrecio", TipoPrecio);
+        itemDevolucion.put("Descripcion", articulo.getNombre());
+        itemDevolucion.put("tipo", "P");
+        itemDevolucion.put("descuento", df.format(cargadetalle.getDESCUENTO()));
+        itemDevolucion.put("iva", df.format(cargadetalle.getIVA()));
+        itemDevolucion.put("total", df.format(cargadetalle.getTOTAL()));
+        listaArticulos.add(itemDevolucion);
 
-        //Validamos que solamente se puedan ingresar 18 articulos
-        /*if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
-            MensajeAviso("No se puede agregar el producto seleccionado,ha alcanzado el limite de 18 productos por pedido para factura grande (Mayorista)");
-            return false;
-        }*/
-
-
-        itemPedidos.put("ITEM", cargadetalle.getITEM());
-        itemPedidos.put("Cod", cargadetalle.getCodigo().split("-")[cargadetalle.getCodigo().split("-").length - 1]);
-        itemPedidos.put("Cantidad", txtCantidad.getText().toString());
-        itemPedidos.put("Precio", String.valueOf(Precio));
-        itemPedidos.put("TipoPrecio", TipoPrecio);
-        itemPedidos.put("Descripcion", DescripcionArt);
-        itemPedidos.put("Costo", String.valueOf(Double.parseDouble(cargadetalle.getCosto())));
-        itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
-        itemPedidos.put("TipoArt", "P");
-        itemPedidos.put("BonificaA", "");
-        itemPedidos.put("Isc", cargadetalle.getIsc());
-        itemPedidos.put("PorIva", cargadetalle.getPorIva());
-        double subtotal, iva, total, descuento, isc, porIva;
-        subtotal = Double.parseDouble(itemPedidos.get("Precio")) * Double.parseDouble(itemPedidos.get("Cantidad"));
-        descuento = subtotal * (Double.parseDouble(itemPedidos.get("PorDescuento")) / 100);
-        subtotal = subtotal - descuento;
-        porIva = Double.parseDouble(cargadetalle.getPorIva());
-        iva = subtotal * porIva;
-        total = subtotal + iva;
-        itemPedidos.put("Descuento", df.format(descuento));
-        itemPedidos.put("PorcentajeIva", cargadetalle.getPorIva());
-        itemPedidos.put("Um", cargadetalle.getUnidad());
-        itemPedidos.put("Iva", df.format(iva));
-        itemPedidos.put("SubTotal", df.format(subtotal));
-        itemPedidos.put("Total", df.format(total));
-        itemPedidos.put("IdProveedor", cargadetalle.getIdProveedor());
-        itemPedidos.put("UnidadCajaVenta", cargadetalle.getUnidadCajaVenta());
-
-
-        HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), variables_publicas.usuario.getCanal(), variables_publicas.FechaActual, itemPedidos.get("Cantidad"));
-        ConsolidadoCargaDetalle cargadetalleB = ConsolidadoCargaDetalleH.BuscarArticulo(itemBonificado.get("itemB"));
-
-        if (itemBonificado.size() > 0) {
-
-            //Validamos que solamente se puedan ingresar 18 articulos
-            if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
-                MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
-                return false;
-            }
-            listaArticulos.add(itemPedidos);
-            HashMap<String, String> articuloBonificado = new HashMap<>();
-
-            articuloBonificado.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-")[itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-").length - 1]);
-            articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-            articuloBonificado.put("Um", cargadetalleB == null ? "UNIDAD" : cargadetalleB.getUnidad());
-            int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
-            articuloBonificado.put("Cantidad", String.valueOf((int) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
-            articuloBonificado.put("Precio", "0");
-            articuloBonificado.put("TipoPrecio", "0");
-            articuloBonificado.put("Descripcion", "**" + itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
-            articuloBonificado.put("Costo", "0");
-            articuloBonificado.put("PorDescuento", "0");
-            articuloBonificado.put("TipoArt", "B");
-            articuloBonificado.put("BonificaA", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV));
-            articuloBonificado.put("Isc", "0");
-            articuloBonificado.put("PorcentajeIva", "0");
-            articuloBonificado.put("Descuento", "0");
-            articuloBonificado.put("Iva", "0");
-            articuloBonificado.put("SubTotal", "0");
-            articuloBonificado.put("Total", "0");
-            articuloBonificado.put("TipoPrecio", "Bonificacion");
-            articuloBonificado.put("IdProveedor", cargadetalleB.getIdProveedor());
-            articuloBonificado.put("UnidadCajaVenta", cargadetalleB.getUnidadCajaVenta());
-            listaArticulos.add(articuloBonificado);
-        } else {
-            //Validamos que solamente se puedan ingresar 18 articulos
-            if (listaArticulos.size() == 18 && cliente.getDetallista().equalsIgnoreCase("false")) {
-                MensajeAviso("No se puede agregar el producto seleccionado,ya que excede el limite de 18 productos para un pedido Mayorista");
-                return false;
-            }
-            listaArticulos.add(itemPedidos);
-        }
         PrecioItem = 0;
         RefrescarGrid();
         CalcularTotales();
-return true;
+        return true;
 
     }
 
     private void RefrescarGrid() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
-                R.layout.pedidos_list_item, new
-                String[]{"Cod", "Cantidad", "Precio", "TipoPrecio", "Descripcion", "PorDescuento", "Descuento", "SubTotal", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetallePorDescuento, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
+                R.layout.devoluciones_list_item, new
+                String[]{"Cod", "Cantidad", "Precio", "TipoPrecio", "Descripcion", "Descuento", "Iva", "Total"}, new
+                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -938,10 +869,10 @@ return true;
                 try {
                     switch (tipoBusqueda) {
                         case 1:
-                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarArticuloCodigo(busqueda);
+                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXCodigo( cboNoFactura.getSelectedItem().toString(),busqueda );
                             break;
                         case 2:
-                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarArticuloNombre(busqueda);
+                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXNombre(cboNoFactura.getSelectedItem().toString(),busqueda );
                             break;
                     }
                 } catch (Exception ex) {
@@ -971,10 +902,10 @@ return true;
                 lblDescripcionArticulo.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
 
-                cargadetalle = ConsolidadoCargaDetalleH.BuscarArticulo(CodigoArticulo);
+                cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(cboNoFactura.getSelectedItem().toString(),CodigoArticulo);
                 /*Validamos que permita vender codigo 1052*/
 
-                HashMap<String, String> art = ConsolidadoCargaDetalleH.BuscarArticuloHashMap(CodigoArticulo);
+                HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
 
@@ -1095,7 +1026,7 @@ return true;
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH, vendedor, cliente, devoluciones.getNdevolucion(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH,  devoluciones.getNdevolucion(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
                     guardadoOK = true;
                 }
             } else {
@@ -1114,7 +1045,6 @@ return true;
     }
 
 
-
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
 
@@ -1122,7 +1052,7 @@ return true;
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog != null && pDialog.isShowing())
+            if (pDialog.isShowing())
                 pDialog.dismiss();
             pDialog = new ProgressDialog(DevolucionesActivity.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");

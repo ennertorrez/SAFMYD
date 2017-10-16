@@ -150,9 +150,11 @@ public class PedidosDetalleHelper {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS_DETALLE + ";");
         Log.d("pedidos detalle_elimina", "Datos eliminados");
     }
-    public void EliminarDetallePedido(String CodigoPedido) {
+    public boolean EliminarDetallePedido(String CodigoPedido) {
         int rowsAffected =database.delete( variables_publicas.TABLE_PEDIDOS_DETALLE, variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido+ "='" +CodigoPedido+"'",null) ;
-        Log.d("Det. pedido eliminado: "+CodigoPedido, "Datos eliminados");
+        if(rowsAffected != -1)
+            return true;
+        else return false;
     }
 
     public boolean ActualizarCodigoPedido(String CodigoPedido, String NoPedido){

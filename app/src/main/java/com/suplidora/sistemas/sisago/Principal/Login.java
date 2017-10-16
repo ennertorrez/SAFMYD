@@ -37,6 +37,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -105,6 +107,8 @@ private boolean isOnline=false;
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
     private PedidosHelper PedidoH;
+    private DevolucionesHelper DevolucionesH;
+    private DevolucionesDetalleHelper DevolucionesDetalleH;
     private SincronizarDatos sd;
     String MsjLoging = "";
 
@@ -136,11 +140,13 @@ private boolean isOnline=false;
         ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
+        DevolucionesH = new DevolucionesHelper(DbOpenHelper.database);
+        DevolucionesDetalleH= new DevolucionesDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH,DevolucionesH,DevolucionesDetalleH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);

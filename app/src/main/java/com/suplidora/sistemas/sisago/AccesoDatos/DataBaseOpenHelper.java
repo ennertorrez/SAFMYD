@@ -201,7 +201,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_SUBTOTAL + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO + " TEXT ) ");
 
@@ -237,6 +237,11 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_numero + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_factura + " TEXT ) ");
 
+
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_MOTIVOS + "( "
+                    + variables_publicas.MOTIVOS_COLUMN_id + " TEXT , "
+                    + variables_publicas.MOTIVOS_COLUMN_motivo + " TEXT ) ");
         }
 
         @Override
@@ -258,7 +263,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE);
-
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_MOTIVOS);
             onCreate(db);
         }
     }

@@ -74,13 +74,14 @@ public class SincronizarDatos {
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
+    private DevolucionesHelper DevolucionesH;
+    private DevolucionesDetalleHelper DevolucionesDetalleH;
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh,
                             PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
@@ -95,10 +96,49 @@ public class SincronizarDatos {
         UsuariosH = usuariosH;
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
-        ConsolidadoCargaH = ConsolidadoCargah;
-        ConsolidadoCargaDetalleH = ConsolidadoCargaDetalleh;
         CartillasBcDetalleH = CartillasBcDetalleh;
 
+    }
+
+    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
+                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
+                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
+                            PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
+                            ConsolidadoCargaHelper consolidadoCargaH, ConsolidadoCargaDetalleHelper consolidadoCargaDetalleH,
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH,DevolucionesHelper devolucionesH,DevolucionesDetalleHelper devolucionesDetalleH) {
+        DbOpenHelper = dbh;
+        ClientesH = Clientesh;
+        VendedoresH = Vendedoresh;
+        CartillasBcH = CatillasBch;
+        CartillasBcDetalleH = CartillasBcDetalleh;
+        FormaPagoH = FormaPagoh;
+        PrecioEspecialH = PrecioEspecialh;
+        ConfigSistemasH = ConfigSistemah;
+        ClientesSucH = ClientesSuch;
+        ArticulosH = Articulosh;
+        UsuariosH = usuariosH;
+        PedidosH = pedidoH;
+        PedidosDetalleH = pedidosDetalleH;
+        CartillasBcDetalleH = CartillasBcDetalleh;
+        DevolucionesH= devolucionesH;
+        DevolucionesDetalleH=devolucionesDetalleH;
+        ConsolidadoCargaH=consolidadoCargaH;
+        ConsolidadoCargaDetalleH =consolidadoCargaDetalleH;
+    }
+
+    public SincronizarDatos(DataBaseOpenHelper dbh,  ConfiguracionSistemaHelper ConfigSistemah,
+                             ArticulosHelper Articulosh, UsuariosHelper usuariosH,
+                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh,
+                            DevolucionesHelper devolucionesH,DevolucionesDetalleHelper devolucionesDetalleH) {
+        DbOpenHelper = dbh;
+        ConfigSistemasH = ConfigSistemah;
+        ArticulosH = Articulosh;
+        UsuariosH = usuariosH;
+        ConsolidadoCargaH = ConsolidadoCargah;
+        ConsolidadoCargaDetalleH = ConsolidadoCargaDetalleh;
+        DevolucionesH =devolucionesH;
+        DevolucionesDetalleH =devolucionesDetalleH;
     }
 
     private boolean SincronizarArticulos() throws JSONException {
@@ -628,18 +668,10 @@ public class SincronizarDatos {
     public void SincronizarDevoluciones() throws JSONException {
         ActualizarUsuario();
         SincronizarArticulos();
-        SincronizarClientes();
-        SincronizarVendedores();
-        SincronizarCartillasBc();
-        SincronizarCartillasBcDetalle();
-        SincronizarFormaPago();
-        SincronizarPrecioEspecial();
-        SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
-
+        ObtenerMotivos();
         SincronizarConsolidadoCarga();
         SincronizarConsolidadoCargaDetalle();
-
     }
     //ConsolidadoCarga
     public String SincronizarConsolidadoCarga() throws JSONException {
@@ -790,6 +822,51 @@ public class SincronizarDatos {
        return false;
     }
 
+    private boolean ObtenerMotivos() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerMotivos/";;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************MOTIVOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray motivos = jsonObj.getJSONArray("ObtenerMotivosResult");
+                if (motivos.length() == 0) {
+                    return false;
+                }
+                DevolucionesH.EliminarMotivos();
+                // looping through All Contacts
+
+                for (int i = 0; i < motivos.length(); i++) {
+                    JSONObject c = motivos.getJSONObject(i);
+                    DevolucionesH.GuardarMotivos(c.get("id").toString(),c.get("motivo").toString());
+                }
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener los motivos de devolucion,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener los motivos de devolucion,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        return false;
+    }
+
     public static String SincronizarPedido(PedidosHelper PedidoH, PedidosDetalleHelper PedidoDetalleH, Vendedor vendedor, Cliente cliente, String IdPedido, String jsonPedido, boolean Editar) {
 
         HttpHandler sh = new HttpHandler();
@@ -855,7 +932,7 @@ public class SincronizarDatos {
 
     }
 
-    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH, Vehiculo vehiculo, Cliente cliente, String ndevolucion, String jsonDevolucion, boolean Editar) {
+    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH, String ndevolucion, String jsonDevolucion, boolean Editar) {
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -871,8 +948,8 @@ public class SincronizarDatos {
             item.put("Descripcion", Codificar(item.get("Descripcion")));
         }
         String jsonDevolucionDetalle = gson.toJson(devolucionDetalle);
-        final String urlDetalle = variables_publicas.direccionIp + "/ServicioPedidos.svc/SincronizarPedidoTotal/";
-        final String urlStringDetalle = urlDetalle + cliente.getCodigoLetra() + "/" + String.valueOf(Editar) + "/" + vehiculo.getIdVehiculo() + "/" + jsonDevolucion + "/" + jsonDevolucionDetalle;
+        final String urlDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/SincronizarDevoluciones/";
+        final String urlStringDetalle = urlDetalle  + String.valueOf(Editar) + "/" + "/" + jsonDevolucion + "/" + jsonDevolucionDetalle;
 
         try {
             URL Url = new URL(urlStringDetalle);
@@ -892,12 +969,12 @@ public class SincronizarDatos {
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrDevolucion);
-                String resultState = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[0];
-                String NoDevolucion = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[1];
+                String resultState = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[0];
+                String NoDevolucion = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[1];
                 if (resultState.equals("false")) {
 
                     if (NoDevolucion.equalsIgnoreCase("Devolucion ya existe en base de datos")) {
-                        NoDevolucion = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[2];
+                        NoDevolucion = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[2];
                     } else {
                         new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion ,Respuesta false", variables_publicas.info + NoDevolucion, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                         return "false," + NoDevolucion;

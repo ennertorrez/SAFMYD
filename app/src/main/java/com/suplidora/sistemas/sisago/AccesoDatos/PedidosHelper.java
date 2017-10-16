@@ -92,10 +92,11 @@ public class PedidosHelper {
         return lst;
     }
 
-    public void EliminaPedido(String IdPedido) {
-        database.execSQL("DELETE FROM " + variables_publicas.TABLE_PEDIDOS + " WHERE" +
-                " "+variables_publicas.PEDIDOS_COLUMN_CodigoPedido+" = '" + IdPedido + "' ;");
-        Log.d("pedido_eliminado", "Datos eliminados");
+    public boolean EliminaPedido(String IdPedido) {
+        long rowInserted = database.delete(variables_publicas.TABLE_PEDIDOS, variables_publicas.PEDIDOS_COLUMN_CodigoPedido + "= '" + IdPedido+"'", null);
+        if (rowInserted != -1)
+                return true;
+            else return false;
     }
 
     public int ObtenerNuevoCodigoPedido() {

@@ -118,7 +118,7 @@
 
                     <TextView
                         android:id="@+id/lblNombCliente"
-                        android:layout_width="210dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:gravity="center"
@@ -225,7 +225,7 @@
 
                     <TextView
                         android:id="@+id/lblDescArticulo"
-                        android:layout_width="210dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:gravity="center"
@@ -456,7 +456,7 @@
                 <RelativeLayout
                     android:id="@+id/layout_totales"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="57dp"
                     android:layout_marginTop="5dp"
                     android:orientation="vertical">
 
@@ -576,60 +576,7 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="25dp"
-                        android:layout_below="@id/layout_totales_cordobas"
-                        android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/lblMonDol"
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-
-                            android:text="DOL"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:textColor="@color/colorPrimaryGreen" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:weightSum="3">
-
-                            <TextView
-                                android:id="@+id/lblSubTotalDol"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="right"
-                                android:text="0.00"
-
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textColor="@color/colorPrimaryGreen" />
-
-
-                            <TextView
-                                android:id="@+id/lblIvaDol"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="right"
-                                android:text="0.00"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textColor="@color/colorPrimaryGreen" />
-
-                            <TextView
-                                android:id="@+id/lblTotalDol"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="right"
-                                android:text="0.00"
-                                android:textAppearance="?android:attr/textAppearanceMedium"
-                                android:textColor="@color/colorPrimaryGreen" />
-                        </LinearLayout>
-
-                    </LinearLayout>
 
                 </RelativeLayout>
 
