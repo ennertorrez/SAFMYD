@@ -12,6 +12,7 @@ import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class ConsolidadoCargaHelper {
 
@@ -59,8 +60,8 @@ public class ConsolidadoCargaHelper {
 
         return list;
     }
-    public List<DtoConsolidadoCargaFacturas> BuscarConsolidadoCargaFacturas() {
-        List<DtoConsolidadoCargaFacturas> list = new ArrayList<DtoConsolidadoCargaFacturas>();
+    public java.util.ArrayList<String> BuscarConsolidadoCargaFacturas() {
+        java.util.ArrayList<String> list = new java.util.ArrayList<String>();
         String selectQuery = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA;
         Cursor cursor = database.rawQuery(selectQuery, null);
 
@@ -68,12 +69,12 @@ public class ConsolidadoCargaHelper {
         if (cursor.moveToFirst()) {
 
             do {
-                list.add(new DtoConsolidadoCargaFacturas(
-                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado)),
-                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura)),
-                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente)),
-                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor)),
-                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion))
+                list.add(new String(
+//                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado)),
+                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura))
+//                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente)),
+//                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor)),
+//                        cursor.getString(cursor.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion))
                 ));
 
             } while (cursor.moveToNext());

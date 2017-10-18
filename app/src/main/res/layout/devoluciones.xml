@@ -68,11 +68,11 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="28dp">
+                    android:layout_height="35dp">
 
                     <TextView
                         android:id="@+id/lblcarga"
-                        android:layout_width="50dp"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:text="Carga: "
                         android:textColor="@color/colorBlack"
@@ -81,14 +81,8 @@
 
                     <Spinner
                         android:id="@+id/cboCarga"
-                        android:layout_width="match_parent"
+                        android:layout_width="98dp"
                         android:layout_height="wrap_content"></Spinner>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp">
 
                     <TextView
                         android:id="@+id/lblFactura"
@@ -101,7 +95,7 @@
 
                     <Spinner
                         android:id="@+id/cboNoFactura"
-                        android:layout_width="250dp"
+                        android:layout_width="110dp"
                         android:layout_height="wrap_content"></Spinner>
 
                     <Button
@@ -110,6 +104,20 @@
                         android:layout_height="match_parent"
                         android:background="@mipmap/ic_search_black_48dp"
                         android:backgroundTint="@color/colorPrimaryDark" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp">
+
+                    <Button
+                        android:id="@+id/btnSearch"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                        android:background="@mipmap/ic_search_black_48dp"
+                        android:backgroundTint="@color/colorPrimaryDark" />
+
                 </LinearLayout>
 
                 <LinearLayout

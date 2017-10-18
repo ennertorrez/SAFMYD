@@ -1,4 +1,6 @@
 package com.suplidora.sistemas.sisago.Devoluciones;
+import com.suplidora.sistemas.sisago.Auxiliar.SimpleSearchDialogCompat;
+
 
 import android.Manifest;
 import android.app.Activity;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -60,6 +63,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
+import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -86,6 +90,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+
+import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
+import ir.mirrajabi.searchdialog.core.BaseSearchDialogCompat;
+import ir.mirrajabi.searchdialog.core.SearchResultListener;
+import ir.mirrajabi.searchdialog.core.Searchable;
 
 public class DevolucionesActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -114,6 +123,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private Button btnOK;
     private Button btnGuardar;
     private Button btnCancelar;
+    private Button btnSearch;
     private EditText txtCantidad;
     private Spinner cboCarga;
     private Spinner cboNoFactura;
@@ -176,9 +186,9 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private boolean editar = false;
     private boolean devolucionLocal;
     private DtoConsolidadoCargaFacturas Factura;
+    java.util.ArrayList<String> CcFactura;
 
-
-
+    SpinnerDialog spinnerDialog;
     //endregion
 
 
@@ -225,7 +235,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombCliente);
         txtCodigoArticulo = (TextView) findViewById(R.id.lblCodArticulo);
-        lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescArticulo);
+        //lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescArticulo);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
         txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -289,6 +299,48 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscaItem = (Button) findViewById(R.id.btnBuscaItem);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
+        btnSearch = (Button) findViewById(R.id.btnSearch);
+        final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
+
+
+                CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
+        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Select or Search City",R.style.DialogAnimations_SmileWindow);
+
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick()
+        {
+            @Override
+            public void onClick(String item, int position)
+            {
+                Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
+                selectedItems.setText(item + " Position: " + position);
+            }
+        });
+
+//        btnSearch.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
+//                        "What are you looking for...?", null,CcFactura,
+//                        new SearchResultListener<DtoConsolidadoCargaFacturas>() {
+//                            @Override
+//                            public void onSelected(BaseSearchDialogCompat baseSearchDialogCompat,
+//                                                   DtoConsolidadoCargaFacturas searchable, int position) {
+//                                Toast.makeText(DevolucionesActivity.this, ""+searchable.getTitle(),
+//                                        Toast.LENGTH_SHORT).show();
+//                                baseSearchDialogCompat.dismiss();
+//                            }
+//                        });
+//
+//            }
+//        });
+btnSearch.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        //provideSimpleDialog();
+        spinnerDialog.showSpinerDialog();
+    }
+});
+
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
         btnCancelar.setOnClickListener(new OnClickListener() {
             @Override
@@ -384,6 +436,38 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         // cboVendedor.setEnabled(false);
     }
+
+    void provideSimpleDialog(){
+        SimpleSearchDialogCompat dialog = new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
+                "What are you looking for...?", null,CcFactura ,
+                new SearchResultListener<DtoConsolidadoCargaFacturas>() {
+                    @Override
+                    public void onSelected(BaseSearchDialogCompat basedialog,DtoConsolidadoCargaFacturas item, int position)
+                    {
+                        Toast.makeText(DevolucionesActivity.this, item.getTitle(),
+                                Toast.LENGTH_SHORT).show();
+                        basedialog.dismiss();
+                    }
+
+                });
+        dialog.show();
+
+        //dialog.getSearchBox().setTypeface(Typeface.SERIF);
+    }
+
+//    private ArrayList<SampleModel> createSampleData(){
+//        ArrayList<SampleModel> items = new ArrayList<>();
+//        items.add(new SampleModel("First item"));
+//        items.add(new SampleModel("Second item"));
+//        items.add(new SampleModel("Third item"));
+//        items.add(new SampleModel("The ultimate item"));
+//        items.add(new SampleModel("Last item"));
+//        items.add(new SampleModel("Lorem ipsum"));
+//        items.add(new SampleModel("Dolor sit"));
+//        items.add(new SampleModel("Some random word"));
+//        items.add(new SampleModel("guess who's back"));
+//        return items;
+//    }
 
     private void ValidarUltimaVersion() {
         boolean isOnline = new Funciones().checkInternetConnection(DevolucionesActivity.this);
@@ -635,7 +719,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             }
         });
         //Combo Carga Fact
-        final List<DtoConsolidadoCargaFacturas> CcargaFact;
+        /*final List<DtoConsolidadoCargaFacturas> CcargaFact;
         CcargaFact= ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
 
         ArrayAdapter<DtoConsolidadoCargaFacturas> adapterCargaFact = new ArrayAdapter<DtoConsolidadoCargaFacturas>(this,android.R.layout.simple_spinner_item,CcargaFact);
@@ -653,7 +737,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
-        });
+        });*/
 
 
     }
