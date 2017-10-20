@@ -108,7 +108,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private EditText txtObservaciones;
     private TextView lblCantidad;
     private TextView txtPrecioArticulo;
-    private TextView lblDescripcion;
     private TextView lblNombCliente;
     private TextView lblCodCliente;
     private TextView txtCodigoArticulo;
@@ -118,12 +117,12 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private TextView lblTotalCor;
     private TextView lblFooter;
     private TextView lblFooterItem;
+    private TextView lblSearch;
     private Button btnAgregar;
     private Button btnBuscaItem;
     private Button btnOK;
     private Button btnGuardar;
     private Button btnCancelar;
-    private Button btnSearch;
     private EditText txtCantidad;
     private Spinner cboCarga;
     private Spinner cboNoFactura;
@@ -187,7 +186,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private boolean devolucionLocal;
     private DtoConsolidadoCargaFacturas Factura;
     java.util.ArrayList<String> CcFactura;
-
+    List<HashMap<String, String>> ObtieneCcarga = null;
     SpinnerDialog spinnerDialog;
     //endregion
 
@@ -225,7 +224,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         cboCarga = (Spinner) findViewById(R.id.cboCarga);
-        cboNoFactura = (Spinner) findViewById(R.id.cboNoFactura);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
         // Displaying all values on the screen
         final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
@@ -235,7 +233,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombCliente);
         txtCodigoArticulo = (TextView) findViewById(R.id.lblCodArticulo);
-        //lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescArticulo);
+        lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescArticulo);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
         txtCantidad.setFocusable(true);
         txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -299,22 +297,27 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscaItem = (Button) findViewById(R.id.btnBuscaItem);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
+        lblSearch = (TextView) findViewById(R.id.lblSearch);
         final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
 
 
                 CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
-        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Select or Search City",R.style.DialogAnimations_SmileWindow);
+        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Seleccione o busque la factura",R.style.DialogAnimations_SmileWindow);
 
         spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick()
         {
             @Override
             public void onClick(String item, int position)
             {
-                Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
-                selectedItems.setText(item + " Position: " + position);
+                //Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
+                ObtieneCcarga = ConsolidadoCargaH.ObtenerCcarga(item);
+
+                lblNombCliente.setText(ObtieneCcarga.get(0).get("Cliente").toString());
+                lblSearch.setText(item);
+                //selectedItems.setText(item + " Position: " + position);
             }
         });
+
 
 //        btnSearch.setOnClickListener(new OnClickListener() {
 //            @Override
@@ -333,7 +336,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 //
 //            }
 //        });
-btnSearch.setOnClickListener(new OnClickListener() {
+lblSearch.setOnClickListener(new OnClickListener() {
     @Override
     public void onClick(View v) {
         //provideSimpleDialog();
@@ -392,20 +395,17 @@ btnSearch.setOnClickListener(new OnClickListener() {
                                                   }
 
 
-                                                  if (PrecioItem == 0) {
-                                                      MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
-                                                      return;
-                                                  }
+//                                                  if (PrecioItem == 0) {
+//                                                      MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
+//                                                      return;
+//                                                  }
                                                   HashMap<String, String> itemPedidos = new HashMap<>();
                                                   if (AgregarDetalle(itemPedidos)) {
-                                                      MensajeCaja = true;
 
                                                       LimipiarDatos(MensajeCaja);
-                                                      for (HashMap<String, String> item : listaArticulos) {
-                                                      }
-                                                      RecalcularDetalle();
-                                                      CalcularTotales();
 
+                                                      CalcularTotales();
+                                                      RefrescarGrid();
                                                       InputMethodManager inputManager = (InputMethodManager)
                                                               getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -437,23 +437,23 @@ btnSearch.setOnClickListener(new OnClickListener() {
         // cboVendedor.setEnabled(false);
     }
 
-    void provideSimpleDialog(){
-        SimpleSearchDialogCompat dialog = new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
-                "What are you looking for...?", null,CcFactura ,
-                new SearchResultListener<DtoConsolidadoCargaFacturas>() {
-                    @Override
-                    public void onSelected(BaseSearchDialogCompat basedialog,DtoConsolidadoCargaFacturas item, int position)
-                    {
-                        Toast.makeText(DevolucionesActivity.this, item.getTitle(),
-                                Toast.LENGTH_SHORT).show();
-                        basedialog.dismiss();
-                    }
-
-                });
-        dialog.show();
-
-        //dialog.getSearchBox().setTypeface(Typeface.SERIF);
-    }
+//    void provideSimpleDialog(){
+//        SimpleSearchDialogCompat dialog = new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
+//                "What are you looking for...?", null,CcFactura ,
+//                new SearchResultListener<DtoConsolidadoCargaFacturas>() {
+//                    @Override
+//                    public void onSelected(BaseSearchDialogCompat basedialog,DtoConsolidadoCargaFacturas item, int position)
+//                    {
+//                        Toast.makeText(DevolucionesActivity.this, item.getTitle(),
+//                                Toast.LENGTH_SHORT).show();
+//                        basedialog.dismiss();
+//                    }
+//
+//                });
+//        dialog.show();
+//
+//        //dialog.getSearchBox().setTypeface(Typeface.SERIF);
+//    }
 
 //    private ArrayList<SampleModel> createSampleData(){
 //        ArrayList<SampleModel> items = new ArrayList<>();
@@ -779,22 +779,29 @@ btnSearch.setOnClickListener(new OnClickListener() {
         }
     }
 
-    private void RecalcularDetalle() {
 
-
-    }
 
     private boolean AgregarDetalle(HashMap<String, String> itemDevolucion) {
-        itemDevolucion.put("item", cargadetalle.getITEM());
+        itemDevolucion.put("IdVehiculo",cargadetalle.getIdVehiculo());
+        itemDevolucion.put("Factura",lblSearch.getText().toString());
+        itemDevolucion.put("ITEM", cargadetalle.getITEM());
         itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
+        itemDevolucion.put("Descripcion", lblDescripcionArticulo.getText().toString());
         itemDevolucion.put("cantidad", txtCantidad.getText().toString());
         itemDevolucion.put("precio", String.valueOf(cargadetalle.getPRECIO()));
-        itemDevolucion.put("TipoPrecio", TipoPrecio);
-        itemDevolucion.put("Descripcion", articulo.getNombre());
-        itemDevolucion.put("tipo", "P");
-        itemDevolucion.put("descuento", df.format(cargadetalle.getDESCUENTO()));
-        itemDevolucion.put("iva", df.format(cargadetalle.getIVA()));
-        itemDevolucion.put("total", df.format(cargadetalle.getTOTAL()));
+
+        double subtotal, iva, total, descuento, isc, porIva;
+        subtotal = Double.parseDouble(itemDevolucion.get("precio")) * Double.parseDouble(itemDevolucion.get("cantidad"));
+        descuento = subtotal * (Double.parseDouble(cargadetalle.getDESCUENTO()) / 100);
+        subtotal = subtotal - descuento;
+        porIva = Double.parseDouble(cargadetalle.getIVA());
+        iva = subtotal * porIva;
+        total = subtotal + iva;
+        itemDevolucion.put("DESCUENTO", df.format(descuento));
+        itemDevolucion.put("Iva", df.format(iva));
+        //itemDevolucion.put("SubTotal", df.format(subtotal));
+        itemDevolucion.put("total", df.format(total));
+
         listaArticulos.add(itemDevolucion);
 
         PrecioItem = 0;
@@ -808,14 +815,15 @@ btnSearch.setOnClickListener(new OnClickListener() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.devoluciones_list_item, new
-                String[]{"Cod", "Cantidad", "Precio", "TipoPrecio", "Descripcion", "Descuento", "Iva", "Total"}, new
-                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleTipoPrecio, R.id.lblDetalleDescripcion, R.id.lblDetalleDescuento, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
+                String[]{"Cod", "Descripcion", "Cantidad", "Iva", "total"}, new
+                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal})
+        {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View currView = super.getView(position, convertView, parent);
                 HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
-                if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).startsWith("**")) {
+                if (currItem.get(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion).startsWith("**")) {
                     currView.setBackgroundColor(Color.RED);
                 } else {
                     currView.setBackgroundColor(Color.WHITE);
@@ -836,19 +844,17 @@ btnSearch.setOnClickListener(new OnClickListener() {
             HashMap<String, String> item = listaArticulos.get(i);
 
             try {
-                subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
+                //subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
                 iva += (df.parse(item.get("Iva"))).doubleValue();
-                total += (df.parse(item.get("Total"))).doubleValue();
+                total += (df.parse(item.get("total"))).doubleValue();
             } catch (ParseException e) {
                 MensajeAviso(e.getMessage());
             }
         }
-        lblSubTotalCor.setText(df.format(subtotal));
+        //lblSubTotalCor.setText(df.format(subtotal));
         lblIvaCor.setText(df.format(iva));
         lblTotalCor.setText(df.format(total));
 
-        if (tasaCambio > 0) {
-        }
         lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
 
     }
@@ -918,7 +924,7 @@ btnSearch.setOnClickListener(new OnClickListener() {
         final EditText txtBusquedaItem = (EditText) dialogView.findViewById(R.id.txtBusqueda);
         lvItem = (ListView) dialogView.findViewById(R.id.list);
         lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
-        txtBusquedaItem.setText(txtCodigoArticulo.getText());
+        //txtBusquedaItem.setText(txtCodigoArticulo.getText());
         btnOK.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -953,22 +959,30 @@ btnSearch.setOnClickListener(new OnClickListener() {
                 try {
                     switch (tipoBusqueda) {
                         case 1:
-                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXCodigo( cboNoFactura.getSelectedItem().toString(),busqueda );
+                            if(lblSearch.getText().toString().equalsIgnoreCase("Seleccionar"))
+                            {MensajeAviso("Seleccione una factura"); return;}
+                            else {
+                                listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXCodigo(lblSearch.getText().toString(), busqueda);
+                            }
                             break;
                         case 2:
-                            listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXNombre(cboNoFactura.getSelectedItem().toString(),busqueda );
+                            if(lblSearch.getText().toString().equalsIgnoreCase("Seleccionar"))
+                            {MensajeAviso("Seleccione una factura"); return;}
+                            else {
+                                listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXNombre(lblSearch.getText().toString(), busqueda);
+                            }
                             break;
                     }
                 } catch (Exception ex) {
                     MensajeAviso(ex.getMessage());
                 }
                 if (listaCCargaArticulosItem.size() == 0) {
-                    MensajeAviso("El codigo de articulo ingresado no existe en la lista del pedido");
+                    MensajeAviso("No se encuentra ningun producto para esta factura ' "+lblSearch.getText().toString()+" '");
                 }
 
                 ListAdapter adapter = new SimpleAdapter(
                         getApplicationContext(), listaCCargaArticulosItem,
-                        R.layout.list_item_devolucion, new String[]{"Codigo", "Nombre", "Cantidad", "TotalItem"}, new int[]{R.id.Codigo, R.id.Nombre,
+                        R.layout.list_item_devolucion, new String[]{"ITEM", "Item_Descripcion", "CANTIDAD", "TOTAL"}, new int[]{R.id.Codigo, R.id.Nombre,
                         R.id.Cantidad, R.id.TotalItem});
 
                 lvItem.setAdapter(adapter);
@@ -985,13 +999,13 @@ btnSearch.setOnClickListener(new OnClickListener() {
                 txtCodigoArticulo.setText("");
                 lblDescripcionArticulo.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
+                String DescArticulo = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
 
-                cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(cboNoFactura.getSelectedItem().toString(),CodigoArticulo);
+                cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(),CodigoArticulo);
                 /*Validamos que permita vender codigo 1052*/
 
-                HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
-                lblDescripcionArticulo.setText(articulo.getNombre());
+                lblDescripcionArticulo.setText(DescArticulo);
 
                 MensajeCaja = true;
 
@@ -1057,7 +1071,6 @@ btnSearch.setOnClickListener(new OnClickListener() {
                     adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
 
-                    RecalcularDetalle();
                     CalcularTotales();
                     LimipiarDatos(true);
                     return true;

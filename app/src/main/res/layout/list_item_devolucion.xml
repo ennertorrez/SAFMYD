@@ -43,9 +43,6 @@
         android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
         android:layout_toRightOf="@id/lblCantidad"
-        android:gravity="right"
-
-
         />
 
     <TextView

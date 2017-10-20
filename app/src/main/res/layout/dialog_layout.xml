@@ -16,7 +16,7 @@
             android:id="@+id/spinerTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select or Search Items"
+            android:text="Seleccione o busque una factura"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
             android:id="@+id/close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Close" />
+            android:text="Cerrar" />
 
     </LinearLayout>
 

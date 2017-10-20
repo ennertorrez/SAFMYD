@@ -208,7 +208,11 @@ public class MenuActivity extends AppCompatActivity
 
             //SINCRONIZAR DATOS
             try {
-                sd.SincronizarTodo();
+                if(variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo"))
+                {
+                    sd.SincronizarDevoluciones();
+                }
+                else {sd.SincronizarTodo();}
             } catch (final JSONException e) {
                 Log.e(TAG, "Json parsing error: " + e.getMessage());
                 runOnUiThread(new Runnable() {

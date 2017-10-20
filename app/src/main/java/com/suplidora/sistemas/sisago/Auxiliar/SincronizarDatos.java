@@ -51,7 +51,7 @@ public class SincronizarDatos {
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
     final String urlConsolidadoCarga = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/GetCarga/";
-    final String urlConsolidadoCargaDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/GetCargaDetalle/";
+    final String urlConsolidadoCargaDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/BuscarConsolidadoDetalle/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
@@ -746,10 +746,10 @@ public class SincronizarDatos {
                 String Item_Descripcion = c.getString("Item_Descripcion");
                 String CANTIDAD = c.getString("CANTIDAD");
                 String PRECIO = c.getString("PRECIO");
-                String SUBTOTAL = c.getString("SUBTOTAL");
+                String TOTAL = c.getString("TOTAL");
                 String IVA = c.getString("IVA");
                 String DESCUENTO = c.getString("DESCUENTO");
-                ConsolidadoCargaDetalleH.GuardarConsolidadoCargaDetalle(IdVehiculo, Factura, ITEM, Item_Descripcion, CANTIDAD, PRECIO, SUBTOTAL, IVA, DESCUENTO);
+                ConsolidadoCargaDetalleH.GuardarConsolidadoCargaDetalle(IdVehiculo, Factura, ITEM, Item_Descripcion, CANTIDAD, PRECIO, TOTAL, IVA, DESCUENTO);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){
@@ -825,7 +825,7 @@ public class SincronizarDatos {
     private boolean ObtenerMotivos() {
 
         HttpHandler sh = new HttpHandler();
-        String urlString = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerMotivos/";;
+        String urlString = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerMotivos";;
         String encodeUrl = "";
         try {
             URL Url = new URL(urlString);

@@ -11,6 +11,7 @@ import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
 import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -84,6 +85,27 @@ public class ConsolidadoCargaHelper {
         // database.close();
 
         return list;
+    }
+    public ArrayList<HashMap<String, String>> ObtenerCcarga(String Factura) {
+
+        String selectQuery = "SELECT * FROM " + variables_publicas.TABLE_CONSOLIDADO_CARGA +" where "+ variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura +" = '"+ Factura +"'" ;
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> Ccarga = new HashMap<>();
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion)));
+                lst.add(Ccarga);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
     public  void EliminaConsolidadoCarga() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CONSOLIDADO_CARGA+";");

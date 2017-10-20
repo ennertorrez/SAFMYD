@@ -26,7 +26,7 @@ public class ConsolidadoCargaDetalleHelper {
                                String Item_Descripcion ,
                                                String CANTIDAD ,
                                                String PRECIO ,
-                                               String SUBTOTAL ,
+                                               String TOTAL ,
                                                String IVA ,
                                String DESCUENTO ) {
 
@@ -38,7 +38,7 @@ public class ConsolidadoCargaDetalleHelper {
          contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, Item_Descripcion);
          contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD, CANTIDAD);
         contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO, PRECIO);
-        contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL, SUBTOTAL);
+        contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL, TOTAL);
         contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA, IVA);
         contentValues.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO, DESCUENTO);
 
@@ -95,7 +95,8 @@ public class ConsolidadoCargaDetalleHelper {
     }
 
     public ArrayList<HashMap<String, String>>  BuscarConsolidadoCargaDetalleXNombre(String Factura,String busqueda) {
-        String Query = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE+" WHERE  "+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura+" = '"+ Factura +"' AND "+ variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion+ " LIKE '%"+busqueda+"'";
+        String Query = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE+" WHERE  "+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura+" = '"+ Factura +"' AND "+ variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion+ " LIKE '%"+busqueda+"%'";
+        //String Query = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE;
         HashMap<String, String> cargaDetalle = null;
         ArrayList<HashMap<String, String>> lst = new ArrayList<>();
 
