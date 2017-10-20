@@ -151,13 +151,14 @@ public class SincronizarDatos {
             return false;
         }
         //Log.e(TAG, "Response from url: " + jsonStrC);
+        DbOpenHelper.database.beginTransaction();
 
         ArticulosH.EliminaArticulos();
         JSONObject jsonObjC = new JSONObject(jsonStrC);
         // Getting JSON Array node
         JSONArray articulos = jsonObjC.getJSONArray("BuscarTotalArticuloResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < articulos.length(); i++) {
@@ -209,13 +210,13 @@ public class SincronizarDatos {
             return false;
         }
         //Log.e(TAG, "Response from url: " + jsonStrC);
-
+        DbOpenHelper.database.beginTransaction();
         ClientesH.EliminaClientes();
         JSONObject jsonObjC = new JSONObject(jsonStrC);
         // Getting JSON Array node
         JSONArray clientes = jsonObjC.getJSONArray("BuscarClientesResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < clientes.length(); i++) {
@@ -274,13 +275,13 @@ public class SincronizarDatos {
             return false;
         }
         //Log.e(TAG, "Response from url: " + jsonStrC);
-
+        DbOpenHelper.database.beginTransaction();
         VendedoresH.EliminaVendedores();
         JSONObject jsonObjV = new JSONObject(jsonStrV);
         // Getting JSON Array node
         JSONArray vendedores = jsonObjV.getJSONArray("ListaVendedoresResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < vendedores.length(); i++) {
@@ -327,12 +328,13 @@ public class SincronizarDatos {
             return false;
         }
 
+        DbOpenHelper.database.beginTransaction();
         CartillasBcH.EliminaCartillasBc();
         JSONObject jsonObjCartillas = new JSONObject(jsonStrCartillas);
         // Getting JSON Array node
         JSONArray cartillas = jsonObjCartillas.getJSONArray("GetCartillasBCResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < cartillas.length(); i++) {
@@ -369,13 +371,13 @@ public class SincronizarDatos {
             new Funciones().SendMail("Ha ocurrido un error DetallaCartillaBC", variables_publicas.info + urlStringCartillasD, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
-
+        DbOpenHelper.database.beginTransaction();
         CartillasBcDetalleH.EliminaCartillasBcDetalle();
         JSONObject jsonObjCartillasD = new JSONObject(jsonStrCartillasD);
         // Getting JSON Array node
         JSONArray cartillasD = jsonObjCartillasD.getJSONArray("GetDetalleCartillasBCResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < cartillasD.length(); i++) {
@@ -412,13 +414,13 @@ public class SincronizarDatos {
             new Funciones().SendMail("Ha ocurrido un error al sincronizar Forma de pago, Respuesta nula GET", variables_publicas.info + urlStringFormaPago, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
-
+        DbOpenHelper.database.beginTransaction();
         FormaPagoH.EliminaFormaPago();
         JSONObject jsonObjFormaPago = new JSONObject(jsonStrFormaPago);
         // Getting JSON Array node
         JSONArray FormaPago = jsonObjFormaPago.getJSONArray("FormasPagoResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < FormaPago.length(); i++) {
@@ -453,12 +455,13 @@ public class SincronizarDatos {
             return false;
         }
 
+        DbOpenHelper.database.beginTransaction();
         PrecioEspecialH.EliminaPrecioEspecial();
         JSONObject jsonObjPrecioEspecial = new JSONObject(jsonStrPrecioEspecial);
         // Getting JSON Array node
         JSONArray PrecioEspecial = jsonObjPrecioEspecial.getJSONArray("ListPrecioEspecialResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < PrecioEspecial.length(); i++) {
@@ -495,12 +498,13 @@ public class SincronizarDatos {
             return false;
         }
 
+        DbOpenHelper.database.beginTransaction();
         ConfigSistemasH.EliminaConfigSistema();
         JSONObject jsonObjConfiguracionSistema = new JSONObject(jsonStrConfiguracionSistema);
         // Getting JSON Array node
         JSONArray FormaPago = jsonObjConfiguracionSistema.getJSONArray("GetConfiguracionesResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < FormaPago.length(); i++) {
@@ -582,12 +586,13 @@ public class SincronizarDatos {
             return false;
         }
 
+        DbOpenHelper.database.beginTransaction();
         ClientesSucH.EliminaClientesSucursales();
         JSONObject jsonObjClientesSucursal = new JSONObject(jsonStrClientesSucursal);
         // Getting JSON Array node
         JSONArray PrecioEspecial = jsonObjClientesSucursal.getJSONArray("GetClienteSucursalesResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < PrecioEspecial.length(); i++) {
@@ -684,14 +689,14 @@ public class SincronizarDatos {
             new Funciones().SendMail("Ha ocurrido un error al sincronicar ConsolidadoCarga, Respuesta nula GET", variables_publicas.info+urlStringCarga,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
             return null;
         }
-
+        DbOpenHelper.database.beginTransaction();
         ConsolidadoCargaH.EliminaConsolidadoCarga();
 
         JSONObject jsonObjCarga = new JSONObject(jsonStrCarga);
         // Getting JSON Array node
         JSONArray carga = jsonObjCarga.getJSONArray("BuscarConsolidadoResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < carga.length(); i++) {
@@ -729,13 +734,14 @@ public class SincronizarDatos {
             return null;
         }
 
+        DbOpenHelper.database.beginTransaction();
         ConsolidadoCargaDetalleH.EliminaConsolidadoCargaDetalle();
 
         JSONObject jsonObjCargaD = new JSONObject(jsonStrConsolidadoCargaD);
         // Getting JSON Array node
         JSONArray cargaD = jsonObjCargaD.getJSONArray("BuscarConsolidadoDetalleResult");
 
-        DbOpenHelper.database.beginTransaction();
+
         try {
             // looping through All Contacts
             for (int i = 0; i < cargaD.length(); i++) {
