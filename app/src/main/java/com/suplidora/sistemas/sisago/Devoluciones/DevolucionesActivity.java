@@ -620,8 +620,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
             return false;
 
         }
-        if (new Funciones().checkInternetConnection(DevolucionesActivity.this)) {
-            new Funciones().GetInternetTime();
+        if (Funciones.checkInternetConnection(DevolucionesActivity.this)) {
+            Funciones.GetDateTime();
         } else {
             Funciones.GetLocalDateTime();
         }
@@ -786,7 +786,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         itemDevolucion.put("Factura",lblSearch.getText().toString());
         itemDevolucion.put("ITEM", cargadetalle.getITEM());
         itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
-        itemDevolucion.put("Descripcion", lblDescripcionArticulo.getText().toString());
+        itemDevolucion.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, lblDescripcionArticulo.getText().toString());
         itemDevolucion.put("cantidad", txtCantidad.getText().toString());
         itemDevolucion.put("precio", String.valueOf(cargadetalle.getPRECIO()));
 
@@ -815,8 +815,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.devoluciones_list_item, new
-                String[]{"Cod", "Descripcion", "Cantidad", "Iva", "total"}, new
-                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad, R.id.lblDetalleSubTotal, R.id.lblDetalleIva, R.id.lblDetalleTotal})
+                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad", "Iva", "total"}, new
+                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,  R.id.lblDetalleIva, R.id.lblDetalleTotal})
         {
 
             @Override

@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
@@ -81,7 +82,10 @@ public class Login extends Activity {
     private String Contrasenia = "";
     private ProgressDialog pDialog;
     private String tipoBusqueda = "3";
-private boolean isOnline=false;
+    private boolean internetOk=false;
+    private boolean isServerOnline =false;
+    private boolean isOnline=false;
+    private
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
@@ -192,8 +196,14 @@ private boolean isOnline=false;
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
+                /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
 
-                boolean isOnline = new Funciones().checkInternetConnection(Login.this);
+                internetOk = Funciones.TestInternetConectivity();
+                isServerOnline =Funciones.TestServerConectivity();
+                isOnline =(internetOk && isServerOnline);
+
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
@@ -216,7 +226,7 @@ private boolean isOnline=false;
         });
 
         variables_publicas.usuario = UltimoUsuario;
-        isOnline= new Funciones().checkInternetConnection(Login.this);
+        isOnline=  Funciones.checkInternetConnection(Login.this);
         /*if (variables_publicas.usuario != null) {
             if (isOnline) {
                 new SincronizardorPedidos().execute();
@@ -518,7 +528,7 @@ private boolean isOnline=false;
             HttpHandler sh = new HttpHandler();
             String urlString = urlGetConfiguraciones;
 
-            String jsonStr = sh.makeServiceCall(urlString);
+            String jsonStr = sh.makeServiceCall(urlString) ;
 
             Log.e(TAG, "Response from url: " + jsonStr);
 

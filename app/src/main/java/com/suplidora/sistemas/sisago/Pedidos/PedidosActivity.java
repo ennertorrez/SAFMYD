@@ -140,6 +140,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String CodigoItemAgregado = "";
     private SincronizarDatos sd;
     private boolean isOnline = false;
+    private boolean internetOk=false;
+    private boolean isServerOnline =false;
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
     //endregion
 
@@ -208,7 +210,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
         pedido = new Pedido();
-        isOnline = new Funciones().checkInternetConnection(PedidosActivity.this);
+      CheckConnectivity();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
@@ -540,6 +542,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     }
 
+    private void CheckConnectivity() {
+        internetOk = Funciones.TestInternetConectivity();
+        isServerOnline =Funciones.TestServerConectivity();
+        isOnline =(internetOk && isServerOnline);
+    }
+
     private void AplicarBonificacionCartillas() {
 
         ArrayList<HashMap<String,String>> listaTemp =new ArrayList<HashMap<String, String>>(); ;
@@ -851,6 +859,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         Gson gson = new Gson();
 
         jsonPedido = gson.toJson(pedido);
+        CheckConnectivity();
         try {
             new SincronizardorPedidos().execute();
         } catch (final Exception ex) {
@@ -955,7 +964,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
         if (new Funciones().checkInternetConnection(PedidosActivity.this)) {
-            new Funciones().GetInternetTime();
+            Funciones.GetDateTime();
         } else {
             Funciones.GetLocalDateTime();
         }
@@ -1867,7 +1876,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         @Override
         protected Void doInBackground(Void... params) {
 
-            if (Funciones.TestInternetConectivity()) {
+            if (isOnline) {
                 if (Boolean.parseBoolean(SincronizarDatos.SincronizarPedido(PedidoH, PedidoDetalleH, vendedor, cliente, pedido.getCodigoPedido(), jsonPedido, (editar == true && pedidoLocal == false)).split(",")[0])) {
                     guardadoOK = true;
                 }
