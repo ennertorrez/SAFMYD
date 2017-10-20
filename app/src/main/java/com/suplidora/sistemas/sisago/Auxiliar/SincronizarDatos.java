@@ -541,7 +541,6 @@ public class SincronizarDatos {
         } finally {
             DbOpenHelper.database.endTransaction();
         }
-
     }
 
     public String ObtenerValorConfigDatos() throws JSONException {
