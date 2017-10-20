@@ -105,9 +105,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     //region Declaracion de controles
 
     private EditText txtDescuento;
-    private EditText txtObservaciones;
+    private EditText txtMotivo;
     private TextView lblCantidad;
-    private TextView txtPrecioArticulo;
     private TextView lblNombCliente;
     private TextView lblCodCliente;
     private TextView txtCodigoArticulo;
@@ -228,7 +227,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         // Displaying all values on the screen
         final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         //final Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
-        TextView lblNombre = (TextView) findViewById(R.id.lblNombCliente);
         //Obtenemos las referencias a los controles
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombCliente);
@@ -282,8 +280,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         });
 
 
-        txtObservaciones = (EditText) findViewById(R.id.txtObservacion);
-        txtPrecioArticulo = (TextView) findViewById(R.id.txtPrecioArticulo);
+        txtMotivo = (EditText) findViewById(R.id.txtMotivo);
         lblSubTotalCor = (TextView) findViewById(R.id.lblSubTotalCor);
         lblIvaCor = (TextView) findViewById(R.id.lblIvaCor);
         lblTotalCor = (TextView) findViewById(R.id.lblTotalCor);
@@ -298,7 +295,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         btnBuscaItem = (Button) findViewById(R.id.btnBuscaItem);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
         lblSearch = (TextView) findViewById(R.id.lblSearch);
-        final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
+        //final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
 
 
                 CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
@@ -336,6 +333,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 //
 //            }
 //        });
+
 lblSearch.setOnClickListener(new OnClickListener() {
     @Override
     public void onClick(View v) {
@@ -361,9 +359,6 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 return true;
             }
         });
-
-
-        lblNombre.setText(Nombre);
 
         btnBuscaItem.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -393,7 +388,6 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                                       txtCantidad.setError("Ingrese un valor mayor a 0");
                                                       return;
                                                   }
-
 
 //                                                  if (PrecioItem == 0) {
 //                                                      MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
@@ -759,8 +753,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
     private void LimipiarDatos(boolean MensajeCaja) {
         if (MensajeCaja) {
-            txtPrecioArticulo.setText("0.00");
-            txtObservaciones.setText("");
+            txtMotivo.setText("");
             cargadetalle = null;
             txtCodigoArticulo.setText(null);
             txtCantidad.setError(null);
@@ -794,7 +787,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
         subtotal = Double.parseDouble(itemDevolucion.get("precio")) * Double.parseDouble(itemDevolucion.get("cantidad"));
         descuento = subtotal * (Double.parseDouble(cargadetalle.getDESCUENTO()) / 100);
         subtotal = subtotal - descuento;
-        porIva = Double.parseDouble(cargadetalle.getIVA());
+        porIva = Double.parseDouble(cargadetalle.getIVA()) > 0 ? 0.15 : 0 ;
+
         iva = subtotal * porIva;
         total = subtotal + iva;
         itemDevolucion.put("DESCUENTO", df.format(descuento));
@@ -815,8 +809,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.devoluciones_list_item, new
-                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad", "Iva", "total"}, new
-                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,  R.id.lblDetalleIva, R.id.lblDetalleTotal})
+                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad","precio", "Iva", "total"}, new
+                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,R.id.lblDetallePrecio,  R.id.lblDetalleIva, R.id.lblDetalleTotal})
         {
 
             @Override
@@ -845,14 +839,14 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
             try {
                 //subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
-                iva += (df.parse(item.get("Iva"))).doubleValue();
+                //iva += (df.parse(item.get("Iva"))).doubleValue();
                 total += (df.parse(item.get("total"))).doubleValue();
             } catch (ParseException e) {
                 MensajeAviso(e.getMessage());
             }
         }
         //lblSubTotalCor.setText(df.format(subtotal));
-        lblIvaCor.setText(df.format(iva));
+        //lblIvaCor.setText(df.format(iva));
         lblTotalCor.setText(df.format(total));
 
         lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
@@ -998,18 +992,17 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                     int position, long id) {
                 txtCodigoArticulo.setText("");
                 lblDescripcionArticulo.setText("");
+                txtCantidad.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
-                String DescArticulo = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
+                //String DescArticulo = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
 
                 cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(),CodigoArticulo);
                 /*Validamos que permita vender codigo 1052*/
 
                 txtCodigoArticulo.setText(CodigoArticulo);
-                lblDescripcionArticulo.setText(DescArticulo);
+                lblDescripcionArticulo.setText(cargadetalle.getItem_Descripcion());
 
                 MensajeCaja = true;
-
-
                 alertDialog.dismiss();
             }
         });
