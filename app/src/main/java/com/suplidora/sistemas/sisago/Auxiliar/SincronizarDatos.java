@@ -593,6 +593,7 @@ public class SincronizarDatos {
         JSONArray PrecioEspecial = jsonObjClientesSucursal.getJSONArray("GetClienteSucursalesResult");
 
 
+
         try {
             // looping through All Contacts
             for (int i = 0; i < PrecioEspecial.length(); i++) {
