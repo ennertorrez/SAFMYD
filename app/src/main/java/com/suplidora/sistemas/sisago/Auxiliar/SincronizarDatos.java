@@ -82,7 +82,7 @@ public class SincronizarDatos {
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH) {
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, DevolucionesHelper Devolucionesh,DevolucionesDetalleHelper DevolucionesDetalleh ) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -97,6 +97,8 @@ public class SincronizarDatos {
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
         CartillasBcDetalleH = CartillasBcDetalleh;
+        DevolucionesH = Devolucionesh;
+        DevolucionesDetalleH = DevolucionesDetalleh;
 
     }
 

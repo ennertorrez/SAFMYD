@@ -47,6 +47,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
@@ -316,7 +317,7 @@ public class MenuActivity extends AppCompatActivity
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
-            case R.id.btnDevoluciones:
+            case R.id.btnNuevaDevoluciones:
 
                 Intent newActi = new Intent(getApplicationContext(), DevolucionesActivity.class);
                 startActivity(newActi);
@@ -325,6 +326,15 @@ public class MenuActivity extends AppCompatActivity
                 startActivity(newAct);
                 Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);
                 startActivity(newAct);*/
+                break;
+            case R.id.btnListaDevoluciones:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaDevolucionesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+
                 break;
             case R.id.btnNuevoPedido:
                /* Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);

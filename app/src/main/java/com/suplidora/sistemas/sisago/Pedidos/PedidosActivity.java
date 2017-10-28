@@ -54,6 +54,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -183,6 +185,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private ConsolidadoCargaHelper ConsolidadoCargaH;
     private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private ConfiguracionSistemaHelper ConfigSistemaH;
+    private DevolucionesHelper DevolucionH;
+    private DevolucionesDetalleHelper DevolucionDetalleH;
     private PedidosHelper PedidoH;
     private String CodigoLetra = "";
     private String jsonPedido = "";
@@ -226,10 +230,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
         ConfigSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
+        DevolucionH = new DevolucionesHelper(DbOpenHelper.database);
+        DevolucionDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
+//        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
+//                CartillasBcDetalleH,
+//                FormaPagoH,
+//                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH,  PedidoH, PedidoDetalleH);
+
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH,  PedidoH, PedidoDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH,  PedidoH, PedidoDetalleH,DevolucionH,DevolucionDetalleH);
 
         if (isOnline) {
             ValidarUltimaVersion();

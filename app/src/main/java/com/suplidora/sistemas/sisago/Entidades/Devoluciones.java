@@ -18,11 +18,7 @@ public class Devoluciones {
    String   rango  = "";
    String    motivo  ="" ;
    String  factura ="";
-   String procesado="";
-   String useranula="";
-   String horaanula="";
     String   tipo ="";
-    String ejecutada="";
     String IMEI="";
     String IdVehiculo="";
 
@@ -30,7 +26,7 @@ public class Devoluciones {
     }
 
     public Devoluciones(String Ndevolucion, String Cliente, String Horagraba, String Usuario, String Subtotal, String Iva, String Total,
-                        String Estado, String Rango, String Motivo, String Factura,String Procesado,String Useranula,String Horaanula, String Tipo,String Ejecutada,String IMEI,String IdVehiculo) {
+                        String Estado, String Rango, String Motivo, String Factura, String Tipo,String IMEI,String IdVehiculo) {
         ndevolucion=Ndevolucion;
         cliente = Cliente;
         horagraba = Horagraba;
@@ -42,11 +38,7 @@ public class Devoluciones {
         rango = Rango;
         motivo = Motivo;
         factura = Factura;
-        procesado = Procesado;
-        useranula = Useranula;
-        horaanula = Horaanula;
         tipo=Tipo;
-        ejecutada=Ejecutada;
         this.IMEI = IMEI;
         IdVehiculo = IdVehiculo;
 
@@ -140,30 +132,6 @@ public class Devoluciones {
         this.factura = factura;
     }
 
-    public String getProcesado() {
-        return procesado;
-    }
-
-    public void setProcesado(String procesado) {
-        this.procesado = procesado;
-    }
-
-    public String getUseranula() {
-        return useranula;
-    }
-
-    public void setUseranula(String useranula) {
-        this.useranula = useranula;
-    }
-
-    public String getHoraanula() {
-        return horaanula;
-    }
-
-    public void setHoraanula(String horaanula) {
-        this.horaanula = horaanula;
-    }
-
     public String getTipo() {
         return tipo;
     }
@@ -172,13 +140,7 @@ public class Devoluciones {
         this.tipo = tipo;
     }
 
-    public String getEjecutada() {
-        return ejecutada;
-    }
 
-    public void setEjecutada(String ejecutada) {
-        this.ejecutada = ejecutada;
-    }
 
     public String getIMEI() {
         return IMEI;

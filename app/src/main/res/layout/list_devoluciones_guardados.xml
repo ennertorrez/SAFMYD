@@ -27,10 +27,10 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/Ndevolucion"
+            android:id="@+id/ndevolucion"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="65dp"
+            android:layout_marginLeft="85dp"
             android:paddingBottom="1dip"
             android:paddingTop="1dip"
             android:textColor="@color/colorPrimaryDark"
@@ -41,7 +41,7 @@
             android:id="@+id/Fecha"
             android:layout_width="125dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/Ndevolucion"
+            android:layout_toRightOf="@+id/ndevolucion"
             android:paddingBottom="1dip"
             android:paddingTop="1dip"
             android:textSize="16sp"
@@ -65,7 +65,7 @@
         >
 
         <TextView
-            android:id="@+id/Cliente"
+            android:id="@+id/cliente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="1dip"
@@ -89,7 +89,7 @@
             android:layout_toRightOf ="@+id/CondicionPago"
             android:paddingBottom="1dip" />
         <TextView
-            android:id="@+id/TotalPedido"
+            android:id="@+id/total"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/lblTotalDevolucion"
@@ -115,7 +115,7 @@
             android:paddingBottom="1dip" />
 
         <TextView
-            android:id="@+id/Estado"
+            android:id="@+id/estado"
             android:layout_width="110dp"
             android:layout_height="wrap_content"
             android:paddingBottom="1dip"
@@ -131,11 +131,11 @@
             android:text="Factura:"
             android:textStyle="bold"
             android:textColor="@color/colorBlack"
-            android:layout_toRightOf="@+id/Estado"
+            android:layout_toRightOf="@+id/estado"
             android:textSize="16sp"
             android:paddingBottom="1dip" />
         <TextView
-            android:id="@+id/Factura"
+            android:id="@+id/factura"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:paddingBottom="1dip"
