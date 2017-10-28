@@ -34,14 +34,25 @@
             </menu>
         </item>
         <item
-            android:id="@+id/btnDevoluciones"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Devoluciones" />
-
-        <item
             android:id="@+id/btnMapa"
             android:icon="@drawable/ic_menu_mapmode"
             android:title="Mapa" />
+        <item
+            android:id="@+id/btnDevoluciones"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Devoluciones" >
+            <menu>
+                <item
+                    android:id="@+id/btnListaDevoluciones"
+                    android:icon="@drawable/ic_menu_send"
+                    android:title="Lista Devoluciones" />
+                <item
+                    android:id="@+id/btnNuevaDevoluciones"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Nueva Devoluciones" />
+
+            </menu>
+        </item>
     </group>
 
     <item android:title="Reportes">

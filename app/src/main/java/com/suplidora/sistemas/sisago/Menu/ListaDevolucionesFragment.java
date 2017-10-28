@@ -92,8 +92,9 @@ public class ListaDevolucionesFragment extends Fragment {
     public static ArrayList<HashMap<String, String>> listadevoluciones;
     public Calendar myCalendar = Calendar.getInstance();
     //  private SimpleAdapter adapter;
-    final String urlDevolucionesVehiculo = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
-    final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
+    final String urlDevolucionesVehiculo = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerListaDevoluciones";
+
+    //final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/AnularPedido";
     //AnularPedido/{Pedido}/{Usuario}
     private String jsonPedido;
     private String jsonAnulaDevolucion;
@@ -231,7 +232,7 @@ public class ListaDevolucionesFragment extends Fragment {
             int cantidad = 0;
             for (HashMap<String, String> devolucion : listadevoluciones) {
                 subtotal += Double.parseDouble(devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_subtotal).replace("C$", "").replace(",", ""));
-                if (devolucion.get("estado").equalsIgnoreCase("Aprobado") || devolucion.get("Estado").equalsIgnoreCase("Facturado") || devolucion.get("Estado").equalsIgnoreCase("Pendiente")) {
+                if (devolucion.get("estado").equalsIgnoreCase("1") || devolucion.get("estado").equalsIgnoreCase("true")) {
                     cantidad += 1;
                 }
             }
@@ -299,15 +300,16 @@ public class ListaDevolucionesFragment extends Fragment {
                 ListaLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha, busqueda);
 
                 for (HashMap<String, String> item : ListaLocal) {
-                    HashMap<String, String> itempedido = new HashMap<>();
-                    /*itempedido.put("Factura", item.get("Factura"));
-                    itempedido.put("Estado", item.get("Estado"));
-                    itempedido.put("Detallista", item.get("Detallista"));
-                    itempedido.put("NombreCliente", item.get("NombreCliente"));
-                    itempedido.put("FormaPago", item.get("FormaPago"));
-                    itempedido.put("Fecha", item.get("Fecha"));
-                    itempedido.put("CodigoPedido", item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
-                    itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));*/
+                    HashMap<String, String> itemdevolucion = new HashMap<>();
+                   // item.get("").substring(" ");
+                    //String Fecha = item.get("horagraba").substring(item.get("horagraba").length() - 10);
+
+                    itemdevolucion.put("ndevolucion", item.get("ndevolucion"));
+                    itemdevolucion.put("horagraba", "horagraba");
+                    itemdevolucion.put("cliente", item.get("cliente"));
+                    itemdevolucion.put("total", item.get("total"));
+                    itemdevolucion.put("estado", item.get("estado"));
+                    itemdevolucion.put("factura", item.get("factura"));
                     listadevoluciones.add(item);
                 }
                 boolean connectionOK = Funciones.TestInternetConectivity();
@@ -360,6 +362,7 @@ public class ListaDevolucionesFragment extends Fragment {
             //ActualizarFooter();
             // Dismiss the progress dialog
             if (pDialog != null && pDialog.isShowing())
+
                 pDialog.dismiss();
             /**
              * Updating parsed JSON data into ListView
@@ -375,37 +378,38 @@ public class ListaDevolucionesFragment extends Fragment {
                 double subtotal = Double.parseDouble(item.get(variables_publicas.DEVOLUCIONES_COLUMN_subtotal).replace("C$", "").replace(",", ""));
                 item.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, df.format(subtotal));
             }
+            //item.get("horagraba").substring(item.get("horagraba").length() - 10);
             adapter = new SimpleAdapter(
                     getActivity(), listadevoluciones,
-                    R.layout.list_devoluciones_guardados, new String[]{"Factura", "Estado",
-                    "NombreCliente", "FormaPago", "Fecha", variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, variables_publicas.DEVOLUCIONES_COLUMN_subtotal},
-                    new int[]{R.id.Factura, R.id.Estado, R.id.Cliente, R.id.CondicionPago, R.id.Fecha,
-                            R.id.CodigoPedido, R.id.TotalPedido}) {
+                    R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "cliente",
+                    "horagraba".substring("horagraba".length() - 10), "total", "estado", "factura"},
+                    new int[]{R.id.ndevolucion, R.id.cliente, R.id.Fecha, R.id.total, R.id.estado,
+                            R.id.factura}) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
                     HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
                     tvSincroniza = (TextView) currView.findViewById(R.id.tvSincronizar);
-                    tvEstado = (TextView) currView.findViewById(R.id.Estado);
-                    if (currItem.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido).startsWith("-")) {
+                    tvEstado = (TextView) currView.findViewById(R.id.estado);
+                    if (currItem.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion).startsWith("-")) {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_red));
                         //tvEstado.setBackgroundColor(Color.parseColor("#FFB9B9B9"));
                         tvEstado.setTextColor(Color.parseColor("#FF6C6C6C"));
                     } else {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
                     }
-                    if (currItem.get("Estado").equals("PENDIENTE")) {
-                        tvEstado.setTextColor(Color.parseColor("#FFBF5300"));
-                    }
-                    if (currItem.get("Estado").equals("APROBADO")) {
-                        tvEstado.setTextColor(Color.parseColor("#303F9F"));
-                    }
-                    if (currItem.get("Estado").equals("ANULADO")) {
-                        tvEstado.setTextColor(Color.parseColor("#FFFF0000"));
-                    }
-                    if (currItem.get("Estado").equals("FACTURADO")) {
-                        tvEstado.setTextColor(Color.parseColor("#FF2D8600"));
-                    }
+//                    if (currItem.get("Estado").equals("PENDIENTE")) {
+//                        tvEstado.setTextColor(Color.parseColor("#FFBF5300"));
+//                    }
+//                    if (currItem.get("Estado").equals("APROBADO")) {
+//                        tvEstado.setTextColor(Color.parseColor("#303F9F"));
+//                    }
+//                    if (currItem.get("Estado").equals("ANULADO")) {
+//                        tvEstado.setTextColor(Color.parseColor("#FFFF0000"));
+//                    }
+//                    if (currItem.get("Estado").equals("FACTURADO")) {
+//                        tvEstado.setTextColor(Color.parseColor("#FF2D8600"));
+//                    }
                     return currView;
                 }
             };
@@ -431,7 +435,8 @@ public class ListaDevolucionesFragment extends Fragment {
         String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
         busqueda = busqueda.isEmpty() ? "%" : busqueda;
-        String urlString = urlDevolucionesVehiculo + "/" + CodigoVehiculo + "/" + fecha + "/" + busqueda;
+        String FormatFecha = fecha.replace("-","");
+        String urlString = urlDevolucionesVehiculo + "/" + CodigoVehiculo + "/" + FormatFecha + "/" + busqueda;
         try {
             URL Url = new URL(urlString);
             URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
@@ -450,32 +455,39 @@ public class ListaDevolucionesFragment extends Fragment {
 
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
-                JSONArray Devoluciones = jsonObj.getJSONArray("ObtenerDevolucionesVehiculoResult");
+                JSONArray Devoluciones = jsonObj.getJSONArray("ObtenerListaDevolucionesResult");
+
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+
 
                 for (int i = 0; i < Devoluciones.length(); i++) {
                     JSONObject c = Devoluciones.getJSONObject(i);
-                    /*String FACTURA = c.getString("FACTURA");
-                    String StatusPedido = c.getString("StatusPedido");
-                    String cliente = c.getString("cliente");
-                    String condicion = c.getString("condicion");
-                    String fecha = c.getString("fecha");
-                    String pedido = c.getString("pedido");
+
+                    Date Ffecha = sdf.parse(c.getString("fecha"));
+                    String FechaFormat = sdf2.format(Ffecha);
+
+                   String ndevolucion = c.getString("ndevolucion");
+                   String fecha = FechaFormat;
+                   String nombrecliente = c.getString("nombrecliente");
+                   String total = c.getString("total");
+                   String estado = c.getString("estado");
+                   String factura = c.getString("factura");
                     String subtotal = c.getString("subtotal");
-                    String total = c.getString("total");
-                    String detallista = c.getString("detallista");*/
+
 
 
                     HashMap<String, String> devoluciones = new HashMap<>();
 
-                    /*devoluciones.put("Factura", FACTURA);
-                    devoluciones.put("Estado", StatusPedido);
-                    devoluciones.put("NombreCliente", cliente);
-                    devoluciones.put("FormaPago", condicion);
-                    devoluciones.put("Fecha", fecha);
-                    devoluciones.put("CodigoPedido", pedido);
+                    devoluciones.put("ndevolucion", ndevolucion);
+                    devoluciones.put("horagraba", fecha);
+                    devoluciones.put("cliente", nombrecliente);
+                    devoluciones.put("total", total);
+                    devoluciones.put("estado", estado);
+                    devoluciones.put("factura", factura);
                     devoluciones.put("subtotal", subtotal);
-                    devoluciones.put("Total", total);
-                    devoluciones.put("Detallista", detallista);*/
+
                     listadevoluciones.add(devoluciones);
                 }
             }
@@ -666,6 +678,7 @@ public class ListaDevolucionesFragment extends Fragment {
     }
 
     //endregion
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         try {

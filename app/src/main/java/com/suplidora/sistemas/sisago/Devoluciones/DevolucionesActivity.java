@@ -1,4 +1,7 @@
 package com.suplidora.sistemas.sisago.Devoluciones;
+import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.SimpleSearchDialogCompat;
 
 
@@ -74,6 +77,7 @@ import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.R;
 
@@ -148,6 +152,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     public static ArrayList<HashMap<String, String>> listaCCargaArticulosItem;
     public boolean Estado;
     public double total;
+    public double iva;
     public double subtotal;
     private Cliente cliente;
     private double tasaCambio = 0;
@@ -155,7 +160,11 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     private DataBaseOpenHelper DbOpenHelper;
     private VendedoresHelper VendedoresH;
+    private PedidosDetalleHelper PedidoDetalleH;
+    private CartillasBcHelper CartillasBcH;
+    private PedidosHelper PedidoH;
     private ClientesSucursalHelper ClientesSucursalH;
+    private ConfiguracionSistemaHelper ConfigH;
     private FormaPagoHelper FormaPagoH;
     private ArticulosHelper ArticulosH;
     private UsuariosHelper UsuariosH;
@@ -167,7 +176,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private ConfiguracionSistemaHelper ConfiguracionSistemaH;
     private DevolucionesHelper DevolucionH;
     private DevolucionesDetalleHelper DevolucionDetalleH;
-
+    private SincronizarDatos sd;
     private String CodigoLetra = "";
     private String jsonDevolucion = "";
     private boolean finalizar = false;
@@ -222,8 +231,16 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         ConfiguracionSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
+        DevolucionH = new DevolucionesHelper(DbOpenHelper.database);
+        DevolucionDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
         cboCarga = (Spinner) findViewById(R.id.cboCarga);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
+
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
+                CartillasBcDetalleH,
+                FormaPagoH,
+                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH,  PedidoH, PedidoDetalleH,DevolucionH,DevolucionDetalleH);
+
         // Displaying all values on the screen
         final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         //final Spinner cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
@@ -287,6 +304,34 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         // getting intent data
         Intent in = getIntent();
 
+        if (in.getSerializableExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion) != null) {
+
+            if (in.getSerializableExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion).toString().startsWith("-")) {
+                devolucionLocal = true;
+
+            } else {
+
+                devolucionLocal = false;
+            }
+
+            editar = true;
+
+            listaArticulos.clear();
+            devoluciones = DevolucionH.GetDevolucion(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
+            listaArticulos = DevolucionDetalleH.ObtenerDevolucionDetalleArrayList(devoluciones.getNdevolucion());
+//            for (HashMap<String, String> item : listaArticulos) {
+//                Articulo art = ConsolidadoCargaH.
+//                //Articulo art = ArticulosH.BuscarArticulo(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
+////                item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
+////                item.put("IdProveedor", art.getIdProveedor());
+////                item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
+//            }
+            txtMotivo.setText(devoluciones.getMotivo());
+            //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
+
+            RefrescarGrid();
+            CalcularTotales();
+        }
 
         // Loading spinner data from database
         CargaDatosCombo();
@@ -397,9 +442,11 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                                   if (AgregarDetalle(itemPedidos)) {
 
                                                       LimipiarDatos(MensajeCaja);
-
+                                                        lblSearch.setEnabled(false);
+                                                      cboCarga.setEnabled(false);
                                                       CalcularTotales();
                                                       RefrescarGrid();
+
                                                       InputMethodManager inputManager = (InputMethodManager)
                                                               getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -418,9 +465,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    CodigoLetra = lblCodigoCliente.getText().toString();
+                    //CodigoLetra = lblCodigoCliente.getText().toString();
 
-                    // Guardar();
+                     Guardar();
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
                     MensajeAviso(e.getMessage());
@@ -537,14 +584,14 @@ lblSearch.setOnClickListener(new OnClickListener() {
         }
 
         String mensaje = "";
-        if ((cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
-            mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
-            devoluciones.setTipo("Detalle");
-
-        } else {
-            devoluciones.setTipo(cliente.getTipo());
-            mensaje = "Esta seguro que desea guardar la devolucion?";
-        }
+//        if ((cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
+//            mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
+//            devoluciones.setTipo("Detalle");
+//
+//        } else {
+//            devoluciones.setTipo(cliente.getTipo());
+//            mensaje = "Esta seguro que desea guardar la devolucion?";
+//        }
         new AlertDialog.Builder(this)
                 .setTitle("Confirmación Requerida")
                 .setMessage(mensaje)
@@ -578,13 +625,15 @@ lblSearch.setOnClickListener(new OnClickListener() {
         IMEI = variables_publicas.IMEI;
         //Guardamos el Header
 
-        devoluciones.setFactura(String.valueOf(devoluciones.getFactura()));
-        devoluciones.setCliente(String.valueOf(devoluciones.getCliente()));
-        devoluciones.setMotivo(String.valueOf(devoluciones.getMotivo()));
-        devoluciones.setUsuario(String.valueOf(devoluciones.getUsuario()));
-        devoluciones.setHoragraba(String.valueOf(devoluciones.getHoragraba()));
-        devoluciones.setHoragraba(String.valueOf(devoluciones.getHoragraba()));
+        devoluciones.setFactura(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura).toString());
+        devoluciones.setCliente(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente).toString());
+        devoluciones.setRango(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado).toString());
+        devoluciones.setMotivo(String.valueOf(txtMotivo.getText().toString()));
+        devoluciones.setUsuario(variables_publicas.usuario.getUsuario());
+        devoluciones.setHoragraba(variables_publicas.FechaActual);
+        devoluciones.setTipo("P");
         devoluciones.setIMEI(IMEI);
+        devoluciones.setMotivo("pendejada");
 
         //Esto lo ponemos para cuando es editar
 
@@ -621,8 +670,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
         }
 
         boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
-                devoluciones.getSubtotal(), devoluciones.getIva(), String.valueOf(total), devoluciones.getEstado(), devoluciones.getRango(), devoluciones.getMotivo(),
-                devoluciones.getFactura(), devoluciones.getProcesado(), devoluciones.getUseranula(), devoluciones.getHoraanula(), devoluciones.getTipo(), devoluciones.getEjecutada(), IMEI);
+                String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1" , devoluciones.getRango(), devoluciones.getMotivo(),
+                devoluciones.getFactura(), devoluciones.getTipo(),  IMEI, variables_publicas.usuario.getCodigo());
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -699,6 +748,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
         ArrayAdapter<ConsolidadoCarga> adapterCarga = new ArrayAdapter<ConsolidadoCarga>(this, android.R.layout.simple_spinner_item, Ccarga);
         adapterCarga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboCarga.setAdapter(adapterCarga);
+        if (editar == false) {
+            GenerarCodigoDevolucion();
+        }
 
         cboCarga.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -736,10 +788,10 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
     }
 
-    private void GenerarCodigoPedido() {
-        devoluciones.setNdevolucion("-" + GetFechaISO() + cliente.getIdCliente() + cliente.getCodCv() + devoluciones.getIdVehiculo());
+    private void GenerarCodigoDevolucion() {
 
-        //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
+        devoluciones.setNdevolucion("-" + GetFechaISO() + devoluciones.getCliente() + devoluciones.getNdevolucion());
+       // lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
     }
 
     private String GetFechaISO() {
@@ -793,7 +845,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         total = subtotal + iva;
         itemDevolucion.put("DESCUENTO", df.format(descuento));
         itemDevolucion.put("Iva", df.format(iva));
-        //itemDevolucion.put("SubTotal", df.format(subtotal));
+        itemDevolucion.put("SubTotal", df.format(subtotal));
         itemDevolucion.put("total", df.format(total));
 
         listaArticulos.add(itemDevolucion);
@@ -831,15 +883,15 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
     private void CalcularTotales() {
 
-        double iva = 0, descuento = 0;
+        iva = 0;
         total = 0;
         subtotal = 0;
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
 
             try {
-                //subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
-                //iva += (df.parse(item.get("Iva"))).doubleValue();
+                subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
+                iva += (df.parse(item.get("Iva"))).doubleValue();
                 total += (df.parse(item.get("total"))).doubleValue();
             } catch (ParseException e) {
                 MensajeAviso(e.getMessage());
@@ -1034,7 +1086,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
-            String HeaderMenu = obj.get("CodigoArticulo") + "\n" + obj.get("Descripcion");
+            String HeaderMenu = obj.get("ITEM") + "\n" + obj.get("Item_Descripcion");
 
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getMenuInflater();
@@ -1054,18 +1106,17 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
                     listaArticulos.remove(itemArticulo);
-                    for (int i = 0; i < listaArticulos.size(); i++) {
-                        HashMap<String, String> a = listaArticulos.get(i);
-                        if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
-                            listaArticulos.remove(a);
-                        }
-                    }
-
-                    adapter.notifyDataSetChanged();
-                    lv.setAdapter(adapter);
+//                    for (int i = 0; i < listaArticulos.size(); i++) {
+//                        HashMap<String, String> a = listaArticulos.get(i);
+//                        if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
+//                            listaArticulos.remove(a);
+//                        }
+//                    }
 
                     CalcularTotales();
                     LimipiarDatos(true);
+                    adapter.notifyDataSetChanged();
+                    lv.setAdapter(adapter);
                     return true;
 
                 default:
