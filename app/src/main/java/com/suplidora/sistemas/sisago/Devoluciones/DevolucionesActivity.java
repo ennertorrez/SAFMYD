@@ -828,8 +828,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
     private boolean AgregarDetalle(HashMap<String, String> itemDevolucion) {
         itemDevolucion.put("IdVehiculo",cargadetalle.getIdVehiculo());
-        itemDevolucion.put("Factura",lblSearch.getText().toString());
-        itemDevolucion.put("ITEM", cargadetalle.getITEM());
+        itemDevolucion.put("ndevolucion",devoluciones.getNdevolucion());
+        itemDevolucion.put("factura",lblSearch.getText().toString());
+        itemDevolucion.put("item", cargadetalle.getITEM());
         itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
         itemDevolucion.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, lblDescripcionArticulo.getText().toString());
         itemDevolucion.put("cantidad", txtCantidad.getText().toString());
@@ -840,12 +841,15 @@ lblSearch.setOnClickListener(new OnClickListener() {
         descuento = subtotal * (Double.parseDouble(cargadetalle.getDESCUENTO()) / 100);
         subtotal = subtotal - descuento;
         porIva = Double.parseDouble(cargadetalle.getIVA()) > 0 ? 0.15 : 0 ;
+        itemDevolucion.put("poriva",df.format(porIva));
 
         iva = subtotal * porIva;
         total = subtotal + iva;
-        itemDevolucion.put("DESCUENTO", df.format(descuento));
-        itemDevolucion.put("Iva", df.format(iva));
-        itemDevolucion.put("SubTotal", df.format(subtotal));
+        itemDevolucion.put("descuento", df.format(descuento));
+        itemDevolucion.put("tipo","P");
+        itemDevolucion.put("numero"," ");
+        itemDevolucion.put("iva", df.format(iva));
+        itemDevolucion.put("subtotal", df.format(subtotal));
         itemDevolucion.put("total", df.format(total));
 
         listaArticulos.add(itemDevolucion);
@@ -861,7 +865,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.devoluciones_list_item, new
-                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad","precio", "Iva", "total"}, new
+                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad","precio", "iva", "total"}, new
                 int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,R.id.lblDetallePrecio,  R.id.lblDetalleIva, R.id.lblDetalleTotal})
         {
 
@@ -890,8 +894,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
             HashMap<String, String> item = listaArticulos.get(i);
 
             try {
-                subtotal += (df.parse(item.get("SubTotal"))).doubleValue();
-                iva += (df.parse(item.get("Iva"))).doubleValue();
+                subtotal += (df.parse(item.get("subtotal"))).doubleValue();
+                iva += (df.parse(item.get("iva"))).doubleValue();
                 total += (df.parse(item.get("total"))).doubleValue();
             } catch (ParseException e) {
                 MensajeAviso(e.getMessage());

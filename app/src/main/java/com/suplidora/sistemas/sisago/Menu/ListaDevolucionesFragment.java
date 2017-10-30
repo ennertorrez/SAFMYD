@@ -382,7 +382,7 @@ public class ListaDevolucionesFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listadevoluciones,
                     R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "cliente",
-                    "horagraba".substring("horagraba".length() - 10), "total", "estado", "factura"},
+                    "horagraba", "total", "estado", "factura"},
                     new int[]{R.id.ndevolucion, R.id.cliente, R.id.Fecha, R.id.total, R.id.estado,
                             R.id.factura}) {
                 @Override

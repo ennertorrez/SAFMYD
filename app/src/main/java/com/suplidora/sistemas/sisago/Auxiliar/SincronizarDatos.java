@@ -947,7 +947,7 @@ public class SincronizarDatos {
         Gson gson = new Gson();
         List<HashMap<String, String>> devolucionDetalle = DevolucionesDetalleH.ObtenerDevolucionDetalle(ndevolucion);
         for (HashMap<String, String> item : devolucionDetalle) {
-            item.put("SubTotal", item.get("SubTotal").replace(",", ""));
+            item.put("subtotal", item.get("subtotal").replace(",", ""));
             item.put("Costo", item.get("Costo").replace(",", ""));
             item.put("Total", item.get("Total").replace(",", ""));
             item.put("Iva", item.get("Iva").replace(",", ""));
