@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.multidex.MultiDex;
@@ -172,7 +173,13 @@ public class MenuActivity extends AppCompatActivity
             navigationView.getMenu().getItem(5).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);
 
+        }else
+        {
+            navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
+            navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
         }
+
+
 
     }
 
@@ -256,7 +263,13 @@ public class MenuActivity extends AppCompatActivity
            int id = item.getItemId();
 
            if (id == R.id.SincronizarDatos) {
-               new SincronizaDatos().execute();
+               if (Build.VERSION.SDK_INT >= 11) {
+                   //--post GB use serial executor by default --
+                   new SincronizaDatos().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+               } else {
+                   //--GB uses ThreadPoolExecutor by default--
+                   new SincronizaDatos().execute();
+               }
            }
            //noinspection SimplifiableIfStatement
            if (id == R.id.Salir) {

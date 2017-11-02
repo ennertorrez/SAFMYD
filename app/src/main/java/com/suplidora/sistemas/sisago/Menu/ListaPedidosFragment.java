@@ -9,7 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -100,6 +102,9 @@ public class ListaPedidosFragment extends Fragment {
     private String IdVendedor;
     private boolean guardadoOK = true;
     private DecimalFormat df;
+    private boolean isOnline = false;
+    private boolean internetOk=false;
+    private boolean isServerOnline =false;
 
     @Nullable
     @Override
@@ -183,7 +188,10 @@ public class ListaPedidosFragment extends Fragment {
         listapedidos = new ArrayList<>();
 
         try{
-            new GetListaPedidos().execute();
+
+                new GetListaPedidos().execute();
+
+
         }catch (Exception e){
             Log.e("Error",e.getMessage());
         }
@@ -191,12 +199,12 @@ public class ListaPedidosFragment extends Fragment {
         btnSincronizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (new Funciones().checkInternetConnection(getActivity())) {
+                CheckConnectivity();
+                if (isOnline) {
                     SincronizarPedido();
 
                 } else {
-                    mensajeAviso("Verifique su conexion a internet");
+                    mensajeAviso("Verifique su conexion a internet y disponibilidad del servidor");
                 }
             }
         });
@@ -210,6 +218,16 @@ public class ListaPedidosFragment extends Fragment {
         });
 
         return myView;
+    }
+
+    private void CheckConnectivity() {
+          /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        internetOk = Funciones.TestInternetConectivity();
+        isServerOnline =Funciones.TestServerConectivity();
+        isOnline =(internetOk && isServerOnline);
     }
 
     private void CargarPedidos() {
@@ -308,8 +326,8 @@ public class ListaPedidosFragment extends Fragment {
                     itempedido.put("Total", item.get(variables_publicas.PEDIDOS_COLUMN_Subtotal));
                     listapedidos.add(item);
                 }
-                boolean connectionOK = Funciones.TestInternetConectivity();
-                if (connectionOK) {
+                CheckConnectivity();
+                if (isOnline) {
                     GetPedidosService();
                 } else {
                     if(getActivity()==null) return null;
@@ -716,7 +734,10 @@ public class ListaPedidosFragment extends Fragment {
 
                     inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                     busqueda = txtBusqueda.getText().toString();
-                    new GetListaPedidos().execute().get();
+
+                        new GetListaPedidos().execute().get();
+
+
                     ActualizarFooter();
 
                     HashMap<String, String> itemPedido = listapedidos.get(info.position);
@@ -744,7 +765,7 @@ public class ListaPedidosFragment extends Fragment {
                                 })
                                 .show();
 
-                    } else if (new Funciones().checkInternetConnection(getActivity())) {
+                    } else if (Funciones.checkInternetConnection(getActivity())) {
 
                         final HashMap<String, String> finalPedido = itemPedido;
                         new AlertDialog.Builder(getActivity())

@@ -98,50 +98,7 @@ public class Funciones {
         return false;
     }
 
-/*    public boolean checkServerConnection(Activity activity) {
-        ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        if (activeNetwork != null) { // connected to the internet
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                return isInternetAvailable();
-            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                return isInternetAvailable();
-            }
-        } else {
-            return false;
-        }
-        return false;
-    }*/
 
-
-/*    private boolean isServerAvailable() {
-        try {
-            HttpURLConnection conn=null;
-            try {
-                connectionOK = false;
-                URL url = new URL(variables_publicas.direccionIp+"/ServicioPedidos.svc/ObtenerInventarioArticulo/4000-01-01-01-001");
-                conn= (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
-                conn.setUseCaches(false);
-                conn.connect();
-                InputStream is = conn.getInputStream();
-                if (is != null) {
-                    connectionOK = true;
-                }
-            } catch (Exception e) {
-
-                connectionOK = false;
-            }finally {
-                conn.disconnect();
-            }
-            return connectionOK;
-        } catch (Exception e) {
-            Log.e("Error: ", e.getMessage());
-            return false;
-        }
-
-    }*/
 
 
     private static boolean isInternetAvailable() {
@@ -151,8 +108,8 @@ public class Funciones {
                 connectionOK = false;
                 URL url = new URL("http://www.google.com.ni");
                 conn= (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
                 conn.setUseCaches(false);
                 conn.connect();
                 InputStream is = conn.getInputStream();
@@ -173,19 +130,15 @@ public class Funciones {
     }
 
 
- /*   public static boolean isConnected() throws InterruptedException, IOException
-    {
-        String command = "ping -c 1 google.com";
-        return (Runtime.getRuntime().exec (command).waitFor() == 0);
-    }*/
+
 
     public static boolean TestInternetConectivity() {
         HttpURLConnection conn=null;
         try {
             URL url = new URL("http://www.google.com.ni");
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(3000);
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
             conn.setUseCaches(false);
             conn.connect();
             InputStream is = conn.getInputStream();
@@ -206,8 +159,8 @@ public class Funciones {
         try {
             URL url = new URL(variables_publicas.direccionIp+"/ServicioPedidos.svc/ObtenerInventarioArticulo/4000-01-01-01-001");
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(3000);
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
             conn.setUseCaches(false);
             conn.connect();
             InputStream is = conn.getInputStream();
@@ -254,17 +207,6 @@ public class Funciones {
         return variables_publicas.FechaActual;
     }
 
-/*    public String GetInternetTime() {
-        try {
-            new GetDateTime().execute().get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return fechaActual;
-    }*/
-
 
     public static String GetDateTime() {
         try {
@@ -288,109 +230,4 @@ public class Funciones {
 
     }
 
-   /* class TestConnectivity extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            HttpURLConnection conn=null;
-            try {
-                connectionOK = false;
-                URL url = new URL("http://www.google.com.ni");
-                conn= (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
-                conn.setUseCaches(false);
-                conn.connect();
-                InputStream is = conn.getInputStream();
-                if (is != null) {
-                    connectionOK = true;
-                }
-            } catch (Exception e) {
-
-                connectionOK = false;
-            }finally {
-                conn.disconnect();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void param) {
-            super.onPostExecute(param);
-        }
-    }
-
-    class TestServerConnectivity extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            HttpURLConnection conn=null;
-            try {
-                connectionOK = false;
-                URL url = new URL(variables_publicas.direccionIp+"/ServicioPedidos.svc/ObtenerInventarioArticulo/4000-01-01-01-001");
-                conn= (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
-                conn.setUseCaches(false);
-                conn.connect();
-                InputStream is = conn.getInputStream();
-                if (is != null) {
-                    connectionOK = true;
-                }
-            } catch (Exception e) {
-
-                connectionOK = false;
-            }finally {
-                conn.disconnect();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void param) {
-            super.onPostExecute(param);
-        }
-    }*/
-
-
-/*    class GetDateTime extends AsyncTask<Void, Void, Boolean> {
-
-            @Override
-            protected Boolean doInBackground(Void... params) {
-
-                try {
-                    String timeServer = "server 0.pool.ntp.org";
-                    Calendar cal = Calendar.getInstance();
-                    try {
-                        NTPUDPClient timeClient = new NTPUDPClient();
-                        InetAddress inetAddress = InetAddress.getByName(timeServer);
-                        TimeInfo timeInfo = timeClient.getTime(inetAddress);
-                        long returnTime = timeInfo.getReturnTime();
-
-                        cal.setTimeInMillis(returnTime);
-                    } catch (Exception ex) {
-                        Log.e("Get Time Error: ", ex.getMessage());
-                    }
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    variables_publicas.FechaActual = sdf.format(cal.getTime());
-                    fechaActual = variables_publicas.FechaActual;
-
-                } catch (Exception e) {
-
-                }
-                return null;
-            }
-
-
-    }*/
 }

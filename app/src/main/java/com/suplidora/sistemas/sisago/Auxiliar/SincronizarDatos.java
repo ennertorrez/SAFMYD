@@ -621,7 +621,7 @@ public class SincronizarDatos {
     }
 
     public boolean SincronizarTodo() throws JSONException {
-        if (ActualizarUsuario()) {
+
             if (SincronizarArticulos()) {
                 if (SincronizarClientes()) {
                     if (SincronizarVendedores()) {
@@ -630,9 +630,11 @@ public class SincronizarDatos {
                                 if (SincronizarFormaPago()) {
                                     if (SincronizarPrecioEspecial()) {
                                         if (SincronizarClientesSucursal()) {
-                                            if (SincronizarConfiguracionSistema()) {
-                                                SincronizarPedidosLocales();
-                                                return true;
+                                            if ( SincronizarConfiguracionSistema()) {
+                                                if(ActualizarUsuario()){
+                                                    SincronizarPedidosLocales();
+                                                    return true;
+                                                }
                                             }
                                         }
                                     }
@@ -642,7 +644,6 @@ public class SincronizarDatos {
                     }
                 }
             }
-        }
         return false;
     }
 
@@ -919,7 +920,7 @@ public class SincronizarDatos {
                     if (NoPedido.equalsIgnoreCase("Pedido ya existe en base de datos")) {
                         NoPedido = (String) ((String) result.get("SincronizarPedidoTotalResult")).split(",")[2];
                     } else {
-                        new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido ,Respuesta false", variables_publicas.info + NoPedido, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                        new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido ,Respuesta false", variables_publicas.info + NoPedido +" *** "+urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                         return "false," + NoPedido;
                     }
 
