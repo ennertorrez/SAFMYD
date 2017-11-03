@@ -303,6 +303,7 @@ public class ListaPedidosFragment extends Fragment {
             pDialog.show();
         }
 
+
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
