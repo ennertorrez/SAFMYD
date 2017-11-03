@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -196,6 +197,7 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
+
                 /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -210,7 +212,15 @@ public class Login extends Activity {
 
 
                 if(isOnline){
-                 new GetValorConfig().execute();
+
+                    if (Build.VERSION.SDK_INT >= 11) {
+                        //--post GB use serial executor by default --
+                        new GetValorConfig().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                    } else {
+                        //--GB uses ThreadPoolExecutor by default--
+                        new GetValorConfig().execute();
+                    }
+
                 }
                 if (!isOnline && variables_publicas.usuario != null) {
                     variables_publicas.MensajeLogin = "";
@@ -227,11 +237,7 @@ public class Login extends Activity {
 
         variables_publicas.usuario = UltimoUsuario;
         isOnline=  Funciones.checkInternetConnection(Login.this);
-        /*if (variables_publicas.usuario != null) {
-            if (isOnline) {
-                new SincronizardorPedidos().execute();
-            }
-        }*/
+
 
         ValidarUltimaVersion();
         loadIMEI();
@@ -356,7 +362,15 @@ public class Login extends Activity {
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
             try {
-                new GetLatestVersion().execute();
+
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new GetLatestVersion().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new GetLatestVersion().execute();
+                }
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -593,7 +607,16 @@ public class Login extends Activity {
                     int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
                     int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
                     if (!FechaLocal.equals(FechaActual) || ValorConfigLocal < ValorConfigServidor) {
-                        new GetUser().execute();
+
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            //--post GB use serial executor by default --
+                            new GetUser().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            //--GB uses ThreadPoolExecutor by default--
+                            new GetUser().execute();
+                        }
+
+
                     } else {
                         variables_publicas.MensajeLogin = "";
                         variables_publicas.LoginOk = true;
@@ -606,7 +629,13 @@ public class Login extends Activity {
                 }
 
             } else if (isOnline && (variables_publicas.usuario == null || variables_publicas.Configuracion == null)) {
-                new GetUser().execute();
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new GetUser().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new GetUser().execute();
+                }
             }
 
 

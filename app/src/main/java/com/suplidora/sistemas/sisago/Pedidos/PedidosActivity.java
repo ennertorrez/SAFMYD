@@ -12,7 +12,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
@@ -94,6 +96,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -204,7 +208,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private boolean editar = false;
     private boolean pedidoLocal;
     private ConfiguracionSistemaHelper ConfigH;
-
+    static final int DEFAULT_THREAD_POOL_SIZE = 4;
+    ExecutorService executorService = Executors.newCachedThreadPool();
     //endregion
 
 
@@ -213,6 +218,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pedidos);
+
+
+
+
         pedido = new Pedido();
       CheckConnectivity();
         DbOpenHelper = new DataBaseOpenHelper(PedidosActivity.this);
@@ -339,9 +348,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
         });
         txtDescuento = (EditText) findViewById(R.id.txtDescuento);
-        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) {
-            txtDescuento.setEnabled(false);
-        }
+
         txtDescuento.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -423,6 +430,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         // Loading spinner data from database
         CargaDatosCombo();
+
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor") && cliente.getEmpleado().equalsIgnoreCase("0")) {
+            txtDescuento.setEnabled(false);
+        }
 
         btnAgregar = (Button) findViewById(R.id.btnAgregar);
         btnBuscar = (Button) findViewById(R.id.btnBuscar);
@@ -549,11 +560,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             cboVendedor.setEnabled(false);
         } else {
             cboVendedor.setEnabled(true);
+
         }
 
     }
 
     private void CheckConnectivity() {
+         /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         internetOk = Funciones.TestInternetConectivity();
         isServerOnline =Funciones.TestServerConectivity();
         isOnline =(internetOk && isServerOnline);
@@ -669,7 +684,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
 
-            Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-01-024");
+            Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-01-661");
             List<String> items = Arrays.asList(ConfigPromo024.getValor().split(","));
 
             boolean existe = false;
@@ -706,13 +721,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     HashMap<String, String> articuloBonificado = new HashMap<>();
                     articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
-                    articuloBonificado.put("Cod", "024");
+                    articuloBonificado.put("Cod", "661");
                     articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
                     articuloBonificado.put("Um", "UNIDAD");
                     articuloBonificado.put("Cantidad", String.valueOf((int) Math.floor(cantidad * 0.2))); //Bonificamos el 20% de la cantidad comprada
                     articuloBonificado.put("Precio", "0");
                     articuloBonificado.put("TipoPrecio", "0");
-                    articuloBonificado.put("Descripcion", "**" + "GEL XTREME ESENCIA ATRACTION 12/250 GR");
+                    articuloBonificado.put("Descripcion", "**" + "GEL XTREME 24/250 GR");
                     articuloBonificado.put("Costo", "0");
                     articuloBonificado.put("PorDescuento", "0");
                     articuloBonificado.put("TipoArt", "B");
@@ -739,8 +754,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
     private void SincronizarConfig() {
-        new GetValorConfig().execute();
-
+        if (Build.VERSION.SDK_INT >= 11) {
+            //--post GB use serial executor by default --
+            new GetValorConfig().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        } else {
+            //--GB uses ThreadPoolExecutor by default--
+            new GetValorConfig().execute();
+        }
     }
 
     private void ValidarUltimaVersion() {
@@ -751,8 +771,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
             try {
-                new GetLatestVersion().execute();
 
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new GetLatestVersion().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new GetLatestVersion().execute();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -778,8 +804,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         int cantidadBonificada = 0;
         double Subtotal = 0.0;
 
+
+      boolean promoActiva=   ConfiguracionSistemaH.BuscarValorConfig("Promo Amsa 4000-01-01-01-811").getActivo().equalsIgnoreCase("true");
+
         /*Validamos que el cliente sea canal detalle sino salimos*/
-        if (!cliente.getTipo().equalsIgnoreCase("Detalle")) {
+        if (!cliente.getTipo().equalsIgnoreCase("Detalle") || promoActiva==false) {
             return;
         }
 
@@ -834,8 +863,19 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
                 listaArticulos.add(articuloBonificado);
             }
+            else {
+                //Eliminamos la bonificacion
+                for(HashMap<String,String> item : listaArticulos ){
+                    if(item.get("CodigoArticulo").equalsIgnoreCase("4000-01-01-01-811") && item.get("TipoArt").equalsIgnoreCase("B")){
+                        listaArticulos.remove(item);
+                        break;
+                    }
+                }
+
+            }
 
         }
+        RefrescarGrid();
     }
 
     private boolean ValidarDescuento() {
@@ -872,7 +912,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         jsonPedido = gson.toJson(pedido);
         CheckConnectivity();
         try {
-            new SincronizardorPedidos().execute();
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new SincronizardorPedidos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new SincronizardorPedidos().execute();
+            }
         } catch (final Exception ex) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -974,7 +1020,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             return false;
 
         }
-        if (new Funciones().checkInternetConnection(PedidosActivity.this)) {
+
+        CheckConnectivity();
+        if (isOnline) {
             Funciones.GetDateTime();
         } else {
             Funciones.GetLocalDateTime();
@@ -1764,10 +1812,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 existencia = articulo.getExistencia();
                 lblExistentias.setText(String.valueOf((int) (Double.parseDouble(existencia))));
 //                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
-                new ConsultarExistencias().execute();
-//                } else {
-//                    lblExistentias.setText("N/A");
-//                }
+
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new ConsultarExistencias().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new ConsultarExistencias().execute();
+                }
+
 
                 MensajeCaja = true;
                 ObtenerPrecio(null, CodigoArticulo, false);
@@ -1911,7 +1964,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             super.onPostExecute(result);
             if (pDialog.isShowing())
                 pDialog.dismiss();
-            MostrarMensajeGuardar();
+
+            if(PedidosActivity.this.isFinishing()==false) {
+                MostrarMensajeGuardar();
+            }
+
         }
     }
 
@@ -1934,7 +1991,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         protected Void doInBackground(Void... params) {
 
             try {
-                if (Funciones.TestInternetConectivity()) {
+                CheckConnectivity();
+                if (isOnline) {
                     existencia = SincronizarDatos.ConsultarExistencias(PedidosActivity.this, PedidoH, ArticulosH, articulo.getCodigo());
                 }
             } catch (Exception ex) {

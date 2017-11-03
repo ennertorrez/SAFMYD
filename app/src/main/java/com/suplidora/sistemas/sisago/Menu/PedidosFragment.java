@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
@@ -99,7 +100,14 @@ public class PedidosFragment extends Fragment {
             }
         });
         listaClientes = new ArrayList<>();
-        new GetClientesPedidos().execute();
+        if (Build.VERSION.SDK_INT >= 11) {
+            //--post GB use serial executor by default --
+            new GetClientesPedidos().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            //--GB uses ThreadPoolExecutor by default--
+            new GetClientesPedidos().execute();
+        }
+
         lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
 
         btnBuscar.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +118,14 @@ public class PedidosFragment extends Fragment {
                 inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                 busqueda = txtBusqueda.getText().toString();
                 tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbCodigo ? "1" : "2";
-                new GetClientesPedidos().execute();
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new GetClientesPedidos().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new GetClientesPedidos().execute();
+                }
+
                 lblFooter.setText("Cliente encontrados: " + String.valueOf(listaClientes.size()));
             }
         });

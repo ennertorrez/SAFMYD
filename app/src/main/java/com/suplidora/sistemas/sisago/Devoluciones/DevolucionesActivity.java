@@ -109,7 +109,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     //region Declaracion de controles
 
     private EditText txtDescuento;
-    private EditText txtMotivo;
+    private EditText txtObservaciones;
     private TextView lblCantidad;
     private TextView lblNombCliente;
     private TextView lblCodCliente;
@@ -297,7 +297,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         });
 
 
-        txtMotivo = (EditText) findViewById(R.id.txtMotivo);
+        txtObservaciones = (EditText) findViewById(R.id.txtObservaciones);
         lblSubTotalCor = (TextView) findViewById(R.id.lblSubTotalCor);
         lblIvaCor = (TextView) findViewById(R.id.lblIvaCor);
         lblTotalCor = (TextView) findViewById(R.id.lblTotalCor);
@@ -326,7 +326,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 ////                item.put("IdProveedor", art.getIdProveedor());
 ////                item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
 //            }
-            txtMotivo.setText(devoluciones.getMotivo());
+            txtObservaciones.setText(devoluciones.getMotivo());
             //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
 
             RefrescarGrid();
@@ -628,7 +628,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         devoluciones.setFactura(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura).toString());
         devoluciones.setCliente(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente).toString());
         devoluciones.setRango(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado).toString());
-        devoluciones.setMotivo(String.valueOf(txtMotivo.getText().toString()));
+        devoluciones.setMotivo(String.valueOf(txtObservaciones.getText().toString()));
         devoluciones.setUsuario(variables_publicas.usuario.getUsuario());
         devoluciones.setHoragraba(variables_publicas.FechaActual);
         devoluciones.setTipo("P");
@@ -805,7 +805,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
     private void LimipiarDatos(boolean MensajeCaja) {
         if (MensajeCaja) {
-            txtMotivo.setText("");
+            txtObservaciones.setText("");
             cargadetalle = null;
             txtCodigoArticulo.setText(null);
             txtCantidad.setError(null);
