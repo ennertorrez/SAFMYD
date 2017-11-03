@@ -29,7 +29,7 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
 
-    public static final String direccionIp = "http://186.1.18.75:8085";
+    public static final String direccionIp = "http://186.1.18.75:8080";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
@@ -158,6 +158,7 @@ public class variables_publicas {
     public static final String VENDEDORES_COLUMN_COD_ZONA = "COD_ZONA";
     public static final String VENDEDORES_COLUMN_RUTA = "RUTA";
     public static final String VENDEDORES_COLUMN_codsuper = "codsuper";
+    public static final String VENDEDORES_COLUMN_Supervisor = "Supervisor";
     public static final String VENDEDORES_COLUMN_Status = "Status";
     public static final String VENDEDORES_COLUMN_detalle = "detalle";
     public static final String VENDEDORES_COLUMN_horeca = "horeca";

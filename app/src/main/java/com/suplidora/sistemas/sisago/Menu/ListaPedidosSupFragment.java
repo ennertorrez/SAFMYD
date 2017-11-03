@@ -46,6 +46,8 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
+import com.suplidora.sistemas.sisago.Entidades.Supervisor;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.Entidades.Ruta;
 import com.suplidora.sistemas.sisago.HttpHandler;
@@ -82,6 +84,7 @@ public class ListaPedidosSupFragment extends Fragment {
     private VendedoresHelper VendedoresH;
 
     private Ruta ruta = null;
+    private Supervisor supervisor = null;
     private String CodigoSupervisor;
 
     private String TAG = ListaPedidosSupFragment.class.getSimpleName();
@@ -225,7 +228,6 @@ public class ListaPedidosSupFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 CargarPedidos();
-
             }
         });
 
@@ -245,29 +247,60 @@ public class ListaPedidosSupFragment extends Fragment {
     private void CargaDatosCombo() {
 
         final List<Ruta> rutas;
+        final List<Supervisor> supervisores;
         if (CodigoSupervisor.equals("0")){
             rutas= VendedoresH.ObtenerTodasRutas();
-        }else{
-            rutas= VendedoresH.ObtenerListaRutas(CodigoSupervisor);
+            supervisores = VendedoresH.ObtenerTodosSupervisores();
+
+            ArrayAdapter<Supervisor> adapterSupervisor = new ArrayAdapter<Supervisor>(getActivity(), android.R.layout.simple_spinner_item, supervisores);
+            adapterSupervisor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cboRuta.setAdapter(adapterSupervisor);
+
+            supervisor = adapterSupervisor.getItem(0);
+            ruta =  rutas.get(0);
+
+            CodigoSupervisor = supervisor.getCodsuper();
+            //btnBuscaVentaVendedor.performClick();
+
+
+            cboRuta.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                    // On selecting a spinner item
+                    supervisor = (Supervisor) adapter.getItemAtPosition(position);
+                    CodigoSupervisor = supervisor.getCodsuper();
+                    //ruta = (Ruta) adapter.getItemAtPosition(0);
+                    btnBuscaVentaVendedor.performClick();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+                }
+            });
+        }
+        else {
+            rutas = VendedoresH.ObtenerListaRutas(CodigoSupervisor);
+
+            //ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(),android.R.layout.simple_spinner_item,rutas);
+            ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(), android.R.layout.simple_spinner_item, rutas);
+            adapterRuta.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cboRuta.setAdapter(adapterRuta);
+
+            cboRuta.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                    // On selecting a spinner item
+                    ruta = (Ruta) adapter.getItemAtPosition(position);
+                    btnBuscaVentaVendedor.performClick();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+                }
+            });
         }
 
-        //ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(),android.R.layout.simple_spinner_item,rutas);
-        ArrayAdapter<Ruta> adapterRuta = new ArrayAdapter<Ruta>(getActivity(),android.R.layout.simple_spinner_item,rutas);
-        adapterRuta.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboRuta.setAdapter(adapterRuta);
 
-        cboRuta.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-                ruta = (Ruta) adapter.getItemAtPosition(position);
-                btnBuscaVentaVendedor.performClick();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
 
     }
 
@@ -405,6 +438,7 @@ public class ListaPedidosSupFragment extends Fragment {
         HttpHandler sh = new HttpHandler();
         busqueda = busqueda.isEmpty() ? "%" : busqueda;
         String Fdesde = fechadesde.replace("-","") ,Fhasta=fechahasta.replace("-","");
+
         String urlString = urlPedidosVendedor + "/" + ruta + "/" + Fdesde + "/" + Fhasta + "/" + CodigoSupervisor;
         try {
             URL Url = new URL(urlString);

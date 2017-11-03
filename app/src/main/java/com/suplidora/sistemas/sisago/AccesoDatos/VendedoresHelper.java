@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Ruta;
+import com.suplidora.sistemas.sisago.Entidades.Supervisor;
+import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class VendedoresHelper {
                                        String COD_ZONA,
                                        String RUTA,
                                        String codsuper,
+                                       String Supervisor,
                                        String Status,
                                        String detalle,
                                        String horeca,
@@ -45,6 +48,7 @@ public class VendedoresHelper {
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_COD_ZONA, COD_ZONA);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_RUTA, RUTA);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_codsuper, codsuper);
+        contentValues.put(variables_publicas.VENDEDORES_COLUMN_Supervisor, Supervisor);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_Status, Status);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_detalle, detalle);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_horeca, horeca);
@@ -78,6 +82,7 @@ public class VendedoresHelper {
                         cursor.getString(cursor.getColumnIndex("COD_ZONA")),
                         cursor.getString(cursor.getColumnIndex("RUTA")),
                         cursor.getString(cursor.getColumnIndex("codsuper")),
+                        cursor.getString(cursor.getColumnIndex("Supervisor")),
                         cursor.getString(cursor.getColumnIndex("Status")),
                         cursor.getString(cursor.getColumnIndex("detalle")),
                         cursor.getString(cursor.getColumnIndex("horeca")),
@@ -140,6 +145,30 @@ public class VendedoresHelper {
 
         return list;
     }
+    public List<Supervisor> ObtenerTodosSupervisores() {
+        List<Supervisor> list = new ArrayList<Supervisor>();
+
+        String selectQuery = "SELECT DISTINCT "+variables_publicas.VENDEDORES_COLUMN_Supervisor+" , "+ variables_publicas.VENDEDORES_COLUMN_codsuper +" FROM " + variables_publicas.TABLE_VENDEDORES+ " ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_Supervisor ;
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+           //list.add(new Supervisor("TODOS"," "));
+            do {
+                list.add(new Supervisor(
+                        cursor.getString(cursor.getColumnIndex("Supervisor")),
+                        cursor.getString(cursor.getColumnIndex("codsuper"))
+                ));
+
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        // database.close();
+
+        return list;
+    }
 
     public Vendedor ObtenerVendedor(String Codigo) {
         Vendedor vendedor= null;
@@ -154,6 +183,7 @@ public class VendedoresHelper {
                         cursor.getString(cursor.getColumnIndex("COD_ZONA")),
                         cursor.getString(cursor.getColumnIndex("RUTA")),
                         cursor.getString(cursor.getColumnIndex("codsuper")),
+                        cursor.getString(cursor.getColumnIndex("Supervisor")),
                         cursor.getString(cursor.getColumnIndex("Status")),
                         cursor.getString(cursor.getColumnIndex("detalle")),
                         cursor.getString(cursor.getColumnIndex("horeca")),

@@ -305,8 +305,9 @@ public class SincronizarDatos {
                 String horeca = c.getString("horeca");
                 String mayorista = c.getString("mayorista");
                 String Super = c.getString("super");
+                String Supervisor = c.getString("Supervisor");
 
-                VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper, Status, detalle, horeca, mayorista, Super);
+                VendedoresH.GuardarTotalVendedores(CODIGO, NOMBRE, DEPARTAMENTO, MUNICIPIO, CIUDAD, TELEFONO, CELULAR, CORREO, COD_ZONA, RUTA, codsuper,Supervisor, Status, detalle, horeca, mayorista, Super);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;

@@ -11,17 +11,19 @@ public class Vendedor {
     String COD_ZONA;
     String RUTA;
     String codsuper;
+    String Supervisor;
     String Status;
     String detalle;
     String horeca;
     String mayorista;
 
-    public Vendedor(String CODIGO, String NOMBRE, String COD_ZONA, String RUTA, String codsuper, String status, String detalle, String horeca, String mayorista) {
+    public Vendedor(String CODIGO, String NOMBRE, String COD_ZONA, String RUTA, String codsuper, String Supervisor, String status, String detalle, String horeca, String mayorista) {
         this.CODIGO = CODIGO;
         this.NOMBRE = NOMBRE;
         this.COD_ZONA = COD_ZONA;
         this.RUTA = RUTA;
         this.codsuper = codsuper;
+        this.Supervisor = Supervisor;
         Status = status;
         this.detalle = detalle;
         this.horeca = horeca;
@@ -71,6 +73,10 @@ public class Vendedor {
     public void setCodsuper(String codsuper) {
         this.codsuper = codsuper;
     }
+
+    public  String getSupervisor(){return Supervisor ;}
+
+    public  void setSupervisor(String Supervisor){this.Supervisor = Supervisor;}
 
     public String getStatus() {
         return Status;
