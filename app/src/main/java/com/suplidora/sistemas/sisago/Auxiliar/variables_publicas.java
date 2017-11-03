@@ -158,6 +158,7 @@ public class variables_publicas {
     public static final String VENDEDORES_COLUMN_COD_ZONA = "COD_ZONA";
     public static final String VENDEDORES_COLUMN_RUTA = "RUTA";
     public static final String VENDEDORES_COLUMN_codsuper = "codsuper";
+    public static final String VENDEDORES_COLUMN_Supervisor = "Supervisor";
     public static final String VENDEDORES_COLUMN_Status = "Status";
     public static final String VENDEDORES_COLUMN_detalle = "detalle";
     public static final String VENDEDORES_COLUMN_horeca = "horeca";

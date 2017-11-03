@@ -96,6 +96,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.VENDEDORES_COLUMN_COD_ZONA + " TEXT , "
                     + variables_publicas.VENDEDORES_COLUMN_RUTA + " TEXT , "
                     + variables_publicas.VENDEDORES_COLUMN_codsuper + " TEXT , "
+                    + variables_publicas.VENDEDORES_COLUMN_Supervisor + " TEXT , "
                     + variables_publicas.VENDEDORES_COLUMN_Status + " TEXT , "
                     + variables_publicas.VENDEDORES_COLUMN_detalle + " TEXT , "
                     + variables_publicas.VENDEDORES_COLUMN_horeca + " TEXT , "
