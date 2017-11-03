@@ -265,7 +265,7 @@ public class MenuActivity extends AppCompatActivity
            if (id == R.id.SincronizarDatos) {
                if (Build.VERSION.SDK_INT >= 11) {
                    //--post GB use serial executor by default --
-                   new SincronizaDatos().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                   new SincronizaDatos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
                } else {
                    //--GB uses ThreadPoolExecutor by default--
                    new SincronizaDatos().execute();

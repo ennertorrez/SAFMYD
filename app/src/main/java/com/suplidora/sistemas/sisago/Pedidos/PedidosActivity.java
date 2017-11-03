@@ -804,8 +804,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         int cantidadBonificada = 0;
         double Subtotal = 0.0;
 
+
+      boolean promoActiva=   ConfiguracionSistemaH.BuscarValorConfig("Promo Amsa 4000-01-01-01-811").getActivo().equalsIgnoreCase("true");
+
         /*Validamos que el cliente sea canal detalle sino salimos*/
-        if (!cliente.getTipo().equalsIgnoreCase("Detalle")) {
+        if (!cliente.getTipo().equalsIgnoreCase("Detalle") || promoActiva==false) {
             return;
         }
 
@@ -860,8 +863,19 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
                 listaArticulos.add(articuloBonificado);
             }
+            else {
+                //Eliminamos la bonificacion
+                for(HashMap<String,String> item : listaArticulos ){
+                    if(item.get("CodigoArticulo").equalsIgnoreCase("4000-01-01-01-811") && item.get("TipoArt").equalsIgnoreCase("B")){
+                        listaArticulos.remove(item);
+                        break;
+                    }
+                }
+
+            }
 
         }
+        RefrescarGrid();
     }
 
     private boolean ValidarDescuento() {
