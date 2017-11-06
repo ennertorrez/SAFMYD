@@ -191,8 +191,11 @@ public class DataBaseOpenHelper {
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA + "( "
                     + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdVendedor + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor + " TEXT , "
+                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada + " TEXT , "
                     + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE + "( "
@@ -209,6 +212,7 @@ public class DataBaseOpenHelper {
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES + "( "
                     + variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_cliente + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_usuario + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_subtotal + " TEXT , "
@@ -220,6 +224,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DEVOLUCIONES_COLUMN_factura + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_tipo + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_IMEI + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_COLUMN_Observaciones + " TEXT ,"
                     + variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + "( "

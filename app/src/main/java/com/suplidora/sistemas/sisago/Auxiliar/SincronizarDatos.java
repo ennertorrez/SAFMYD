@@ -77,6 +77,7 @@ public class SincronizarDatos {
     private DevolucionesHelper DevolucionesH;
     private DevolucionesDetalleHelper DevolucionesDetalleH;
 
+
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
@@ -675,12 +676,12 @@ public class SincronizarDatos {
         return guardadoOK;
     }
     public void SincronizarDevoluciones() throws JSONException {
-        ActualizarUsuario();
         SincronizarArticulos();
         SincronizarConfiguracionSistema();
         ObtenerMotivos();
         SincronizarConsolidadoCarga();
         SincronizarConsolidadoCargaDetalle();
+        ActualizarUsuario();
     }
     //ConsolidadoCarga
     public String SincronizarConsolidadoCarga() throws JSONException {
@@ -711,8 +712,11 @@ public class SincronizarDatos {
                 String Cliente = c.getString("Cliente");
                 String Vendedor = c.getString("Vendedor");
                 String Direccion = c.getString("Direccion");
+                String IdCliente =c.getString("IdCliente");
+                String IdVendedor =c.getString("IdVendedor");
+                String Guardada=c.getString("Guardada");
 
-                ConsolidadoCargaH.GuardarConsolidadoCarga(IdConsolidado, Factura, Cliente, Vendedor, Direccion);
+                ConsolidadoCargaH.GuardarConsolidadoCarga(IdConsolidado, Factura, Cliente, Vendedor, Direccion,IdCliente,IdVendedor,Guardada);
             }
             DbOpenHelper.database.setTransactionSuccessful();
         }catch (Exception ex){
@@ -942,7 +946,7 @@ public class SincronizarDatos {
 
     }
 
-    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH, String ndevolucion, String jsonDevolucion, boolean Editar) {
+    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH,ConsolidadoCargaHelper ConsolidadoCargaH, String ndevolucion,String rango,String factura, String jsonDevolucion, boolean Editar) {
 
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -950,16 +954,15 @@ public class SincronizarDatos {
         List<HashMap<String, String>> devolucionDetalle = DevolucionesDetalleH.ObtenerDevolucionDetalle(ndevolucion);
         for (HashMap<String, String> item : devolucionDetalle) {
             item.put("subtotal", item.get("subtotal").replace(",", ""));
-            item.put("Costo", item.get("Costo").replace(",", ""));
-            item.put("Total", item.get("Total").replace(",", ""));
-            item.put("Iva", item.get("Iva").replace(",", ""));
-            item.put("Precio", item.get("Precio").replace(",", ""));
-            item.put("Descuento", item.get("Descuento").replace(",", ""));
-            item.put("Descripcion", Codificar(item.get("Descripcion")));
+            item.put("total", item.get("total").replace(",", ""));
+            item.put("iva", item.get("iva").replace(",", ""));
+            item.put("precio", item.get("precio").replace(",", ""));
+            item.put("descuento", item.get("descuento").replace(",", ""));
+
         }
         String jsonDevolucionDetalle = gson.toJson(devolucionDetalle);
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/SincronizarDevoluciones/";
-        final String urlStringDetalle = urlDetalle  + String.valueOf(Editar) + "/" + "/" + jsonDevolucion + "/" + jsonDevolucionDetalle;
+        final String urlStringDetalle = urlDetalle  + String.valueOf(Editar) + "/"  + jsonDevolucion + "/" + jsonDevolucionDetalle;
 
         try {
             URL Url = new URL(urlStringDetalle);
@@ -979,12 +982,12 @@ public class SincronizarDatos {
         } else {
             try {
                 JSONObject result = new JSONObject(jsonStrDevolucion);
-                String resultState = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[0];
-                String NoDevolucion = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[1];
+                String resultState = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[0];
+                String NoDevolucion = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[1];
                 if (resultState.equals("false")) {
 
-                    if (NoDevolucion.equalsIgnoreCase("Devolucion ya existe en base de datos")) {
-                        NoDevolucion = (String) ((String) result.get("SincronizarDevolucionesResult")).split(",")[2];
+                    if (NoDevolucion.equalsIgnoreCase("devolucion ya existe en base de datos")) {
+                        NoDevolucion = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[2];
                     } else {
                         new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion ,Respuesta false", variables_publicas.info + NoDevolucion, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                         return "false," + NoDevolucion;
@@ -992,6 +995,7 @@ public class SincronizarDatos {
                 }
                 DevolucionesH.ActualizarDevoluciones(ndevolucion, NoDevolucion);
                 DevolucionesDetalleH.Actualizarndevolucion(ndevolucion, NoDevolucion);
+                ConsolidadoCargaH.ActualizarConsolidadoCarga(rango,factura);
 
                 return "true";
             } catch (Exception ex) {

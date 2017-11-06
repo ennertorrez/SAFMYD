@@ -19,6 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -182,6 +183,23 @@ public class Funciones {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String formatteDate = df.format(date);
         return formatteDate;
+    }
+
+    public static Date StringToDate(String sDate){
+        String dtStart = sDate;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date date = format.parse(dtStart);
+           return  date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String DateToString(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return  sdf.format(date);
     }
 
     public boolean SendMail(String subject, String body, String from, String recipients) {

@@ -26,7 +26,7 @@ public class ConsolidadoCargaHelper {
                                 String Factura ,
                                String Cliente ,
                                String Vendedor ,
-                               String Direccion ) {
+                               String Direccion,String IdCliente,String IdVendedor,String Guardada ) {
 
         long rows =0;
         ContentValues contentValues = new ContentValues();
@@ -35,6 +35,9 @@ public class ConsolidadoCargaHelper {
          contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente, Cliente);
          contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor, Vendedor);
          contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion, Direccion);
+        contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente,IdCliente);
+        contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdVendedor,IdVendedor);
+        contentValues.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada,Guardada);
 
         database.insert(variables_publicas.TABLE_CONSOLIDADO_CARGA, null, contentValues);
     }
@@ -43,7 +46,7 @@ public class ConsolidadoCargaHelper {
     }*/
     public List<ConsolidadoCarga> BuscarConsolidadoCarga() {
         List<ConsolidadoCarga> list = new ArrayList<ConsolidadoCarga>();
-        String selectQuery = "select DISTINCT "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado+" from " + variables_publicas.TABLE_CONSOLIDADO_CARGA;
+        String selectQuery = "select DISTINCT "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado+" from " + variables_publicas.TABLE_CONSOLIDADO_CARGA+" where "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada+" = 'false'";
         Cursor cursor = database.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -61,9 +64,9 @@ public class ConsolidadoCargaHelper {
 
         return list;
     }
-    public java.util.ArrayList<String> BuscarConsolidadoCargaFacturas() {
+    public java.util.ArrayList<String> BuscarConsolidadoCargaFacturas(String IdConsolidado) {
         java.util.ArrayList<String> list = new java.util.ArrayList<String>();
-        String selectQuery = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA;
+        String selectQuery = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA+" where "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado+" = '"+IdConsolidado+"'"+ " AND "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada+ " = 'false'";
         Cursor cursor = database.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -101,6 +104,9 @@ public class ConsolidadoCargaHelper {
                 Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente)));
                 Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor)));
                 Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdVendedor)));
+                Ccarga.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada)));
                 lst.add(Ccarga);
             } while (c.moveToNext());
         }
@@ -110,6 +116,15 @@ public class ConsolidadoCargaHelper {
     public  void EliminaConsolidadoCarga() {
         database.execSQL("DELETE FROM "+variables_publicas.TABLE_CONSOLIDADO_CARGA+";");
         Log.d("ConsoliCarga_elimina", "Datos eliminados");
+    }
+
+    public boolean ActualizarConsolidadoCarga(String rango,String factura ) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada, "true");
+        long rowsUpdated = database.update(variables_publicas.TABLE_CONSOLIDADO_CARGA, con, variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura + "= '" + factura+"'"+" AND "+variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado+" = '"+rango+"'", null);
+        if (rowsUpdated != -1)
+            return true;
+        else return false;
     }
 
 

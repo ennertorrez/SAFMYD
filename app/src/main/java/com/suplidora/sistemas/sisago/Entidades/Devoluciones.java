@@ -9,6 +9,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 public class Devoluciones {
    String    ndevolucion  = "";
    String   cliente = "";
+    String nombrecliente="";
    String  horagraba  = "";
     String   usuario ="";
    String  subtotal  = "";
@@ -21,12 +22,13 @@ public class Devoluciones {
     String   tipo ="";
     String IMEI="";
     String IdVehiculo="";
+    String Observaciones="";
 
     public Devoluciones() {
     }
 
-    public Devoluciones(String Ndevolucion, String Cliente, String Horagraba, String Usuario, String Subtotal, String Iva, String Total,
-                        String Estado, String Rango, String Motivo, String Factura, String Tipo,String IMEI,String IdVehiculo) {
+    public Devoluciones(String Ndevolucion, String Cliente,String nombrecliente, String Horagraba, String Usuario, String Subtotal, String Iva, String Total,
+                        String Estado, String Rango, String Motivo, String Factura, String Tipo,String IMEI,String IdVehiculo,String observaciones) {
         ndevolucion=Ndevolucion;
         cliente = Cliente;
         horagraba = Horagraba;
@@ -41,7 +43,25 @@ public class Devoluciones {
         tipo=Tipo;
         this.IMEI = IMEI;
         IdVehiculo = IdVehiculo;
+        Observaciones=observaciones;
+        this.nombrecliente=nombrecliente;
 
+    }
+
+    public String getNombrecliente() {
+        return nombrecliente;
+    }
+
+    public void setNombrecliente(String nombrecliente) {
+        this.nombrecliente = nombrecliente;
+    }
+
+    public String getObservaciones() {
+        return Observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        Observaciones = observaciones;
     }
 
     public String getNdevolucion() {

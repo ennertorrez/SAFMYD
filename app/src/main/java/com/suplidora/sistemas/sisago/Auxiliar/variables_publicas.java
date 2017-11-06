@@ -29,11 +29,11 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
 
-    public static final String direccionIp = "http://186.1.18.75:8080";
+    public static final String direccionIp = "http://186.1.18.75:8085";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 59;
+    public static final int DATABASE_VERSION = 64;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -213,8 +213,11 @@ public class variables_publicas {
     public static final String CONSOLIDADO_CARGA_COLUMN_IdConsolidado = "IdConsolidado";
     public static final String CONSOLIDADO_CARGA_COLUMN_Factura = "Factura";
     public static final String CONSOLIDADO_CARGA_COLUMN_Cliente = "Cliente";
+    public static final String CONSOLIDADO_CARGA_COLUMN_IdCliente = "IdCliente";
+    public static final String CONSOLIDADO_CARGA_COLUMN_IdVendedor = "IdVendedor";
     public static final String CONSOLIDADO_CARGA_COLUMN_Vendedor = "Vendedor";
     public static final String CONSOLIDADO_CARGA_COLUMN_Direccion = "Direccion";
+    public static final String CONSOLIDADO_CARGA_COLUMN_Guardada ="Guardada";
 
     //Variables CamposTbConsolidadoCargaDetalle
     public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo= "IdVehiculo";
@@ -230,6 +233,7 @@ public class variables_publicas {
     //Variables CamposTbDevoluciones
     public static final String DEVOLUCIONES_COLUMN_ndevolucion= "ndevolucion";
     public static final String DEVOLUCIONES_COLUMN_cliente = "cliente";
+    public static final String DEVOLUCIONES_COLUMN_nombrecliente = "nombrecliente";
     public static final String DEVOLUCIONES_COLUMN_horagraba = "horagraba";
     public static final String DEVOLUCIONES_COLUMN_usuario = "usuario";
     public static final String DEVOLUCIONES_COLUMN_subtotal = "subtotal";
@@ -242,6 +246,7 @@ public class variables_publicas {
     public static final String DEVOLUCIONES_COLUMN_tipo = "tipo";
     public static final String DEVOLUCIONES_COLUMN_IMEI = "IMEI";
     public static final String DEVOLUCIONES_COLUMN_IdVehiculo = "IdVehiculo";
+    public static final String DEVOLUCIONES_COLUMN_Observaciones="Observaciones";
 
     //Variables CamposTbDevolucionesDetalle
     public static final String DEVOLUCIONES_DETALLE_COLUMN_ndevolucion= "ndevolucion";

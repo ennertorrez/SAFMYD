@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="EL PEDIDO NO PUDO SER SINCRONIZADO, PEDIDO GUARDADO LOCALMENTE"
+            android:text="LOS DATOS NO PUDIERON SER SINCRONIZADOS, GUARDADO LOCALMENTE"
             android:textColor="#d24d36"
             android:textStyle="bold"
             android:textAlignment="center"

@@ -97,6 +97,28 @@
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/lblrango"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:text="Rango:"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:layout_toRightOf ="@+id/total"
+            android:paddingBottom="1dip" />
+        <TextView
+            android:id="@+id/rango"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/lblrango"
+            android:paddingBottom="1dip"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

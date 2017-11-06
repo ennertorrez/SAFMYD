@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
@@ -76,6 +77,7 @@ import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCargaDetalle;
 import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
+import com.suplidora.sistemas.sisago.Entidades.Motivos;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
@@ -128,7 +130,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private Button btnCancelar;
     private EditText txtCantidad;
     private Spinner cboCarga;
-    private Spinner cboNoFactura;
+    private Spinner cboMotivo;
     private ListView lv;
     private ListView lvItem;
     private SimpleAdapter adapter;
@@ -196,6 +198,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     java.util.ArrayList<String> CcFactura;
     List<HashMap<String, String>> ObtieneCcarga = null;
     SpinnerDialog spinnerDialog;
+    private double CantidadPedido;
+
     //endregion
 
 
@@ -234,6 +238,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         DevolucionH = new DevolucionesHelper(DbOpenHelper.database);
         DevolucionDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
         cboCarga = (Spinner) findViewById(R.id.cboCarga);
+        txtObservaciones = (EditText) findViewById(R.id.txtObservaciones) ;
+        cboMotivo = (Spinner) findViewById(R.id.cboMotivo) ;
         lblFooter = (TextView) findViewById(R.id.lblFooter);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
@@ -326,7 +332,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 ////                item.put("IdProveedor", art.getIdProveedor());
 ////                item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
 //            }
-            txtObservaciones.setText(devoluciones.getMotivo());
+            txtObservaciones.setText(devoluciones.getObservaciones());
             //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
 
             RefrescarGrid();
@@ -343,23 +349,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         //final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
 
 
-                CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
-        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Seleccione o busque la factura",R.style.DialogAnimations_SmileWindow);
-
-        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick()
-        {
-            @Override
-            public void onClick(String item, int position)
-            {
-                //Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
-                ObtieneCcarga = ConsolidadoCargaH.ObtenerCcarga(item);
-
-                lblNombCliente.setText(ObtieneCcarga.get(0).get("Cliente").toString());
-                lblSearch.setText(item);
-                //selectedItems.setText(item + " Position: " + position);
-            }
-        });
-
+        CargarListaFacturas();
 
 
 
@@ -418,12 +408,20 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                                       return;
                                                   }
 
-//                                                  if (PrecioItem == 0) {
-//                                                      MensajeAviso("Ha ocurrido un error por favor seleccione nuevamente el articulo");
-//                                                      return;
-//                                                  }
-                                                  HashMap<String, String> itemPedidos = new HashMap<>();
-                                                  if (AgregarDetalle(itemPedidos)) {
+                                                  if(Double.parseDouble(txtCantidad.getText().toString())> CantidadPedido){
+                                                      txtCantidad.setError("La cantidad maxima permitida para este producto es: " +CantidadPedido);
+                                                      return;
+                                                  }
+
+                                                  boolean repetido = EsArticuloRepetido(txtCodigoArticulo.getText().toString());
+                                                  if (repetido) {
+                                                      MensajeAviso("Este artículo ya ha sigo agregado al pedido.");
+                                                      return;
+                                                  }
+
+
+                                                  HashMap<String, String> itemDevolucion = new HashMap<>();
+                                                  if (AgregarDetalle(itemDevolucion)) {
 
                                                       LimipiarDatos(MensajeCaja);
                                                         lblSearch.setEnabled(false);
@@ -449,7 +447,11 @@ lblSearch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    //CodigoLetra = lblCodigoCliente.getText().toString();
+
+                    if(devoluciones.getMotivo().isEmpty()){
+                        MensajeAviso("Seleccione un motivo");
+                        return;
+                    }
 
                      Guardar();
                 } catch (Exception e) {
@@ -459,6 +461,41 @@ lblSearch.setOnClickListener(new OnClickListener() {
             }
         });
 
+
+    }
+
+    private boolean EsArticuloRepetido(String s) {
+
+        for (HashMap<String, String> item : listaArticulos) {
+            if (item.get("CodigoArticulo").equals(s) && item.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo).equalsIgnoreCase("P")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void CargarListaFacturas() {
+        if(carga!=null){
+            CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas(carga.getIdConsolidado());
+        }else{
+            CcFactura =new  java.util.ArrayList<String>();
+        }
+
+        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Seleccione o busque la factura",R.style.DialogAnimations_SmileWindow);
+
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick()
+        {
+            @Override
+            public void onClick(String item, int position)
+            {
+                //Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
+                ObtieneCcarga = ConsolidadoCargaH.ObtenerCcarga(item);
+
+                lblNombCliente.setText(ObtieneCcarga.get(0).get("Cliente").toString());
+                lblSearch.setText(item);
+                //selectedItems.setText(item + " Position: " + position);
+            }
+        });
 
     }
 
@@ -513,7 +550,13 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
         jsonDevolucion = gson.toJson(devolucion);
         try {
-            new SincronizardorDevoluciones().execute();
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new SincronizardorDevoluciones().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new SincronizardorDevoluciones().execute();
+            }
         } catch (final Exception ex) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -536,7 +579,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
             return false;
         }
 
-        String mensaje = "";
+        String mensaje = "Esta seguro que desea guardar la devolucion?";
 
         new AlertDialog.Builder(this)
                 .setTitle("Confirmación Requerida")
@@ -552,6 +595,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
                         } else {
                             DbOpenHelper.database.endTransaction();
                         }
+
 
                     }
                 })
@@ -572,14 +616,14 @@ lblSearch.setOnClickListener(new OnClickListener() {
         //Guardamos el Header
 
         devoluciones.setFactura(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura).toString());
-        devoluciones.setCliente(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente).toString());
+        devoluciones.setCliente(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente).toString());
+        devoluciones.setNombrecliente(Funciones.Codificar(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente).toString()));
         devoluciones.setRango(ObtieneCcarga.get(0).get(variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado).toString());
-        devoluciones.setMotivo(String.valueOf(txtObservaciones.getText().toString()));
         devoluciones.setUsuario(variables_publicas.usuario.getUsuario());
         devoluciones.setHoragraba(variables_publicas.FechaActual);
         devoluciones.setTipo("P");
         devoluciones.setIMEI(IMEI);
-        devoluciones.setMotivo("pendejada");
+        devoluciones.setObservaciones(txtObservaciones.getText().toString());
 
         //Esto lo ponemos para cuando es editar
 
@@ -615,9 +659,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
             Funciones.GetLocalDateTime();
         }
 
-        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
+        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(),devoluciones.getNombrecliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
                 String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1" , devoluciones.getRango(), devoluciones.getMotivo(),
-                devoluciones.getFactura(), devoluciones.getTipo(),  IMEI, variables_publicas.usuario.getCodigo());
+                devoluciones.getFactura(), devoluciones.getTipo(),  IMEI, variables_publicas.usuario.getCodigo(),Funciones.Codificar( txtObservaciones.getText().toString()));
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -703,7 +747,28 @@ lblSearch.setOnClickListener(new OnClickListener() {
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
                 carga = (ConsolidadoCarga) adapter.getItemAtPosition(position);
+                CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas(carga.getIdConsolidado());
+                CargarListaFacturas();
+                lblSearch.setText("--Selecccione--");
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
+
+        final List<Motivos> dtMotivos;
+        dtMotivos = DevolucionH.ObtenerListaMotivos();
+        ArrayAdapter<Motivos> adapterMotivos = new ArrayAdapter<Motivos>(this, android.R.layout.simple_spinner_item, dtMotivos);
+        adapterCarga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboMotivo.setAdapter(adapterMotivos);
+
+        cboMotivo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                devoluciones.setMotivo(((Motivos) adapter.getItemAtPosition(position)).getMotivo()) ;
             }
 
             @Override
@@ -976,6 +1041,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 lblDescripcionArticulo.setText("");
                 txtCantidad.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
+                CantidadPedido = Double.parseDouble (((TextView) view.findViewById(R.id.Cantidad)).getText().toString());
                 //String DescArticulo = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
 
                 cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(),CodigoArticulo);
@@ -1076,12 +1142,22 @@ lblSearch.setOnClickListener(new OnClickListener() {
     }
     //endregion
 
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if ( pDialog!=null && pDialog.isShowing() ){
+            pDialog.cancel();
+        }
+    }
+
 
     private class SincronizardorDevoluciones extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
+
+
             pDialog = new ProgressDialog(DevolucionesActivity.this);
             pDialog.setMessage("Guardando datos, por favor espere...");
             pDialog.setCancelable(false);
@@ -1092,7 +1168,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH,  devoluciones.getNdevolucion(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH,ConsolidadoCargaH,  devoluciones.getNdevolucion(),devoluciones.getRango(),devoluciones.getFactura(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
                     guardadoOK = true;
                 }
             } else {

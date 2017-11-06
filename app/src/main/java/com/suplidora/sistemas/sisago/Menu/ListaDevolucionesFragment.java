@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
@@ -72,6 +74,7 @@ public class ListaDevolucionesFragment extends Fragment {
     private DataBaseOpenHelper DbOpenHelper;
     private DevolucionesHelper DevolucionesH;
     private DevolucionesDetalleHelper DevolucionesDetalleH;
+    private ConsolidadoCargaHelper ConsolidadoCargaH;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
 
@@ -114,7 +117,7 @@ public class ListaDevolucionesFragment extends Fragment {
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
-        getActivity().setTitle("Lista de Pedidos");
+        getActivity().setTitle("Lista de Devoluciones");
         lv = (ListView) myView.findViewById(R.id.listdevolucionesdia);
         registerForContextMenu(lv);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -140,6 +143,7 @@ public class ListaDevolucionesFragment extends Fragment {
         DevolucionesDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
+        ConsolidadoCargaH= new ConsolidadoCargaHelper(DbOpenHelper.database);
         variables_publicas.Devoluciones = DevolucionesH.BuscarDevolucionesSinconizar();
         txtFechaDevolucion.setText(getDatePhone());
         fecha = txtFechaDevolucion.getText().toString();
@@ -222,7 +226,14 @@ public class ListaDevolucionesFragment extends Fragment {
 
         inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
         busqueda = txtBusqueda.getText().toString();
-        new GetListaDevoluciones().execute();
+
+        if (Build.VERSION.SDK_INT >= 11) {
+            //--post GB use serial executor by default --
+            new GetListaDevoluciones().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        } else {
+            //--GB uses ThreadPoolExecutor by default--
+            new GetListaDevoluciones().execute();
+        }
     }
 
     private void ActualizarFooter() {
@@ -306,10 +317,11 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     itemdevolucion.put("ndevolucion", item.get("ndevolucion"));
                     itemdevolucion.put("horagraba", "horagraba");
-                    itemdevolucion.put("cliente", item.get("cliente"));
+                    itemdevolucion.put("nombrecliente", item.get("nombrecliente"));
                     itemdevolucion.put("total", item.get("total"));
                     itemdevolucion.put("estado", item.get("estado"));
                     itemdevolucion.put("factura", item.get("factura"));
+                    itemdevolucion.put("rango", item.get("rango"));
                     listadevoluciones.add(item);
                 }
                 boolean connectionOK = Funciones.TestInternetConectivity();
@@ -377,14 +389,20 @@ public class ListaDevolucionesFragment extends Fragment {
             for (HashMap<String, String> item : listadevoluciones) {
                 double subtotal = Double.parseDouble(item.get(variables_publicas.DEVOLUCIONES_COLUMN_subtotal).replace("C$", "").replace(",", ""));
                 item.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, df.format(subtotal));
+                try{
+                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba,Funciones.DateToString( Funciones.StringToDate(item.get(variables_publicas.DEVOLUCIONES_COLUMN_horagraba))));
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
             }
             //item.get("horagraba").substring(item.get("horagraba").length() - 10);
             adapter = new SimpleAdapter(
                     getActivity(), listadevoluciones,
-                    R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "cliente",
-                    "horagraba", "total", "estado", "factura"},
+                    R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "nombrecliente",
+                    "horagraba", "total", "estado", "factura","rango"},
                     new int[]{R.id.ndevolucion, R.id.cliente, R.id.Fecha, R.id.total, R.id.estado,
-                            R.id.factura}) {
+                            R.id.factura,R.id.rango}) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
@@ -475,6 +493,7 @@ public class ListaDevolucionesFragment extends Fragment {
                    String estado = c.getString("estado");
                    String factura = c.getString("factura");
                     String subtotal = c.getString("subtotal");
+                    String rango= c.getString("rango");
 
 
 
@@ -482,10 +501,11 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     devoluciones.put("ndevolucion", ndevolucion);
                     devoluciones.put("horagraba", fecha);
-                    devoluciones.put("cliente", nombrecliente);
+                    devoluciones.put("nombrecliente", nombrecliente);
                     devoluciones.put("total", total);
                     devoluciones.put("estado", estado);
                     devoluciones.put("factura", factura);
+                    devoluciones.put("rango",rango);
                     devoluciones.put("subtotal", subtotal);
 
                     listadevoluciones.add(devoluciones);
@@ -517,17 +537,21 @@ public class ListaDevolucionesFragment extends Fragment {
         protected Void doInBackground(Void... params) {
             if(getActivity()==null) return null;
             List<HashMap<String, String>> DevolucionesLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha, "");
+            guardadoOK=true;
             for (HashMap<String, String> item : DevolucionesLocal) {
                 if (guardadoOK == false) {
                     break;
                 }
+               item.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente,Funciones.Codificar( item.get(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
                 Gson gson = new Gson();
 
-                //Cambiar
-                /*Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
-                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
-                String jsonDevolucion = gson.toJson(DevolucionesH.ObtenerDevolucion(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
-                guardadoOK = Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion( DevolucionesH, DevolucionesDetalleH, vendedor, cliente, item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion), jsonPedido, false).split(",")[0]);*/
+                    String jsonDevolucion = gson.toJson(DevolucionesH.ObtenerDevolucion(item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
+                    if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionesH, DevolucionesDetalleH,ConsolidadoCargaH,  item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion),item.get(variables_publicas.DEVOLUCIONES_COLUMN_rango),item.get(variables_publicas.DEVOLUCIONES_COLUMN_factura), jsonDevolucion, false).split(",")[0])) {
+                        guardadoOK = true;
+                    }
+                else {
+                    guardadoOK = false;
+                }
             }
             return null;
         }

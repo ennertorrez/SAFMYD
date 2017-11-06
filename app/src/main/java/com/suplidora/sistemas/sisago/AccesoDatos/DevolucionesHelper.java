@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.Motivos;
@@ -22,7 +23,7 @@ public class DevolucionesHelper {
         database = db;
     }
 
-    public boolean GuardarDevolucion(String ndevolucion, String cliente,
+    public boolean GuardarDevolucion(String ndevolucion, String cliente,String nombrecliente,
                                  String horagraba,
                                  String usuario,
                                  String subtotal,
@@ -31,11 +32,12 @@ public class DevolucionesHelper {
                                  String estado,
                                  String rango,
                                  String motivo,
-                                 String factura, String tipo,String IMEI,String IdVehiculo) {
+                                 String factura, String tipo,String IMEI,String IdVehiculo,String Observaciones) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, ndevolucion);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, cliente);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, nombrecliente);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba, horagraba);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_usuario, usuario);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal   , subtotal);
@@ -48,6 +50,7 @@ public class DevolucionesHelper {
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo, tipo);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI, IMEI);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo, IdVehiculo);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones, Observaciones);
         long rowInserted = database.insert(variables_publicas.TABLE_DEVOLUCIONES, null, contentValues);
         if (rowInserted != -1)
             return true;
@@ -119,6 +122,7 @@ public class DevolucionesHelper {
                 devoluciones = new HashMap<>();
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_cliente)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horagraba)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_usuario, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_usuario)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_subtotal)));
@@ -131,6 +135,7 @@ public class DevolucionesHelper {
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
                 lst.add(devoluciones);
             } while (c.moveToNext());
         }
@@ -173,6 +178,7 @@ public class DevolucionesHelper {
                 devolucion = new HashMap<>();
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_cliente)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, Funciones.Codificar( c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente))));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horagraba)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_usuario, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_usuario)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_subtotal)));
@@ -185,6 +191,7 @@ public class DevolucionesHelper {
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones,Funciones.Codificar( c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones))));
             } while (c.moveToNext());
         }
         c.close();
@@ -212,6 +219,7 @@ public class DevolucionesHelper {
                 devolucion.setTipo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.setIMEI(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devolucion.setIdVehiculo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
+                devolucion.setIdVehiculo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
             } while (c.moveToNext());
         }
         c.close();
@@ -230,6 +238,7 @@ public class DevolucionesHelper {
                 HashMap<String, String> devolucion = new HashMap<>();
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_cliente)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horagraba)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_usuario, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_usuario)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_subtotal)));
@@ -241,6 +250,7 @@ public class DevolucionesHelper {
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_factura, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_factura)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
                 lst.add(devolucion);
             } while (c.moveToNext());
         }
@@ -255,6 +265,7 @@ public class DevolucionesHelper {
             do {
                 devoluciones = (new Devoluciones(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_cliente)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_horagraba)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_usuario)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_subtotal)),
@@ -266,7 +277,8 @@ public class DevolucionesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_factura)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)),
-                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo))
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones))
                 ));
             } while (c.moveToNext());
         }
