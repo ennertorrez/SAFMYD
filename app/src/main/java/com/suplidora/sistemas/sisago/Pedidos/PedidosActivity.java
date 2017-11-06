@@ -146,8 +146,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String CodigoItemAgregado = "";
     private SincronizarDatos sd;
     private boolean isOnline = false;
-    private boolean internetOk=false;
-    private boolean isServerOnline =false;
+
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
     //endregion
 
@@ -569,9 +568,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
          /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        internetOk = Funciones.TestInternetConectivity();
-        isServerOnline =Funciones.TestServerConectivity();
-        isOnline =(internetOk && isServerOnline);
+        isOnline =Funciones.TestServerConectivity();
     }
 
     private void AplicarBonificacionCartillas() {

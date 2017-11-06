@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.FragmentTransaction;
@@ -261,14 +262,19 @@ public class MenuActivity extends AppCompatActivity
 
        try{
            int id = item.getItemId();
-
            if (id == R.id.SincronizarDatos) {
-               if (Build.VERSION.SDK_INT >= 11) {
-                   //--post GB use serial executor by default --
-                   new SincronizaDatos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-               } else {
-                   //--GB uses ThreadPoolExecutor by default--
-                   new SincronizaDatos().execute();
+               //Esto sirve para permitir realizar conexion a internet en el Hilo principal
+               StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+               StrictMode.setThreadPolicy(policy);
+               boolean isOnline =Funciones.TestServerConectivity();
+               if(isOnline){
+                   if (Build.VERSION.SDK_INT >= 11) {
+                       //--post GB use serial executor by default --
+                       new SincronizaDatos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                   } else {
+                       //--GB uses ThreadPoolExecutor by default--
+                       new SincronizaDatos().execute();
+                   }
                }
            }
            //noinspection SimplifiableIfStatement

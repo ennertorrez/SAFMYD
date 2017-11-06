@@ -19,12 +19,18 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,8 +115,8 @@ public class Funciones {
                 connectionOK = false;
                 URL url = new URL("http://www.google.com.ni");
                 conn= (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(5000);
-                conn.setReadTimeout(5000);
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
                 conn.setUseCaches(false);
                 conn.connect();
                 InputStream is = conn.getInputStream();
@@ -132,14 +138,14 @@ public class Funciones {
 
 
 
-
+/*
     public static boolean TestInternetConectivity() {
         HttpURLConnection conn=null;
         try {
             URL url = new URL("http://www.google.com.ni");
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
             conn.setUseCaches(false);
             conn.connect();
             InputStream is = conn.getInputStream();
@@ -153,15 +159,15 @@ public class Funciones {
         finally {
             conn.disconnect();
         }
-    }
+    }*/
 
     public static boolean TestServerConectivity() {
         HttpURLConnection conn=null;
         try {
             URL url = new URL(variables_publicas.direccionIp+"/ServicioPedidos.svc/ObtenerInventarioArticulo/4000-01-01-01-001");
             conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
             conn.setUseCaches(false);
             conn.connect();
             InputStream is = conn.getInputStream();
@@ -247,5 +253,51 @@ public class Funciones {
         }
 
     }
+
+    public static boolean TestInternetConectivity() {
+        InetAddress inetAddress = null;
+        int timeOut=5000;
+        try {
+            Future<InetAddress> future = Executors.newSingleThreadExecutor().submit(new Callable<InetAddress>() {
+                @Override
+                public InetAddress call() {
+                    try {
+                        return InetAddress.getByName("google.com");
+                    } catch (UnknownHostException e) {
+                        return null;
+                    }
+                }
+            });
+            inetAddress = future.get(timeOut, TimeUnit.MILLISECONDS);
+            future.cancel(true);
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        }
+        return inetAddress!=null && !inetAddress.equals("");
+    }
+
+   /* public static boolean TestServerConectivity() {
+        InetAddress inetAddress = null;
+        int timeOut=5000;
+        try {
+            Future<InetAddress> future = Executors.newSingleThreadExecutor().submit(new Callable<InetAddress>() {
+                @Override
+                public InetAddress call() {
+                    try {
+                        return InetAddress.getByName(variables_publicas.direccionIp+"/ServicioPedidos.svc/ObtenerInventarioArticulo/4000-01-01-01-001");
+                    } catch (UnknownHostException e) {
+                        return null;
+                    }
+                }
+            });
+            inetAddress = future.get(timeOut, TimeUnit.MILLISECONDS);
+            future.cancel(true);
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        } catch (TimeoutException e) {
+        }
+        return inetAddress!=null && !inetAddress.equals("");
+    }*/
 
 }

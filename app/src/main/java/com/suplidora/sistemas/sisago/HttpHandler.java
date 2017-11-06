@@ -11,10 +11,19 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class HttpHandler {
 
     private static final String TAG = HttpHandler.class.getSimpleName();
+    private static OkHttpClient client;
+    private static MediaType JSON;
+
 
     public HttpHandler() {
     }
@@ -75,7 +84,7 @@ public class HttpHandler {
             conn.setReadTimeout(20000);
             conn.setUseCaches(false);
             conn.setDoOutput(true);
-            int responceCode = conn.getResponseCode();
+                        int responceCode = conn.getResponseCode();
 
             if (responceCode == HttpURLConnection.HTTP_OK) {
                 String line;
@@ -122,6 +131,21 @@ public class HttpHandler {
         }
         return sb.toString();
     }
+
+    public static String Post(String url, String json) throws IOException {
+        client = new OkHttpClient();
+        JSON = MediaType.parse("application/json; charset=utf-8");
+
+        RequestBody body = RequestBody.create(JSON, json);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+
+    }
+
 
 
 }

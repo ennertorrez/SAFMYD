@@ -55,7 +55,7 @@ public class VendedoresHelper {
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_mayorista, mayorista);
         contentValues.put(variables_publicas.VENDEDORES_COLUMN_Super, Super);
 
-        database.insert(variables_publicas.TABLE_VENDEDORES, null, contentValues);
+        long rowInserted=database.insert(variables_publicas.TABLE_VENDEDORES, null, contentValues);
     }
 
     //    public Cursor ObtenerListaVendedores() {

@@ -83,10 +83,8 @@ public class Login extends Activity {
     private String Contrasenia = "";
     private ProgressDialog pDialog;
     private String tipoBusqueda = "3";
-    private boolean internetOk=false;
-    private boolean isServerOnline =false;
     private boolean isOnline=false;
-    private
+
     // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
@@ -197,22 +195,19 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
+/*
 
-                /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
+                */
+                //Esto sirve para permitir realizar conexion a internet en el Hilo principal
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
 
-                internetOk = Funciones.TestInternetConectivity();
-                isServerOnline =Funciones.TestServerConectivity();
-                isOnline =(internetOk && isServerOnline);
-
+                isOnline =Funciones.TestServerConectivity();
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);
 
-
                 if(isOnline){
-
                     if (Build.VERSION.SDK_INT >= 11) {
                         //--post GB use serial executor by default --
                         new GetValorConfig().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
@@ -220,7 +215,6 @@ public class Login extends Activity {
                         //--GB uses ThreadPoolExecutor by default--
                         new GetValorConfig().execute();
                     }
-
                 }
                 if (!isOnline && variables_publicas.usuario != null) {
                     variables_publicas.MensajeLogin = "";
@@ -231,14 +225,9 @@ public class Login extends Activity {
                 } else if (!isOnline && variables_publicas.usuario == null) {
                     mensajeAviso("Usuario o contraseña invalido\n O para conectar un nuevo usuario debe conectarse a internet");
                 }
-
             }
         });
-
         variables_publicas.usuario = UltimoUsuario;
-        isOnline=  Funciones.checkInternetConnection(Login.this);
-
-
         ValidarUltimaVersion();
         loadIMEI();
         try {
@@ -247,8 +236,6 @@ public class Login extends Activity {
         } catch (Exception ex) {
             Funciones.MensajeAviso(getApplicationContext(), ex.getMessage());
         }
-
-
 
     }
 
@@ -370,7 +357,6 @@ public class Login extends Activity {
                     //--GB uses ThreadPoolExecutor by default--
                     new GetLatestVersion().execute();
                 }
-
 
             } catch (Exception e) {
                 e.printStackTrace();

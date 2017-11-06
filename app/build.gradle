@@ -57,7 +57,8 @@ dependencies {
     compile files('lib/mail.jar')
     compile files('lib/additionnal.jar')
     compile files('lib/commons-net-3.6.jar')
-   // compile 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
+    // compile 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
     compile 'com.github.mirrajabi:search-dialog:1.2.1'
     compile 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
 }

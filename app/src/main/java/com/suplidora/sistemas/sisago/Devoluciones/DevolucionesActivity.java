@@ -398,6 +398,11 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
                                               try {
 
+                                                  if(txtCodigoArticulo.getText().toString().isEmpty()){
+                                                      txtCantidad.setError("Primero seleccione un producto");
+                                                      return;
+                                                  }
+
                                                   if (TextUtils.isEmpty(txtCantidad.getText().toString())) {
                                                       txtCantidad.setError("Ingrese un valor");
                                                       return;
@@ -415,7 +420,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
                                                   boolean repetido = EsArticuloRepetido(txtCodigoArticulo.getText().toString());
                                                   if (repetido) {
-                                                      MensajeAviso("Este artículo ya ha sigo agregado al pedido.");
+                                                      MensajeAviso("Este artículo ya ha sigo agregado a la devolucion.");
                                                       return;
                                                   }
 
@@ -467,7 +472,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
     private boolean EsArticuloRepetido(String s) {
 
         for (HashMap<String, String> item : listaArticulos) {
-            if (item.get("CodigoArticulo").equals(s) && item.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo).equalsIgnoreCase("P")) {
+            if (item.get("item").equals(s) && item.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo).equalsIgnoreCase("P")) {
                 return true;
             }
         }
@@ -1082,7 +1087,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
-            String HeaderMenu = obj.get("ITEM") + "\n" + obj.get("Item_Descripcion");
+            String HeaderMenu = obj.get("item") + "\n" + obj.get("Item_Descripcion");
 
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getMenuInflater();
@@ -1194,12 +1199,12 @@ lblSearch.setOnClickListener(new OnClickListener() {
         protected void onPreExecute() {
             super.onPreExecute();
             // Showing progress dialog
-            if (pDialog.isShowing())
-                pDialog.dismiss();
-            pDialog = new ProgressDialog(DevolucionesActivity.this);
+
+         /*   pDialog = new ProgressDialog(DevolucionesActivity.this);
             pDialog.setMessage("consultando version del sistema, por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+            pDialog.show();*/
+
         }
 
         @Override
@@ -1222,9 +1227,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-          /*  if (pDialog.isShowing())
-                pDialog.dismiss();
-*/
+    /*        if (pDialog.isShowing())
+                pDialog.dismiss();*/
+
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
             if (latestVersion != null && !currentVersion.equals(latestVersion)) {
