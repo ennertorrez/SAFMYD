@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
+import com.suplidora.sistemas.sisago.Entidades.Motivos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,12 +57,47 @@ public class DevolucionesHelper {
     public boolean GuardarMotivos(String id, String motivo){
         long rows = 0;
         ContentValues contentValues = new ContentValues();
-        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, id);
-        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, motivo);
+        contentValues.put(variables_publicas.MOTIVOS_COLUMN_id, id);
+        contentValues.put(variables_publicas.MOTIVOS_COLUMN_motivo, motivo);
         long rowInserted = database.insert(variables_publicas.TABLE_MOTIVOS, null, contentValues);
         if (rowInserted != -1)
             return true;
         else return false;
+    }
+
+
+    public List<HashMap<String, String>> ObtenerListaMotivosHashMap() {
+        HashMap<String, String> motivos = null;
+        List<HashMap<String, String>> lst = new ArrayList<>();
+        String Query = "SELECT * FROM " + variables_publicas.TABLE_MOTIVOS + ";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                motivos = new HashMap<>();
+                motivos.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.MOTIVOS_COLUMN_id)));
+                motivos.put(variables_publicas.DEVOLUCIONES_COLUMN_cliente, c.getString(c.getColumnIndex(variables_publicas.MOTIVOS_COLUMN_motivo)));
+                lst.add(motivos);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+
+    public ArrayList<Motivos> ObtenerListaMotivos() {
+        Motivos motivo = null;
+        ArrayList<Motivos> lst = new ArrayList<>();
+        String Query = "SELECT * FROM " + variables_publicas.TABLE_MOTIVOS + ";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                motivo = new Motivos(
+                 c.getString(c.getColumnIndex(variables_publicas.MOTIVOS_COLUMN_id)),
+               c.getString(c.getColumnIndex(variables_publicas.MOTIVOS_COLUMN_motivo)));
+                lst.add(motivo);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
 
     public boolean ActualizarDevoluciones(String ndevolucion , String CodigoDevolucion) {

@@ -361,23 +361,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         });
 
 
-//        btnSearch.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
-//                        "What are you looking for...?", null,CcFactura,
-//                        new SearchResultListener<DtoConsolidadoCargaFacturas>() {
-//                            @Override
-//                            public void onSelected(BaseSearchDialogCompat baseSearchDialogCompat,
-//                                                   DtoConsolidadoCargaFacturas searchable, int position) {
-//                                Toast.makeText(DevolucionesActivity.this, ""+searchable.getTitle(),
-//                                        Toast.LENGTH_SHORT).show();
-//                                baseSearchDialogCompat.dismiss();
-//                            }
-//                        });
-//
-//            }
-//        });
+
 
 lblSearch.setOnClickListener(new OnClickListener() {
     @Override
@@ -475,40 +459,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
             }
         });
 
-        // cboVendedor.setEnabled(false);
+
     }
 
-//    void provideSimpleDialog(){
-//        SimpleSearchDialogCompat dialog = new SimpleSearchDialogCompat(DevolucionesActivity.this, "Search...",
-//                "What are you looking for...?", null,CcFactura ,
-//                new SearchResultListener<DtoConsolidadoCargaFacturas>() {
-//                    @Override
-//                    public void onSelected(BaseSearchDialogCompat basedialog,DtoConsolidadoCargaFacturas item, int position)
-//                    {
-//                        Toast.makeText(DevolucionesActivity.this, item.getTitle(),
-//                                Toast.LENGTH_SHORT).show();
-//                        basedialog.dismiss();
-//                    }
-//
-//                });
-//        dialog.show();
-//
-//        //dialog.getSearchBox().setTypeface(Typeface.SERIF);
-//    }
-
-//    private ArrayList<SampleModel> createSampleData(){
-//        ArrayList<SampleModel> items = new ArrayList<>();
-//        items.add(new SampleModel("First item"));
-//        items.add(new SampleModel("Second item"));
-//        items.add(new SampleModel("Third item"));
-//        items.add(new SampleModel("The ultimate item"));
-//        items.add(new SampleModel("Last item"));
-//        items.add(new SampleModel("Lorem ipsum"));
-//        items.add(new SampleModel("Dolor sit"));
-//        items.add(new SampleModel("Some random word"));
-//        items.add(new SampleModel("guess who's back"));
-//        return items;
-//    }
 
     private void ValidarUltimaVersion() {
         boolean isOnline = new Funciones().checkInternetConnection(DevolucionesActivity.this);
@@ -584,14 +537,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         }
 
         String mensaje = "";
-//        if ((cliente.getTipo().equalsIgnoreCase("Mayorista"))) {
-//            mensaje = "Este cliente es de tipo FORANEO, pero el pedido es menor a C$3,000 por lo que se guardará como tipo :DETALLE. Esta seguro que desea continuar?";
-//            devoluciones.setTipo("Detalle");
-//
-//        } else {
-//            devoluciones.setTipo(cliente.getTipo());
-//            mensaje = "Esta seguro que desea guardar la devolucion?";
-//        }
+
         new AlertDialog.Builder(this)
                 .setTitle("Confirmación Requerida")
                 .setMessage(mensaje)
@@ -764,26 +710,6 @@ lblSearch.setOnClickListener(new OnClickListener() {
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-        //Combo Carga Fact
-        /*final List<DtoConsolidadoCargaFacturas> CcargaFact;
-        CcargaFact= ConsolidadoCargaH.BuscarConsolidadoCargaFacturas();
-
-        ArrayAdapter<DtoConsolidadoCargaFacturas> adapterCargaFact = new ArrayAdapter<DtoConsolidadoCargaFacturas>(this,android.R.layout.simple_spinner_item,CcargaFact);
-        adapterCargaFact.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboNoFactura.setAdapter(adapterCargaFact);
-
-        cboNoFactura.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-
-                Factura = (DtoConsolidadoCargaFacturas) adapter.getItemAtPosition(position);
-
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });*/
 
 
     }
@@ -1110,12 +1036,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
                     listaArticulos.remove(itemArticulo);
-//                    for (int i = 0; i < listaArticulos.size(); i++) {
-//                        HashMap<String, String> a = listaArticulos.get(i);
-//                        if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
-//                            listaArticulos.remove(a);
-//                        }
-//                    }
+
 
                     CalcularTotales();
                     LimipiarDatos(true);

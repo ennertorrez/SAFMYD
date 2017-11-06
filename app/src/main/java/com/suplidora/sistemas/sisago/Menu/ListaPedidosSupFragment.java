@@ -156,8 +156,8 @@ public class ListaPedidosSupFragment extends Fragment {
             CodigoSupervisor = variables_publicas.usuario.getCodigo();
         }
         else if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")){
-            Vendedor IdSupervisor = VendedoresH.ObtenerVendedor(variables_publicas.usuario.getCodigo());
-            CodigoSupervisor = IdSupervisor.getCodsuper();
+            Vendedor vendedor = VendedoresH.ObtenerVendedor(variables_publicas.usuario.getCodigo());
+            CodigoSupervisor = vendedor.getCodsuper();
         }
         else
         {
