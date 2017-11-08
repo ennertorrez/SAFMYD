@@ -1,9 +1,4 @@
 package com.suplidora.sistemas.sisago.Devoluciones;
-import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
-import com.suplidora.sistemas.sisago.Auxiliar.SimpleSearchDialogCompat;
-
 
 import android.Manifest;
 import android.app.Activity;
@@ -15,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -53,6 +47,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
@@ -62,6 +57,8 @@ import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -79,7 +76,6 @@ import com.suplidora.sistemas.sisago.Entidades.DtoConsolidadoCargaFacturas;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.Motivos;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
-import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.R;
 
@@ -98,9 +94,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
-import ir.mirrajabi.searchdialog.core.BaseSearchDialogCompat;
-import ir.mirrajabi.searchdialog.core.SearchResultListener;
-import ir.mirrajabi.searchdialog.core.Searchable;
 
 public class DevolucionesActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -238,14 +231,14 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         DevolucionH = new DevolucionesHelper(DbOpenHelper.database);
         DevolucionDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
         cboCarga = (Spinner) findViewById(R.id.cboCarga);
-        txtObservaciones = (EditText) findViewById(R.id.txtObservaciones) ;
-        cboMotivo = (Spinner) findViewById(R.id.cboMotivo) ;
+        txtObservaciones = (EditText) findViewById(R.id.txtObservaciones);
+        cboMotivo = (Spinner) findViewById(R.id.cboMotivo);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH,  PedidoH, PedidoDetalleH,DevolucionH,DevolucionDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH, DevolucionH, DevolucionDetalleH);
 
         // Displaying all values on the screen
         final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
@@ -352,14 +345,13 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         CargarListaFacturas();
 
 
-
-lblSearch.setOnClickListener(new OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        //provideSimpleDialog();
-        spinnerDialog.showSpinerDialog();
-    }
-});
+        lblSearch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //provideSimpleDialog();
+                spinnerDialog.showSpinerDialog();
+            }
+        });
 
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
         btnCancelar.setOnClickListener(new OnClickListener() {
@@ -398,7 +390,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
 
                                               try {
 
-                                                  if(txtCodigoArticulo.getText().toString().isEmpty()){
+                                                  if (txtCodigoArticulo.getText().toString().isEmpty()) {
                                                       txtCantidad.setError("Primero seleccione un producto");
                                                       return;
                                                   }
@@ -413,8 +405,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                                       return;
                                                   }
 
-                                                  if(Double.parseDouble(txtCantidad.getText().toString())> CantidadPedido){
-                                                      txtCantidad.setError("La cantidad maxima permitida para este producto es: " +CantidadPedido);
+                                                  if (Double.parseDouble(txtCantidad.getText().toString()) > CantidadPedido) {
+                                                      txtCantidad.setError("La cantidad maxima permitida para este producto es: " + CantidadPedido);
                                                       return;
                                                   }
 
@@ -429,7 +421,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
                                                   if (AgregarDetalle(itemDevolucion)) {
 
                                                       LimipiarDatos(MensajeCaja);
-                                                        lblSearch.setEnabled(false);
+                                                      lblSearch.setEnabled(false);
                                                       cboCarga.setEnabled(false);
                                                       CalcularTotales();
                                                       RefrescarGrid();
@@ -453,12 +445,12 @@ lblSearch.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 try {
 
-                    if(devoluciones.getMotivo().isEmpty()){
+                    if (devoluciones.getMotivo().isEmpty()) {
                         MensajeAviso("Seleccione un motivo");
                         return;
                     }
 
-                     Guardar();
+                    Guardar();
                 } catch (Exception e) {
                     DbOpenHelper.database.endTransaction();
                     MensajeAviso(e.getMessage());
@@ -480,19 +472,17 @@ lblSearch.setOnClickListener(new OnClickListener() {
     }
 
     private void CargarListaFacturas() {
-        if(carga!=null){
+        if (carga != null) {
             CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas(carga.getIdConsolidado());
-        }else{
-            CcFactura =new  java.util.ArrayList<String>();
+        } else {
+            CcFactura = new java.util.ArrayList<String>();
         }
 
-        spinnerDialog=new SpinnerDialog(DevolucionesActivity.this,CcFactura,"Seleccione o busque la factura",R.style.DialogAnimations_SmileWindow);
+        spinnerDialog = new SpinnerDialog(DevolucionesActivity.this, CcFactura, "Seleccione o busque la factura", R.style.DialogAnimations_SmileWindow);
 
-        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick()
-        {
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
             @Override
-            public void onClick(String item, int position)
-            {
+            public void onClick(String item, int position) {
                 //Toast.makeText(DevolucionesActivity.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
                 ObtieneCcarga = ConsolidadoCargaH.ObtenerCcarga(item);
 
@@ -658,15 +648,13 @@ lblSearch.setOnClickListener(new OnClickListener() {
             return false;
 
         }
-        if (Funciones.checkInternetConnection(DevolucionesActivity.this)) {
-            Funciones.GetDateTime();
-        } else {
-            Funciones.GetLocalDateTime();
-        }
 
-        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(),devoluciones.getNombrecliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
-                String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1" , devoluciones.getRango(), devoluciones.getMotivo(),
-                devoluciones.getFactura(), devoluciones.getTipo(),  IMEI, variables_publicas.usuario.getCodigo(),Funciones.Codificar( txtObservaciones.getText().toString()));
+        Funciones.GetLocalDateTime();
+
+
+        boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), devoluciones.getNombrecliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
+                String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1", devoluciones.getRango(), devoluciones.getMotivo(),
+                devoluciones.getFactura(), devoluciones.getTipo(), IMEI, variables_publicas.usuario.getCodigo(), Funciones.Codificar(txtObservaciones.getText().toString()));
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -773,7 +761,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                devoluciones.setMotivo(((Motivos) adapter.getItemAtPosition(position)).getMotivo()) ;
+                devoluciones.setMotivo(((Motivos) adapter.getItemAtPosition(position)).getMotivo());
             }
 
             @Override
@@ -787,7 +775,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
     private void GenerarCodigoDevolucion() {
 
         devoluciones.setNdevolucion("-" + GetFechaISO() + devoluciones.getCliente() + devoluciones.getNdevolucion());
-       // lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
+        // lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
     }
 
     private String GetFechaISO() {
@@ -821,11 +809,10 @@ lblSearch.setOnClickListener(new OnClickListener() {
     }
 
 
-
     private boolean AgregarDetalle(HashMap<String, String> itemDevolucion) {
-        itemDevolucion.put("IdVehiculo",cargadetalle.getIdVehiculo());
-        itemDevolucion.put("ndevolucion",devoluciones.getNdevolucion());
-        itemDevolucion.put("factura",lblSearch.getText().toString());
+        itemDevolucion.put("IdVehiculo", cargadetalle.getIdVehiculo());
+        itemDevolucion.put("ndevolucion", devoluciones.getNdevolucion());
+        itemDevolucion.put("factura", lblSearch.getText().toString());
         itemDevolucion.put("item", cargadetalle.getITEM());
         itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
         itemDevolucion.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, lblDescripcionArticulo.getText().toString());
@@ -836,14 +823,14 @@ lblSearch.setOnClickListener(new OnClickListener() {
         subtotal = Double.parseDouble(itemDevolucion.get("precio")) * Double.parseDouble(itemDevolucion.get("cantidad"));
         descuento = subtotal * (Double.parseDouble(cargadetalle.getDESCUENTO()) / 100);
         subtotal = subtotal - descuento;
-        porIva = Double.parseDouble(cargadetalle.getIVA()) > 0 ? 0.15 : 0 ;
-        itemDevolucion.put("poriva",df.format(porIva));
+        porIva = Double.parseDouble(cargadetalle.getIVA()) > 0 ? 0.15 : 0;
+        itemDevolucion.put("poriva", df.format(porIva));
 
         iva = subtotal * porIva;
         total = subtotal + iva;
         itemDevolucion.put("descuento", df.format(descuento));
-        itemDevolucion.put("tipo","P");
-        itemDevolucion.put("numero"," ");
+        itemDevolucion.put("tipo", "P");
+        itemDevolucion.put("numero", " ");
         itemDevolucion.put("iva", df.format(iva));
         itemDevolucion.put("subtotal", df.format(subtotal));
         itemDevolucion.put("total", df.format(total));
@@ -861,9 +848,8 @@ lblSearch.setOnClickListener(new OnClickListener() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaArticulos,
                 R.layout.devoluciones_list_item, new
-                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad","precio", "iva", "total"}, new
-                int[]{R.id.lblDetalleCodProducto,R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad,R.id.lblDetallePrecio,  R.id.lblDetalleIva, R.id.lblDetalleTotal})
-        {
+                String[]{"Cod", variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, "cantidad", "precio", "iva", "total"}, new
+                int[]{R.id.lblDetalleCodProducto, R.id.lblDetalleDescripcion, R.id.lblDetalleCantidad, R.id.lblDetallePrecio, R.id.lblDetalleIva, R.id.lblDetalleTotal}) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -1005,16 +991,18 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 try {
                     switch (tipoBusqueda) {
                         case 1:
-                            if(lblSearch.getText().toString().equalsIgnoreCase("Seleccionar"))
-                            {MensajeAviso("Seleccione una factura"); return;}
-                            else {
+                            if (lblSearch.getText().toString().equalsIgnoreCase("Seleccionar")) {
+                                MensajeAviso("Seleccione una factura");
+                                return;
+                            } else {
                                 listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXCodigo(lblSearch.getText().toString(), busqueda);
                             }
                             break;
                         case 2:
-                            if(lblSearch.getText().toString().equalsIgnoreCase("Seleccionar"))
-                            {MensajeAviso("Seleccione una factura"); return;}
-                            else {
+                            if (lblSearch.getText().toString().equalsIgnoreCase("Seleccionar")) {
+                                MensajeAviso("Seleccione una factura");
+                                return;
+                            } else {
                                 listaCCargaArticulosItem = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXNombre(lblSearch.getText().toString(), busqueda);
                             }
                             break;
@@ -1023,7 +1011,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
                     MensajeAviso(ex.getMessage());
                 }
                 if (listaCCargaArticulosItem.size() == 0) {
-                    MensajeAviso("No se encuentra ningun producto para esta factura ' "+lblSearch.getText().toString()+" '");
+                    MensajeAviso("No se encuentra ningun producto para esta factura ' " + lblSearch.getText().toString() + " '");
                 }
 
                 ListAdapter adapter = new SimpleAdapter(
@@ -1046,10 +1034,10 @@ lblSearch.setOnClickListener(new OnClickListener() {
                 lblDescripcionArticulo.setText("");
                 txtCantidad.setText("");
                 String CodigoArticulo = ((TextView) view.findViewById(R.id.Codigo)).getText().toString();
-                CantidadPedido = Double.parseDouble (((TextView) view.findViewById(R.id.Cantidad)).getText().toString());
+                CantidadPedido = Double.parseDouble(((TextView) view.findViewById(R.id.Cantidad)).getText().toString());
                 //String DescArticulo = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
 
-                cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(),CodigoArticulo);
+                cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(), CodigoArticulo);
                 /*Validamos que permita vender codigo 1052*/
 
                 txtCodigoArticulo.setText(CodigoArticulo);
@@ -1148,9 +1136,9 @@ lblSearch.setOnClickListener(new OnClickListener() {
     //endregion
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if ( pDialog!=null && pDialog.isShowing() ){
+        if (pDialog != null && pDialog.isShowing()) {
             pDialog.cancel();
         }
     }
@@ -1173,7 +1161,7 @@ lblSearch.setOnClickListener(new OnClickListener() {
         protected Void doInBackground(Void... params) {
 
             if (Funciones.TestInternetConectivity()) {
-                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH,ConsolidadoCargaH,  devoluciones.getNdevolucion(),devoluciones.getRango(),devoluciones.getFactura(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionH, DevolucionDetalleH, ConsolidadoCargaH, devoluciones.getNdevolucion(), devoluciones.getRango(), devoluciones.getFactura(), jsonDevolucion, (editar == true && devolucionLocal == false)).split(",")[0])) {
                     guardadoOK = true;
                 }
             } else {

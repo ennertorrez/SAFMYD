@@ -195,14 +195,12 @@ public class Login extends Activity {
                     txtPassword.setError("Ingrese la contraseña");
                     return;
                 }
-/*
 
-                */
                 //Esto sirve para permitir realizar conexion a internet en el Hilo principal
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
-
                 isOnline =Funciones.TestServerConectivity();
+
                 variables_publicas.usuario = UsuariosH.BuscarUsuarios(Usuario, Contrasenia);
                 String VersionDatos = "VersionDatos";
                 variables_publicas.Configuracion = ConfigH.BuscarValorConfig(VersionDatos);

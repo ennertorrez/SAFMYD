@@ -103,8 +103,7 @@ public class ListaPedidosFragment extends Fragment {
     private boolean guardadoOK = true;
     private DecimalFormat df;
     private boolean isOnline = false;
-    private boolean internetOk=false;
-    private boolean isServerOnline =false;
+
 
     @Nullable
     @Override
@@ -199,13 +198,10 @@ public class ListaPedidosFragment extends Fragment {
         btnSincronizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CheckConnectivity();
-                if (isOnline) {
+
                     SincronizarPedido();
 
-                } else {
-                    mensajeAviso("Verifique su conexion a internet y disponibilidad del servidor");
-                }
+
             }
         });
 
@@ -221,13 +217,7 @@ public class ListaPedidosFragment extends Fragment {
     }
 
     private void CheckConnectivity() {
-          /*Esto sirve para permitir realizar conexion a internet en el Hilo principal*/
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        internetOk = Funciones.TestInternetConectivity();
-        isServerOnline =Funciones.TestServerConectivity();
-        isOnline =(internetOk && isServerOnline);
+        isOnline =Funciones.TestServerConectivity();
     }
 
     private void CargarPedidos() {
@@ -521,17 +511,33 @@ public class ListaPedidosFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             if(getActivity()==null) return null;
-            List<HashMap<String, String>> PedidosLocal = PedidosH.ObtenerPedidosLocales(fecha, "");
-            for (HashMap<String, String> item : PedidosLocal) {
-                if (guardadoOK == false) {
-                    break;
+
+            CheckConnectivity();
+            if(isOnline){
+                List<HashMap<String, String>> PedidosLocal = PedidosH.ObtenerPedidosLocales(fecha, "");
+                for (HashMap<String, String> item : PedidosLocal) {
+                    if (guardadoOK == false) {
+                        break;
+                    }
+                    Gson gson = new Gson();
+                    Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
+                    Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
+                    String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
+                    guardadoOK = Boolean.parseBoolean(SincronizarDatos.SincronizarPedido( PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false).split(",")[0]);
                 }
-                Gson gson = new Gson();
-                Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
-                Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente), item.get(variables_publicas.PEDIDOS_COLUMN_Cod_cv));
-                String jsonPedido = gson.toJson(PedidosH.ObtenerPedido(item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido)));
-                guardadoOK = Boolean.parseBoolean(SincronizarDatos.SincronizarPedido( PedidosH, PedidosDetalleH, vendedor, cliente, item.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido), jsonPedido, false).split(",")[0]);
+            }else{
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(getActivity().isFinishing()) return;
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "No es posible conectarse con el servidor, por favor verifique su conexion a internet",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
             }
+
+
             return null;
         }
 

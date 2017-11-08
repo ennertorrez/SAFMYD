@@ -60,6 +60,24 @@ public class Funciones {
                 .replace("~", "(tilde)");
     }
 
+    public static String Decodificar(String text) {
+        return text.replace("(plus)","+")
+                .replace("(hash)","#")
+                .replace("(dot)",".")
+                .replace("(at)","@")
+                .replace("(star)","*")
+                .replace("(minus)","-")
+                .replace("(comma)",",")
+                .replace("(semicolon)",":")
+                .replace("(exclamation)","!")
+                .replace("(question)","?")
+                .replace("(slash)","/")
+                .replace("(backslash)","\\")
+                .replace("(sigleQuote)","'")
+                .replace("(doubleQuote)","\"")
+                .replace("(tilde)","~");
+    }
+
     private static Pattern p = Pattern.compile("\\((\\d+)([+-]\\d{2})(\\d{2})\\)");
 
     public static Date jd2d(String jsonDateString) {
@@ -232,6 +250,7 @@ public class Funciones {
     }
 
 
+    /*Esta funcion sirve para obtener la hora de internet*/
     public static String GetDateTime() {
         try {
             String timeServer = "0.north-america.pool.ntp.org";

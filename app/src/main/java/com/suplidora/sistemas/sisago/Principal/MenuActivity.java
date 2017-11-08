@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.FragmentTransaction;
@@ -58,9 +57,6 @@ import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
-
-import static android.R.id.toggle;
-import static com.suplidora.sistemas.sisago.Auxiliar.variables_publicas.VersionSistema;
 /*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
 import com.suplidora.sistemas.sisago.app.ControladorSincronizacion;*/
 
@@ -113,24 +109,24 @@ public class MenuActivity extends AppCompatActivity
 
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
         navigationView.addHeaderView(header);
-         lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
+        lblUsuarioHeader = (TextView) header.findViewById(R.id.UsuarioHeader);
         lblUsuarioHeaderCodigo = (TextView) header.findViewById(R.id.UsuarioHeaderCodigo);
-        lblVersion =(TextView) header.findViewById(R.id.lblVersionSistema);
+        lblVersion = (TextView) header.findViewById(R.id.lblVersionSistema);
         lblServidor = (TextView) header.findViewById(R.id.lblServidor);
-        String userHeader="";
-        String userHeaderCodigo="";
-        String VersionSistema="";
-        String Servidor="";
-      try{
-          userHeader = variables_publicas.usuario.getNombre();
-          userHeaderCodigo = variables_publicas.usuario.getCodigo();
-          VersionSistema = "Version: " +variables_publicas.VersionSistema;
-          Servidor = variables_publicas.direccionIp.equals("http://186.1.18.75:8080")? "SERVIDOR: PRODUCCION" : "SERVIDOR: DESARROLLO";
-      }catch (Exception ex){
-          Log.e("Error:",ex.getMessage());
-      }
+        String userHeader = "";
+        String userHeaderCodigo = "";
+        String VersionSistema = "";
+        String Servidor = "";
+        try {
+            userHeader = variables_publicas.usuario.getNombre();
+            userHeaderCodigo = variables_publicas.usuario.getCodigo();
+            VersionSistema = "Version: " + variables_publicas.VersionSistema;
+            Servidor = variables_publicas.direccionIp.equals("http://186.1.18.75:8080") ? "SERVIDOR: PRODUCCION" : "SERVIDOR: DESARROLLO";
+        } catch (Exception ex) {
+            Log.e("Error:", ex.getMessage());
+        }
         lblUsuarioHeader.setText(userHeader);
-        lblUsuarioHeaderCodigo.setText("Codigo: "+ userHeaderCodigo);
+        lblUsuarioHeaderCodigo.setText("Codigo: " + userHeaderCodigo);
         lblVersion.setText(VersionSistema);
         lblServidor.setText(Servidor);
 
@@ -145,7 +141,7 @@ public class MenuActivity extends AppCompatActivity
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
-        UsuariosH= new UsuariosHelper(DbOpenHelper.database);
+        UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
@@ -156,16 +152,16 @@ public class MenuActivity extends AppCompatActivity
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH,UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH,DevolucionesH,DevolucionesDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH, ConsolidadoCargaDetalleH, PedidoH, PedidoDetalleH, DevolucionesH, DevolucionesDetalleH);
 
-        try{
-            variables_publicas.info="***** Usuario: "+variables_publicas.usuario.getNombre() + " / IMEI: "+(variables_publicas.IMEI ==null? "null" : variables_publicas.IMEI )+ " / VersionSistema: "+ variables_publicas.VersionSistema + " ******** ";
-        }catch (Exception ex){
-            Log.e("error",ex.getMessage());
+        try {
+            variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";
+        } catch (Exception ex) {
+            Log.e("error", ex.getMessage());
             ex.printStackTrace();
         }
 
-        if( variables_publicas.usuario.getTipo().equalsIgnoreCase("Vehiculo")){
+        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vehiculo")) {
             navigationView.getMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(false);
@@ -174,12 +170,10 @@ public class MenuActivity extends AppCompatActivity
             navigationView.getMenu().getItem(5).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);
 
-        }else
-        {
+        } else {
             navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
         }
-
 
 
     }
@@ -191,7 +185,7 @@ public class MenuActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-                    removeAllFragments(getFragmentManager());
+            removeAllFragments(getFragmentManager());
         }
     }
 
@@ -201,6 +195,7 @@ public class MenuActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
     private class SincronizaDatos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -217,11 +212,16 @@ public class MenuActivity extends AppCompatActivity
 
             //SINCRONIZAR DATOS
             try {
-                if(variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo"))
-                {
-                    sd.SincronizarDevoluciones();
+
+                boolean isOnline = Funciones.TestServerConectivity();
+                if (isOnline) {
+                    if (variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo")) {
+                        sd.SincronizarDevoluciones();
+                    } else {
+                        sd.SincronizarTodo();
+                    }
                 }
-                else {sd.SincronizarTodo();}
+
             } catch (final JSONException e) {
                 Log.e(TAG, "Json parsing error: " + e.getMessage());
                 runOnUiThread(new Runnable() {
@@ -237,6 +237,7 @@ public class MenuActivity extends AppCompatActivity
 
             return null;
         }
+
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
@@ -246,6 +247,7 @@ public class MenuActivity extends AppCompatActivity
             mensajeAviso("Datos actualizados correctamente");
         }
     }
+
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         dlgAlert.setMessage(texto);
@@ -260,40 +262,35 @@ public class MenuActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-       try{
-           int id = item.getItemId();
-           if (id == R.id.SincronizarDatos) {
-               //Esto sirve para permitir realizar conexion a internet en el Hilo principal
-               StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-               StrictMode.setThreadPolicy(policy);
-               boolean isOnline =Funciones.TestServerConectivity();
-               if(isOnline){
-                   if (Build.VERSION.SDK_INT >= 11) {
-                       //--post GB use serial executor by default --
-                       new SincronizaDatos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-                   } else {
-                       //--GB uses ThreadPoolExecutor by default--
-                       new SincronizaDatos().execute();
-                   }
-               }
-           }
-           //noinspection SimplifiableIfStatement
-           if (id == R.id.Salir) {
-               finish();//return true;
-           }
-           if (id == R.id.CerrarSesion) {
-               Intent newAct = new Intent(getApplicationContext(), Login.class);
-              newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-               startActivity(newAct);//return true;
-               finish();
-           }
-           return super.onOptionsItemSelected(item);
-       }catch (Exception e){
-           Funciones.MensajeAviso(getApplicationContext(), e.getMessage());
-       }
-       finally {
-           return super.onOptionsItemSelected(item);
-       }
+        try {
+            int id = item.getItemId();
+            if (id == R.id.SincronizarDatos) {
+
+                if (Build.VERSION.SDK_INT >= 11) {
+                    //--post GB use serial executor by default --
+                    new SincronizaDatos().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                } else {
+                    //--GB uses ThreadPoolExecutor by default--
+                    new SincronizaDatos().execute();
+                }
+
+            }
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.Salir) {
+                finish();//return true;
+            }
+            if (id == R.id.CerrarSesion) {
+                Intent newAct = new Intent(getApplicationContext(), Login.class);
+                newAct.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(newAct);//return true;
+                finish();
+            }
+            return super.onOptionsItemSelected(item);
+        } catch (Exception e) {
+            Funciones.MensajeAviso(getApplicationContext(), e.getMessage());
+        } finally {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -382,9 +379,9 @@ public class MenuActivity extends AppCompatActivity
         return true;
     }
 
-    private  void removeAllFragments(FragmentManager fragmentManager) {
+    private void removeAllFragments(FragmentManager fragmentManager) {
 
-        if(fragmentManager.getBackStackEntryCount() > 0 || getSupportFragmentManager().getBackStackEntryCount()>0) {
+        if (fragmentManager.getBackStackEntryCount() > 0 || getSupportFragmentManager().getBackStackEntryCount() > 0) {
 
             while (fragmentManager.getBackStackEntryCount() > 0) {
                 fragmentManager.popBackStackImmediate();
@@ -394,13 +391,12 @@ public class MenuActivity extends AppCompatActivity
                 getSupportFragmentManager().popBackStackImmediate();
             }
 
-        }else{
-               new AlertDialog.Builder(this)
+        } else {
+            new AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmación requerida")
                     .setMessage("Está seguro que desea salir de la aplicación?")
-                    .setPositiveButton("Si", new DialogInterface.OnClickListener()
-                    {
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             finish();
@@ -411,9 +407,9 @@ public class MenuActivity extends AppCompatActivity
                     .show();
         }
     }
+
     @Override
-    protected void attachBaseContext(Context base)
-    {
+    protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(MenuActivity.this);
     }

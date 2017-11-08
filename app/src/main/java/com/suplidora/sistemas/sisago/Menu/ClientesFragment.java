@@ -172,35 +172,36 @@ public class ClientesFragment extends Fragment {
                     for (int i = 0; i < clientes.length(); i++) {
                         JSONObject c = clientes.getJSONObject(i);
 
-
                         HashMap<String, String> cliente = new HashMap<>();
-
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString("IdCliente"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString("CodCv"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString("Nombre"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString("NombreCliente"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString("FechaCreacion"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString("Direccion"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdDepartamento, c.getString("IdDepartamento"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdMunicipio, c.getString("IdMunicipio"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ciudad, c.getString("Ciudad"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruc, c.getString("Ruc"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Cedula, c.getString("Cedula"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_LimiteCredito, c.getString("LimiteCredito"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdFormaPago, c.getString("IdFormaPago"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdVendedor, c.getString("IdVendedor"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Excento, c.getString("Excento"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoLetra, c.getString("CodigoLetra"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruta, c.getString("Ruta"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString("Frecuencia"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString("PrecioEspecial"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString("FechaUltimaCompra"));
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString("Tipo"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ciudad, c.getString("Ciudad"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString("CodCv"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoLetra, c.getString("CodigoLetra"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString("Detallista"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString("Direccion"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString("EsClienteVarios"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Excento, c.getString("Excento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString("FechaCreacion"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString("FechaUltimaCompra"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString("Frecuencia"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString("IdCliente"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdDepartamento, c.getString("IdDepartamento"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdFormaPago, c.getString("IdFormaPago"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdMunicipio, c.getString("IdMunicipio"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdVendedor, c.getString("IdVendedor"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_LimiteCredito, c.getString("LimiteCredito"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString("Nombre"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString("NombreCliente"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString("PrecioEspecial"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruc, c.getString("Ruc"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Ruta, c.getString("Ruta"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString("RutaForanea"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString("Tipo"));
+
 
                         if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
                             cliente.put("CodCv2", "");

@@ -1,5 +1,7 @@
 package com.suplidora.sistemas.sisago.Entidades;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
+
 /**
  * Created by Sistemas on 6/5/2017.
  */
@@ -72,7 +74,7 @@ public class Pedido {
     }
 
     public String getObservacion() {
-        return Observacion;
+        return Funciones.Decodificar( Observacion);
     }
 
     public void setObservacion(String observacion) {

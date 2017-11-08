@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
@@ -41,7 +42,7 @@ public class PedidosHelper {
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, IdCliente);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, Cod_cv);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Tipo   , Tipo);
-        contentValues.put(variables_publicas.PEDIDOS_COLUMN_Observacion, Observacion);
+        contentValues.put(variables_publicas.PEDIDOS_COLUMN_Observacion, Funciones.Codificar( Observacion));
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, IdFormaPago);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, IdSucursal);
         contentValues.put(variables_publicas.PEDIDOS_COLUMN_Fecha, Fecha);
@@ -125,7 +126,7 @@ public class PedidosHelper {
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdCliente)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Cod_cv, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Cod_cv)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Tipo, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Tipo)));
-                pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion)));
+                pedido.put(variables_publicas.PEDIDOS_COLUMN_Observacion, Funciones.Decodificar( c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Observacion))));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdFormaPago, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdFormaPago)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_IdSucursal, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_IdSucursal)));
                 pedido.put(variables_publicas.PEDIDOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.PEDIDOS_COLUMN_Fecha)));
