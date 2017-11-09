@@ -126,9 +126,10 @@ public class DevolucionesDetalleHelper {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + ";");
         Log.d("devolucionDet_elimina", "Datos eliminados");
     }
-    public void EliminarDetalleDevolucion(String ndevolucion) {
+    public boolean EliminarDetalleDevolucion(String ndevolucion) {
         int rowsAffected =database.delete( variables_publicas.TABLE_DEVOLUCIONES_DETALLE, variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion+ "='" +ndevolucion+"'",null) ;
         Log.d("Det.DevolucionDeleted: "+ndevolucion, "Datos eliminados");
+        return rowsAffected>0;
     }
 
     public boolean Actualizarndevolucion(String ndevolucion, String NoDevolucion){

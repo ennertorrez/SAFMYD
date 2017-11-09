@@ -1930,7 +1930,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
             } else {
                 guardadoOK = false;
-                runOnUiThread(new Runnable() {
+               /* runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         variables_publicas.MensajeError = "Ha ocurrido un error al obtener las existencias,Respuesta nula";
@@ -1938,7 +1938,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 "Ha ocurrido un error al obtener las existencias,Respuesta nula",
                                 Toast.LENGTH_LONG).show();
                     }
-                });
+                });*/
             }
             return null;
         }

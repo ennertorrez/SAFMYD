@@ -70,6 +70,33 @@ public class ConsolidadoCargaDetalleHelper {
         return lst;
     }
 
+    public ArrayList<HashMap<String, String>>  BuscarConsolidadoCargaDetalleXFactura(String Factura) {
+        String Query = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE+" WHERE  "+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura+" = '"+ Factura +"'";
+        HashMap<String, String> cargaDetalle = null;
+        ArrayList<HashMap<String, String>> lst = new ArrayList<>();
+
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                cargaDetalle = new HashMap<>();
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA)));
+                cargaDetalle.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO, c.getString(c.getColumnIndex(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO)));
+
+                lst.add(cargaDetalle);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+
+
     public ConsolidadoCargaDetalle BuscarConsolidadoCargaDetalle(String Factura, String codigo) {
         String Query = "select * from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE+" WHERE  "+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura+" = '"+ Factura +"' AND "+ variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM+ " = '"+codigo+"'";
         ConsolidadoCargaDetalle cargaDetalle = null;

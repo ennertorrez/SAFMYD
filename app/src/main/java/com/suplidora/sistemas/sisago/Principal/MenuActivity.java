@@ -171,7 +171,7 @@ public class MenuActivity extends AppCompatActivity
             navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);
 
         } else {
-            navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
+           // navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
         }
 

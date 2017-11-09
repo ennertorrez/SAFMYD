@@ -970,7 +970,7 @@ public class SincronizarDatos {
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/SincronizarDevoluciones/";
         final String urlStringDetalle = urlDetalle  + String.valueOf(Editar) + "/"  + jsonDevolucion + "/" + jsonDevolucionDetalle;
 
-        try {
+       /* try {
             URL Url = new URL(urlStringDetalle);
             URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
             encodeUrl = uri.toURL().toString();
@@ -979,9 +979,16 @@ public class SincronizarDatos {
             new Funciones().SendMail("Ha ocurrido un error al sincronizar devolucion, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             e.printStackTrace();
             return "false," + e.getMessage();
-        }
+        }*/
 
-        String jsonStrDevolucion = sh.makeServiceCallPost(encodeUrl);
+        HashMap<String,String> postData = new HashMap<>();
+        postData.put("Editar",String.valueOf(Editar));
+        postData.put("devolucion",jsonDevolucion);
+        postData.put("Detalle",jsonDevolucionDetalle)   ;
+
+        String jsonStrDevolucion = sh.performPostCall(urlDetalle,postData);
+
+       // String jsonStrDevolucion = sh.makeServiceCallPost(encodeUrl);
         if (jsonStrDevolucion == null) {
             new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion,Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return "false,Ha ocurrido un error al sincronizar el detalle de la devolucion,Respuesta nula";
@@ -1048,8 +1055,9 @@ public class SincronizarDatos {
                 String resultState = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[0];
                 final String existencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
                 if (resultState.equals("false")) {
+
                     new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false", variables_publicas.info + " --- " + existencia, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                    activity.runOnUiThread(new Runnable() {
+                  /*  activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             variables_publicas.MensajeError = existencia;
@@ -1057,7 +1065,7 @@ public class SincronizarDatos {
                                     existencia,
                                     Toast.LENGTH_LONG).show();
                         }
-                    });
+                    });*/
                     return "N/A";
                 }
                 /*Si no hubo ningun problema procedemos a actualizar las existencias locales*/

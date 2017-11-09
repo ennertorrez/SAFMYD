@@ -121,6 +121,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private Button btnOK;
     private Button btnGuardar;
     private Button btnCancelar;
+    private Button btnAgregarTodos;
     private EditText txtCantidad;
     private Spinner cboCarga;
     private Spinner cboMotivo;
@@ -152,6 +153,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private Cliente cliente;
     private double tasaCambio = 0;
     private Devoluciones devoluciones;
+    private boolean isOnline;
 
     private DataBaseOpenHelper DbOpenHelper;
     private VendedoresHelper VendedoresH;
@@ -249,6 +251,11 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         txtCodigoArticulo = (TextView) findViewById(R.id.lblCodArticulo);
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescArticulo);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
+        btnAgregar = (Button) findViewById(R.id.btnAgregar);
+        btnBuscaItem = (Button) findViewById(R.id.btnBuscaItem);
+        btnGuardar = (Button) findViewById(R.id.btnGuardar);
+        lblSearch = (TextView) findViewById(R.id.lblSearch);
+        btnAgregarTodos =(Button) findViewById(R.id.btnAgregarTodos);
         txtCantidad.setFocusable(true);
         txtCantidad.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -316,35 +323,40 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             editar = true;
 
             listaArticulos.clear();
+
+            /*Seleccionamos el consolidado de carga*/
+            List<ConsolidadoCarga> ccarga = ConsolidadoCargaH.BuscarConsolidadoCarga();
+            int indice;
+            for (int i = 0; i < ccarga.size(); i++) {
+                if (ccarga.get(i).getIdConsolidado().equals(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_rango))) {
+                    final int finalI = i;
+                    cboCarga.post(new Runnable() {
+                        public void run() {
+                            cboCarga.setSelection(finalI);
+                        }
+                    });
+                    break;
+                }
+            }
+
+            lblSearch.setText(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura));
             devoluciones = DevolucionH.GetDevolucion(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
             listaArticulos = DevolucionDetalleH.ObtenerDevolucionDetalleArrayList(devoluciones.getNdevolucion());
-//            for (HashMap<String, String> item : listaArticulos) {
-//                Articulo art = ConsolidadoCargaH.
-//                //Articulo art = ArticulosH.BuscarArticulo(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
-////                item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
-////                item.put("IdProveedor", art.getIdProveedor());
-////                item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
-//            }
             txtObservaciones.setText(devoluciones.getObservaciones());
-            //lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
 
             RefrescarGrid();
             CalcularTotales();
+            cboCarga.setEnabled(false);
+            lblSearch.setEnabled(false);
+
         }
 
         // Loading spinner data from database
         CargaDatosCombo();
 
-        btnAgregar = (Button) findViewById(R.id.btnAgregar);
-        btnBuscaItem = (Button) findViewById(R.id.btnBuscaItem);
-        btnGuardar = (Button) findViewById(R.id.btnGuardar);
-        lblSearch = (TextView) findViewById(R.id.lblSearch);
-        //final TextView selectedItems=(TextView)findViewById(R.id.lblDescArticulo);
 
 
         CargarListaFacturas();
-
-
         lblSearch.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -418,7 +430,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
 
                                                   HashMap<String, String> itemDevolucion = new HashMap<>();
-                                                  if (AgregarDetalle(itemDevolucion)) {
+                                                  if (AgregarDetalle(itemDevolucion,txtCantidad.getText().toString())) {
 
                                                       LimipiarDatos(MensajeCaja);
                                                       lblSearch.setEnabled(false);
@@ -459,6 +471,68 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         });
 
 
+
+        btnAgregarTodos.setOnClickListener(new OnClickListener() {
+                                          public void onClick(View v) {
+
+                                              try {
+
+                                                  if(lblSearch.getText().toString().isEmpty() || lblSearch.getText().toString().equalsIgnoreCase("--Selecccione--") ){
+                                                      MensajeAviso("Por favor seleccione una factura");
+                                                      return;
+                                                  }
+
+
+
+
+                                                  String mensaje ="Esta seguro que desea agregar todos los productos a la devolucion?";
+
+                                                  new AlertDialog.Builder(DevolucionesActivity.this)
+                                                          .setTitle("Confirmación Requerida")
+                                                          .setMessage(mensaje)
+                                                          .setCancelable(false)
+                                                          .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                                              public void onClick(DialogInterface dialog, int id) {
+                                                                  listaArticulos = new ArrayList<HashMap<String, String>>();
+                                                                  listaCCargaArticulosItem =ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalleXFactura(lblSearch.getText().toString());
+                                                                  /*Recorremos la lista de productos*/
+                                                                  for (HashMap<String,String> item:listaCCargaArticulosItem) {
+                                                                      cargadetalle = ConsolidadoCargaDetalleH.BuscarConsolidadoCargaDetalle(lblSearch.getText().toString(), item.get(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM));
+                                                                      HashMap<String, String> itemDevolucion = new HashMap<>();
+                                                                      AgregarDetalle(itemDevolucion,item.get(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD)) ;
+                                                                  }
+                                                                  LimipiarDatos(MensajeCaja);
+                                                                  lblSearch.setEnabled(false);
+                                                                  cboCarga.setEnabled(false);
+                                                                  CalcularTotales();
+                                                                  RefrescarGrid();
+
+                                                                  InputMethodManager inputManager = (InputMethodManager)
+                                                                          getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                                                                  inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                                                          InputMethodManager.RESULT_SHOWN);
+
+                                                              }
+                                                          })
+                                                          .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                              @Override
+                                                              public void onClick(DialogInterface dialog, int which) {
+
+                                                              }
+                                                          })
+                                                          .show();
+
+
+
+
+                                              } catch (Exception e) {
+                                                  MensajeAviso(e.getMessage());
+                                              }
+                                          }
+                                      }
+        );
+
     }
 
     private boolean EsArticuloRepetido(String s) {
@@ -488,7 +562,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
                 lblNombCliente.setText(ObtieneCcarga.get(0).get("Cliente").toString());
                 lblSearch.setText(item);
-                //selectedItems.setText(item + " Position: " + position);
             }
         });
 
@@ -496,9 +569,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
 
     private void ValidarUltimaVersion() {
-        boolean isOnline = new Funciones().checkInternetConnection(DevolucionesActivity.this);
-
-        if (isOnline) {
             String latestVersion = "";
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
@@ -508,9 +578,11 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
     }
 
+    private void CheckConnectivity() {
+        isOnline = Funciones.TestServerConectivity();
+    }
     private String getCurrentVersion() {
         PackageManager pm = this.getPackageManager();
         PackageInfo pInfo = null;
@@ -809,14 +881,14 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     }
 
 
-    private boolean AgregarDetalle(HashMap<String, String> itemDevolucion) {
+    private boolean AgregarDetalle(HashMap<String, String> itemDevolucion,String cantidad) {
         itemDevolucion.put("IdVehiculo", cargadetalle.getIdVehiculo());
         itemDevolucion.put("ndevolucion", devoluciones.getNdevolucion());
         itemDevolucion.put("factura", lblSearch.getText().toString());
         itemDevolucion.put("item", cargadetalle.getITEM());
         itemDevolucion.put("Cod", cargadetalle.getITEM().split("-")[cargadetalle.getITEM().split("-").length - 1]);
-        itemDevolucion.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, lblDescripcionArticulo.getText().toString());
-        itemDevolucion.put("cantidad", txtCantidad.getText().toString());
+        itemDevolucion.put(variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion, cargadetalle.getItem_Descripcion());
+        itemDevolucion.put("cantidad", cantidad);
         itemDevolucion.put("precio", String.valueOf(cargadetalle.getPRECIO()));
 
         double subtotal, iva, total, descuento, isc, porIva;
@@ -1198,12 +1270,13 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                //It retrieves the latest version by scraping the content of current version from play store at runtime
-                String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
-                Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
-
-
+                CheckConnectivity();
+                if(isOnline){
+                    //It retrieves the latest version by scraping the content of current version from play store at runtime
+                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+                    Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
 

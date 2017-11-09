@@ -342,10 +342,10 @@ public class Login extends Activity {
 */
 
     private void ValidarUltimaVersion() {
+        String currentVersion = getCurrentVersion();
+        variables_publicas.VersionSistema = currentVersion;
         if (isOnline) {
             String latestVersion = "";
-            String currentVersion = getCurrentVersion();
-            variables_publicas.VersionSistema = currentVersion;
             try {
 
                 if (Build.VERSION.SDK_INT >= 11) {

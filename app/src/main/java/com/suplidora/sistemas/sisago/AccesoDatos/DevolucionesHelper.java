@@ -89,7 +89,7 @@ public class DevolucionesHelper {
     public ArrayList<Motivos> ObtenerListaMotivos() {
         Motivos motivo = null;
         ArrayList<Motivos> lst = new ArrayList<>();
-        String Query = "SELECT * FROM " + variables_publicas.TABLE_MOTIVOS + ";";
+        String Query = "SELECT * FROM " + variables_publicas.TABLE_MOTIVOS + " ORDER BY "+variables_publicas.MOTIVOS_COLUMN_motivo+";";
         Cursor c = database.rawQuery(Query, null);
         if (c.moveToFirst()) {
             do {
@@ -143,10 +143,13 @@ public class DevolucionesHelper {
         return lst;
     }
 
-    public void EliminaDevolucion(String ndevolucion) {
-        database.execSQL("DELETE FROM " + variables_publicas.TABLE_DEVOLUCIONES + " WHERE" +
-                " "+variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion+" = '" + ndevolucion + "' ;");
+    public boolean EliminaDevolucion(String ndevolucion) {
+      /*  database.execSQL("DELETE FROM " + variables_publicas.TABLE_DEVOLUCIONES + " WHERE" +
+                " "+variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion+" = '" + ndevolucion + "' ;");*/
+
+       long deletedRows= database.delete(variables_publicas.TABLE_DEVOLUCIONES,variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion+" = '" + ndevolucion + "'",null);
         Log.d("devolucion_deleted", "Datos eliminados");
+        return deletedRows>0;
     }
 
     public boolean EliminarMotivos() {
@@ -226,9 +229,9 @@ public class DevolucionesHelper {
         return devolucion;
     }
 
-    public ArrayList<HashMap<String, String>> ObtenerDevolucionesLocales(String Fecha, String Nombre) {
+    public ArrayList<HashMap<String, String>> ObtenerDevolucionesLocales(String Fecha, String columnaFiltro, String filtro) {
 
-        String selectQuery = "SELECT * FROM " + variables_publicas.TABLE_DEVOLUCIONES+ " WHERE DATE( " + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + ") = DATE('" + Fecha + "') AND " + variables_publicas.DEVOLUCIONES_COLUMN_cliente + " LIKE '%" + Nombre + "%'";
+        String selectQuery = "SELECT * FROM " + variables_publicas.TABLE_DEVOLUCIONES+ " WHERE DATE( " + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + ") = DATE('" + Fecha + "') AND " + columnaFiltro + " LIKE '%" + filtro + "%'";
 
         Cursor c = database.rawQuery(selectQuery, null);
 

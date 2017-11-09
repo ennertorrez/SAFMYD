@@ -47,7 +47,7 @@
         android:layout_below="@+id/Rl1">
 
         <RadioGroup
-            android:id="@+id/rgGrupo"
+            android:id="@+id/rgGrupo1"
             android:layout_width="200dp"
             android:layout_height="45dp"
             android:layout_alignParentLeft="true"

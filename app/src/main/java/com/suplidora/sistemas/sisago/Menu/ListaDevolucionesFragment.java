@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,16 +39,13 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
-import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
@@ -91,6 +90,7 @@ public class ListaDevolucionesFragment extends Fragment {
     private Button btnBuscar;
     private Button btnSincronizar;
     private TextView txtFechaDevolucion;
+    private RadioGroup rgGrupo;
     private SimpleAdapter adapter;
     public static ArrayList<HashMap<String, String>> listadevoluciones;
     public Calendar myCalendar = Calendar.getInstance();
@@ -106,6 +106,9 @@ public class ListaDevolucionesFragment extends Fragment {
     private String IdVendedor;
     private boolean guardadoOK = true;
     private DecimalFormat df;
+    private boolean isOnline;
+    private String tipoBusqueda;
+
 
     @Nullable
     @Override
@@ -137,17 +140,24 @@ public class ListaDevolucionesFragment extends Fragment {
         View dialogView = inflate.inflate(R.layout.list_devoluciones_guardados, null);
         tvSincroniza = (TextView) dialogView.findViewById(R.id.tvSincronizar);
         tvEstado = (TextView) dialogView.findViewById(R.id.Estado);
-
+        rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo1);
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         DevolucionesH = new DevolucionesHelper(DbOpenHelper.database);
         DevolucionesDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
-        ConsolidadoCargaH= new ConsolidadoCargaHelper(DbOpenHelper.database);
+        ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
         variables_publicas.Devoluciones = DevolucionesH.BuscarDevolucionesSinconizar();
         txtFechaDevolucion.setText(getDatePhone());
         fecha = txtFechaDevolucion.getText().toString();
 
+        tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbFactura ? variables_publicas.DEVOLUCIONES_COLUMN_factura : variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente;
+        rgGrupo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                tipoBusqueda = rgGrupo.getCheckedRadioButtonId() == R.id.rbFactura ? variables_publicas.DEVOLUCIONES_COLUMN_factura : variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente;
+            }
+        });
 
         /***DatePicker***/
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
@@ -189,22 +199,16 @@ public class ListaDevolucionesFragment extends Fragment {
         });
         listadevoluciones = new ArrayList<>();
 
-        try{
+        try {
             new GetListaDevoluciones().execute();
-        }catch (Exception e){
-            Log.e("Error",e.getMessage());
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
         }
 
         btnSincronizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (new Funciones().checkInternetConnection(getActivity())) {
-                    SincronizarDevolucion();
-
-                } else {
-                    mensajeAviso("Verifique su conexion a internet");
-                }
+                SincronizarDevolucion();
             }
         });
 
@@ -238,7 +242,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
     private void ActualizarFooter() {
 
-        try{
+        try {
             double subtotal = 0.00;
             int cantidad = 0;
             for (HashMap<String, String> devolucion : listadevoluciones) {
@@ -249,9 +253,9 @@ public class ListaDevolucionesFragment extends Fragment {
             }
             lblFooterCantidad.setText("Cantidad: " + String.valueOf(cantidad));
             lblFooterSubtotal.setText("Total: C$" + df.format(subtotal));
-        }catch (Exception ex){
-            new Funciones().SendMail("Ha ocurrido un error al actualizar footer en la lista de devoluciones, Excepcion controlada",variables_publicas.info+" --- "+ex.getMessage(),variables_publicas.correoError,variables_publicas.correosErrores );
-            Log.e("Error:",ex.getMessage());
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al actualizar footer en la lista de devoluciones, Excepcion controlada", variables_publicas.info + " --- " + ex.getMessage(), variables_publicas.correoError, variables_publicas.correosErrores);
+            Log.e("Error:", ex.getMessage());
             ex.printStackTrace();
         }
 
@@ -302,17 +306,18 @@ public class ListaDevolucionesFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
             try {
-                if(getActivity()==null) return null;
+                if (getActivity() == null) return null;
                 DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
                 DevolucionesH = new DevolucionesHelper(DbOpenHelper.database);
                 listadevoluciones.clear();
                 List<HashMap<String, String>> ListaLocal = null;
 
-                ListaLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha, busqueda);
+
+                ListaLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha,tipoBusqueda, busqueda);
 
                 for (HashMap<String, String> item : ListaLocal) {
                     HashMap<String, String> itemdevolucion = new HashMap<>();
-                   // item.get("").substring(" ");
+                    // item.get("").substring(" ");
                     //String Fecha = item.get("horagraba").substring(item.get("horagraba").length() - 10);
 
                     itemdevolucion.put("ndevolucion", item.get("ndevolucion"));
@@ -324,11 +329,11 @@ public class ListaDevolucionesFragment extends Fragment {
                     itemdevolucion.put("rango", item.get("rango"));
                     listadevoluciones.add(item);
                 }
-                boolean connectionOK = Funciones.TestInternetConectivity();
-                if (connectionOK) {
+                CheckConnectivity();
+                if (isOnline) {
                     GetDevolucionService();
                 } else {
-                    if(getActivity()==null) return null;
+                    if (getActivity() == null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -342,7 +347,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     });
                 }
             } catch (final Exception e) {
-                if(getActivity()==null) return null;
+                if (getActivity() == null) return null;
                 //Log.e(TAG, "Json parsing error: " + e.getMessage());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -369,6 +374,10 @@ public class ListaDevolucionesFragment extends Fragment {
         }
     }
 
+    private void CheckConnectivity() {
+        isOnline = Funciones.TestServerConectivity();
+    }
+
     private void ActualizarLista() {
         try {
             //ActualizarFooter();
@@ -389,9 +398,9 @@ public class ListaDevolucionesFragment extends Fragment {
             for (HashMap<String, String> item : listadevoluciones) {
                 double subtotal = Double.parseDouble(item.get(variables_publicas.DEVOLUCIONES_COLUMN_subtotal).replace("C$", "").replace(",", ""));
                 item.put(variables_publicas.DEVOLUCIONES_COLUMN_subtotal, df.format(subtotal));
-                try{
-                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba,Funciones.DateToString( Funciones.StringToDate(item.get(variables_publicas.DEVOLUCIONES_COLUMN_horagraba))));
-                }catch (Exception ex){
+                try {
+                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_horagraba, Funciones.DateToString(Funciones.StringToDate(item.get(variables_publicas.DEVOLUCIONES_COLUMN_horagraba))));
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
 
@@ -400,9 +409,9 @@ public class ListaDevolucionesFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listadevoluciones,
                     R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "nombrecliente",
-                    "horagraba", "total", "estado", "factura","rango"},
+                    "horagraba", "total", "estado", "factura", "rango"},
                     new int[]{R.id.ndevolucion, R.id.cliente, R.id.Fecha, R.id.total, R.id.estado,
-                            R.id.factura,R.id.rango}) {
+                            R.id.factura, R.id.rango}) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
@@ -436,7 +445,7 @@ public class ListaDevolucionesFragment extends Fragment {
             ActualizarFooter();
 
         } catch (final Exception ex) {
-            if(getActivity()==null) return ;
+            if (getActivity() == null) return;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -453,7 +462,7 @@ public class ListaDevolucionesFragment extends Fragment {
         String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
         busqueda = busqueda.isEmpty() ? "%" : busqueda;
-        String FormatFecha = fecha.replace("-","");
+        String FormatFecha = fecha.replace("-", "");
         String urlString = urlDevolucionesVehiculo + "/" + CodigoVehiculo + "/" + FormatFecha + "/" + busqueda;
         try {
             URL Url = new URL(urlString);
@@ -486,15 +495,14 @@ public class ListaDevolucionesFragment extends Fragment {
                     Date Ffecha = sdf.parse(c.getString("fecha"));
                     String FechaFormat = sdf2.format(Ffecha);
 
-                   String ndevolucion = c.getString("ndevolucion");
-                   String fecha = FechaFormat;
-                   String nombrecliente = c.getString("nombrecliente");
-                   String total = c.getString("total");
-                   String estado = c.getString("estado");
-                   String factura = c.getString("factura");
+                    String ndevolucion = c.getString("ndevolucion");
+                    String fecha = FechaFormat;
+                    String nombrecliente = c.getString("nombrecliente");
+                    String total = c.getString("total");
+                    String estado = c.getString("estado");
+                    String factura = c.getString("factura");
                     String subtotal = c.getString("subtotal");
-                    String rango= c.getString("rango");
-
+                    String rango = c.getString("rango");
 
 
                     HashMap<String, String> devoluciones = new HashMap<>();
@@ -505,7 +513,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     devoluciones.put("total", total);
                     devoluciones.put("estado", estado);
                     devoluciones.put("factura", factura);
-                    devoluciones.put("rango",rango);
+                    devoluciones.put("rango", rango);
                     devoluciones.put("subtotal", subtotal);
 
                     listadevoluciones.add(devoluciones);
@@ -535,23 +543,36 @@ public class ListaDevolucionesFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            if(getActivity()==null) return null;
-            List<HashMap<String, String>> DevolucionesLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha, "");
-            guardadoOK=true;
-            for (HashMap<String, String> item : DevolucionesLocal) {
-                if (guardadoOK == false) {
-                    break;
-                }
-               item.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente,Funciones.Codificar( item.get(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
-                Gson gson = new Gson();
+            if (getActivity() == null) return null;
+            List<HashMap<String, String>> DevolucionesLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha,tipoBusqueda, "");
+            guardadoOK = true;
+            CheckConnectivity();
+            if (isOnline) {
+                for (HashMap<String, String> item : DevolucionesLocal) {
+                    if (guardadoOK == false) {
+                        break;
+                    }
+                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, Funciones.Codificar(item.get(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
+                    Gson gson = new Gson();
 
                     String jsonDevolucion = gson.toJson(DevolucionesH.ObtenerDevolucion(item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
-                    if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionesH, DevolucionesDetalleH,ConsolidadoCargaH,  item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion),item.get(variables_publicas.DEVOLUCIONES_COLUMN_rango),item.get(variables_publicas.DEVOLUCIONES_COLUMN_factura), jsonDevolucion, false).split(",")[0])) {
+                    if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionesH, DevolucionesDetalleH, ConsolidadoCargaH, item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion), item.get(variables_publicas.DEVOLUCIONES_COLUMN_rango), item.get(variables_publicas.DEVOLUCIONES_COLUMN_factura), jsonDevolucion, false).split(",")[0])) {
                         guardadoOK = true;
+                    } else {
+                        guardadoOK = false;
                     }
-                else {
-                    guardadoOK = false;
                 }
+            } else {
+                if (getActivity() == null) return null;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (getActivity().isFinishing()) return;
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "Error: " + "No ha sido posible establecer conexion con el servidor, por favor revise su conexion a internet e intente nuevamente",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
             }
             return null;
         }
@@ -562,18 +583,18 @@ public class ListaDevolucionesFragment extends Fragment {
             try {
 
                 // Dismiss the progress dialog
-                if ( pDialog.isShowing())
+                if (pDialog.isShowing())
                     pDialog.dismiss();
 
                 btnBuscar.performClick();
 
 
             } catch (final Exception ex) {
-                if(getActivity()==null) return ;
+                if (getActivity() == null) return;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(getActivity().isFinishing()) return;
+                        if (getActivity().isFinishing()) return;
                         Toast.makeText(getActivity().getApplicationContext(),
                                 "SincronizarPedidos onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
@@ -602,7 +623,22 @@ public class ListaDevolucionesFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            if(getActivity()==null) return null;
+            CheckConnectivity();
+            if (!isOnline) {
+                if (getActivity() == null) return null;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "No ha sido posible conectarse al servidor, por favor revise su conexion a internet e intente nuevamente",
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+                return null;
+            }
+
+            if (getActivity() == null) return null;
             HttpHandler sh = new HttpHandler();
             final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdDevolucion + "/" + variables_publicas.usuario.getUsuario();
 
@@ -624,7 +660,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     String resultState = ((String) result.get("AnularPedidoResult")).split(",")[0];
                     final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
                     if (resultState.equals("false")) {
-                        if(getActivity()==null) return null;
+                        if (getActivity() == null) return null;
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -643,7 +679,7 @@ public class ListaDevolucionesFragment extends Fragment {
                 } catch (final Exception ex) {
                     guardadoOK = false;
                     new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                    if(getActivity()==null) return null;
+                    if (getActivity() == null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -658,7 +694,7 @@ public class ListaDevolucionesFragment extends Fragment {
                 }
             } else {
                 new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                if(getActivity()==null) return null;
+                if (getActivity() == null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -686,7 +722,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
 
             } catch (final Exception ex) {
-                if(getActivity()==null) return ;
+                if (getActivity() == null) return;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -712,28 +748,28 @@ public class ListaDevolucionesFragment extends Fragment {
 
             HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
-            String HeaderMenu = obj.get("CodigoPedido") + "\n" + obj.get("NombreCliente");
+            String HeaderMenu = obj.get("ndevolucion") + "\n" + obj.get("nombrecliente");
 
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getActivity().getMenuInflater();
 
-            inflater.inflate(R.menu.pedidos_list_menu_context, menu);
+            inflater.inflate(R.menu.devoluciones_list_menu_context, menu);
             MenuItem tv = menu.getItem(1); //Boton Eliminar
-            if (!obj.get("CodigoPedido").startsWith("-"))
-                tv.setTitle("Anular Pedido");
 
-            if (!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")) {
+            if (!obj.get("ndevolucion").startsWith("-"))
+                tv.setTitle("Anular devolucion");
+
+            if (!obj.get("factura").equalsIgnoreCase("") || obj.get("estado").equalsIgnoreCase("0")) {
                 tv.setEnabled(false);
 
             } else {
                 tv.setEnabled(true);
             }
-            if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")
-                    || (obj.get("Estado").equalsIgnoreCase("APROBADO") && obj.get("Detallista").equalsIgnoreCase("false")) )
-            {
+            /*Si la devolucion esta anulada*/
+            if (obj.get("estado").equalsIgnoreCase("0")) {
                 //Ponemos el boton Editar en falso
                 ((MenuItem) menu.getItem(0)).setEnabled(false);
-            }else{
+            } else {
                 ((MenuItem) menu.getItem(0)).setEnabled(true);
             }
 
@@ -785,7 +821,7 @@ public class ListaDevolucionesFragment extends Fragment {
                                 })
                                 .show();
 
-                    } else if (new Funciones().checkInternetConnection(getActivity())) {
+                    } else {
 
                         final HashMap<String, String> finalDevolucion = itemDevolucion;
                         new AlertDialog.Builder(getActivity())
@@ -805,8 +841,6 @@ public class ListaDevolucionesFragment extends Fragment {
                                 })
                                 .show();
 
-                    } else {
-                        mensajeAviso("No es posible connectarse con el servidor, por favor verifique su conexión a internet");
                     }
 
                     return true;
@@ -831,8 +865,10 @@ public class ListaDevolucionesFragment extends Fragment {
                     //Editar
                     HashMap<String, String> obj = listadevoluciones.get(info.position);
                     String ndevolucion = obj.get("ndevolucion");
-                    if (obj.get("Factura").equalsIgnoreCase("")) {
-                        if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)")) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
+
+                    //validar esto luego falta traer el campo de procesada
+                  //  if (obj.get("procesada").equalsIgnoreCase("0")) {
+                        if (obj.get("estado").equalsIgnoreCase("1")) {
 
                             devolucion = DevolucionesH.ObtenerDevolucion(ndevolucion);
                             if (devolucion == null) {
@@ -840,22 +876,22 @@ public class ListaDevolucionesFragment extends Fragment {
                                 return true;
                             }
 
-                            String IdCliente = devolucion.get("IdCliente");
-                            String CodCv = devolucion.get("Cod_cv");
-                            Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
-                            String Nombre = cliente.getNombreCliente();
+                            String nodevolucion = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion);
+                            String rango = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_rango);
+                            String factura = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_factura);
                             // Starting new intent
-                            Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+                            Intent in = new Intent(getActivity().getApplicationContext(), DevolucionesActivity.class);
 
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
-                            in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, ndevolucion);
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, nodevolucion);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_rango, rango);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura, factura);
+
                             startActivity(in);
                         }
-                    } else {
+                 //   }
+                /*    else {
                         Funciones.MensajeAviso(getActivity(), "Esta devolucion no se puede anular, ya que fue Procesada");
-                    }
+                    }*/
 
 
                     return true;
