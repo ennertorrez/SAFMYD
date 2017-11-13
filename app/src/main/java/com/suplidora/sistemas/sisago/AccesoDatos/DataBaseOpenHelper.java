@@ -225,11 +225,14 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DEVOLUCIONES_COLUMN_tipo + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_IMEI + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_COLUMN_Observaciones + " TEXT ,"
+                    + variables_publicas.DEVOLUCIONES_COLUMN_ejecutada + " TEXT ,"
+                    + variables_publicas.DEVOLUCIONES_COLUMN_procesado+ " TEXT ,"
                     + variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + "( "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item + " TEXT , "
+                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio + " TEXT , "
                     + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva + " TEXT , "

@@ -23,12 +23,14 @@ public class Devoluciones {
     String IMEI="";
     String IdVehiculo="";
     String Observaciones="";
+    String ejecutada="";
+    String procesado="";
 
     public Devoluciones() {
     }
 
     public Devoluciones(String Ndevolucion, String Cliente,String nombrecliente, String Horagraba, String Usuario, String Subtotal, String Iva, String Total,
-                        String Estado, String Rango, String Motivo, String Factura, String Tipo,String IMEI,String IdVehiculo,String observaciones) {
+                        String Estado, String Rango, String Motivo, String Factura, String Tipo,String IMEI,String IdVehiculo,String observaciones,String ejecutada,String procesado) {
         ndevolucion=Ndevolucion;
         cliente = Cliente;
         horagraba = Horagraba;
@@ -42,10 +44,28 @@ public class Devoluciones {
         factura = Factura;
         tipo=Tipo;
         this.IMEI = IMEI;
-        IdVehiculo = IdVehiculo;
+        this.IdVehiculo = IdVehiculo;
         Observaciones=observaciones;
         this.nombrecliente=nombrecliente;
+        this.ejecutada=ejecutada;
+        this.procesado=procesado;
 
+    }
+
+    public String getEjecutada() {
+        return ejecutada;
+    }
+
+    public void setEjecutada(String ejecutada) {
+        this.ejecutada = ejecutada;
+    }
+
+    public String getProcesado() {
+        return procesado;
+    }
+
+    public void setProcesado(String procesado) {
+        this.procesado = procesado;
     }
 
     public String getNombrecliente() {

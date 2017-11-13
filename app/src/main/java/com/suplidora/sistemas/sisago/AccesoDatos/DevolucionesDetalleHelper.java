@@ -20,7 +20,7 @@ public class DevolucionesDetalleHelper {
         database = db;
     }
 
-    public void GuardarDetalleDevolucion(String ndevolucion, String item,
+    public void GuardarDetalleDevolucion(String ndevolucion, String item,String item_descripcion,
                                      String cantidad,
                                      String precio,
                                      String iva,
@@ -37,6 +37,7 @@ public class DevolucionesDetalleHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion, ndevolucion);
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item, item);
+        contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion, item_descripcion);
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad, cantidad);
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio, precio);
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva, iva);
@@ -56,6 +57,7 @@ public class DevolucionesDetalleHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion, lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion));
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item, lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item));
+        contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion,  lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion));
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad, lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad));
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio, lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio));
         contentValues.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva, lstArticulos.get(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva));
@@ -80,6 +82,7 @@ public class DevolucionesDetalleHelper {
                 HashMap<String, String> detalle = new HashMap<>();
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item)));
+                detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva)));
@@ -105,6 +108,7 @@ public class DevolucionesDetalleHelper {
                 HashMap<String, String> detalle = new HashMap<>();
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item)));
+                detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva)));
@@ -115,6 +119,7 @@ public class DevolucionesDetalleHelper {
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_numero, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_numero)));
                 detalle.put(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_factura, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_factura)));
+                detalle.put("Cod",  c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item)).split("-")[c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item)).split("-").length - 1]);
                 lst.add(detalle);
             } while (c.moveToNext());
         }

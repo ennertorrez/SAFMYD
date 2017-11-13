@@ -349,6 +349,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
             cboCarga.setEnabled(false);
             lblSearch.setEnabled(false);
 
+        }else{
+            lblSearch.setText("--Selecccione--");
         }
 
         // Loading spinner data from database
@@ -726,7 +728,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), devoluciones.getNombrecliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
                 String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1", devoluciones.getRango(), devoluciones.getMotivo(),
-                devoluciones.getFactura(), devoluciones.getTipo(), IMEI, variables_publicas.usuario.getCodigo(), Funciones.Codificar(txtObservaciones.getText().toString()));
+                devoluciones.getFactura(), devoluciones.getTipo(), IMEI, variables_publicas.usuario.getCodigo(), Funciones.Codificar(txtObservaciones.getText().toString()),"0","0");
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -814,7 +816,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                 carga = (ConsolidadoCarga) adapter.getItemAtPosition(position);
                 CcFactura = ConsolidadoCargaH.BuscarConsolidadoCargaFacturas(carga.getIdConsolidado());
                 CargarListaFacturas();
-                lblSearch.setText("--Selecccione--");
+
             }
 
             @Override
@@ -826,7 +828,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         final List<Motivos> dtMotivos;
         dtMotivos = DevolucionH.ObtenerListaMotivos();
         ArrayAdapter<Motivos> adapterMotivos = new ArrayAdapter<Motivos>(this, android.R.layout.simple_spinner_item, dtMotivos);
-        adapterCarga.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterMotivos.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboMotivo.setAdapter(adapterMotivos);
 
         cboMotivo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

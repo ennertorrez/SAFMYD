@@ -322,7 +322,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     itemdevolucion.put("ndevolucion", item.get("ndevolucion"));
                     itemdevolucion.put("horagraba", "horagraba");
-                    itemdevolucion.put("nombrecliente", item.get("nombrecliente"));
+                    itemdevolucion.put("nombrecliente", Funciones.Decodificar( item.get("nombrecliente")));
                     itemdevolucion.put("total", item.get("total"));
                     itemdevolucion.put("estado", item.get("estado"));
                     itemdevolucion.put("factura", item.get("factura"));
@@ -868,7 +868,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     //validar esto luego falta traer el campo de procesada
                   //  if (obj.get("procesada").equalsIgnoreCase("0")) {
-                        if (obj.get("estado").equalsIgnoreCase("1")) {
+                        if (obj.get("estado").equalsIgnoreCase("true")) {
 
                             devolucion = DevolucionesH.ObtenerDevolucion(ndevolucion);
                             if (devolucion == null) {

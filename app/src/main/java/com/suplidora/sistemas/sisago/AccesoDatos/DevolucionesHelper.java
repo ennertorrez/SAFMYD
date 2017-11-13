@@ -32,7 +32,7 @@ public class DevolucionesHelper {
                                  String estado,
                                  String rango,
                                  String motivo,
-                                 String factura, String tipo,String IMEI,String IdVehiculo,String Observaciones) {
+                                 String factura, String tipo,String IMEI,String IdVehiculo,String Observaciones,String ejecutada,String procesado) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, ndevolucion);
@@ -51,6 +51,9 @@ public class DevolucionesHelper {
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI, IMEI);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo, IdVehiculo);
         contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones, Observaciones);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada, ejecutada);
+        contentValues.put(variables_publicas.DEVOLUCIONES_COLUMN_procesado, procesado);
+
         long rowInserted = database.insert(variables_publicas.TABLE_DEVOLUCIONES, null, contentValues);
         if (rowInserted != -1)
             return true;
@@ -136,6 +139,8 @@ public class DevolucionesHelper {
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
                 devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devoluciones.put(variables_publicas.DEVOLUCIONES_COLUMN_procesado,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_procesado)));
                 lst.add(devoluciones);
             } while (c.moveToNext());
         }
@@ -195,6 +200,8 @@ public class DevolucionesHelper {
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones,Funciones.Codificar( c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones))));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_procesado,c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_procesado)));
             } while (c.moveToNext());
         }
         c.close();
@@ -223,6 +230,8 @@ public class DevolucionesHelper {
                 devolucion.setIMEI(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devolucion.setIdVehiculo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)));
                 devolucion.setIdVehiculo(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
+                devolucion.setEjecutada(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devolucion.setProcesado(c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_procesado)));
             } while (c.moveToNext());
         }
         c.close();
@@ -231,7 +240,7 @@ public class DevolucionesHelper {
 
     public ArrayList<HashMap<String, String>> ObtenerDevolucionesLocales(String Fecha, String columnaFiltro, String filtro) {
 
-        String selectQuery = "SELECT * FROM " + variables_publicas.TABLE_DEVOLUCIONES+ " WHERE DATE( " + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + ") = DATE('" + Fecha + "') AND " + columnaFiltro + " LIKE '%" + filtro + "%'";
+        String selectQuery = "SELECT * FROM " + variables_publicas.TABLE_DEVOLUCIONES+ " WHERE "+variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion+" LIKE '-%' AND  "+" DATE( " + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + ") = DATE('" + Fecha + "') AND " + columnaFiltro + " LIKE '%" + filtro + "%'";
 
         Cursor c = database.rawQuery(selectQuery, null);
 
@@ -254,6 +263,8 @@ public class DevolucionesHelper {
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_tipo, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_IMEI, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)));
                 devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)));
+                devolucion.put(variables_publicas.DEVOLUCIONES_COLUMN_procesado, c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_procesado)));
                 lst.add(devolucion);
             } while (c.moveToNext());
         }
@@ -281,7 +292,10 @@ public class DevolucionesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_tipo)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IMEI)),
                         c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo)),
-                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones))
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada)),
+                        c.getString(c.getColumnIndex(variables_publicas.DEVOLUCIONES_COLUMN_procesado))
+
                 ));
             } while (c.moveToNext());
         }

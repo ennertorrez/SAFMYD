@@ -8,6 +8,7 @@ public class DevolucionesDetalle {
    String    ID  = "";
    String   ndevolucion = "";
    String  item  = "";
+    String item_descripcion="";
     String   cantidad ="";
    String  precio  = "";
    String   iva  = "";
@@ -24,7 +25,7 @@ public class DevolucionesDetalle {
     public DevolucionesDetalle() {
     }
 
-    public DevolucionesDetalle(String iD, String Ndevolucion, String Item, String Cantidad, String Precio, String Iva, String Subtotal,
+    public DevolucionesDetalle(String iD, String Ndevolucion, String Item,String Item_descripcion, String Cantidad, String Precio, String Iva, String Subtotal,
                                String Total, String Poriva, String Descuento, String Tipo, String Numero, String Factura) {
         ID=iD;
         ndevolucion = Ndevolucion;
@@ -39,7 +40,16 @@ public class DevolucionesDetalle {
         tipo = Tipo;
         numero = Numero;
         factura = Factura;
+        item_descripcion=Item_descripcion;
 
+    }
+
+    public String getItem_descripcion() {
+        return item_descripcion;
+    }
+
+    public void setItem_descripcion(String item_descripcion) {
+        this.item_descripcion = item_descripcion;
     }
 
     public String getID() {

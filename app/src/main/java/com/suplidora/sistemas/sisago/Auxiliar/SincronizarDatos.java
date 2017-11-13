@@ -922,7 +922,7 @@ public class SincronizarDatos {
         String jsonStrPedido = sh.performPostCall(urlDetalle,postData);
 
       //  String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
-        if (jsonStrPedido == null) {
+        if (jsonStrPedido == null || jsonPedido.isEmpty()) {
             new Funciones().SendMail("Ha ocurrido un error al sincronizar el pedido,Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return "false,Ha ocurrido un error al sincronizar el detalle del pedido,Respuesta nula";
         } else {

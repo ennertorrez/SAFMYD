@@ -501,7 +501,6 @@
                         android:id="@+id/btnGuardar"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="110dp"
                         android:background="@mipmap/ic_save_black_48dp"
                         android:backgroundTint="@color/colorPrimaryDark" />
 
@@ -510,7 +509,6 @@
                         android:id="@+id/btnAgregarTodos"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
-                        android:layout_marginRight="240dp"
                         android:background="@mipmap/ic_local_shipping_black_48dp"
                         android:backgroundTint="@color/colorOrange"
                         android:layout_alignParentTop="true"
