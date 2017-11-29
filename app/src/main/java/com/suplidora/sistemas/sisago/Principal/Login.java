@@ -197,6 +197,7 @@ public class Login extends Activity {
                 }
 
                 //Esto sirve para permitir realizar conexion a internet en el Hilo principal
+
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
                 isOnline =Funciones.TestServerConectivity();
@@ -344,7 +345,7 @@ public class Login extends Activity {
     private void ValidarUltimaVersion() {
         String currentVersion = getCurrentVersion();
         variables_publicas.VersionSistema = currentVersion;
-        if (isOnline) {
+
             String latestVersion = "";
             try {
 
@@ -359,7 +360,7 @@ public class Login extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+
     }
 
     private String getCurrentVersion() {
@@ -528,10 +529,10 @@ public class Login extends Activity {
                 try {
                     JSONObject jsonObj = new JSONObject(jsonStr);
                     // Getting JSON Array node
-                    JSONArray Usuarios = jsonObj.getJSONArray("GetConfiguracionesResult");
+                    JSONArray conf = jsonObj.getJSONArray("GetConfiguracionesResult");
 
-                    for (int i = 0; i < Usuarios.length(); i++) {
-                        JSONObject c = Usuarios.getJSONObject(i);
+                    for (int i = 0; i < conf.length(); i++) {
+                        JSONObject c = conf.getJSONObject(i);
                         String Valor = c.getString("Valor");
                         String Configuracion = c.getString("Configuracion");
                         String ConfigVDatos = "VersionDatos";
@@ -656,10 +657,14 @@ public class Login extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                //It retrieves the latest version by scraping the content of current version from play store at runtime
-                String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
-                Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                CheckConnectivity();
+                if(isOnline){
+                    //It retrieves the latest version by scraping the content of current version from play store at runtime
+                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+                    Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                }
+
 
 
             } catch (Exception e) {
@@ -669,6 +674,8 @@ public class Login extends Activity {
 
             return null;
         }
+
+
 
         @Override
         protected void onPostExecute(Void result) {
@@ -696,6 +703,10 @@ public class Login extends Activity {
         }
 
 
+    }
+
+    private void CheckConnectivity() {
+        isOnline = Funciones.TestServerConectivity();
     }
 
     private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {

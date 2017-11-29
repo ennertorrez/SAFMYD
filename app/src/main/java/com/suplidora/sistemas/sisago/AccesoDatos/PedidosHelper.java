@@ -116,7 +116,7 @@ public class PedidosHelper {
 
     public HashMap<String, String> ObtenerPedido(String CodigoPedido) {
 
-        Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS + " Where " + variables_publicas.PEDIDOS_COLUMN_CodigoPedido + " = ?", new String[]{CodigoPedido});
+        Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_PEDIDOS  + " Where " + variables_publicas.PEDIDOS_COLUMN_CodigoPedido + " = ?", new String[]{CodigoPedido});
         HashMap<String, String> pedido = null;
         if (c.moveToFirst()) {
             do {

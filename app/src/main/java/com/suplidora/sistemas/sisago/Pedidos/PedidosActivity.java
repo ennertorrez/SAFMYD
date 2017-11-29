@@ -873,7 +873,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double descuentoArticulo = Double.parseDouble(articulo.getDescuentoMaximo());
         double descuentoCliente = Double.parseDouble(cliente.getDescuento());
         double descuentoMayor = descuentoArticulo > descuentoCliente ? descuentoArticulo : descuentoCliente;
-        if (descuento > descuentoMayor) {
+        if (descuento > descuentoMayor && !cliente.getPrecioEspecial().equalsIgnoreCase("true")) {
             MensajeAviso("El descuento maximo permitido para este producto es de: " + String.valueOf(descuentoMayor));
             txtDescuento.setText("");
 //            txtDescuento.requestFocus();
@@ -1109,7 +1109,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     this.vendedor = vendedor;
                     vendedor = vendedores.get(i);
                 } catch (Exception ex) {
-                    new Funciones().SendMail("Ha ocurrido un error , Excepcion controlada", ex.getStackTrace().toString(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al seleccionar el vendedor en CargarDatosCombo PedidosActivity Tipo 'Vendedor', Excepcion controlada", ex.getStackTrace().toString()+" *** "+variables_publicas.info, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 }
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
         } else {
@@ -1120,7 +1120,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     this.vendedor = vendedor;
                     vendedor = vendedores.get(i);
                 } catch (Exception ex) {
-                    new Funciones().SendMail("Ha ocurrido un error , Excepcion controlada", ex.getStackTrace().toString(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al seleccionar el vendedor en CargarDatosCombo PedidosActivity Tipo 'No vendedor', Excepcion controlada", ex.getStackTrace().toString()+" *** "+variables_publicas.info, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 }
             }
             cboVendedor.setSelection(adapterVendedor.getPosition(vendedor));
@@ -1219,7 +1219,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         FaltaParaCaja = ModCantidadCajas == 0 ? 0 : (UnidadCaja - ModCantidadCajas);
         cajas = cantidadItems / UnidadCaja;
 
-        /*Ponemos esto para permitir vender mas de 3 sacos de 50 pero sin limitar x multiplo de caja*/
+        /*ojo: no quitar, esto para permitir vender mas de 3 sacos de 50 pero sin limitar x multiplo de caja*/
         if (PrecioCajas && CodArticulo.equals("4000-01-01-03-081")) {
             FaltaParaCaja = 0;
         }
@@ -1233,7 +1233,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         TipoForaneo = "Precio" + (Arrays.asList(lstDepartamentosForaneo1).contains(cliente.getIdDepartamento()) ? "Foraneo" : "Foraneo2");
         if (cliente.getTipo().equalsIgnoreCase("Detalle")) {
             if (Boolean.parseBoolean(cliente.getRutaForanea()) && !AplicarPrecioDetalle) {
-                tipoprecio = "Super";
+                tipoprecio = "Super"; //detalle foraneo
             } else {
                 tipoprecio = "Detalle";
             }
@@ -1278,7 +1278,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
 
         if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equals("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
-            if (cantidadItems > 0) {
+            if (cantidadItems > 0 && (item!=null && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) ) {
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
@@ -1425,6 +1425,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             tipoprecio = "Mayorista";
         }
         double precioE = 0;
+        double descuentoE=0;
 
         if (Boolean.parseBoolean(cliente.getPrecioEspecial()) && (cliente.getTipo().equalsIgnoreCase("Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
             txtDescuento.setEnabled(false);
@@ -1434,15 +1435,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(pedido.getIdCliente(), articulo.getCodigo());
             if (precioEspecial != null) {
                 tipoprecio = "Especial";
+                txtDescuento.setText(precioEspecial.getDescuento());
                 if (precioEspecial.getFacturar().equals("0")) {
                     MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
                     return;
                 }
                 precioE = Double.parseDouble(precioEspecial.getPrecio());
-
+                descuentoE=Double.parseDouble(precioEspecial.getDescuento());
                 if (ActualizarItem) {
                     item.put("Precio", precioEspecial.getPrecio());
                     item.put("TipoPrecio", "Especial");
+                    item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, String.valueOf(descuentoE));
                 } else {
                     tipoprecio = "Especial";
                     precio = Double.parseDouble(precioEspecial.getPrecio());
@@ -1462,6 +1465,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) {
                     if (tipoprecio.equalsIgnoreCase("Especial")) {
                         item.put("Precio", String.valueOf(precioE));
+                        item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, String.valueOf(descuentoE));
                     } else {
                         item.put("Precio", art.get("Precio" + tipoprecio));
                     }
@@ -1585,6 +1589,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             MensajeAviso("No se puede agregar el producto seleccionado,ya que excede el limite de 18 productos para un pedido Mayorista");
             return false;
         }
+
         CodigoItemAgregado = articulo.getCodigo();
         listaArticulos.add(itemPedidos);
 

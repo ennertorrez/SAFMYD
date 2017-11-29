@@ -89,6 +89,8 @@
         android:layout_toRightOf="@+id/PrecioMayorista"
         android:layout_toStartOf="@+id/PrecioDetalle" />
 
+
+
     <TextView
         android:id="@+id/PrecioForaneo"
         android:layout_width="80dp"
