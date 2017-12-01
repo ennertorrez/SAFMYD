@@ -568,6 +568,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void AplicarBonificacionCartillas() {
 
+
+        if(cliente.getTipo().equalsIgnoreCase("Super")){
+            return;
+        }
+
         ArrayList<HashMap<String, String>> listaTemp = new ArrayList<HashMap<String, String>>();
         ;
         /*Primero eliminamos todas la bonificaciones para poder recalcular*/
@@ -656,6 +661,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     }
 
     private void AplicarPromocion024() {
+
+        if(cliente.getTipo().equalsIgnoreCase("Super")){
+            return;
+        }
+
           /*Estas puras mamadas de android para comparar 2 fechas :V*/
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date fechaActual = new Date();
@@ -677,7 +687,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
 
-            Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-01-661");
+            Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-01-024");
             List<String> items = Arrays.asList(ConfigPromo024.getValor().split(","));
 
             boolean existe = false;
@@ -714,13 +724,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     HashMap<String, String> articuloBonificado = new HashMap<>();
                     articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
-                    articuloBonificado.put("Cod", "661");
+                    articuloBonificado.put("Cod", "024");
                     articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
                     articuloBonificado.put("Um", "UNIDAD");
                     articuloBonificado.put("Cantidad", String.valueOf((int) Math.floor(cantidad * 0.2))); //Bonificamos el 20% de la cantidad comprada
                     articuloBonificado.put("Precio", "0");
                     articuloBonificado.put("TipoPrecio", "0");
-                    articuloBonificado.put("Descripcion", "**" + "GEL XTREME 24/250 GR");
+                    articuloBonificado.put("Descripcion", "**" + "GEL XTREME ESENCIA ATRACTION 12/250 GR");
                     articuloBonificado.put("Costo", "0");
                     articuloBonificado.put("PorDescuento", "0");
                     articuloBonificado.put("TipoArt", "B");
@@ -987,7 +997,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoDetalleH.EliminarDetallePedido(pedido.getCodigoPedido());
 
 
-        if (IMEI == null) {
+   /*     if (IMEI == null) {
 
             new AlertDialog.Builder(this)
                     .setTitle("Confirmación Requerida")
@@ -1009,7 +1019,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             return false;
 
         }
-
+*/
         Funciones.GetLocalDateTime();
 
 
@@ -1154,6 +1164,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     cliente.setIdDepartamento(sucursal.getDeptoID());
                     IdDepartamento = Integer.parseInt(sucursal.getDeptoID());
                 }
+                RecalcularDetalle();
+                RefrescarGrid();
+                CalcularTotales();
             }
 
             @Override
@@ -1281,7 +1294,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             if (cantidadItems > 0 && (item!=null && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P")) ) {
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
-                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") ||  variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) {
                             if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;
                                 if (!ActualizarItem) {
@@ -1435,7 +1448,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             PrecioEspecial precioEspecial = PrecioEspecialH.BuscarPrecioEspecial(pedido.getIdCliente(), articulo.getCodigo());
             if (precioEspecial != null) {
                 tipoprecio = "Especial";
-                txtDescuento.setText(precioEspecial.getDescuento());
+                txtDescuento.setText(String.valueOf(  Double.parseDouble( precioEspecial.getDescuento()) ));
                 if (precioEspecial.getFacturar().equals("0")) {
                     MensajeAviso("Este Producto no esta habilidado para venderlo a este cliente");
                     return;
@@ -1446,6 +1459,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     item.put("Precio", precioEspecial.getPrecio());
                     item.put("TipoPrecio", "Especial");
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, String.valueOf(descuentoE));
+                    item.put("PorDescuentoOriginal", String.valueOf(descuentoE));
                 } else {
                     tipoprecio = "Especial";
                     precio = Double.parseDouble(precioEspecial.getPrecio());
@@ -1466,18 +1480,24 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     if (tipoprecio.equalsIgnoreCase("Especial")) {
                         item.put("Precio", String.valueOf(precioE));
                         item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, String.valueOf(descuentoE));
+                        item.put("PorDescuentoOriginal", String.valueOf(descuentoE));
                     } else {
                         item.put("Precio", art.get("Precio" + tipoprecio));
+
                     }
                 } else {
                     tipoprecio = "Bonificacion";
                 }
 
+                if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")){
+                    item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento, String.valueOf( Double.parseDouble( item.get("PorDescuentoOriginal")) + Double.parseDouble ((sucursal!=null? sucursal.getDescuento(): "0")) ));
+                }
+
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoPrecio, tipoprecio);
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descuento,
-                        df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100)));
+                        df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento))) / 100));
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal,
-                        df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) - ((Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio))) * (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento)) / 100))));
+                        df.format(Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio)) - ((Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) * Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Precio))) * (  (Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_PorDescuento))) / 100))));
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva,
                         df.format(Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",", "")) * Double.parseDouble(articulo.getPorIva())));
                 item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Total, df.format(Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",", "")) + Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Iva).replace(",", ""))));
@@ -1562,7 +1582,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         itemPedidos.put("TipoPrecio", TipoPrecio);
         itemPedidos.put("Descripcion", DescripcionArt);
         itemPedidos.put("Costo", String.valueOf(Double.parseDouble(articulo.getCosto())));
-        itemPedidos.put("PorDescuento", txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString());
+        itemPedidos.put("PorDescuento", String.valueOf( Double.parseDouble((txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString()) )));
+        itemPedidos.put("PorDescuentoOriginal", String.valueOf( Double.parseDouble((txtDescuento.getText().toString().equals("") ? "0" : txtDescuento.getText().toString()) )));
         itemPedidos.put("TipoArt", "P");
         itemPedidos.put("BonificaA", "");
         itemPedidos.put("Isc", articulo.getIsc());
@@ -1865,21 +1886,24 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
                     listaArticulos.remove(itemArticulo);
-                    for (int i = 0; i < listaArticulos.size(); i++) {
+                    for (int i = 0; i < listaArticulos.size()-1; i++) {
                         HashMap<String, String> a = listaArticulos.get(i);
                         if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
                             listaArticulos.remove(a);
                         }
                     }
+                    adapter.notifyDataSetChanged();
+                    lv.setAdapter(adapter);
+                    
                     AplicarBonificacionCartillas();
                     AplicarPromocionAmsa();
                     AplicarPromocion024();
 
                     RecalcularDetalle();
                     CalcularTotales();
+                    RefrescarGrid();
                     LimipiarDatos(true);
-                    adapter.notifyDataSetChanged();
-                    lv.setAdapter(adapter);
+
                     return true;
 
                 default:

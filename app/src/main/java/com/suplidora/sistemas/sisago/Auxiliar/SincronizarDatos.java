@@ -610,8 +610,9 @@ public class SincronizarDatos {
                 String DeptoID = c.getString("DeptoID");
                 String Direccion = c.getString("Direccion");
                 String FormaPagoID = c.getString("FormaPagoID");
+                String Descuento = c.getString("Descuento");
 
-                ClientesSucH.GuardarTotalClientesSucursal(CodSuc, CodCliente, Sucursal, Ciudad, DeptoID, Direccion, FormaPagoID);
+                ClientesSucH.GuardarTotalClientesSucursal(CodSuc, CodCliente, Sucursal, Ciudad, DeptoID, Direccion, FormaPagoID,Descuento);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;

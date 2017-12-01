@@ -110,6 +110,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Ciudad + " TEXT , "
                     + variables_publicas.CLIENTES_SUCURSALES_COLUMN_DeptoID + " TEXT , "
                     + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Direccion + " TEXT , "
+                    + variables_publicas.CLIENTES_SUCURSALES_COLUMN_Descuento + " TEXT , "
                     + variables_publicas.CLIENTES_SUCURSALES_COLUMN_FormaPagoID + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FORMA_PAGO + "( "

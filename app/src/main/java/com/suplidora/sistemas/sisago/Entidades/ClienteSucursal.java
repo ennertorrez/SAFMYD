@@ -13,11 +13,12 @@ public class ClienteSucursal {
     String DeptoID = "" ;
     String Direccion = "" ;
     String FormaPagoID = "" ;
+    String Descuento ="";
 
     public ClienteSucursal() {
     }
 
-    public ClienteSucursal(String codSuc, String codCliente, String sucursal, String ciudad, String deptoID, String direccion, String formaPagoID) {
+    public ClienteSucursal(String codSuc, String codCliente, String sucursal, String ciudad, String deptoID, String direccion, String formaPagoID,String descuento) {
 
         CodSuc = codSuc;
         CodCliente = codCliente;
@@ -26,6 +27,15 @@ public class ClienteSucursal {
         DeptoID = deptoID;
         Direccion = direccion;
         FormaPagoID = formaPagoID;
+        Descuento=descuento;
+    }
+
+    public String getDescuento() {
+        return Descuento;
+    }
+
+    public void setDescuento(String descuento) {
+        Descuento = descuento;
     }
 
     public String getCodSuc() {

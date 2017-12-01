@@ -29,7 +29,7 @@ public class ClientesSucursalHelper {
                                      String Ciudad ,
                                      String DeptoID ,
                                      String Direccion ,
-                                     String FormaPagoID
+                                     String FormaPagoID,String Descuento
                                      )
     {
         long rows =0;
@@ -42,7 +42,7 @@ public class ClientesSucursalHelper {
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_DeptoID, DeptoID);
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_Direccion, Direccion);
         contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_FormaPagoID, FormaPagoID);
-
+        contentValues.put(variables_publicas.CLIENTES_SUCURSALES_COLUMN_Descuento, Descuento);
 
         database.insert(variables_publicas.TABLE_CLIENTES_SUCURSALES, null, contentValues);
     }
@@ -69,7 +69,8 @@ public class ClientesSucursalHelper {
                         cursor.getString(cursor.getColumnIndex("Ciudad")),
                         cursor.getString(cursor.getColumnIndex("DeptoID")),
                         cursor.getString(cursor.getColumnIndex("Direccion")),
-                        cursor.getString(cursor.getColumnIndex("FormaPagoID"))
+                        cursor.getString(cursor.getColumnIndex("FormaPagoID")),
+                        cursor.getString(cursor.getColumnIndex("Descuento"))
                         ));
             } while (cursor.moveToNext());
         }
@@ -85,7 +86,7 @@ public class ClientesSucursalHelper {
         String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_CLIENTES_SUCURSALES+" where "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_CodCliente+" = "+IdCliente+ " ORDER BY "+variables_publicas.CLIENTES_SUCURSALES_COLUMN_Sucursal;
         Cursor cursor = database.rawQuery(selectQuery, null);
         // looping through all rows and adding to list
-        list.add(new ClienteSucursal("0",IdCliente,"[SIN SUCURSAL]","","","",""));
+        list.add(new ClienteSucursal("0",IdCliente,"[SIN SUCURSAL]","","","","","0"));
         if (cursor.moveToFirst()) {
             do {
                 list.add(new ClienteSucursal(cursor.getString(cursor.getColumnIndex("CodSuc")),
@@ -94,7 +95,8 @@ public class ClientesSucursalHelper {
                         cursor.getString(cursor.getColumnIndex("Ciudad")),
                         cursor.getString(cursor.getColumnIndex("DeptoID")),
                         cursor.getString(cursor.getColumnIndex("Direccion")),
-                        cursor.getString(cursor.getColumnIndex("FormaPagoID"))
+                        cursor.getString(cursor.getColumnIndex("FormaPagoID")),
+                        cursor.getString(cursor.getColumnIndex("Descuento"))
                 ));
             } while (cursor.moveToNext());
         }
