@@ -776,7 +776,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             e.printStackTrace();
         }
           /*Si no hay bonificacion en cartilla.. Verificamos si existe bonificacion 1069 ... esto queda hehizo por falta de tiempo :V */
-        if (fechaActual.before(fechaLimite) && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")) && ConfigPromoSalnica != null && ConfigPromoSalnica.getActivo().equalsIgnoreCase("true")) {
+        if (fechaActual.before(fechaLimite) && (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoSalnica != null && ConfigPromoSalnica.getActivo().equalsIgnoreCase("true")) {
             //Validamos que solamente se puedan ingresar 18 articulos
             if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
@@ -800,10 +800,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             if (cantidad >=1 && cantidad <=49) {
                 cantidadB = cantidad*2;
-            }else if (cantidad >=50 && cantidad <=100){
+            }else if (cantidad >=50 && cantidad <=99){
                 cantidadB = (int) Math.floor(cantidad*2.5);
             }
-            else if (cantidad >=101)
+            else if (cantidad >=100)
             {
                 cantidadB = cantidad*3;
             }
@@ -1310,15 +1310,24 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         //Esto para utilizarlo en el metodo SetPrecio
         Articulo articulo = ArticulosH.BuscarArticulo(CodArticulo);
         boolean AplicarPrecioDetalle = Boolean.parseBoolean(articulo.getAplicaPrecioDetalle());
-        int ModCantidadCajas, cantidadItems = 0, FaltaParaCaja, cajas, UnidadCaja;
+        int ModCantidadCajas, cantidadItems = 0, FaltaParaCaja, cajas, UnidadCaja, ModMultiplo50=0,FaltaParaCaja50=0;
+        boolean multiplo50= false;
+        int factorMult50 = 0;
         boolean PrecioCajas = false;
         UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta());
+        factorMult50 = 50 / Integer.parseInt(articulo.getUnidadCajaVenta());
         if (item != null) {
             if ((item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()) {
                 cantidadItems = 0;
             } else {
                 cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
-            }
+                ModMultiplo50 = (cantidadItems % (UnidadCaja * factorMult50));
+                if (ModMultiplo50==0) {
+                    multiplo50 =true;
+                }else {
+                    multiplo50 =false;
+                }
+             }
         } else {
             try {
                 cantidadItems = Integer.parseInt(txtCantidad.getText().toString().isEmpty() ? "0" : txtCantidad.getText().toString());
@@ -1340,7 +1349,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         if (PrecioCajas && CodArticulo.equals("4000-01-01-03-081")) {
             FaltaParaCaja = 0;
         }
-
+        /* Esto es para validar los multiplos de 50 para el articulo 4000-02-01-04-1068*/
+        if (PrecioCajas && CodArticulo.equals("4000-02-01-04-1068") && cantidadItems>=50 && multiplo50== true ) {
+            FaltaParaCaja50 = 0;
+        }
+        else if (PrecioCajas && CodArticulo.equals("4000-02-01-04-1068") && cantidadItems<50 && multiplo50== false) {
+            FaltaParaCaja = 0;
+        }else
+        {
+            FaltaParaCaja50 = 1;
+        }
 
         String tipoprecio = "Super";
 
@@ -1397,7 +1415,25 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equals("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
             if (cantidadItems > 0 && (item != null && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P"))) {
                 if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
-                    if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
+                    if (FaltaParaCaja50 > 0 && ModMultiplo50 > 0 && CodArticulo.equals("4000-02-01-04-1068") ) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) {
+                            if (MensajeCaja && !ActualizarItem) {
+                                final String finalTipoprecio = tipoprecio;
+                                if (!ActualizarItem) {
+                                    MensajeCaja = false;
+                                }
+                                listaArticulos.remove(listaArticulos.size() - 1);
+                                AplicarBonificacionCartillas();
+                                AplicarPromocionAmsa();
+                                AplicarPromocion024();
+                                AplicarPromocionSalnica();
+
+                                MensajeAviso("No se puede Facturar cantidades que no sean multiplos de 50.");
+                                txtCantidad.requestFocus();
+                            }
+                        }
+                    }
+                    else if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) {
                             if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;

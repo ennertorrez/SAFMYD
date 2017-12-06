@@ -22,7 +22,7 @@ public class ConfiguracionSistemaHelper {
                                       String Valor ,
                                       String Activo ) {
 
-        ContentValues contentValues = new ContentValues();
+         ContentValues contentValues = new ContentValues();
          contentValues.put(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id, Id);
          contentValues.put(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Sistema, Sistema);
          contentValues.put(variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Configuracion, Configuracion);

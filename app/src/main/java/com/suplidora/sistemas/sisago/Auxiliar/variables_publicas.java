@@ -34,7 +34,7 @@ public class variables_publicas {
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
     public static final int DATABASE_VERSION = 67;
-    public static final String DATABASE_NAME = "SysContabv3.db";
+    public static final String DATABASE_NAME = "SysContabNoviembre.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
     public static final String TABLE_CLIENTES = "Cliente";
