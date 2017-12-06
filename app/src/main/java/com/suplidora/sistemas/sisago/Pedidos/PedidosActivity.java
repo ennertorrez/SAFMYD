@@ -1422,6 +1422,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 if (!ActualizarItem) {
                                     MensajeCaja = false;
                                 }
+
                                 listaArticulos.remove(listaArticulos.size() - 1);
                                 AplicarBonificacionCartillas();
                                 AplicarPromocionAmsa();
