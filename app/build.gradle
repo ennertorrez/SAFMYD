@@ -15,8 +15,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 59
-        versionName "1.58"
+        versionCode 60
+        versionName "1.59"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true

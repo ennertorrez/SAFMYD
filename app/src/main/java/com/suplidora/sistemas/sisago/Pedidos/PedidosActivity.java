@@ -1316,6 +1316,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         boolean PrecioCajas = false;
         UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta());
         factorMult50 = 50 / Integer.parseInt(articulo.getUnidadCajaVenta());
+        if (factorMult50==0){
+            factorMult50=1;
+        }
         if (item != null) {
             if ((item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)).isEmpty()) {
                 cantidadItems = 0;
