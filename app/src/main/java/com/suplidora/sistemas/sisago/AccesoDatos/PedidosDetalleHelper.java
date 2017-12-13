@@ -165,5 +165,19 @@ public class PedidosDetalleHelper {
             return true;
         else return false;
     }
-
+    public boolean ValidaPromoGaga(String CodigoCliente, String CodigoCV, String CodArticulo){
+        Cursor c = database.rawQuery("SELECT IFNULL(COUNT(*),0) Cantidad  FROM " + variables_publicas.TABLE_PEDIDOS + " P INNER JOIN "+ variables_publicas.TABLE_PEDIDOS_DETALLE + " PD ON P." + variables_publicas.PEDIDOS_COLUMN_CodigoPedido + " =  PD."+ variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoPedido + " WHERE P." + variables_publicas.PEDIDOS_COLUMN_Cod_cv + " = '" + CodigoCV + "' AND P." + variables_publicas.PEDIDOS_COLUMN_IdCliente + " = '" + CodigoCliente + "' AND PD." + variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo + " = '" + CodArticulo + "' AND PD." + variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt + " ='B' ", null);
+        int cant =0;
+        if (c.moveToFirst()) {
+            do {
+                cant = c.getInt(c.getColumnIndex("Cantidad"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        if (cant==0){
+            return false;
+        }else {
+            return true;
+        }
+    }
 }
