@@ -1031,7 +1031,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             if (cantidad >=12 && cantxTipoCliente ==2) {
                 cantidadB = 1;
-            }else if (cantidad >=1 && cantxTipoCliente ==1){
+            }else if (cantidad >=24 && cantxTipoCliente ==1){
                 cantidadB = 1;
             }
             else
