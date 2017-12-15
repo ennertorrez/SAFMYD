@@ -48,55 +48,64 @@
                 android:layout_height="wrap_content"
                 android:text="Nombre" />
         </RadioGroup>
-    </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/Rl2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/Rl1">
+        <!---   <Button
+               android:id="@+id/btnAgregarCliente"
+               android:layout_width="48dp"
+               android:layout_height="wrap_content"
+               android:background="@mipmap/plus_add_green"
+               android:layout_alignParentRight="true"
+               android:onClick="AgregarCliente" />-->
 
-        <EditText
-            android:id="@+id/txtBusqueda"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/btnBuscar"
-            android:background="@drawable/rounded_edittext"
-            android:hint="Ingrese su busqueda"
-            android:inputType="text"
-            android:maxLines="1" />
+       </RelativeLayout>
 
-        <Button
-            android:id="@+id/btnBuscar"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/places_ic_search"
-            android:backgroundTint="@color/colorPrimaryDark"
+       <RelativeLayout
+           android:id="@+id/Rl2"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/Rl1">
 
-            />
-    </RelativeLayout>
+           <EditText
+               android:id="@+id/txtBusqueda"
+               android:layout_width="match_parent"
+               android:layout_height="50dp"
+               android:layout_alignParentLeft="true"
+               android:layout_alignParentStart="true"
+               android:layout_alignTop="@+id/btnBuscar"
+               android:background="@drawable/rounded_edittext"
+               android:hint="Ingrese su busqueda"
+               android:inputType="text"
+               android:maxLines="1" />
 
-    <TextView
-        android:background="@color/colorPrimary"
-        android:textColor="@color/White"
-        android:id="@+id/lblFooter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Clientes encontrados: 0" />
+           <Button
+               android:id="@+id/btnBuscar"
+               android:layout_width="50dp"
+               android:layout_height="wrap_content"
+               android:layout_alignParentRight="true"
+               android:layout_marginTop="5dp"
+               android:background="@drawable/places_ic_search"
+               android:backgroundTint="@color/colorPrimaryDark"
 
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/lblFooter"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/Rl2"
-        />
+               />
+       </RelativeLayout>
 
-</RelativeLayout>
+       <TextView
+           android:background="@color/colorPrimary"
+           android:textColor="@color/White"
+           android:id="@+id/lblFooter"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_alignParentBottom="true"
+           android:text="Clientes encontrados: 0" />
+
+       <ListView
+           android:id="@+id/list"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_above="@+id/lblFooter"
+           android:layout_alignParentLeft="true"
+           android:layout_alignParentStart="true"
+           android:layout_below="@+id/Rl2"
+           />
+
+   </RelativeLayout>

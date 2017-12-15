@@ -1016,9 +1016,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             int cantidadB =0;
             int cantxTipoCliente =0;
 
-            if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2")){
+            if (cliente.getTipo().equalsIgnoreCase("Mayorista") ){
                 cantxTipoCliente=1;
-            }else if (cliente.getTipo().equalsIgnoreCase("Detalle")){
+            }else if (cliente.getTipo().equalsIgnoreCase("Detalle") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2")){
                 cantxTipoCliente=2;
             }
             /*Primero sumamos las cantidades de los items promocionados*/
@@ -1057,6 +1057,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             } else {
 
                /*Si no existe lo agregamos*/
+                /*if (listaArticulos.size() <= 17 && existe == false && cantidadB>0) {*/
                 if (existe == false && cantidadB>0) {
 
                     HashMap<String, String> articuloBonificado = new HashMap<>();
@@ -1422,8 +1423,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         boolean multiplo50= false;
         int factorMult50 = 0;
         boolean PrecioCajas = false;
-        UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta());
-        factorMult50 = 50 / Integer.parseInt(articulo.getUnidadCajaVenta());
+        UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta().equals("0") ? "1" : articulo.getUnidadCajaVenta());
+        factorMult50 = 50 / UnidadCaja;
         if (factorMult50==0){
             factorMult50=1;
         }
