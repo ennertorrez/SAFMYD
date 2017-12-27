@@ -73,7 +73,7 @@ public class ArticulosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_AplicaPrecioDetalle)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Detallista)),
-                                c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Existencia)),
+                        c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_Existencia)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta)),
                         c.getString(c.getColumnIndex(variables_publicas.ARTICULO_COLUMN_IdProveedor))
                 ));
@@ -107,7 +107,8 @@ public class ArticulosHelper {
                 articulo.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
                 articulo.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 articulo.put(variables_publicas.ARTICULO_COLUMN_Existencia, c.getString(c.getColumnIndex("Existencia")));
-
+                articulo.put(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta,c.getString(c.getColumnIndex("UnidadCajaVenta")));
+                articulo.put(variables_publicas.ARTICULO_COLUMN_IdProveedor,c.getString(c.getColumnIndex("IdProveedor")));
             } while (c.moveToNext());
         }
         c.close();
@@ -137,6 +138,8 @@ public class ArticulosHelper {
                 articulos.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, String.valueOf((int) Double.parseDouble( c.getString(c.getColumnIndex("Existencia")) ) ) );
+                articulos.put(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta, c.getString(c.getColumnIndex("UnidadCajaVenta")));
+                articulos.put(variables_publicas.ARTICULO_COLUMN_IdProveedor, c.getString(c.getColumnIndex("IdProveedor")));
                 lst.add(articulos);
 
             }while (c.moveToNext());
@@ -169,6 +172,8 @@ public class ArticulosHelper {
                 articulos.put(variables_publicas.ARTICULO_COLUMN_DescuentoMaximo, c.getString(c.getColumnIndex("DescuentoMaximo")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 articulos.put(variables_publicas.ARTICULO_COLUMN_Existencia, String.valueOf((int) Double.parseDouble( c.getString(c.getColumnIndex("Existencia")) ) ) );
+                articulos.put(variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta, c.getString(c.getColumnIndex("UnidadCajaVenta")));
+                articulos.put(variables_publicas.ARTICULO_COLUMN_IdProveedor, c.getString(c.getColumnIndex("IdProveedor")));
                 lst.add(articulos);
 
             }while (c.moveToNext());

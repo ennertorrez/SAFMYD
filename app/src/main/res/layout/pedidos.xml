@@ -211,17 +211,37 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:layout_marginRight="10dp"
-                        android:text="PRECIO:"
+                        android:text="PREC:"
                         android:textColor="#000000"
                         android:textSize="15dp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtPrecioArticulo"
-                        android:layout_width="75dp"
+                        android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:text="0.00"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/lblDescUMArt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:layout_marginRight="10dp"
+                        android:text="UM:"
+                        android:textColor="#000000"
+                        android:textSize="15dp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/lblUMArt"
+                        android:layout_width="30dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:text="00"
                         android:textColor="@color/colorAccent"
                         android:textSize="15dp"
                         android:textStyle="bold" />
@@ -232,14 +252,14 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:layout_marginRight="10dp"
-                        android:text="U/M:"
+                        android:text="UMV:"
                         android:textColor="#000000"
                         android:textSize="15dp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/lblUMArticulo"
-                        android:layout_width="40dp"
+                        android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:text="00"
@@ -253,21 +273,20 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:layout_marginRight="10dp"
-                        android:text="Exist.:"
+                        android:text="Exis:"
                         android:textColor="#000000"
                         android:textSize="15dp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/lblExistencia"
-                        android:layout_width="match_parent"
+                        android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:text="N/A"
                         android:textColor="@color/colorAccent"
                         android:textSize="15dp"
                         android:textStyle="bold" />
-
 
 
                 </LinearLayout>

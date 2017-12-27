@@ -237,10 +237,13 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         cboMotivo = (Spinner) findViewById(R.id.cboMotivo);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
 
+
+
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
                 PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH, DevolucionH, DevolucionDetalleH);
+
 
         // Displaying all values on the screen
         final TextView lblCodigoCliente = (TextView) findViewById(R.id.lblCodigoCliente);
@@ -1009,6 +1012,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
+
     }
 
     public void BuscarArticulo() {

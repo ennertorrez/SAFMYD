@@ -124,7 +124,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private TextView lblTotalDol;
     private TextView lblFooter;
     private TextView lblFooterItem;
-    private TextView lblUM;
+    private TextView lblUM; //Unidad de medida por caja
+    private TextView lblUMV; // Unidad minima de venta
     private TextView lblExistentias;
     private Button btnAgregar;
     private Button btnBuscar;
@@ -298,7 +299,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         lblCodCliente = (TextView) findViewById(R.id.lblCodigoCliente);
         lblNombCliente = (TextView) findViewById(R.id.lblNombreCliente);
         lblDescripcionArticulo = (TextView) findViewById(R.id.lblDescripcionArticulo);
-        lblUM = (TextView) findViewById(R.id.lblUMArticulo);
+        lblUM = (TextView) findViewById(R.id.lblUMArt);
+        lblUMV = (TextView) findViewById(R.id.lblUMArticulo);
         lblExistentias = (TextView) findViewById(R.id.lblExistencia);
         lblNoPedido = (TextView) findViewById(R.id.lblNoPedido);
         txtCantidad = (EditText) findViewById(R.id.txtCantidad);
@@ -403,6 +405,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
                 item.put("IdProveedor", art.getIdProveedor());
                 item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
+                item.put("UnidadCaja",art.getUnidadCaja());
             }
             txtObservaciones.setText(pedido.getObservacion());
             lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
@@ -1011,6 +1014,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-04-1088");
             List<String> items = Arrays.asList(ConfigPromoGaga.getValor().split(","));
 
+
             boolean existe = false;
             int cantidad = 0;
             int cantidadB =0;
@@ -1419,12 +1423,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         //Esto para utilizarlo en el metodo SetPrecio
         Articulo articulo = ArticulosH.BuscarArticulo(CodArticulo);
         boolean AplicarPrecioDetalle = Boolean.parseBoolean(articulo.getAplicaPrecioDetalle());
-        int ModCantidadCajas, cantidadItems = 0, FaltaParaCaja, cajas, UnidadCaja, ModMultiplo50=0,FaltaParaCaja50=0;
+        boolean cumpleCantMinima= false;
+        int ModCantidadCajas, cantidadItems = 0, FaltaParaCaja, cajas, UnidadCaja, ModMultiplo50=0,FaltaParaCaja50=0, CantidadMinima=0;
+        CantidadMinima=Integer.parseInt(articulo.getUnidadCajaVenta().equals("0") ? "1" : articulo.getUnidadCajaVenta());
+
         boolean multiplo50= false;
         int factorMult50 = 0;
         boolean PrecioCajas = false;
-        UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta().equals("0") ? "1" : articulo.getUnidadCajaVenta());
+        //UnidadCaja = Integer.parseInt(articulo.getUnidadCajaVenta().equals("0") ? "1" : articulo.getUnidadCajaVenta());
+        UnidadCaja = Integer.parseInt(articulo.getUnidadCaja().equals("0") ? "1" : articulo.getUnidadCaja());
         factorMult50 = 50 / UnidadCaja;
+
         if (factorMult50==0){
             factorMult50=1;
         }
@@ -1433,6 +1442,37 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 cantidadItems = 0;
             } else {
                 cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+
+                if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")){
+                    if (cantidadItems < CantidadMinima) {
+                        cumpleCantMinima = false;
+                    } else {
+                        cumpleCantMinima = true;
+                    }
+                }
+                else {
+                    cumpleCantMinima = true;
+                }
+               /* if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") ){
+                    cumpleCantMinima=true;
+                } else if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && cliente.getTipo().equalsIgnoreCase("Mayorista")) {
+                    if (cantidadItems < CantidadMinima) {
+                        cumpleCantMinima=false;
+                    }else{
+                        cumpleCantMinima=true;
+                    }
+                } else if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && !cliente.getTipo().equalsIgnoreCase("Mayorista")){
+                    cumpleCantMinima=true;
+                }else if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && cliente.getTipo().equalsIgnoreCase("Mayorista")){
+                    if (cantidadItems < CantidadMinima) {
+                        cumpleCantMinima=false;
+                    }else{
+                        cumpleCantMinima=true;
+                    }
+                }
+                else
+                {cumpleCantMinima=true;}*/
+
                 ModMultiplo50 = (cantidadItems % (UnidadCaja * factorMult50));
                 if (ModMultiplo50==0) {
                     multiplo50 =true;
@@ -1449,7 +1489,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
         String TipoForaneo = "";
-        UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCajaVenta());
+        //UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCajaVenta());
+        UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCaja());
         ModCantidadCajas = (cantidadItems % UnidadCaja);
         if (cantidadItems >= UnidadCaja) {
             PrecioCajas = true;
@@ -1526,7 +1567,23 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         if (variables_publicas.AplicarPrecioMayoristaXCaja.equalsIgnoreCase("1") && cliente.getEmpleado().equals("0") && !vendedor.getCODIGO().equalsIgnoreCase("9")) {
             if (cantidadItems > 0 && (item != null && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("P"))) {
-                if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
+                if (!cumpleCantMinima)  {
+                    if (MensajeCaja && !ActualizarItem) {
+                        final String finalTipoprecio = tipoprecio;
+                        if (!ActualizarItem) {
+                            MensajeCaja = false;
+                        }
+                        listaArticulos.remove(listaArticulos.size() - 1);
+                        AplicarBonificacionCartillas();
+                        AplicarPromocionAmsa();
+                        AplicarPromocion024();
+                        AplicarPromocionSalnica();
+                        AplicarPromocionGaga();
+                        MensajeAviso("La cantidad Minima para ventas es de " + String.valueOf(CantidadMinima) + " Unidades.");
+                        txtCantidad.requestFocus();
+                    }
+                }
+                else if (PrecioCajas && !cliente.getTipo().equalsIgnoreCase("Super")) {
                     if (FaltaParaCaja50 > 0 && ModMultiplo50 > 0 && CodArticulo.equals("4000-02-01-04-1068") ) {
                         if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) {
                             if (MensajeCaja && !ActualizarItem) {
@@ -1557,7 +1614,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                         .setTitle("Confirmación Requerida")
                                         .setMessage("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas, Desea continuar ? ")
                                         .setCancelable(false)
-                                        .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton("SI", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 if (!ActualizarItem) {
                                                     MensajeCaja = true;
@@ -1566,12 +1623,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                 }
                                             }
                                         })
-                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
 
                                                 if (!ActualizarItem) {
                                                     setPrecio(art, finalTipoprecio, 0, item == null);
                                                     if (listaArticulos.size() > 0) {
+                                                        if (!ActualizarItem) {
+                                                            MensajeCaja = false;
+                                                        }
                                                         listaArticulos.remove(listaArticulos.size() - 1);
                                                         AplicarBonificacionCartillas();
                                                         AplicarPromocionAmsa();
@@ -1580,6 +1640,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         AplicarPromocionGaga();
                                                         RefrescarGrid();
                                                         CalcularTotales();
+                                                        txtCantidad.requestFocus();
                                                     }
                                                     txtCantidad.requestFocus();
                                                 }
@@ -1783,6 +1844,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
             txtCodigoArticulo.requestFocus();
             lblUM.setText("N/A");
+            lblUMV.setText("N/A");
             lblExistentias.setText("N/A");
             InputMethodManager inputManager = (InputMethodManager)
                     getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -2082,7 +2144,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());
-                lblUM.setText(articulo.getUnidadCajaVenta());
+                lblUM.setText(articulo.getUnidadCaja());
+                lblUMV.setText(articulo.getUnidadCajaVenta());
                 existencia = articulo.getExistencia();
                 lblExistentias.setText(String.valueOf((int) (Double.parseDouble(existencia))));
 //                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
