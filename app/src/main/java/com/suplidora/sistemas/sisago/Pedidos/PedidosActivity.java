@@ -1489,8 +1489,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
         String TipoForaneo = "";
-        //UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCajaVenta());
-        UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCaja());
+        UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCajaVenta());
+        //UnidadCaja = UnidadCaja == 0 ? 1 : Integer.parseInt(articulo.getUnidadCaja());
         ModCantidadCajas = (cantidadItems % UnidadCaja);
         if (cantidadItems >= UnidadCaja) {
             PrecioCajas = true;

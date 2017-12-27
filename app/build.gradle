@@ -15,8 +15,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 65
-        versionName "1.64"
+        versionCode 66
+        versionName "1.65"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -32,6 +32,12 @@ android {
     }
     productFlavors {
     }
+
+
+        lintOptions {
+            abortOnError false
+        }
+
 }
 
 
