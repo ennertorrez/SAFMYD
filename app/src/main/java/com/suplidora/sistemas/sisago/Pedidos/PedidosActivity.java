@@ -1443,7 +1443,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             } else {
                 cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
 
-                if (cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo")){
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")){
                     if (cantidadItems < CantidadMinima) {
                         cumpleCantMinima = false;
                     } else {
