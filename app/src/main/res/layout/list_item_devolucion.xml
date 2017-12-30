@@ -31,8 +31,10 @@
         android:text="Cantidad: "
         android:textColor="@color/colorAccent"
         android:paddingBottom="2dip"
-        android:layout_below="@id/Nombre"
-        android:gravity="right"/>
+        android:gravity="right"
+        android:layout_alignBaseline="@+id/Cantidad"
+        android:layout_alignBottom="@+id/Cantidad"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/Cantidad"

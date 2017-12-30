@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCargaDetalle;
+import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,6 +153,18 @@ public class ConsolidadoCargaDetalleHelper {
         Log.d("ConsoliCargaDet_elimina", "Datos eliminados");
     }
 
-
+    public Double  BuscarTotalFactura(String Factura) {
+        String Query = "select printf(\"%.2f\",SUM("+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL+")) as vTotal from " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE+" WHERE  "+variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura+" = '"+ Factura +"'";
+        double totFacturaoriginal=0;
+        Cursor c = database.rawQuery(Query, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                totFacturaoriginal=c.getDouble(c.getColumnIndex("vTotal"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return totFacturaoriginal;
+    }
 
     }

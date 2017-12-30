@@ -102,6 +102,7 @@ public class ListaDevolucionesFragment extends Fragment {
     private String jsonPedido;
     private String jsonAnulaDevolucion;
     private String IdDevolucion;
+    private String NoFactura;
     private Cliente Clientes;
     private String IdVendedor;
     private boolean guardadoOK = true;
@@ -616,7 +617,7 @@ public class ListaDevolucionesFragment extends Fragment {
                 pDialog.dismiss();
 
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Anulando Pedido...Por favor espere...");
+            pDialog.setMessage("Anulando Devolución...Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -640,7 +641,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
             if (getActivity() == null) return null;
             HttpHandler sh = new HttpHandler();
-            final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdDevolucion + "/" + variables_publicas.usuario.getUsuario();
+            final String url = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/AnularDevolucion/" + IdDevolucion + "/" + NoFactura + "/" + variables_publicas.usuario.getUsuario();
 
             String urlString = url;
             String urlStr = urlString;
@@ -657,8 +658,8 @@ public class ListaDevolucionesFragment extends Fragment {
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
-                    String resultState = ((String) result.get("AnularPedidoResult")).split(",")[0];
-                    final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
+                    String resultState = ((String) result.get("AnularDevolucionResult")).split(",")[0];
+                    final String mensaje = ((String) result.get("AnularDevolucionResult")).split(",")[1];
                     if (resultState.equals("false")) {
                         if (getActivity() == null) return null;
                         getActivity().runOnUiThread(new Runnable() {
@@ -678,7 +679,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
                 } catch (final Exception ex) {
                     guardadoOK = false;
-                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al Anular Devolución,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     if (getActivity() == null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -693,7 +694,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     });
                 }
             } else {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener lista de devoluciones,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 if (getActivity() == null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -879,12 +880,16 @@ public class ListaDevolucionesFragment extends Fragment {
                             String nodevolucion = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion);
                             String rango = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_rango);
                             String factura = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_factura);
+                            String motivo = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_motivo);
+                            String observacion = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones);
                             // Starting new intent
                             Intent in = new Intent(getActivity().getApplicationContext(), DevolucionesActivity.class);
 
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion, nodevolucion);
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_rango, rango);
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura, factura);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_motivo, motivo);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_motivo, observacion);
 
                             startActivity(in);
                         }

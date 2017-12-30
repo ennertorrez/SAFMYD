@@ -102,7 +102,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private static final int REQUEST_READ_PHONE_STATE = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     //region Declaracion de controles
-
+    public String valorFacturaNew;
     private EditText txtDescuento;
     private EditText txtObservaciones;
     private TextView lblCantidad;
@@ -113,6 +113,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     private TextView lblSubTotalCor;
     private TextView lblIvaCor;
     private TextView lblTotalCor;
+    private TextView lblNewTotalFact;
     private TextView lblFooter;
     private TextView lblFooterItem;
     private TextView lblSearch;
@@ -148,6 +149,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     public static ArrayList<HashMap<String, String>> listaCCargaArticulosItem;
     public boolean Estado;
     public double total;
+    public double totalFactura;
+    public double totalNewFactura;
     public double iva;
     public double subtotal;
     private Cliente cliente;
@@ -310,6 +313,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         lblSubTotalCor = (TextView) findViewById(R.id.lblSubTotalCor);
         lblIvaCor = (TextView) findViewById(R.id.lblIvaCor);
         lblTotalCor = (TextView) findViewById(R.id.lblTotalCor);
+        lblNewTotalFact = (TextView) findViewById(R.id.lblNewTotalFact);
+
         // getting intent data
         Intent in = getIntent();
 
@@ -342,11 +347,15 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                 }
             }
 
+            if (editar==true) {
+                ObtieneCcarga = ConsolidadoCargaH.ObtenerCcarga(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura));
+            }
             lblSearch.setText(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura));
             devoluciones = DevolucionH.GetDevolucion(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
             listaArticulos = DevolucionDetalleH.ObtenerDevolucionDetalleArrayList(devoluciones.getNdevolucion());
             txtObservaciones.setText(devoluciones.getObservaciones());
-
+            totalFactura=ConsolidadoCargaDetalleH.BuscarTotalFactura(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura));
+            lblNewTotalFact.setText(Double.toString(totalFactura));
             RefrescarGrid();
             CalcularTotales();
             cboCarga.setEnabled(false);
@@ -358,7 +367,10 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         // Loading spinner data from database
         CargaDatosCombo();
-
+        if (editar==true) {
+            cboMotivo.setSelection(getIndice(cboMotivo, in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_motivo)));
+            txtObservaciones.setText(in.getStringExtra(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones));
+        }
 
 
         CargarListaFacturas();
@@ -476,7 +488,6 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         });
 
 
-
         btnAgregarTodos.setOnClickListener(new OnClickListener() {
                                           public void onClick(View v) {
 
@@ -540,6 +551,22 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     }
 
+    private int getIndice(Spinner cboMot, String cadena){
+
+        //Creamos la variable posicion y lo inicializamos en 0
+        int posicion = 0;
+        //Recorre el spinner en busca del ítem que coincida con el parametro `String fruta`
+        //que lo pasaremos posteriormente
+        for (int i = 0; i < cboMot.getCount(); i++) {
+            //Almacena la posición del ítem que coincida con la búsqueda
+            if (cboMot.getItemAtPosition(i).toString().equalsIgnoreCase(cadena)) {
+                posicion = i;
+            }
+        }
+        //Devuelve un valor entero (si encontro una coincidencia devuelve la
+        // posición 0 o N, de lo contrario devuelve 0 = posición inicial)
+        return posicion;
+    }
     private boolean EsArticuloRepetido(String s) {
 
         for (HashMap<String, String> item : listaArticulos) {
@@ -567,6 +594,8 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
                 lblNombCliente.setText(ObtieneCcarga.get(0).get("Cliente").toString());
                 lblSearch.setText(item);
+                totalFactura=ConsolidadoCargaDetalleH.BuscarTotalFactura(item);
+                lblNewTotalFact.setText(df.format(totalFactura));
             }
         });
 
@@ -695,6 +724,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         devoluciones.setHoragraba(variables_publicas.FechaActual);
         devoluciones.setTipo("P");
         devoluciones.setIMEI(IMEI);
+        devoluciones.setMotivo( cboMotivo.getItemAtPosition(cboMotivo.getSelectedItemPosition()).toString());
         devoluciones.setObservaciones(txtObservaciones.getText().toString());
 
         //Esto lo ponemos para cuando es editar
@@ -949,6 +979,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         iva = 0;
         total = 0;
         subtotal = 0;
+        totalNewFactura= 0;
         for (int i = 0; i < listaArticulos.size(); i++) {
             HashMap<String, String> item = listaArticulos.get(i);
 
@@ -962,8 +993,9 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         }
         //lblSubTotalCor.setText(df.format(subtotal));
         //lblIvaCor.setText(df.format(iva));
+        totalNewFactura = totalFactura - total;
         lblTotalCor.setText(df.format(total));
-
+        lblNewTotalFact.setText(df.format(totalNewFactura));
         lblFooter.setText("Total items:" + String.valueOf(listaArticulos.size()));
 
     }
@@ -989,8 +1021,14 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         View dialogView = null;
         dialogBuilder.setCancelable(false);
         if (guardadoOK) {
-            dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
+            //Se ha agregado esto para pasar el valor del nuevo total al layout     de resultado
+            String auxValorNuevo=lblNewTotalFact.getText().toString();
+            Intent in = new Intent(this, DevolucionesActivityResult.class);
+            in.putExtra("NuevoValorfactura", auxValorNuevo);
+            startActivity(in);
 
+            dialogView = inflater.inflate(R.layout.dialog_ok_dev_layout, null);
+            //R.layout.dialog_ok_dev_layout.Total
             Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
             btnOK.setOnClickListener(new OnClickListener() {
                 @Override
@@ -998,6 +1036,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
                     finish();
                 }
             });
+
         } else {
 
             dialogView = inflater.inflate(R.layout.offline_layout, null);
