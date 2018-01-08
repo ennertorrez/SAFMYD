@@ -133,6 +133,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
     AlertDialog alertDialog;
     private String CodigoArticulo;
 
+    public final static String NuevoValorfactura="";
     //endregion
 
     //region Declaracion de variables
@@ -761,7 +762,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
         boolean saved = DevolucionH.GuardarDevolucion(devoluciones.getNdevolucion(), devoluciones.getCliente(), devoluciones.getNombrecliente(), variables_publicas.FechaActual, devoluciones.getUsuario(),
                 String.valueOf(subtotal), String.valueOf(iva), String.valueOf(total), "1", devoluciones.getRango(), devoluciones.getMotivo(),
-                devoluciones.getFactura(), devoluciones.getTipo(), IMEI, variables_publicas.usuario.getCodigo(), Funciones.Codificar(txtObservaciones.getText().toString()),"0","0");
+                devoluciones.getFactura(), devoluciones.getTipo(), IMEI, variables_publicas.usuario.getCodigo(), Funciones.Codificar(devoluciones.getObservaciones().toString()),"0","0");
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -896,7 +897,7 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
 
     private void LimipiarDatos(boolean MensajeCaja) {
         if (MensajeCaja) {
-            txtObservaciones.setText("");
+            //txtObservaciones.setText("");
             cargadetalle = null;
             txtCodigoArticulo.setText(null);
             txtCantidad.setError(null);
@@ -1023,20 +1024,19 @@ public class DevolucionesActivity extends Activity implements ActivityCompat.OnR
         if (guardadoOK) {
             //Se ha agregado esto para pasar el valor del nuevo total al layout     de resultado
             String auxValorNuevo=lblNewTotalFact.getText().toString();
-            Intent in = new Intent(this, DevolucionesActivityResult.class);
-            in.putExtra("NuevoValorfactura", auxValorNuevo);
-            startActivity(in);
 
             dialogView = inflater.inflate(R.layout.dialog_ok_dev_layout, null);
-            //R.layout.dialog_ok_dev_layout.Total
             Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
+            TextView nuevoValor = (TextView) dialogView.findViewById(R.id.nuevoTotal);
+            nuevoValor.setText(auxValorNuevo);
+            nuevoValor.setTextColor(Color.parseColor("#FFBF5300"));
             btnOK.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     finish();
                 }
             });
-
+            //finish();
         } else {
 
             dialogView = inflater.inflate(R.layout.offline_layout, null);

@@ -99,8 +99,8 @@ public class ListaDevolucionesFragment extends Fragment {
 
     //final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/AnularPedido";
     //AnularPedido/{Pedido}/{Usuario}
-    private String jsonPedido;
     private String jsonAnulaDevolucion;
+    private String jsonDevolucion;
     private String IdDevolucion;
     private String NoFactura;
     private Cliente Clientes;
@@ -328,6 +328,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     itemdevolucion.put("estado", item.get("estado"));
                     itemdevolucion.put("factura", item.get("factura"));
                     itemdevolucion.put("rango", item.get("rango"));
+                    itemdevolucion.put("ejecutada", item.get("ejecutada"));
                     listadevoluciones.add(item);
                 }
                 CheckConnectivity();
@@ -410,9 +411,9 @@ public class ListaDevolucionesFragment extends Fragment {
             adapter = new SimpleAdapter(
                     getActivity(), listadevoluciones,
                     R.layout.list_devoluciones_guardados, new String[]{"ndevolucion", "nombrecliente",
-                    "horagraba", "total", "estado", "factura", "rango"},
+                    "horagraba", "total", "estado", "factura", "rango" , "ejecutada"},
                     new int[]{R.id.ndevolucion, R.id.cliente, R.id.Fecha, R.id.total, R.id.estado,
-                            R.id.factura, R.id.rango}) {
+                            R.id.factura, R.id.rango, R.id.ejecutada}) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View currView = super.getView(position, convertView, parent);
@@ -426,18 +427,18 @@ public class ListaDevolucionesFragment extends Fragment {
                     } else {
                         tvSincroniza.setBackground(getResources().getDrawable(R.drawable.rounded_corner_green));
                     }
-//                    if (currItem.get("Estado").equals("PENDIENTE")) {
-//                        tvEstado.setTextColor(Color.parseColor("#FFBF5300"));
-//                    }
-//                    if (currItem.get("Estado").equals("APROBADO")) {
-//                        tvEstado.setTextColor(Color.parseColor("#303F9F"));
-//                    }
-//                    if (currItem.get("Estado").equals("ANULADO")) {
-//                        tvEstado.setTextColor(Color.parseColor("#FFFF0000"));
-//                    }
-//                    if (currItem.get("Estado").equals("FACTURADO")) {
-//                        tvEstado.setTextColor(Color.parseColor("#FF2D8600"));
-//                    }
+                    if (currItem.get("ejecutada").equals("false") && currItem.get("estado").equals("true")) {
+                        tvEstado.setText("Pendiente");
+                        tvEstado.setTextColor(Color.parseColor("#FFBF5300"));
+                    }
+                    if (currItem.get("ejecutada").equals("true") && currItem.get("estado").equals("false")) {
+                        tvEstado.setText("Anulada");
+                        tvEstado.setTextColor(Color.RED);
+                    }
+                    if (currItem.get("ejecutada").equals("true") && currItem.get("estado").equals("true")) {
+                        tvEstado.setText("Aplicada");
+                        tvEstado.setTextColor(Color.parseColor("#FF2D8600"));
+                    }
                     return currView;
                 }
             };
@@ -504,6 +505,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     String factura = c.getString("factura");
                     String subtotal = c.getString("subtotal");
                     String rango = c.getString("rango");
+                    String ejecutada = c.getString("ejecutada");
 
 
                     HashMap<String, String> devoluciones = new HashMap<>();
@@ -515,6 +517,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     devoluciones.put("estado", estado);
                     devoluciones.put("factura", factura);
                     devoluciones.put("rango", rango);
+                    devoluciones.put("ejecutada", ejecutada);
                     devoluciones.put("subtotal", subtotal);
 
                     listadevoluciones.add(devoluciones);
@@ -545,18 +548,19 @@ public class ListaDevolucionesFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             if (getActivity() == null) return null;
-            List<HashMap<String, String>> DevolucionesLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha,tipoBusqueda, "");
-            guardadoOK = true;
             CheckConnectivity();
+           // guardadoOK = true;
+
             if (isOnline) {
+                List<HashMap<String, String>> DevolucionesLocal = DevolucionesH.ObtenerDevolucionesLocales(fecha,tipoBusqueda, "");
                 for (HashMap<String, String> item : DevolucionesLocal) {
                     if (guardadoOK == false) {
                         break;
                     }
-                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, Funciones.Codificar(item.get(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
                     Gson gson = new Gson();
-
+                    item.put(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente, Funciones.Codificar(item.get(variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente)));
                     String jsonDevolucion = gson.toJson(DevolucionesH.ObtenerDevolucion(item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion)));
+
                     if (Boolean.parseBoolean(SincronizarDatos.SincronizarDevolucion(DevolucionesH, DevolucionesDetalleH, ConsolidadoCargaH, item.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion), item.get(variables_publicas.DEVOLUCIONES_COLUMN_rango), item.get(variables_publicas.DEVOLUCIONES_COLUMN_factura), jsonDevolucion, false).split(",")[0])) {
                         guardadoOK = true;
                     } else {
@@ -564,13 +568,12 @@ public class ListaDevolucionesFragment extends Fragment {
                     }
                 }
             } else {
-                if (getActivity() == null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (getActivity().isFinishing()) return;
+                        if(getActivity().isFinishing()) return;
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "Error: " + "No ha sido posible establecer conexion con el servidor, por favor revise su conexion a internet e intente nuevamente",
+                                "No es posible conectarse con el servidor, por favor verifique su conexion a internet",
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -597,7 +600,7 @@ public class ListaDevolucionesFragment extends Fragment {
                     public void run() {
                         if (getActivity().isFinishing()) return;
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "SincronizarPedidos onPostExecute: " + ex.getMessage(),
+                                "SincronizarDevoluciones onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
@@ -760,14 +763,14 @@ public class ListaDevolucionesFragment extends Fragment {
             if (!obj.get("ndevolucion").startsWith("-"))
                 tv.setTitle("Anular devolucion");
 
-            if (!obj.get("factura").equalsIgnoreCase("") || obj.get("estado").equalsIgnoreCase("0")) {
+            if (!obj.get("factura").equalsIgnoreCase("") || obj.get("ejecutada").equalsIgnoreCase("0")) {
                 tv.setEnabled(false);
 
             } else {
                 tv.setEnabled(true);
             }
-            /*Si la devolucion esta anulada*/
-            if (obj.get("estado").equalsIgnoreCase("0")) {
+            /*Si la devolucion esta aplicada*/
+            if (obj.get("ejecutada").equalsIgnoreCase("true")) {
                 //Ponemos el boton Editar en falso
                 ((MenuItem) menu.getItem(0)).setEnabled(false);
             } else {
@@ -869,7 +872,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
                     //validar esto luego falta traer el campo de procesada
                   //  if (obj.get("procesada").equalsIgnoreCase("0")) {
-                        if (obj.get("estado").equalsIgnoreCase("true")) {
+                        if (obj.get("estado").equalsIgnoreCase("true") ) {
 
                             devolucion = DevolucionesH.ObtenerDevolucion(ndevolucion);
                             if (devolucion == null) {
@@ -882,6 +885,12 @@ public class ListaDevolucionesFragment extends Fragment {
                             String factura = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_factura);
                             String motivo = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_motivo);
                             String observacion = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones);
+                            String vEjecutada = devolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ejecutada);
+
+                            if (vEjecutada.equalsIgnoreCase("1")) {
+                                Funciones.MensajeAviso(getActivity(), "Esta devolución no se puede editar, ya que se encuentra en estado Ejecutada");
+                                return true;
+                            }
                             // Starting new intent
                             Intent in = new Intent(getActivity().getApplicationContext(), DevolucionesActivity.class);
 
@@ -889,7 +898,7 @@ public class ListaDevolucionesFragment extends Fragment {
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_rango, rango);
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_factura, factura);
                             in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_motivo, motivo);
-                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_motivo, observacion);
+                            in.putExtra(variables_publicas.DEVOLUCIONES_COLUMN_Observaciones, observacion);
 
                             startActivity(in);
                         }

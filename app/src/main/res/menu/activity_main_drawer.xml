@@ -49,7 +49,7 @@
                 <item
                     android:id="@+id/btnNuevaDevoluciones"
                     android:icon="@drawable/ic_menu_plussign"
-                    android:title="Nueva Devoluciones" />
+                    android:title="Nueva Devolución" />
 
             </menu>
         </item>

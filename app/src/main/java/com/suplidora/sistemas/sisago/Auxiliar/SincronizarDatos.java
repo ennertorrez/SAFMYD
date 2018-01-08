@@ -51,7 +51,7 @@ public class SincronizarDatos {
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
-    final String urlConsolidadoCarga = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/GetCarga/";
+    final String urlConsolidadoCarga = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/Getcarga/";
     final String urlConsolidadoCargaDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/BuscarConsolidadoDetalle/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";

@@ -117,6 +117,15 @@
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16sp"
             android:textStyle="bold" />
+        <TextView
+            android:id="@+id/ejecutada"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:visibility="invisible"
+            android:paddingBottom="1dip"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="1sp"
+            android:textStyle="bold" />
 
 
     </RelativeLayout>
