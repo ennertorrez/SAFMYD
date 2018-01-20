@@ -229,7 +229,7 @@ public class Funciones {
     public boolean SendMail(String subject, String body, String from, String recipients) {
 
         try {
-            GMailSender sender = new GMailSender("suplidorainternacional@gmail.com", "Suplisa2016");
+            GMailSender sender = new GMailSender("suplidorainternacional@gmail.com", "Sisa.Adivina++");
             sender.sendMail(subject,
                     body,
                     from,

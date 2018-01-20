@@ -250,6 +250,14 @@ public class DataBaseOpenHelper {
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_MOTIVOS + "( "
                     + variables_publicas.MOTIVOS_COLUMN_id + " TEXT , "
                     + variables_publicas.MOTIVOS_COLUMN_motivo + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DPTOMUNIBARRIOS + "( "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento + " TEXT , "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + " TEXT , "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio + " TEXT , "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " TEXT , "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio + " TEXT , "
+                    + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " TEXT ) ");
         }
 
         @Override
@@ -272,6 +280,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_MOTIVOS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DPTOMUNIBARRIOS);
             onCreate(db);
         }
     }

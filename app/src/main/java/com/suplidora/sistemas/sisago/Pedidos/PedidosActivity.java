@@ -682,7 +682,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         try {
             fechaActual = dateFormat.parse(variables_publicas.FechaActual);
             /*Esta fecha limite la definimos en base a correo de GALA con fecha: 2017-10-07 Titulo:  RE: PROMOCION HENKEL 9 OCTUBRE AL 31 DE DICIEMBRE. */
-            fechaLimite = dateFormat.parse("2018-01-01 00:00:00");
+            fechaLimite = dateFormat.parse("2018-02-01 00:00:00");
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -1,41 +1,27 @@
-package com.suplidora.sistemas.sisago.Menu;
+package com.suplidora.sistemas.sisago.Clientes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.telephony.TelephonyManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,19 +33,20 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
+import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.DptpMuniBarrio;
 import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
-import com.suplidora.sistemas.sisago.Principal.Login;
 import com.suplidora.sistemas.sisago.R;
+
+import java.util.List;
+
+
 /**
  * Created by Sistemas on 14/12/2017.
  */
@@ -69,6 +56,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private String TAG = ClientesNew.class.getSimpleName();
     private Button btnBuscar;
     private Cliente cliente;
+    private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
@@ -77,6 +66,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     static final String KEY_IdClienteV = "IdCliente";
     static final String KEY_NombreClienteV = "Nombre";
     private String focusedControl = "";
+
+    String IMEI = "";
 
     private TextView txtIdClienteV;
     private TextView txtNombreClienteV;
@@ -94,20 +85,24 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private Button btnBuscarCed;
     private Button btnGuardar;
     private Button btnCancelar;
+    private DptpMuniBarrio dptoMuniBarrio;
+
+    java.util.ArrayList<String> CcDptos;
+    SpinnerDialog spinnerDialog;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.clientes_agregar);
-        DbOpenHelper = new DataBaseOpenHelper(ClientesNew.this);
-        ClientesH = new ClientesHelper(DbOpenHelper.database);
 
-      //  sd = new SincronizarDatos(DbOpenHelper, ClientesH);
-
+        dptoMuniBarrio = new DptpMuniBarrio();
 
         ValidarUltimaVersion();
         if (isOnline) {
             SincronizarConfig();
         }
+
+        DbOpenHelper = new DataBaseOpenHelper(ClientesNew.this);
+        ClientesH = new ClientesHelper(DbOpenHelper.database);
 
         txtIdClienteV = (TextView) findViewById(R.id.lblIdCV);
         txtNombreClienteV = (TextView) findViewById(R.id.lblNombreClienteV);
@@ -129,6 +124,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         btnGuardar = (Button) findViewById(R.id.btnGuardarCli);
         btnCancelar = (Button) findViewById(R.id.btnCancelarCli);
 
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH);
+
         txtCedula.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
@@ -140,7 +137,30 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 return true;
             }
         });
+        CargaDatosCombo();
+    }
 
+    private void CargaDatosCombo() {
+
+        //Combo Carga
+        final List<DptpMuniBarrio> CDptos;
+        CDptos = ClientesH.ObtenerListaDepartamentos2();
+
+        ArrayAdapter<DptpMuniBarrio> adapterDpto = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CDptos);
+        adapterDpto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboDpto.setAdapter(adapterDpto);
+
+        cboDpto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                dptoMuniBarrio.setNombre_Departamento(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getNombre_Departamento());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
     }
     private void SincronizarConfig() {
         if (Build.VERSION.SDK_INT >= 11) {
@@ -254,6 +274,69 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
 
     private void CheckConnectivity() {
         isOnline = Funciones.TestServerConectivity();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_PHONE_STATE:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    loadIMEI();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+            requestReadPhoneStatePermission();
+        } else {
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
+        }
+    }
+
+    public void doPermissionGrantedStuffs() {
+        //Have an  object of TelephonyManager
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
+        variables_publicas.IMEI = tm.getDeviceId();
+
+
+    }
+
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            new AlertDialog.Builder(ClientesNew.this)
+                    .setTitle("Permission Request")
+                    .setMessage("Se necesita permiso para acceder al estado del telefono")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //re-request
+                            ActivityCompat.requestPermissions(ClientesNew.this,
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
     }
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;

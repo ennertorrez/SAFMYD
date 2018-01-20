@@ -30,11 +30,11 @@ public class variables_publicas {
     public static String MensajeError;
     public static  int CantidadItemPromoGaga;
 
-    public static final String direccionIp = "http://186.1.18.75:8085";
+    public static final String direccionIp = "http://186.1.18.75:8080";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 67;
+    public static final int DATABASE_VERSION = 68;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -54,6 +54,7 @@ public class variables_publicas {
     public static final String TABLE_DEVOLUCIONES = "Devoluciones";
     public static final String TABLE_DEVOLUCIONES_DETALLE = "DevolucionesDetalle";
     public static final String TABLE_MOTIVOS="Motivos";
+    public static final String TABLE_DPTOMUNIBARRIOS="DptoMuniBarrio";
 
     //Variables CamposTbArticulos
     //public static final String ARTICULO_COLUMN_Id= "Id";
@@ -267,7 +268,16 @@ public class variables_publicas {
     public static final String DEVOLUCIONES_DETALLE_COLUMN_numero = "numero";
     public static final String DEVOLUCIONES_DETALLE_COLUMN_factura = "factura";
 
+    //Variables CamposTbMotivos
     public static  final String MOTIVOS_COLUMN_id = "id";
     public static final String  MOTIVOS_COLUMN_motivo ="motivo";
+
+    //Variables CamposTbDptoMuniBarrios
+    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento = "Codigo_Departamento";
+    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento ="Nombre_Departamento";
+    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio = "Codigo_Municipio";
+    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio ="Nombre_Municipio";
+    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio = "Codigo_Barrio";
+    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio ="Nombre_Barrio";
 
 }

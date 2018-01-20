@@ -71,7 +71,6 @@ public class DevolucionesHelper {
         else return false;
     }
 
-
     public List<HashMap<String, String>> ObtenerListaMotivosHashMap() {
         HashMap<String, String> motivos = null;
         List<HashMap<String, String>> lst = new ArrayList<>();

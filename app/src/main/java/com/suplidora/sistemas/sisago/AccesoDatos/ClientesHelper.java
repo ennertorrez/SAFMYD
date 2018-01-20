@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
-import com.suplidora.sistemas.sisago.Entidades.Vendedor;
+import com.suplidora.sistemas.sisago.Entidades.DptpMuniBarrio;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -274,5 +274,59 @@ public class ClientesHelper {
 
         return cli;
     }
+    public ArrayList<DptpMuniBarrio> ObtenerListaDepartamentos() {
+        DptpMuniBarrio Departamento = null;
+        ArrayList<DptpMuniBarrio> lst = new ArrayList<>();
+        String Query = "SELECT * FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                Departamento = new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento)),
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento)),
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio)),
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio)),
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio)),
+                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio)));
+                lst.add(Departamento);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
 
+    public List<DptpMuniBarrio> ObtenerListaDepartamentos2() {
+        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
+        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex("Nombre_Departamento"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    public boolean GuardarDptosMuniBarrios(String codDpto, String DesDepto,String codMun, String DesMun,String codBarr, String DesBarr){
+        long rows = 0;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento, codDpto);
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento, DesDepto);
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio, codMun);
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio, DesMun);
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio, codBarr);
+        contentValues.put(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio, DesBarr);
+        long rowInserted = database.insert(variables_publicas.TABLE_DPTOMUNIBARRIOS, null, contentValues);
+        if (rowInserted != -1)
+            return true;
+        else return false;
+    }
+    public boolean EliminarDptosMuniBarrios() {
+        long deletedrows=  database.delete( variables_publicas.TABLE_DPTOMUNIBARRIOS,null,null);
+        Log.d("DPTOMUNIBARRIOS_deleted", "Datos eliminados");
+        return deletedrows!=-1;
+    }
 }

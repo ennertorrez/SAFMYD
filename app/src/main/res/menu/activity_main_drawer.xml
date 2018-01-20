@@ -31,6 +31,10 @@
                     android:id="@+id/btnMaestroClientes"
                     android:icon="@drawable/ic_menu_slideshow"
                     android:title="Maestro Clientes" />
+                <item
+                    android:id="@+id/btnNuevoCliente"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Agregar Cliente" />
             </menu>
         </item>
         <item

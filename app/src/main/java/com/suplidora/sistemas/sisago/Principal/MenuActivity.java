@@ -48,6 +48,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
+import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
@@ -166,6 +167,7 @@ public class MenuActivity extends AppCompatActivity
             navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(2).getSubMenu().getItem(0).setEnabled(false);
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(4).setEnabled(false);
             navigationView.getMenu().getItem(5).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);
@@ -173,6 +175,7 @@ public class MenuActivity extends AppCompatActivity
         } else {
            // navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
         }
 
 
@@ -324,6 +327,10 @@ public class MenuActivity extends AppCompatActivity
                 tran.add(R.id.content_frame, new ClientesFragment());
                 tran.addToBackStack(null);
                 tran.commit();
+                break;
+            case R.id.btnNuevoCliente:
+                Intent newCli = new Intent(getApplicationContext(), ClientesNew.class);
+                startActivity(newCli);
                 break;
             case R.id.btnListadoPedidos:
 

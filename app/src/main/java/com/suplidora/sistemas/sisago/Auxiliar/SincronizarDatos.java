@@ -47,6 +47,7 @@ public class SincronizarDatos {
 
 
     private String urlClientes = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
+    private String urlDptoMuniBarrios = variables_publicas.direccionIp + "/ServicioClientes.svc/ObtenerDptoMuniBarrios";
     private String urlArticulos = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
@@ -145,6 +146,11 @@ public class SincronizarDatos {
         DevolucionesDetalleH =devolucionesDetalleH;
     }
 
+    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh ) {
+        DbOpenHelper = dbh;
+        ClientesH = Clientesh;
+    }
+
     private boolean SincronizarArticulos() throws JSONException {
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlArticulos;
@@ -205,6 +211,9 @@ public class SincronizarDatos {
     public boolean SincronizarClientes() throws JSONException {
         /*******************************CLIENTES******************************/
         //************CLIENTES
+
+        //ObtenerDptosMuniBarrios();
+
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 3;
         String jsonStrC = shC.makeServiceCall(urlStringC);
@@ -878,6 +887,51 @@ public class SincronizarDatos {
 
         } else {
             new Funciones().SendMail("Ha ocurrido un error al obtener los motivos de devolucion,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        return false;
+    }
+
+    private boolean ObtenerDptosMuniBarrios() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = urlDptoMuniBarrios;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************DEPARTAMENTOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray dptosMunBarr = jsonObj.getJSONArray("ObtenerDptoMuniBarriosResult");
+                if (dptosMunBarr.length() == 0) {
+                    return false;
+                }
+                ClientesH.EliminarDptosMuniBarrios();
+                // looping through All Contacts
+
+                for (int i = 0; i < dptosMunBarr.length(); i++) {
+                    JSONObject c = dptosMunBarr.getJSONObject(i);
+                    ClientesH.GuardarDptosMuniBarrios(c.get("Codigo_Departamento").toString(),c.get("Nombre_Departamento").toString(),c.get("Codigo_Municipio").toString(),c.get("Nombre_Municipio").toString(),c.get("Codigo_Barrio").toString(),c.get("Nombre_Barrio").toString());
+                }
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener los Departamentos, Municipios y Barrios,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener los Departamentos, Municipios y Barrios,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
         return false;
