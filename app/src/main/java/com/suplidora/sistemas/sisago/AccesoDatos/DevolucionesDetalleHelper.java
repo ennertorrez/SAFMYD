@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 
 import java.util.ArrayList;
@@ -144,6 +145,33 @@ public class DevolucionesDetalleHelper {
         if(rowInserted != -1)
             return true;
         else return false;
+    }
+
+    public ArrayList<HashMap<String, String>> ObtenerProductosDevoluciones(String ndevolucion) {
+
+        String selectQuery = "SELECT DD."+variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item+",A."+variables_publicas.ARTICULO_COLUMN_Nombre+",SUM(DD."+variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad+") AS Cantidad,SUM(DD."+variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_total+") AS Total FROM " +
+                            " " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + " AS DD INNER JOIN "+ variables_publicas.TABLE_DEVOLUCIONES +" AS D ON D."+ variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion +"= DD."+ variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion +"  INNER JOIN " +
+                            " " + variables_publicas.TABLE_ARTICULOS +" AS A ON A."+ variables_publicas.ARTICULO_COLUMN_Codigo +"=DD."+ variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item +"  WHERE D." +
+                            "" + variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo +"= "+ ndevolucion +"  GROUP BY DD." +
+                            "" + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item+",A."+variables_publicas.ARTICULO_COLUMN_Nombre+"  ORDER BY A."+variables_publicas.ARTICULO_COLUMN_Nombre+"";
+
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> devolucion = new HashMap<>();
+
+                devolucion.put("Codigo", c.getString(c.getColumnIndex("item")));
+                devolucion.put("descripcion", Funciones.Decodificar( c.getString(c.getColumnIndex("Nombre"))));
+                devolucion.put("Cantidad", c.getString(c.getColumnIndex("Cantidad")));
+                devolucion.put("Total", c.getString(c.getColumnIndex("Total")));
+                lst.add(devolucion);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
 
 }

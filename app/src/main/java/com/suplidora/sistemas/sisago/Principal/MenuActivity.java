@@ -163,19 +163,23 @@ public class MenuActivity extends AppCompatActivity
         }
 
         if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vehiculo")) {
-            navigationView.getMenu().getItem(0).setEnabled(false);
+            /*navigationView.getMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(2).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(4).setEnabled(false);
             navigationView.getMenu().getItem(5).getSubMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);
-
+            navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);*/
+            navigationView.getMenu().getItem(0).setVisible(false);
+            navigationView.getMenu().getItem(1).setVisible(false);
+            navigationView.getMenu().getItem(2).setVisible(false);
+            navigationView.getMenu().getItem(5).setVisible(false);
         } else {
            // navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
+            navigationView.getMenu().getItem(4).setVisible(false);
         }
 
 

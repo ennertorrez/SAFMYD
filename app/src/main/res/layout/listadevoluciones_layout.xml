@@ -48,14 +48,13 @@
 
         <RadioGroup
             android:id="@+id/rgGrupo1"
-            android:layout_width="200dp"
+            android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="8dp"
             android:background="@drawable/rounded_edittext"
             android:checkedButton="@+id/rbFactura"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true">
 
             <RadioButton
                 android:id="@+id/rbFactura"
@@ -68,7 +67,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Cliente" />
+            <TextView
+                android:id="@+id/lblespacio"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:text=" "
+                android:textColor="@color/colorBlack" />
+
+            <Button
+                android:id="@+id/btnBuscarDev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="2dp"
+                android:text="Ver Detalle"
+                android:textColor="#FFFFFFFF"
+                android:textStyle="bold"
+                android:backgroundTint="@color/colorPrimaryDark"
+                />
         </RadioGroup>
+
+
     </RelativeLayout>
 
     <RelativeLayout

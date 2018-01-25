@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White">
+
+    <RelativeLayout
+        android:id="@+id/Rl1"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+        <TextView
+            android:text="Lista de Artículos Devueltos en Rango"
+            android:id="@+id/lblDevoluciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/borde_campos_pedidos"
+            android:cursorVisible="false"
+            android:focusableInTouchMode="false"
+            android:orientation="horizontal"
+            android:paddingBottom="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="20dp"
+            android:textStyle="bold"/>
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/Rl2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Rl1">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_marginBottom="2dp">
+            <TextView
+                android:id="@+id/lblConsolidado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="0dp"
+                android:text="0"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorPrimaryDark"
+                android:typeface="monospace" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/Rlfooter"
+        android:layout_below="@+id/Rl2"
+        android:orientation="vertical">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/layout_list_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblColItem"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:gravity="left"
+                        android:paddingLeft="0dp"
+                        android:text="Item"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#000000"
+                        android:typeface="monospace" />
+                    <TextView
+                        android:id="@+id/lblColDescItem"
+                        android:layout_width="283dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:gravity="center"
+                        android:text="Descripción"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#000000"
+                        android:typeface="monospace" />
+                    <TextView
+                        android:id="@+id/lblColCantidad"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:gravity="right"
+                        android:text="Cant."
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#000000"
+                        android:typeface="monospace" />
+
+                    <TextView
+                        android:id="@+id/lblColTtotal"
+                        android:layout_width="152dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:gravity="right"
+                        android:text="Total"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#000000"
+                        android:typeface="monospace" />
+
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/grouplayout_lista"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/layout_list_header"
+                    android:orientation="vertical">
+
+                    <ListView
+                        android:id="@+id/listResumenDevolucion"
+                        android:layout_width="555dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:scrollbars="vertical" />
+                </RelativeLayout>
+            </RelativeLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/Rlfooter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+
+        <TextView
+            android:id="@+id/lblFooterCantidad"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Cantidad: 0"
+            android:textColor="@color/White"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/lblFooterSubtotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="right"
+            android:text="Total: C$0.00"
+            android:textColor="@color/White"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

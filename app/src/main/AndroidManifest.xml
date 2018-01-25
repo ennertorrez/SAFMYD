@@ -96,10 +96,20 @@
         </activity>
 
         <activity android:name=".Clientes.ClientesNew" android:windowSoftInputMode="stateHidden"
+        android:configChanges="orientation"
+        android:screenOrientation="portrait">
+        <intent-filter>
+            <action android:name="android.intent.action.ClientesNew" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+    </activity>
+
+        <activity android:name=".Devoluciones.ListaArtDevolucionFragment" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.ClientesNew" />
+                <action android:name="android.intent.action.ListaArtDevolucionFragment" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

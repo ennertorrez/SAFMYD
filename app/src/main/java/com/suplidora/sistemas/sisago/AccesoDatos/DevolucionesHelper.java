@@ -156,6 +156,15 @@ public class DevolucionesHelper {
         return deletedRows>0;
     }
 
+    public boolean ActualizaFacturaConsolidado(String rango,String factura, String vGuardada) {
+        ContentValues con = new ContentValues();
+        con.put("Guardada", vGuardada);
+
+        long updatedRows= database.update(variables_publicas.TABLE_CONSOLIDADO_CARGA,con,variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura+" = '" + factura + "' AND "+ variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado+" = '" + rango + "'",null);
+        Log.d("Factura actualizada", "Datos Actualizados");
+        return updatedRows>0;
+    }
+
     public boolean EliminarMotivos() {
       long deletedrows=  database.delete( variables_publicas.TABLE_MOTIVOS,null,null);
         Log.d("devolucion_deleted", "Datos eliminados");
@@ -301,5 +310,4 @@ public class DevolucionesHelper {
         c.close();
         return devoluciones;
     }
-
 }

@@ -44,6 +44,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
+import com.suplidora.sistemas.sisago.Devoluciones.ListaArtDevolucionFragment;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -88,6 +89,7 @@ public class ListaDevolucionesFragment extends Fragment {
     private TextView tvEstado;
     private EditText txtBusqueda;
     private Button btnBuscar;
+    private Button btnBuscarDev;
     private Button btnSincronizar;
     private TextView txtFechaDevolucion;
     private RadioGroup rgGrupo;
@@ -133,6 +135,7 @@ public class ListaDevolucionesFragment extends Fragment {
             }
         });
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
+        btnBuscarDev = (Button) myView.findViewById(R.id.btnBuscarDev);
         btnSincronizar = (Button) myView.findViewById(R.id.btnSincronizar);
         txtFechaDevolucion = (EditText) myView.findViewById(R.id.txtFechaDevolucion);
         lblFooterCantidad = (TextView) myView.findViewById(R.id.lblFooterCantidad);
@@ -221,8 +224,17 @@ public class ListaDevolucionesFragment extends Fragment {
             }
         });
 
+        btnBuscarDev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent verDevArticulos = new Intent(v.getContext(), ListaArtDevolucionFragment.class);
+                startActivity(verDevArticulos);
+            }
+        });
         return myView;
     }
+
+
 
     private void CargarDevoluciones() {
         fecha = txtFechaDevolucion.getText().toString();
@@ -644,7 +656,7 @@ public class ListaDevolucionesFragment extends Fragment {
 
             if (getActivity() == null) return null;
             HttpHandler sh = new HttpHandler();
-            final String url = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/AnularDevolucion/" + IdDevolucion + "/" + NoFactura + "/" + variables_publicas.usuario.getUsuario();
+            final String url = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/EliminaDevolucion/" + IdDevolucion + "/" + NoFactura + "/" + variables_publicas.usuario.getUsuario();
 
             String urlString = url;
             String urlStr = urlString;
@@ -661,8 +673,8 @@ public class ListaDevolucionesFragment extends Fragment {
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
-                    String resultState = ((String) result.get("AnularDevolucionResult")).split(",")[0];
-                    final String mensaje = ((String) result.get("AnularDevolucionResult")).split(",")[1];
+                    String resultState = ((String) result.get("EliminaDevolucionResult")).split(",")[0];
+                    final String mensaje = ((String) result.get("EliminaDevolucionResult")).split(",")[1];
                     if (resultState.equals("false")) {
                         if (getActivity() == null) return null;
                         getActivity().runOnUiThread(new Runnable() {
@@ -676,6 +688,9 @@ public class ListaDevolucionesFragment extends Fragment {
                         });
 
                     } else {
+                        DevolucionesH.EliminaDevolucion(IdDevolucion);
+                        DevolucionesDetalleH.EliminarDetalleDevolucion(IdDevolucion);
+                        DevolucionesH.ActualizaFacturaConsolidado(variables_publicas.usuario.getCodigo(),NoFactura,"false");
                         guardadoOK = true;
                     }
 
@@ -771,10 +786,12 @@ public class ListaDevolucionesFragment extends Fragment {
             }
             /*Si la devolucion esta aplicada*/
             if (obj.get("ejecutada").equalsIgnoreCase("true")) {
-                //Ponemos el boton Editar en falso
+                //Ponemos el boton Editar y Anular en falso
                 ((MenuItem) menu.getItem(0)).setEnabled(false);
+                ((MenuItem) menu.getItem(1)).setEnabled(false);
             } else {
                 ((MenuItem) menu.getItem(0)).setEnabled(true);
+                ((MenuItem) menu.getItem(1)).setEnabled(true);
             }
 
 
@@ -804,16 +821,18 @@ public class ListaDevolucionesFragment extends Fragment {
                     devolucion = DevolucionesH.ObtenerDevolucion(itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion));
 
                     IdDevolucion = itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion);
+                    NoFactura = itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_factura);
                     if (itemDevolucion.get(variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion).startsWith("-")) {
                         final HashMap<String, String> finalPedido = devolucion;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea eliminar la devolucion ?")
+                                .setMessage("Esta seguro que desea eliminar la devolución ?")
                                 .setCancelable(false)
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         DevolucionesH.EliminaDevolucion(IdDevolucion);
                                         DevolucionesDetalleH.EliminarDetalleDevolucion(IdDevolucion);
+                                        DevolucionesH.ActualizaFacturaConsolidado(variables_publicas.usuario.getCodigo(),NoFactura,"false");
                                         btnBuscar.performClick();
                                     }
                                 })
@@ -830,10 +849,11 @@ public class ListaDevolucionesFragment extends Fragment {
                         final HashMap<String, String> finalDevolucion = itemDevolucion;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea anular la devolucion?")
+                                .setMessage("Esta seguro que desea anular la devolución?")
                                 .setCancelable(false)
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
+
                                         AnularDevolucion(finalDevolucion);
                                     }
                                 })
