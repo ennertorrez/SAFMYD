@@ -49,6 +49,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
+import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
@@ -163,14 +164,6 @@ public class MenuActivity extends AppCompatActivity
         }
 
         if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vehiculo")) {
-            /*navigationView.getMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(1).getSubMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(false);
-            navigationView.getMenu().getItem(2).getSubMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
-            navigationView.getMenu().getItem(4).setEnabled(false);
-            navigationView.getMenu().getItem(5).getSubMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(5).getSubMenu().getItem(1).setEnabled(false);*/
             navigationView.getMenu().getItem(0).setVisible(false);
             navigationView.getMenu().getItem(1).setVisible(false);
             navigationView.getMenu().getItem(2).setVisible(false);
@@ -178,7 +171,8 @@ public class MenuActivity extends AppCompatActivity
         } else {
            // navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
             navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
-            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setEnabled(false);
+           // navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
+            navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
             navigationView.getMenu().getItem(4).setVisible(false);
         }
 
@@ -348,11 +342,6 @@ public class MenuActivity extends AppCompatActivity
 
                 Intent newActi = new Intent(getApplicationContext(), DevolucionesActivity.class);
                 startActivity(newActi);
-
-              /*  Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
-                startActivity(newAct);
-                Intent newAct = new Intent(getApplicationContext(), AndroidJSONParsingActivity.class);
-                startActivity(newAct);*/
                 break;
             case R.id.btnListaDevoluciones:
 
@@ -364,23 +353,26 @@ public class MenuActivity extends AppCompatActivity
 
                 break;
             case R.id.btnNuevoPedido:
-               /* Intent newAct = new Intent(getApplicationContext(), ControladorSincronizacion.class);
-                startActivity(newAct);
-                //Para pruebas
-                Intent newActi = new Intent(getApplicationContext(), ConsultaArticulosActivity.class);
-                startActivity(newActi);
-*/
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new PedidosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
+
             case R.id.btnReporteVentasAlDia:
 
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaPedidosSupFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+            case R.id.btnReporteHistVentas:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new HistoricoventasClienteFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

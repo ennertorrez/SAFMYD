@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -39,12 +40,21 @@ import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
 import com.suplidora.sistemas.sisago.Entidades.DptpMuniBarrio;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+
+import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
 
 /**
@@ -59,6 +69,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private static final int REQUEST_READ_PHONE_STATE = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
+    final String urlGetCedula = variables_publicas.direccionIp + "/ServicioClientes.svc/GetCedula/";
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
     private SincronizarDatos sd;
@@ -69,7 +80,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
 
     String IMEI = "";
 
-    private TextView txtIdClienteV;
+    //private Spinner cboClienteVario;
+    private TextView lblIdCv;
     private TextView txtNombreClienteV;
     private EditText txtCodCliente;
     private EditText txtCedula;
@@ -86,9 +98,14 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private Button btnGuardar;
     private Button btnCancelar;
     private DptpMuniBarrio dptoMuniBarrio;
-
+    private String cvId;
+    private String vnomclientevario;
+    private String vcedula;
+    List<HashMap<String, String>> ObtieneCV = null;
+    public static ArrayList<HashMap<String, String>> listaCed;
     java.util.ArrayList<String> CcDptos;
     SpinnerDialog spinnerDialog;
+    public static ArrayList<HashMap<String, String>> lista;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,7 +121,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         DbOpenHelper = new DataBaseOpenHelper(ClientesNew.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
 
-        txtIdClienteV = (TextView) findViewById(R.id.lblIdCV);
+        //cboClienteVario = (Spinner) findViewById(R.id.cboClienteVario);
+        lblIdCv = (TextView) findViewById(R.id.lblIdCV);
         txtNombreClienteV = (TextView) findViewById(R.id.lblNombreClienteV);
         txtCodCliente = (EditText) findViewById(R.id.txtCodCliente);
         txtCedula = (EditText) findViewById(R.id.txtCedulaB);
@@ -137,7 +155,35 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 return true;
             }
         });
+
+
+        cvId = ClientesH.ObtenerClientesVariosId(variables_publicas.usuario.getCodigo());
+        ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
+        lblIdCv.setText("No. Clientes Varios: " + cvId);
+
+        lista = new ArrayList<HashMap<String, String>>();
+        lista=ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
+
+        for (int i = 0; i < lista.size(); i++) {
+            cvId = lista.get(i).get("IdCliente");
+            vnomclientevario=lista.get(i).get("Nombre");
+        }
+        txtNombreClienteV.setText(vnomclientevario);
+        lblIdCv.setText("No. Clientes Varios: " + cvId);
+
         CargaDatosCombo();
+
+        btnBuscarCed.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+//
+                GetDatosCedula();
+                txtNombreCliente.setText(variables_publicas.nombreCed);
+                txtDireccion.setText(variables_publicas.direccionCedula);
+                txtNombreCliente.requestFocus();
+                //focusedControl = "";
+                // }
+            }
+        });
     }
 
     private void CargaDatosCombo() {
@@ -149,18 +195,95 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         ArrayAdapter<DptpMuniBarrio> adapterDpto = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CDptos);
         adapterDpto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         cboDpto.setAdapter(adapterDpto);
-
+        //cboDpto.setSelection(Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
+        dptoMuniBarrio.setNombre_Departamento("MANAGUA");  //(DptpMuniBarrio) Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
         cboDpto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                dptoMuniBarrio.setNombre_Departamento(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getNombre_Departamento());
+                dptoMuniBarrio.setCodigo_Departamento(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Departamento());
+                //cboDpto.setSelection(Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
+
+        final List<DptpMuniBarrio> CMuni;
+        CMuni = ClientesH.ObtenerMunicipios();
+        //CMuni = ClientesH.ObtenerListaMunicipios(dptoMuniBarrio.getNombre_Departamento());
+
+        ArrayAdapter<DptpMuniBarrio> adapterMuni = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CMuni);
+        adapterMuni.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboMuni.setAdapter(adapterMuni);
+
+        cboMuni.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                dptoMuniBarrio.setCodigo_Municipio(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Municipio());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+        final List<DptpMuniBarrio> CBarrio;
+        CBarrio = ClientesH.ObtenerBarrios();
+        //CBarrio = ClientesH.ObtenerListaBarrios(dptoMuniBarrio.getNombre_Departamento());
+
+        ArrayAdapter<DptpMuniBarrio> adapterBarrio = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CBarrio);
+        adapterBarrio.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboBarrio.setAdapter(adapterBarrio);
+
+        cboBarrio.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                dptoMuniBarrio.setCodigo_Barrio(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Barrio());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+        final List<Cliente> CRuta;
+        CRuta = ClientesH.ObtenerListaRutas(variables_publicas.usuario.getCodigo());
+
+        ArrayAdapter<Cliente> adapterRuta = new ArrayAdapter<Cliente>(this, android.R.layout.simple_spinner_item, CRuta);
+        adapterRuta.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        cboRuta.setAdapter(adapterRuta);
+
+        cboRuta.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                //cliente.setRuta(((Cliente) adapter.getItemAtPosition(position)).getRuta());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+        //cboDiaVisita = (Spinner) findViewById(R.id.sp_semana);
+        //Rellenar spinner con datos de ejemplo
+
+        String[] valores = {"LUNES","MARTES","MIERCOLES","JUEVES","VIERNES","SABADO", "DOMINGO"};
+        cboDiaVisita.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, valores));
+        cboDiaVisita.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                // On selecting a spinner item
+                cboDiaVisita.setSelection(Funciones.getIndexSpinner(cboDiaVisita, "LUNES"));
+               // cliente.setFrecuencia(((Cliente) adapter.getItemAtPosition(position)).getFrecuencia());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
     }
     private void SincronizarConfig() {
         if (Build.VERSION.SDK_INT >= 11) {
@@ -171,6 +294,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             new ClientesNew.GetValorConfig().execute();
         }
     }
+
 
     private void ValidarUltimaVersion() {
 
@@ -398,5 +522,55 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         }
 
 
+    }
+    private void GetDatosCedula()  {
+        if (TextUtils.isEmpty(txtCedula.getText().toString())) {
+            txtCedula.setError("Ingrese un número de Cédula.");
+            txtNombreCliente.setText("");
+            txtDireccion.setText("");
+            return;
+        }
+        vcedula= txtCedula.getText().toString().trim();
+                String encodeUrl = "";
+        HttpHandler sh = new HttpHandler();
+
+        String urlString = urlGetCedula + vcedula;
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+            if (jsonStr == null) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula, Respuesta nula GET", variables_publicas.info+urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            } else {
+                Log.e(TAG, "Response from url: " + jsonStr);
+
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray DatosCedula = jsonObj.getJSONArray("GetCedulaResult");
+                 for (int i = 0; i < DatosCedula.length(); i++) {
+                    JSONObject c = DatosCedula.getJSONObject(i);
+
+                     String CodCedula = c.getString("Cedula");
+                     String nomCedula = c.getString("Nombre");
+                     String dirCedula = c.getString("Direccion");
+                     variables_publicas.noCedula=CodCedula;
+                     variables_publicas.nombreCed=nomCedula;
+                     variables_publicas.direccionCedula=dirCedula;
+                }
+            }
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula,Excepcion controlada", variables_publicas.info+ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

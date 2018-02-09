@@ -29,12 +29,18 @@ public class variables_publicas {
     public static String IMEI;
     public static String MensajeError;
     public static  int CantidadItemPromoGaga;
+    public static final String diasventas="Dias";
+    public static final String descMeses="DescMeses";
+
+    public static String noCedula = "";
+    public static String nombreCed = "";
+    public static String direccionCedula = "";
 
     public static final String direccionIp = "http://186.1.18.75:8080";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 68;
+    public static final int DATABASE_VERSION = 72;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -107,6 +113,8 @@ public class variables_publicas {
     public static final String CLIENTES_COLUMN_Detallista = "Detallista";
     public static final String CLIENTES_COLUMN_RutaForanea = "RutaForanea";
     public static final String CLIENTES_COLUMN_EsClienteVarios="EsClienteVarios";
+    public static final String CLIENTES_COLUMN_IdBarrio="IdBarrio";
+    public static final String CLIENTES_COLUMN_TipoNegocio="TipoNegocio";
     public static String VersionSistema = "";
     public static String info = "";
     //Variables CamposTbPedidos

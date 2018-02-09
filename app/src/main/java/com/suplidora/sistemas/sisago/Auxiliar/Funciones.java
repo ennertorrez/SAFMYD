@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Spinner;
 
 import com.suplidora.sistemas.sisago.R;
 
@@ -123,7 +124,17 @@ public class Funciones {
         return false;
     }
 
+    public static int getIndexSpinner(Spinner spinner, String myString)
+    {
+        int index = 0;
 
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)) {
+                index = i;
+            }
+        }
+        return index;
+    }
 
 
     private static boolean isInternetAvailable() {

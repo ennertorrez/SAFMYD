@@ -44,7 +44,7 @@ public class ClientesHelper {
                                       String Ruta ,
                                       String Frecuencia ,
                                       String PrecioEspecial ,
-                                      String FechaUltimaCompra,String Tipo,String CodigoGalatea,String Descuento,String Empleado,String Detallista, String RutaForanea,String EsClienteVarios) {
+                                      String FechaUltimaCompra,String Tipo,String CodigoGalatea,String Descuento,String Empleado,String Detallista, String RutaForanea,String EsClienteVarios, String idBarrio, String tipoNegocio) {
         long rows =0;
 
         ContentValues contentValues = new ContentValues();
@@ -77,6 +77,8 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Detallista, Detallista) ;
         contentValues.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, RutaForanea );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, EsClienteVarios );
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, idBarrio );
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, tipoNegocio );
 
        long inserted= database.insert(variables_publicas.TABLE_CLIENTES, null, contentValues);
         if(inserted!=-1)
@@ -119,6 +121,8 @@ public class ClientesHelper {
         contentValues.put(variables_publicas.CLIENTES_COLUMN_Detallista, cliente.get(variables_publicas.CLIENTES_COLUMN_Detallista) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, cliente.get(variables_publicas.CLIENTES_COLUMN_RutaForanea) );
         contentValues.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, cliente.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios));
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, cliente.get(variables_publicas.CLIENTES_COLUMN_IdBarrio));
+        contentValues.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, cliente.get(variables_publicas.CLIENTES_COLUMN_TipoNegocio));
         database.insert(variables_publicas.TABLE_CLIENTES, null, contentValues);
     }
     public Cursor ObtenerListaClientesCodigo(String Busqueda) {
@@ -167,6 +171,8 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString(c.getColumnIndex("RutaForanea")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString(c.getColumnIndex("EsClienteVarios")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, c.getString(c.getColumnIndex("IdBarrio")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, c.getString(c.getColumnIndex("TipoNegocio")));
                         lst.add(cliente);
 
             }while (c.moveToNext());
@@ -214,6 +220,8 @@ public class ClientesHelper {
                 cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString(c.getColumnIndex("Detallista")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString(c.getColumnIndex("RutaForanea")));
                 cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString(c.getColumnIndex("EsClienteVarios")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, c.getString(c.getColumnIndex("IdBarrio")));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, c.getString(c.getColumnIndex("TipoNegocio")));
                 lst.add(cliente);
 
             }while (c.moveToNext());
@@ -267,7 +275,9 @@ public class ClientesHelper {
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Empleado)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Detallista)),
                         c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_RutaForanea)),
-                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_EsClienteVarios))
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_EsClienteVarios)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdBarrio)),
+                        c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_TipoNegocio))
                 );
             }while (c.moveToNext());
         }
@@ -310,6 +320,121 @@ public class ClientesHelper {
         return list;
     }
 
+    public List<DptpMuniBarrio> ObtenerListaMunicipios( String DesDepto) {
+        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
+        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " WHERE "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + "= '"+ DesDepto + "' ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex("Nombre_Municipio"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+    public List<DptpMuniBarrio> ObtenerMunicipios() {
+        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
+        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + "  ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex("Nombre_Municipio"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    public List<DptpMuniBarrio> ObtenerListaBarrios( String DesDepto) {
+        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
+        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " WHERE "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + "= '"+ DesDepto + "' ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex("Nombre_Barrio"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+    public List<DptpMuniBarrio> ObtenerBarrios( ) {
+        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
+        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new DptpMuniBarrio(
+                        c.getString(c.getColumnIndex("Nombre_Barrio"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
+    public List<Cliente> ObtenerListaRutas( String Idvendedor) {
+        List<Cliente> list = new ArrayList<Cliente>();
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor+ "= '"+ Idvendedor + "' ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new Cliente(
+                        c.getString(c.getColumnIndex("Ruta"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+    public List<Cliente> ObtenerRutas( ) {
+        List<Cliente> list = new ArrayList<Cliente>();
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new Cliente(
+                        c.getString(c.getColumnIndex("Ruta"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+    public ArrayList<HashMap<String, String>> BuscarClientesVarios( String Idvendedor) {
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
+        Cursor c = database.rawQuery(Query, null);
+        ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String,String> dtCliente= new HashMap<>();
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
+                lst.add(dtCliente);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+    public String ObtenerClientesVariosId(String Idvendedor) {
+
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
+        Cursor c = database.rawQuery(Query, null);
+        String numero = "0";
+        if (c.moveToFirst()) {
+            do {
+                numero = c.getString(0);
+
+            } while (c.moveToNext());
+        }
+        c.close();
+        return numero;
+    }
     public boolean GuardarDptosMuniBarrios(String codDpto, String DesDepto,String codMun, String DesMun,String codBarr, String DesBarr){
         long rows = 0;
         ContentValues contentValues = new ContentValues();

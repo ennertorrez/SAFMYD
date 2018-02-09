@@ -64,7 +64,11 @@
             <item
                 android:id="@+id/btnReporteVentasAlDia"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Pre-ventas" />
+                android:title="Reporte Pre-ventas" />
+            <item
+                android:id="@+id/btnReporteHistVentas"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Histórico de Ventas" />
             <item
                 android:id="@+id/btnReporteTermometroCumplimiento"
                 android:icon="@drawable/ic_menu_send"

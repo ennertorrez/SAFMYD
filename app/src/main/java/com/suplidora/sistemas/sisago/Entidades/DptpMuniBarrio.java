@@ -17,7 +17,13 @@ public class DptpMuniBarrio {
     public DptpMuniBarrio(String Nombre_Departamento){
         this.Nombre_Departamento = Nombre_Departamento;
     }
+   /* public DptpMuniBarrio(String Nombre_Municipio){
+        this.Nombre_Municipio = Nombre_Municipio;
+    }
 
+    public DptpMuniBarrio(String Nombre_Barrio){
+        this.Nombre_Barrio = Nombre_Barrio;
+    }*/
     public DptpMuniBarrio(String Codigo_Departamento, String Nombre_Departamento, String Codigo_Municipio, String Nombre_Municipio, String Codigo_Barrio, String Nombre_Barrio) {
         this.Codigo_Departamento = Codigo_Departamento;
         this.Nombre_Departamento = Nombre_Departamento;

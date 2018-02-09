@@ -36,6 +36,8 @@ public class Cliente {
     String Detallista="";
     String RutaForanea="";
     String EsClienteVarios="";
+    String IdBarrio= "";
+    String TipoNegocio= "";
     public Cliente() {
 
     }
@@ -48,7 +50,10 @@ public class Cliente {
         EsClienteVarios = esClienteVarios;
     }
 
-    public Cliente(String idCliente, String codCv, String nombre, String nombreCliente, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra, String tipo, String codigoGalatea, String descuento, String empleado, String detallista, String rutaForanea, String esClienteVarios) {
+    public Cliente(String Ruta) {
+        this.Ruta = Ruta;
+    }
+    public Cliente(String idCliente, String codCv, String nombre, String nombreCliente, String fechaCreacion, String telefono, String direccion, String idDepartamento, String idMunicipio, String ciudad, String ruc, String cedula, String limiteCredito, String idFormaPago, String idVendedor, String excento, String codigoLetra, String ruta, String frecuencia, String precioEspecial, String fechaUltimaCompra, String tipo, String codigoGalatea, String descuento, String empleado, String detallista, String rutaForanea, String esClienteVarios, String idbarrio, String tipoNegocio) {
         IdCliente = idCliente;
         CodCv = codCv;
         Nombre = nombre;
@@ -77,7 +82,8 @@ public class Cliente {
         Detallista=detallista;
         RutaForanea=rutaForanea;
         EsClienteVarios=esClienteVarios;
-
+        IdBarrio= idbarrio;
+        TipoNegocio =tipoNegocio;
     }
 
     public String getIdCliente() {
@@ -278,6 +284,22 @@ public class Cliente {
 
     public void setDetallista(String detallista) {
         Detallista = detallista;
+    }
+
+    public String getIdBarrio() {
+        return IdBarrio;
+    }
+
+    public void setIdBarrio(String idBarrio) {
+        IdBarrio = idBarrio;
+    }
+
+    public String getTipoNegocio() {
+        return TipoNegocio;
+    }
+
+    public void setTipoNegocio(String tipoNegocio) {
+        TipoNegocio = tipoNegocio;
     }
 
     public String getRutaForanea() {

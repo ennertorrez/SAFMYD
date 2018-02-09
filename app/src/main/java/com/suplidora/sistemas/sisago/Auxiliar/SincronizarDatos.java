@@ -212,7 +212,7 @@ public class SincronizarDatos {
         /*******************************CLIENTES******************************/
         //************CLIENTES
 
-        //ObtenerDptosMuniBarrios();
+        ObtenerDptosMuniBarrios();
 
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 3;
@@ -263,7 +263,9 @@ public class SincronizarDatos {
                 String Detallista = c.getString("Detallista");
                 String RutaForanea = c.getString("RutaForanea");
                 String EsClienteVarios = c.getString("EsClienteVarios");
-                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado, Detallista, RutaForanea, EsClienteVarios);
+                String IdBarrio = c.getString("IdBarrio");
+                String TipoNegocio = c.getString("TipoNegocio");
+                ClientesH.GuardarTotalClientes(IdCliente, CodCv, Nombre, NombreCliente, FechaCreacion, Telefono, Direccion, IdDepartamento, IdMunicipio, Ciudad, Ruc, Cedula, LimiteCredito, IdFormaPago, IdVendedor, Excento, CodigoLetra, Ruta, Frecuencia, PrecioEspecial, FechaUltimaCompra, Tipo, CodigoGalatea, Descuento, Empleado, Detallista, RutaForanea, EsClienteVarios,IdBarrio,TipoNegocio);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;

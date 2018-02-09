@@ -202,7 +202,6 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString("Tipo"));
 
-
                         if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
                             cliente.put("CodCv2", "");
                             cliente.put("NombreCompleto", c.getString("NombreCliente"));
@@ -210,7 +209,8 @@ public class ClientesFragment extends Fragment {
                             cliente.put("CodCv2","Cod_Cv: "+ c.getString("CodCv"));
                             cliente.put("NombreCompleto",c.getString("Nombre")+ " / " + c.getString("NombreCliente"));
                         }
-
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, c.getString("IdBarrio"));
+                        cliente.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, c.getString("TipoNegocio"));
 
                         listaClientes.add(cliente);
                     }
