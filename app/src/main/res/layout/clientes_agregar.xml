@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
 
-    tools:context=".Pedidos.PedidosActivity">
+    tools:context=".Clientes.ClientesNew">
 
     <ScrollView
         android:id="@+id/scrollView1"
@@ -114,7 +114,7 @@
                         android:hint="Direccion"
                         android:inputType="textMultiLine"
                         android:scrollbars = "vertical"
-                        android:maxLines="1"></EditText>
+                        android:maxLines="4"></EditText>
                 </LinearLayout>
             </LinearLayout>
 

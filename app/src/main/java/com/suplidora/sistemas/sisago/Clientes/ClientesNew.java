@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.support.annotation.StringDef;
 import android.telephony.TelephonyManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,6 +46,7 @@ import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
 import com.suplidora.sistemas.sisago.Entidades.DptpMuniBarrio;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 
 import java.net.URI;
@@ -61,7 +63,7 @@ import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
  * Created by Sistemas on 14/12/2017.
  */
 
-public class ClientesNew extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class ClientesNew extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private String TAG = ClientesNew.class.getSimpleName();
     private Button btnBuscar;
@@ -70,6 +72,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
     final String urlGetCedula = variables_publicas.direccionIp + "/ServicioClientes.svc/GetCedula/";
+    final String urlGetIdClienteNuevo = variables_publicas.direccionIp + "/ServicioClientes.svc/ObtenerIdClienteNuevo/";
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
     private SincronizarDatos sd;
@@ -77,7 +80,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     static final String KEY_IdClienteV = "IdCliente";
     static final String KEY_NombreClienteV = "Nombre";
     private String focusedControl = "";
-
+    public boolean vEditando = false;
     String IMEI = "";
 
     //private Spinner cboClienteVario;
@@ -101,6 +104,11 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private String cvId;
     private String vnomclientevario;
     private String vcedula;
+    private String vtipo = "1";
+    private String vFrecuencia = "LUNES";
+    private String vRuta = "MA_101";
+    private String vtipoNeg = "Pulpería";
+
     List<HashMap<String, String>> ObtieneCV = null;
     public static ArrayList<HashMap<String, String>> listaCed;
     java.util.ArrayList<String> CcDptos;
@@ -134,14 +142,19 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         cboDiaVisita = (Spinner) findViewById(R.id.cboDiasVisita);
         cboRuta = (Spinner) findViewById(R.id.cboRutaCliente);
         cboTipoNeg = (Spinner) findViewById(R.id.cboTipoNeg);
-        txtTelefono =(EditText) findViewById(R.id.txtTelefono);
+        txtTelefono = (EditText) findViewById(R.id.txtTelefono);
         txtCedula.setFocusable(true);
         txtCodCliente.setEnabled(false);
 
         btnBuscarCed = (Button) findViewById(R.id.btnBusCedCliente);
         btnGuardar = (Button) findViewById(R.id.btnGuardarCli);
         btnCancelar = (Button) findViewById(R.id.btnCancelarCli);
-
+        btnCancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClientesNew.this.onBackPressed();
+            }
+        });
         sd = new SincronizarDatos(DbOpenHelper, ClientesH);
 
         txtCedula.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -156,23 +169,30 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             }
         });
 
+        if (vEditando == false) {
 
-        cvId = ClientesH.ObtenerClientesVariosId(variables_publicas.usuario.getCodigo());
-        ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
-        lblIdCv.setText("No. Clientes Varios: " + cvId);
+           /* cvId = ClientesH.ObtenerClientesVariosId(variables_publicas.usuario.getCodigo());
+            ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
+            lblIdCv.setText("No. Clientes Varios: " + cvId);*/
 
-        lista = new ArrayList<HashMap<String, String>>();
-        lista=ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
+            lista = new ArrayList<HashMap<String, String>>();
+            lista = ClientesH.BuscarClientesVarios(variables_publicas.usuario.getCodigo());
 
-        for (int i = 0; i < lista.size(); i++) {
-            cvId = lista.get(i).get("IdCliente");
-            vnomclientevario=lista.get(i).get("Nombre");
+            for (int i = 0; i < lista.size(); i++) {
+                cvId = lista.get(i).get("IdCliente");
+                vnomclientevario = lista.get(i).get("Nombre");
+            }
+            txtNombreClienteV.setText(vnomclientevario);
+            lblIdCv.setText("No. Clientes Varios: " + cvId);
+
+            if (cvId.equals("")) {
+                vtipo = "2";
+            }
+            GetIdCliente();
+            CargaDatosCombo();
+        } else {
+            CargaDatosComboEdit();
         }
-        txtNombreClienteV.setText(vnomclientevario);
-        lblIdCv.setText("No. Clientes Varios: " + cvId);
-
-        CargaDatosCombo();
-
         btnBuscarCed.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 //
@@ -186,37 +206,35 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         });
     }
 
+    private void CargaDatosComboEdit() {
+
+    }
+
     private void CargaDatosCombo() {
 
         //Combo Carga
         final List<DptpMuniBarrio> CDptos;
-        CDptos = ClientesH.ObtenerListaDepartamentos2();
+        CDptos = ClientesH.ObtenerListaDepartamentos();
 
         ArrayAdapter<DptpMuniBarrio> adapterDpto = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CDptos);
-        adapterDpto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterDpto.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboDpto.setAdapter(adapterDpto);
         //cboDpto.setSelection(Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
         dptoMuniBarrio.setNombre_Departamento("MANAGUA");  //(DptpMuniBarrio) Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
         cboDpto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
+                int item = position;
+                String itemval = adapter.getItemAtPosition(position).toString();
+                CargarMunicipios(itemval);
+                CargarBarrios(itemval);
                 dptoMuniBarrio.setCodigo_Departamento(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Departamento());
-                //cboDpto.setSelection(Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-
-        final List<DptpMuniBarrio> CMuni;
-        CMuni = ClientesH.ObtenerMunicipios();
-        //CMuni = ClientesH.ObtenerListaMunicipios(dptoMuniBarrio.getNombre_Departamento());
-
-        ArrayAdapter<DptpMuniBarrio> adapterMuni = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CMuni);
-        adapterMuni.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboMuni.setAdapter(adapterMuni);
 
         cboMuni.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -229,13 +247,6 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-        final List<DptpMuniBarrio> CBarrio;
-        CBarrio = ClientesH.ObtenerBarrios();
-        //CBarrio = ClientesH.ObtenerListaBarrios(dptoMuniBarrio.getNombre_Departamento());
-
-        ArrayAdapter<DptpMuniBarrio> adapterBarrio = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CBarrio);
-        adapterBarrio.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        cboBarrio.setAdapter(adapterBarrio);
 
         cboBarrio.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -248,35 +259,31 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-        final List<Cliente> CRuta;
+
+        final List<String> CRuta;
         CRuta = ClientesH.ObtenerListaRutas(variables_publicas.usuario.getCodigo());
 
-        ArrayAdapter<Cliente> adapterRuta = new ArrayAdapter<Cliente>(this, android.R.layout.simple_spinner_item, CRuta);
-        adapterRuta.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapterRuta = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, CRuta);
+        adapterRuta.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboRuta.setAdapter(adapterRuta);
-
         cboRuta.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-                //cliente.setRuta(((Cliente) adapter.getItemAtPosition(position)).getRuta());
+                vRuta = adapter.getItemAtPosition(position).toString();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-        //cboDiaVisita = (Spinner) findViewById(R.id.sp_semana);
-        //Rellenar spinner con datos de ejemplo
 
-        String[] valores = {"LUNES","MARTES","MIERCOLES","JUEVES","VIERNES","SABADO", "DOMINGO"};
+        String[] valores = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"};
         cboDiaVisita.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, valores));
+        cboDiaVisita.setSelection(Funciones.getIndexSpinner(cboDiaVisita, "LUNES"));
         cboDiaVisita.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-                cboDiaVisita.setSelection(Funciones.getIndexSpinner(cboDiaVisita, "LUNES"));
-               // cliente.setFrecuencia(((Cliente) adapter.getItemAtPosition(position)).getFrecuencia());
+                vFrecuencia = adapter.getItemAtPosition(position).toString();
             }
 
             @Override
@@ -284,7 +291,38 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             }
         });
 
+        String[] valoresTipoNeg = {"Pulpería", "Hogar con Venta", "Farmacia", "Comedor", "Variedades", "Distribuidora", "Restaurante", "Cafetín",
+                "Hotel", "Ferretería", "Panadería", "Barbería", "Bar", "Veterinaria", "Gasolinera", "Licorería", "Tienda", "Otros"};
+        cboTipoNeg.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, valoresTipoNeg));
+        cboTipoNeg.setSelection(Funciones.getIndexSpinner(cboTipoNeg, "Pulpería"));
+        cboTipoNeg.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                vtipoNeg = adapter.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
     }
+
+    private void CargarMunicipios(String vDepartamento) {
+        final List<DptpMuniBarrio> CMuni;
+        CMuni = ClientesH.ObtenerListaMunicipios(vDepartamento);
+        ArrayAdapter<DptpMuniBarrio> adapterMuni = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CMuni);
+        adapterMuni.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboMuni.setAdapter(adapterMuni);
+    }
+
+    private void CargarBarrios(String vDepartamento) {
+        final List<DptpMuniBarrio> CBarrio;
+        CBarrio = ClientesH.ObtenerListaBarrios(vDepartamento);
+        ArrayAdapter<DptpMuniBarrio> adapterBarrio = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CBarrio);
+        adapterBarrio.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboBarrio.setAdapter(adapterBarrio);
+    }
+
     private void SincronizarConfig() {
         if (Build.VERSION.SDK_INT >= 11) {
             //--post GB use serial executor by default --
@@ -294,7 +332,6 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             new ClientesNew.GetValorConfig().execute();
         }
     }
-
 
     private void ValidarUltimaVersion() {
 
@@ -314,6 +351,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             e.printStackTrace();
         }
     }
+
     //region ObtieneValorConfiguracion
     private class GetValorConfig extends AsyncTask<Void, Void, Void> {
         @Override
@@ -381,6 +419,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             return null;
         }
     }
+
     private String getCurrentVersion() {
         PackageManager pm = this.getPackageManager();
         PackageInfo pInfo = null;
@@ -462,6 +501,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                     MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
         }
     }
+
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
 
@@ -523,15 +563,16 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
 
 
     }
-    private void GetDatosCedula()  {
+
+    private void GetDatosCedula() {
         if (TextUtils.isEmpty(txtCedula.getText().toString())) {
             txtCedula.setError("Ingrese un número de Cédula.");
             txtNombreCliente.setText("");
             txtDireccion.setText("");
             return;
         }
-        vcedula= txtCedula.getText().toString().trim();
-                String encodeUrl = "";
+        vcedula = txtCedula.getText().toString().trim();
+        String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
 
         String urlString = urlGetCedula + vcedula;
@@ -546,31 +587,83 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
 
             String jsonStr = sh.makeServiceCall(encodeUrl);
             if (jsonStr == null) {
-                new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula, Respuesta nula GET", variables_publicas.info+urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula, Respuesta nula GET", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             } else {
                 Log.e(TAG, "Response from url: " + jsonStr);
 
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
                 JSONArray DatosCedula = jsonObj.getJSONArray("GetCedulaResult");
-                 for (int i = 0; i < DatosCedula.length(); i++) {
+                for (int i = 0; i < DatosCedula.length(); i++) {
                     JSONObject c = DatosCedula.getJSONObject(i);
 
-                     String CodCedula = c.getString("Cedula");
-                     String nomCedula = c.getString("Nombre");
-                     String dirCedula = c.getString("Direccion");
-                     variables_publicas.noCedula=CodCedula;
-                     variables_publicas.nombreCed=nomCedula;
-                     variables_publicas.direccionCedula=dirCedula;
+                    String CodCedula = c.getString("Cedula");
+                    String nomCedula = c.getString("Nombre");
+                    String dirCedula = c.getString("Direccion");
+                    variables_publicas.noCedula = CodCedula;
+                    variables_publicas.nombreCed = nomCedula;
+                    variables_publicas.direccionCedula = dirCedula;
                 }
             }
         } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula,Excepcion controlada", variables_publicas.info+ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener los datos de la cédula,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
 
         }
     }
+
+    private void GetIdCliente() {
+        if (TextUtils.isEmpty(lblIdCv.getText().toString())) {
+            vtipo = "2";
+        }
+        String encodeUrl = "";
+        HttpHandler sh = new HttpHandler();
+
+        String urlString = urlGetIdClienteNuevo + vtipo;
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+            if (jsonStr == null) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener el Nuevo Id de Cliente, Respuesta nula GET", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            } else {
+                Log.e(TAG, "Response from url: " + jsonStr);
+
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                String resultState = (String) ((String) jsonObj.get("ObtenerIdClienteNuevoResult")).split(",")[0];
+                String NoCliente = (String) ((String) jsonObj.get("ObtenerIdClienteNuevoResult")).split(",")[1];
+                if (resultState.equals("true")) {
+                    txtCodCliente.setText(NoCliente);
+
+                }
+            }
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al obtener el Nuevo Id de Cliente, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
     }
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage("Esta seguro que desea cancelar el Registro de Cliente?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ClientesNew.this.finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
 }
+

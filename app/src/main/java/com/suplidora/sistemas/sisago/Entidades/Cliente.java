@@ -8,36 +8,36 @@ import org.jsoup.nodes.Entities;
 
 public class Cliente {
 
-    String IdCliente = "";
-    String CodCv= "";
-    String Nombre= "";
-    String NombreCliente="";
-    String FechaCreacion = "";
-    String Telefono = "";
-    String Direccion = "";
-    String IdDepartamento= "";
-    String IdMunicipio = "";
-    String Ciudad = "";
-    String Ruc= "";
-    String Cedula= "";
-    String LimiteCredito= "";
-    String IdFormaPago= "";
-    String IdVendedor= "";
-    String Excento= "";
-    String CodigoLetra= "";
-    String Ruta= "";
-    String Frecuencia= "";
-    String PrecioEspecial= "";
-    String FechaUltimaCompra= "";
-    String Tipo="";
-    String CodigoGalatea="";
-    String Descuento="";
-    String Empleado="";
-    String Detallista="";
-    String RutaForanea="";
-    String EsClienteVarios="";
-    String IdBarrio= "";
-    String TipoNegocio= "";
+    private String IdCliente = "";
+    private String CodCv= "";
+    private String Nombre= "";
+    private String NombreCliente="";
+    private String FechaCreacion = "";
+    private String Telefono = "";
+    private String Direccion = "";
+    private String IdDepartamento= "";
+    private String IdMunicipio = "";
+    private String Ciudad = "";
+    private String Ruc= "";
+    private String Cedula= "";
+    private String LimiteCredito= "";
+    private String IdFormaPago= "";
+    private String IdVendedor= "";
+    private String Excento= "";
+    private String CodigoLetra= "";
+    private String Ruta= "";
+    private  String Frecuencia= "";
+    private String PrecioEspecial= "";
+    private String FechaUltimaCompra= "";
+    private String Tipo="";
+    private String CodigoGalatea="";
+    private String Descuento="";
+    private String Empleado="";
+    private String Detallista="";
+    private String RutaForanea="";
+    private String EsClienteVarios="";
+    private String IdBarrio= "";
+    private String TipoNegocio= "";
     public Cliente() {
 
     }

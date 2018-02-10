@@ -5,12 +5,12 @@ package com.suplidora.sistemas.sisago.Entidades;
  */
 
 public class DptpMuniBarrio {
-    private String Codigo_Departamento;
-    private String Nombre_Departamento;
-    private String Codigo_Municipio;
-    private String Nombre_Municipio;
-    private String Codigo_Barrio;
-    private String Nombre_Barrio;
+    private String Codigo_Departamento="";
+    private String Nombre_Departamento="";
+    private String Codigo_Municipio="";
+    private String Nombre_Municipio="";
+    private String Codigo_Barrio="";
+    private String Nombre_Barrio="";
 
     public DptpMuniBarrio() {
     }

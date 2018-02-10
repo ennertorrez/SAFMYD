@@ -284,28 +284,8 @@ public class ClientesHelper {
 
         return cli;
     }
-    public ArrayList<DptpMuniBarrio> ObtenerListaDepartamentos() {
-        DptpMuniBarrio Departamento = null;
-        ArrayList<DptpMuniBarrio> lst = new ArrayList<>();
-        String Query = "SELECT * FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento+";";
-        Cursor c = database.rawQuery(Query, null);
-        if (c.moveToFirst()) {
-            do {
-                Departamento = new DptpMuniBarrio(
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento)),
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento)),
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio)),
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio)),
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio)),
-                        c.getString(c.getColumnIndex(variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio)));
-                lst.add(Departamento);
-            } while (c.moveToNext());
-        }
-        c.close();
-        return lst;
-    }
 
-    public List<DptpMuniBarrio> ObtenerListaDepartamentos2() {
+    public List<DptpMuniBarrio> ObtenerListaDepartamentos() {
         List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
         String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento+";";
         Cursor c = database.rawQuery(Query, null);
@@ -334,39 +314,12 @@ public class ClientesHelper {
         c.close();
         return list;
     }
-    public List<DptpMuniBarrio> ObtenerMunicipios() {
-        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
-        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + "  ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio+";";
-        Cursor c = database.rawQuery(Query, null);
-        if (c.moveToFirst()) {
-            do {
-                list.add(new DptpMuniBarrio(
-                        c.getString(c.getColumnIndex("Nombre_Municipio"))
-                ));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return list;
-    }
 
     public List<DptpMuniBarrio> ObtenerListaBarrios( String DesDepto) {
         List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
         String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " WHERE "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + "= '"+ DesDepto + "' ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
         Cursor c = database.rawQuery(Query, null);
-        if (c.moveToFirst()) {
-            do {
-                list.add(new DptpMuniBarrio(
-                        c.getString(c.getColumnIndex("Nombre_Barrio"))
-                ));
-            } while (c.moveToNext());
-        }
-        c.close();
-        return list;
-    }
-    public List<DptpMuniBarrio> ObtenerBarrios( ) {
-        List<DptpMuniBarrio> list = new ArrayList<DptpMuniBarrio>();
-        String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
-        Cursor c = database.rawQuery(Query, null);
+        c.getCount();
         if (c.moveToFirst()) {
             do {
                 list.add(new DptpMuniBarrio(
@@ -378,33 +331,29 @@ public class ClientesHelper {
         return list;
     }
 
-    public List<Cliente> ObtenerListaRutas( String Idvendedor) {
-        List<Cliente> list = new ArrayList<Cliente>();
-        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor+ "= '"+ Idvendedor + "' ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";";
-        Cursor c = database.rawQuery(Query, null);
-        if (c.moveToFirst()) {
-            do {
-                list.add(new Cliente(
-                        c.getString(c.getColumnIndex("Ruta"))
-                ));
-            } while (c.moveToNext());
+    public List<String>  ObtenerListaRutas(String Idvendedor) {
+        Cursor c= database.rawQuery("SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor+ "= '"+ Idvendedor + "' ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";", null);
+        List<String> lst= new ArrayList<String>();
+
+        if(c.moveToFirst()){
+            do{
+                lst.add(c.getString(c.getColumnIndex("Ruta")));
+            }while (c.moveToNext());
         }
         c.close();
-        return list;
+        return  lst;
     }
-    public List<Cliente> ObtenerRutas( ) {
-        List<Cliente> list = new ArrayList<Cliente>();
-        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";";
-        Cursor c = database.rawQuery(Query, null);
-        if (c.moveToFirst()) {
-            do {
-                list.add(new Cliente(
-                        c.getString(c.getColumnIndex("Ruta"))
-                ));
-            } while (c.moveToNext());
+
+    public List<String> ObtenerRutas( ) {
+        Cursor c= database.rawQuery("SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";",null);
+        List<String> lst= new ArrayList<String>();
+        if(c.moveToFirst()){
+            do{
+                lst.add(c.getString(c.getColumnIndex("Ruta")));
+            }while (c.moveToNext());
         }
         c.close();
-        return list;
+        return  lst;
     }
     public ArrayList<HashMap<String, String>> BuscarClientesVarios( String Idvendedor) {
         String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
@@ -435,6 +384,7 @@ public class ClientesHelper {
         c.close();
         return numero;
     }
+
     public boolean GuardarDptosMuniBarrios(String codDpto, String DesDepto,String codMun, String DesMun,String codBarr, String DesBarr){
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -453,5 +403,20 @@ public class ClientesHelper {
         long deletedrows=  database.delete( variables_publicas.TABLE_DPTOMUNIBARRIOS,null,null);
         Log.d("DPTOMUNIBARRIOS_deleted", "Datos eliminados");
         return deletedrows!=-1;
+    }
+    public ArrayList<HashMap<String, String>> ObtenerClienteCedula( String vCedula) {
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ vCedula + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
+        Cursor c = database.rawQuery(Query, null);
+        ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String,String> dtCliente= new HashMap<>();
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
+                lst.add(dtCliente);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
 }
