@@ -3,11 +3,13 @@ package com.suplidora.sistemas.sisago.Clientes;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 import android.support.annotation.StringDef;
 import android.telephony.TelephonyManager;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -35,6 +38,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
@@ -44,7 +48,9 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.ConsolidadoCarga;
-import com.suplidora.sistemas.sisago.Entidades.DptpMuniBarrio;
+import com.suplidora.sistemas.sisago.Entidades.Departamentos;
+import com.suplidora.sistemas.sisago.Entidades.Municipios;
+import com.suplidora.sistemas.sisago.Entidades.Barrios;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
@@ -82,8 +88,13 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private String focusedControl = "";
     public boolean vEditando = false;
     String IMEI = "";
+    private String jsonCliente = "";
+    private boolean editar = false;
+    private boolean guardadoOK = false;
+    private ProgressDialog pDialog;
+    AlertDialog alertDialog;
+    private int IdDepartamento;
 
-    //private Spinner cboClienteVario;
     private TextView lblIdCv;
     private TextView txtNombreClienteV;
     private EditText txtCodCliente;
@@ -100,7 +111,9 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private Button btnBuscarCed;
     private Button btnGuardar;
     private Button btnCancelar;
-    private DptpMuniBarrio dptoMuniBarrio;
+    private Departamentos dpto;
+    private Municipios muni;
+    private Barrios barrios;
     private String cvId;
     private String vnomclientevario;
     private String vcedula;
@@ -108,6 +121,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private String vFrecuencia = "LUNES";
     private String vRuta = "MA_101";
     private String vtipoNeg = "Pulpería";
+    private boolean finalizar = false;
+    private String codletraCliente;
 
     List<HashMap<String, String>> ObtieneCV = null;
     public static ArrayList<HashMap<String, String>> listaCed;
@@ -119,7 +134,10 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.clientes_agregar);
 
-        dptoMuniBarrio = new DptpMuniBarrio();
+        dpto = new Departamentos();
+        muni = new Municipios();
+        barrios = new Barrios();
+        cliente= new Cliente();
 
         ValidarUltimaVersion();
         if (isOnline) {
@@ -182,12 +200,13 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 cvId = lista.get(i).get("IdCliente");
                 vnomclientevario = lista.get(i).get("Nombre");
             }
+            if (cvId == null) {
+                vtipo = "2";
+                cvId="";
+            }
             txtNombreClienteV.setText(vnomclientevario);
             lblIdCv.setText("No. Clientes Varios: " + cvId);
 
-            if (cvId.equals("")) {
-                vtipo = "2";
-            }
             GetIdCliente();
             CargaDatosCombo();
         } else {
@@ -204,8 +223,268 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 // }
             }
         });
+        btnGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (TextUtils.isEmpty(txtNombreCliente.getText().toString())) {
+                        txtNombreCliente.setError("Ingrese un nombre de Cliente.");
+                        return;
+                    }
+                    if (TextUtils.isEmpty(txtCedula.getText().toString())) {
+                        txtCedula.setError("Ingrese un número de Cédula.");
+                        return;
+                    }
+                    if (TextUtils.isEmpty(txtDireccion.getText().toString())) {
+                        txtDireccion.setError("Ingrese una dirección.");
+                        return;
+                    }
+                    Guardar();
+                } catch (Exception e) {
+                    DbOpenHelper.database.endTransaction();
+                    //MensajeAviso(e.getMessage());
+                }
+            }
+        });
     }
 
+    private boolean Guardar() {
+
+        String mensaje = "";
+            mensaje = "Esta seguro que desea guardar el Cliente?";
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        DbOpenHelper.database.beginTransaction();
+                        if (GuardarCliente()) {
+                            DbOpenHelper.database.setTransactionSuccessful();
+                            DbOpenHelper.database.endTransaction();
+                            SincronizarCiente(ClientesH.ObtenerClienteGuardado(cliente.getIdCliente()));
+                        } else {
+                            DbOpenHelper.database.endTransaction();
+                        }
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+        return true;
+    }
+    private boolean GuardarCliente() {
+
+        cliente.setIdDepartamento(dpto.getCodigo_Departamento());
+        if (cvId.equals("")){
+            cliente.setIdCliente(txtCodCliente.getText().toString());
+            cliente.setCodCv("0");
+            cliente.setNombre(txtNombreCliente.getText().toString());
+            cliente.setNombreCliente(txtNombreCliente.getText().toString());
+            codletraCliente="1102-01-" + dpto.getCodigo_Departamento() + "-" + cliente.getIdCliente().toString();
+       }else {
+            cliente.setIdCliente(cvId);
+            cliente.setCodCv(txtCodCliente.getText().toString().trim());
+            cliente.setNombre(txtNombreClienteV.getText().toString().trim());
+            cliente.setNombreCliente(txtNombreCliente.getText().toString().trim());
+            codletraCliente="1102-01-" + dpto.getCodigo_Departamento() + "-" + cliente.getCodCv().toString();
+        }
+        cliente.setFechaCreacion(variables_publicas.FechaActual);
+        cliente.setTelefono(txtTelefono.getText().toString());
+        cliente.setDireccion(txtDireccion.getText().toString());
+
+        cliente.setIdMunicipio(muni.getCodigo_Municipio());
+        cliente.setCiudad(muni.getNombre_Municipio());
+
+
+        cliente.setRuc("");
+        cliente.setCedula(txtCedula.getText().toString());
+        cliente.setLimiteCredito("0");
+        cliente.setIdFormaPago("115");
+        if (vEditando== false) {
+            cliente.setIdVendedor(variables_publicas.usuario.getCodigo());
+        }
+        cliente.setExcento("false");
+        cliente.setCodigoLetra(codletraCliente);
+        cliente.setRuta(vRuta);
+        cliente.setFrecuencia(vFrecuencia);
+        cliente.setPrecioEspecial("false");
+        cliente.setFechaUltimaCompra(variables_publicas.FechaActual);
+        if (vEditando== false) {
+            cliente.setTipo("Detalle");
+        }
+        cliente.setCodigoGalatea("NULL");
+        cliente.setDescuento("0");
+        cliente.setEmpleado("0");
+        if (vEditando== false) {
+            cliente.setDetallista("True");
+        }
+        cliente.setRutaForanea("true");
+        cliente.setEsClienteVarios("true");
+        cliente.setIdBarrio(barrios.getCodigo_Barrio());
+        cliente.setTipoNegocio(vtipoNeg);
+
+        if (lblIdCv.equals("")){
+            ClientesH.EliminaCliente(cliente.getIdCliente());
+        }else {
+            ClientesH.EliminaClienteVarios(cliente.getCodCv());
+        }
+
+
+        IMEI = variables_publicas.IMEI;
+        if (IMEI == null) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmación Requerida")
+                    .setMessage("Es necesario configurar el permiso \"Administrar llamadas telefonicas\" para porder guardar un Cliente, Desea continuar ? ")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                            loadIMEI();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return false;
+
+        }
+        Funciones.GetLocalDateTime();
+
+
+        boolean saved = ClientesH.GuardarTotalClientes(cliente.getIdCliente(), cliente.getCodCv(), cliente.getNombre(), cliente.getNombreCliente(), cliente.getFechaCreacion(), cliente.getTelefono(),
+                        cliente.getDireccion(), cliente.getIdDepartamento(), cliente.getIdMunicipio(), cliente.getCiudad(), cliente.getRuc(), cliente.getCedula(), cliente.getLimiteCredito(),
+                        cliente.getIdFormaPago(), cliente.getIdVendedor(), cliente.getExcento(), cliente.getCodigoLetra(), cliente.getRuta(), cliente.getFrecuencia(), cliente.getPrecioEspecial(),
+                        cliente.getFechaUltimaCompra(), cliente.getTipo(), cliente.getCodigoGalatea(), cliente.getDescuento(), cliente.getEmpleado(), cliente.getDetallista(), cliente.getRutaForanea(),
+                        cliente.getEsClienteVarios(), cliente.getIdBarrio(), cliente.getTipoNegocio());
+
+        if (!saved) {
+            MensajeAviso("Ha Ocurrido un error al guardar los datos");
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean SincronizarCiente(HashMap<String, String> clientevalor) {
+        Gson gson = new Gson();
+
+        jsonCliente = gson.toJson(clientevalor);
+
+        try {
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new SincronizarClientes().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new SincronizarClientes().execute();
+            }
+        } catch (final Exception ex) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            ex.getMessage(),
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+
+        return false;
+    }
+    private class SincronizarClientes extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(ClientesNew.this);
+            pDialog.setMessage("Guardando datos, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            CheckConnectivity();
+            if (isOnline) {
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarClientesTotal(cliente,  jsonCliente, (editar == true )).split(",")[0])) {
+                    guardadoOK = true;
+                }
+            } else {
+                guardadoOK = false;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (ClientesNew.this.isFinishing() == false) {
+                MostrarMensajeGuardar();
+            }
+
+        }
+    }
+
+    public void MensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (finalizar) {
+                    finish();
+                }
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
+
+    public void MostrarMensajeGuardar() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = null;
+        dialogBuilder.setCancelable(false);
+        if (guardadoOK) {
+            dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
+
+            Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
+            btnOK.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+
+            dialogView = inflater.inflate(R.layout.offline_layout, null);
+            dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+        }
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
     private void CargaDatosComboEdit() {
 
     }
@@ -213,14 +492,14 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private void CargaDatosCombo() {
 
         //Combo Carga
-        final List<DptpMuniBarrio> CDptos;
+        final List<Departamentos> CDptos;
         CDptos = ClientesH.ObtenerListaDepartamentos();
 
-        ArrayAdapter<DptpMuniBarrio> adapterDpto = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CDptos);
+        ArrayAdapter<Departamentos> adapterDpto = new ArrayAdapter<Departamentos>(this, android.R.layout.simple_spinner_item, CDptos);
         adapterDpto.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboDpto.setAdapter(adapterDpto);
         //cboDpto.setSelection(Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
-        dptoMuniBarrio.setNombre_Departamento("MANAGUA");  //(DptpMuniBarrio) Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
+       // dptoMuniBarrio.setNombre_Departamento("MANAGUA");  //(DptpMuniBarrio) Funciones.getIndexSpinner(cboDpto, "MANAGUA"));
         cboDpto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
@@ -228,7 +507,9 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 String itemval = adapter.getItemAtPosition(position).toString();
                 CargarMunicipios(itemval);
                 CargarBarrios(itemval);
-                dptoMuniBarrio.setCodigo_Departamento(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Departamento());
+               // dptoMuniBarrio = (Departamentos) adapter.getItemAtPosition(position);
+               // IdDepartamento = Integer.parseInt(dptoMuniBarrio.getCodigo_Departamento());
+                dpto.setCodigo_Departamento(((Departamentos) adapter.getItemAtPosition(position)).getCodigo_Departamento());
             }
 
             @Override
@@ -240,7 +521,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                dptoMuniBarrio.setCodigo_Municipio(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Municipio());
+                muni.setCodigo_Municipio(((Municipios) adapter.getItemAtPosition(position)).getCodigo_Municipio());
             }
 
             @Override
@@ -252,7 +533,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                dptoMuniBarrio.setCodigo_Barrio(((DptpMuniBarrio) adapter.getItemAtPosition(position)).getCodigo_Barrio());
+                barrios.setCodigo_Barrio(((Barrios) adapter.getItemAtPosition(position)).getCodigo_Barrio());
             }
 
             @Override
@@ -308,17 +589,17 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     }
 
     private void CargarMunicipios(String vDepartamento) {
-        final List<DptpMuniBarrio> CMuni;
+        final List<Municipios> CMuni;
         CMuni = ClientesH.ObtenerListaMunicipios(vDepartamento);
-        ArrayAdapter<DptpMuniBarrio> adapterMuni = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CMuni);
+        ArrayAdapter<Municipios> adapterMuni = new ArrayAdapter<Municipios>(this, android.R.layout.simple_spinner_item, CMuni);
         adapterMuni.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboMuni.setAdapter(adapterMuni);
     }
 
     private void CargarBarrios(String vDepartamento) {
-        final List<DptpMuniBarrio> CBarrio;
+        final List<Barrios> CBarrio;
         CBarrio = ClientesH.ObtenerListaBarrios(vDepartamento);
-        ArrayAdapter<DptpMuniBarrio> adapterBarrio = new ArrayAdapter<DptpMuniBarrio>(this, android.R.layout.simple_spinner_item, CBarrio);
+        ArrayAdapter<Barrios> adapterBarrio = new ArrayAdapter<Barrios>(this, android.R.layout.simple_spinner_item, CBarrio);
         adapterBarrio.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboBarrio.setAdapter(adapterBarrio);
     }
@@ -594,15 +875,22 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
                 JSONArray DatosCedula = jsonObj.getJSONArray("GetCedulaResult");
-                for (int i = 0; i < DatosCedula.length(); i++) {
-                    JSONObject c = DatosCedula.getJSONObject(i);
 
-                    String CodCedula = c.getString("Cedula");
-                    String nomCedula = c.getString("Nombre");
-                    String dirCedula = c.getString("Direccion");
-                    variables_publicas.noCedula = CodCedula;
-                    variables_publicas.nombreCed = nomCedula;
-                    variables_publicas.direccionCedula = dirCedula;
+                if (DatosCedula.length()> 0) {
+                    for (int i = 0; i < DatosCedula.length(); i++) {
+                        JSONObject c = DatosCedula.getJSONObject(i);
+
+                        String CodCedula = c.getString("Cedula");
+                        String nomCedula = c.getString("Nombre");
+                        String dirCedula = c.getString("Direccion");
+                        variables_publicas.noCedula = CodCedula;
+                        variables_publicas.nombreCed = nomCedula;
+                        variables_publicas.direccionCedula = dirCedula;
+                    }
+                }else {
+                    variables_publicas.noCedula = "";
+                    variables_publicas.nombreCed = "";
+                    variables_publicas.direccionCedula = "";
                 }
             }
         } catch (Exception ex) {

@@ -1138,5 +1138,54 @@ public class SincronizarDatos {
 
     }
 
+    public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente, boolean Editar) {
+
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+        Gson gson = new Gson();
+
+        final String urlCliente = variables_publicas.direccionIp + "/ServicioClientes.svc/SincronizarClienteTotal/";
+        final String urlStringDetalle = urlCliente + cliente.getIdCliente() + "/" + String.valueOf(Editar) + "/" + cliente.getCodCv() + "/" + jsonCliente;
+
+
+        HashMap<String,String> postData = new HashMap<>();
+        postData.put("Editar",String.valueOf(Editar));
+        postData.put("IdCliente",cliente.getIdCliente());
+        postData.put("IdClienteVario",cliente.getCodCv());
+        postData.put("cliente",jsonCliente);
+
+
+        String jsonStrCliente = sh.performPostCall(urlCliente,postData);
+
+        //  String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
+        if (jsonStrCliente == null || jsonCliente.isEmpty()) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar el Cliente,Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return "false,Ha ocurrido un error al sincronizar el cliente,Respuesta nula";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrCliente);
+                String resultState = (String) ((String) result.get("SincronizarClienteTotalResult")).split(",")[0];
+                String NoCliente = (String) ((String) result.get("SincronizarClienteTotalResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    if (NoCliente.equalsIgnoreCase("Cliente ya existe en base de datos")) {
+                        NoCliente =  ((String) result.get("SincronizarClienteTotalResult")).split(",")[1];
+                    } else {
+                        new Funciones().SendMail("Ha ocurrido un error al sincronizar el Cliente ,Respuesta false", variables_publicas.info + NoCliente +" *** "+urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                        return "false," + NoCliente;
+                    }
+                }
+               // PedidoH.ActualizarPedido(IdPedido, NoPedido);
+//
+                return "true";
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al sincronizar el Cliente, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "false," + ex.getMessage() + "";
+            }
+
+        }
+
+    }
 
 }
