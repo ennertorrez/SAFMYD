@@ -98,6 +98,38 @@ public class VendedoresHelper {
         return list;
     }
 
+    public List<Vendedor> ObtenerListaVendedores2() {
+        List<Vendedor> list = new ArrayList<Vendedor>();
+
+        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE " + variables_publicas.VENDEDORES_COLUMN_detalle + "= 'true' ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+
+            do {
+                list.add(new Vendedor(cursor.getString(cursor.getColumnIndex("CODIGO")),
+                        cursor.getString(cursor.getColumnIndex("NOMBRE")),
+                        cursor.getString(cursor.getColumnIndex("COD_ZONA")),
+                        cursor.getString(cursor.getColumnIndex("RUTA")),
+                        cursor.getString(cursor.getColumnIndex("codsuper")),
+                        cursor.getString(cursor.getColumnIndex("Supervisor")),
+                        cursor.getString(cursor.getColumnIndex("Status")),
+                        cursor.getString(cursor.getColumnIndex("detalle")),
+                        cursor.getString(cursor.getColumnIndex("horeca")),
+                        cursor.getString(cursor.getColumnIndex("mayorista")
+                        )));
+
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        // database.close();
+
+        return list;
+    }
+
     public List<Ruta> ObtenerListaRutas(String CodigoSupervisor) {
         List<Ruta> list = new ArrayList<Ruta>();
 
@@ -122,6 +154,23 @@ public class VendedoresHelper {
         return list;
     }
 
+    public List<Ruta> ObtenerRutavendedor(String CodigoVendedor) {
+        List<Ruta> list = new ArrayList<Ruta>();
+
+        String selectQuery = "SELECT DISTINCT "+variables_publicas.VENDEDORES_COLUMN_RUTA+" FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE "+ variables_publicas.VENDEDORES_COLUMN_CODIGO + "= '" + CodigoVendedor + "' ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_RUTA ;
+
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(new Ruta(
+                        cursor.getString(cursor.getColumnIndex("RUTA"))
+                ));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
     public List<Ruta> ObtenerTodasRutas() {
         List<Ruta> list = new ArrayList<Ruta>();
 

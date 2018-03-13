@@ -41,22 +41,6 @@
             android:id="@+id/btnMapa"
             android:icon="@drawable/ic_menu_mapmode"
             android:title="Mapa" />
-        <item
-            android:id="@+id/btnDevoluciones"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Devoluciones" >
-            <menu>
-                <item
-                    android:id="@+id/btnListaDevoluciones"
-                    android:icon="@drawable/ic_menu_send"
-                    android:title="Lista Devoluciones" />
-                <item
-                    android:id="@+id/btnNuevaDevoluciones"
-                    android:icon="@drawable/ic_menu_plussign"
-                    android:title="Nueva Devolución" />
-
-            </menu>
-        </item>
     </group>
 
     <item android:title="Reportes">
@@ -69,10 +53,6 @@
                 android:id="@+id/btnReporteHistVentas"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Histórico de Ventas" />
-            <item
-                android:id="@+id/btnReporteTermometroCumplimiento"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Termometro de cumplimiento" />
         </menu>
     </item>
 

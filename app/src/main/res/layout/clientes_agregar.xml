@@ -91,6 +91,8 @@
                         android:layout_weight="0.79"
                         android:background="@drawable/rounded_edittext"
                         android:hint="Codigo"
+                        android:textStyle="bold"
+                        android:textColorHint="@color/colorPrimary"
                         android:editable="false"
                         android:maxLines="1"></EditText>
                     <EditText
@@ -126,7 +128,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblDpto"
                         android:layout_width="150dp"
@@ -146,7 +148,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblMuni"
                         android:layout_width="150dp"
@@ -165,7 +167,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblBarrio"
                         android:layout_width="150dp"
@@ -176,15 +178,15 @@
                         android:textColor="@color/colorAccent"
                         android:textSize="13dp"
                         android:textStyle="bold" />
-                    <Spinner
+                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
                         android:id="@+id/cboBarrio"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        ></Spinner>
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblDiasVisit"
                         android:layout_width="150dp"
@@ -203,7 +205,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblRutaCliente"
                         android:layout_width="150dp"
@@ -222,7 +224,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblTipoNeg"
                         android:layout_width="150dp"
@@ -261,6 +263,25 @@
                         android:hint="Telefono"
                         android:inputType="number"
                         android:maxLines="1"></EditText>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp">
+                    <TextView
+                        android:id="@+id/lblVendedor"
+                        android:layout_width="150dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:text="Vendedor"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/cboVendedor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ></Spinner>
                 </LinearLayout>
                 <RelativeLayout
                     android:layout_width="match_parent"

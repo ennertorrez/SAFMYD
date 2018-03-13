@@ -2,7 +2,6 @@ package com.suplidora.sistemas.sisago.Auxiliar;
 
 import android.app.Activity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
@@ -11,11 +10,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -32,7 +27,6 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,13 +41,11 @@ public class SincronizarDatos {
 
 
     private String urlClientes = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
-    private String urlDptoMuniBarrios = variables_publicas.direccionIp + "/ServicioClientes.svc/ObtenerDptoMuniBarrios";
+    private String urlDptoMuniBarrios = variables_publicas.direccionIp + "/ServicioClientes.svc/GetDptoMuniBarrios";
     private String urlArticulos = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
-    final String urlConsolidadoCarga = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/Getcarga/";
-    final String urlConsolidadoCargaDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/BuscarConsolidadoDetalle/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
@@ -70,14 +62,10 @@ public class SincronizarDatos {
     private PedidosDetalleHelper PedidosDetalleH;
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
-    private ConsolidadoCargaHelper ConsolidadoCargaH;
-    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
-    private DevolucionesHelper DevolucionesH;
-    private DevolucionesDetalleHelper DevolucionesDetalleH;
 
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -85,7 +73,7 @@ public class SincronizarDatos {
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, DevolucionesHelper Devolucionesh,DevolucionesDetalleHelper DevolucionesDetalleh ) {
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH ) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -99,52 +87,19 @@ public class SincronizarDatos {
         UsuariosH = usuariosH;
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
-        CartillasBcDetalleH = CartillasBcDetalleh;
-        DevolucionesH = Devolucionesh;
-        DevolucionesDetalleH = DevolucionesDetalleh;
-
     }
 
-    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
-                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
-                            PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
-                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            ConsolidadoCargaHelper consolidadoCargaH, ConsolidadoCargaDetalleHelper consolidadoCargaDetalleH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH,DevolucionesHelper devolucionesH,DevolucionesDetalleHelper devolucionesDetalleH) {
-        DbOpenHelper = dbh;
-        ClientesH = Clientesh;
-        VendedoresH = Vendedoresh;
-        CartillasBcH = CatillasBch;
-        CartillasBcDetalleH = CartillasBcDetalleh;
-        FormaPagoH = FormaPagoh;
-        PrecioEspecialH = PrecioEspecialh;
-        ConfigSistemasH = ConfigSistemah;
-        ClientesSucH = ClientesSuch;
-        ArticulosH = Articulosh;
-        UsuariosH = usuariosH;
-        PedidosH = pedidoH;
-        PedidosDetalleH = pedidosDetalleH;
-        CartillasBcDetalleH = CartillasBcDetalleh;
-        DevolucionesH= devolucionesH;
-        DevolucionesDetalleH=devolucionesDetalleH;
-        ConsolidadoCargaH=consolidadoCargaH;
-        ConsolidadoCargaDetalleH =consolidadoCargaDetalleH;
-    }
-
-    public SincronizarDatos(DataBaseOpenHelper dbh,  ConfiguracionSistemaHelper ConfigSistemah,
-                             ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            ConsolidadoCargaHelper ConsolidadoCargah, ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleh,
-                            DevolucionesHelper devolucionesH,DevolucionesDetalleHelper devolucionesDetalleH) {
+  /*   public SincronizarDatos(DataBaseOpenHelper dbh,  ConfiguracionSistemaHelper ConfigSistemah,
+                             ArticulosHelper Articulosh, UsuariosHelper usuariosH) {
         DbOpenHelper = dbh;
         ConfigSistemasH = ConfigSistemah;
         ArticulosH = Articulosh;
         UsuariosH = usuariosH;
-        ConsolidadoCargaH = ConsolidadoCargah;
+       ConsolidadoCargaH = ConsolidadoCargah;
         ConsolidadoCargaDetalleH = ConsolidadoCargaDetalleh;
         DevolucionesH =devolucionesH;
         DevolucionesDetalleH =devolucionesDetalleH;
-    }
+    }*/
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh ) {
         DbOpenHelper = dbh;
@@ -211,6 +166,7 @@ public class SincronizarDatos {
     public boolean SincronizarClientes() throws JSONException {
         /*******************************CLIENTES******************************/
         //************CLIENTES
+        DbOpenHelper.database.beginTransaction();
 
         ObtenerDptosMuniBarrios();
 
@@ -223,7 +179,7 @@ public class SincronizarDatos {
             return false;
         }
         //Log.e(TAG, "Response from url: " + jsonStrC);
-        DbOpenHelper.database.beginTransaction();
+
         ClientesH.EliminaClientes();
         JSONObject jsonObjC = new JSONObject(jsonStrC);
         // Getting JSON Array node
@@ -688,106 +644,6 @@ public class SincronizarDatos {
         }
         return guardadoOK;
     }
-    public void SincronizarDevoluciones() throws JSONException {
-        SincronizarArticulos();
-        SincronizarConfiguracionSistema();
-        ObtenerMotivos();
-        SincronizarConsolidadoCarga();
-        SincronizarConsolidadoCargaDetalle();
-        ActualizarUsuario();
-    }
-    //ConsolidadoCarga
-    public String SincronizarConsolidadoCarga() throws JSONException {
-        HttpHandler shCarga = new HttpHandler();
-        String urlStringCarga = urlConsolidadoCarga + variables_publicas.CodigoVendedor;
-        String jsonStrCarga = shCarga.makeServiceCall(urlStringCarga);
-
-        if (jsonStrCarga == null)
-        {
-            new Funciones().SendMail("Ha ocurrido un error al sincronicar ConsolidadoCarga, Respuesta nula GET", variables_publicas.info+urlStringCarga,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-            return null;
-        }
-        DbOpenHelper.database.beginTransaction();
-        ConsolidadoCargaH.EliminaConsolidadoCarga();
-
-        JSONObject jsonObjCarga = new JSONObject(jsonStrCarga);
-        // Getting JSON Array node
-        JSONArray carga = jsonObjCarga.getJSONArray("BuscarConsolidadoResult");
-
-
-        try {
-            // looping through All Contacts
-            for (int i = 0; i < carga.length(); i++) {
-                JSONObject c = carga.getJSONObject(i);
-
-                String IdConsolidado = c.getString("IdConsolidado");
-                String Factura = c.getString("Factura");
-                String Cliente = c.getString("Cliente");
-                String Vendedor = c.getString("Vendedor");
-                String Direccion = c.getString("Direccion");
-                String IdCliente =c.getString("IdCliente");
-                String IdVendedor =c.getString("IdVendedor");
-                String Guardada=c.getString("Guardada");
-
-                ConsolidadoCargaH.GuardarConsolidadoCarga(IdConsolidado, Factura, Cliente, Vendedor, Direccion,IdCliente,IdVendedor,Guardada);
-            }
-            DbOpenHelper.database.setTransactionSuccessful();
-        }catch (Exception ex){
-            new Funciones().SendMail("Ha ocurrido un error al sincronicar ConsolidadoCarga, Excepcion controlada",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-        }
-
-        finally {
-            DbOpenHelper.database.endTransaction();
-        }
-        return jsonStrCarga;
-    }
-
-
-    //ConsolidadoCargaDetalle
-    public String SincronizarConsolidadoCargaDetalle() throws JSONException {
-        HttpHandler shConsolidadoCargaD = new HttpHandler();
-        String urlStringConsolidadoD = urlConsolidadoCargaDetalle + variables_publicas.CodigoVendedor;
-        String jsonStrConsolidadoCargaD = shConsolidadoCargaD.makeServiceCall(urlStringConsolidadoD);
-
-        if (jsonStrConsolidadoCargaD == null)
-        {
-            new Funciones().SendMail("Ha ocurrido un error ConsolidadoCargaDetalle",variables_publicas.info+urlStringConsolidadoD,"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-            return null;
-        }
-
-        DbOpenHelper.database.beginTransaction();
-        ConsolidadoCargaDetalleH.EliminaConsolidadoCargaDetalle();
-
-        JSONObject jsonObjCargaD = new JSONObject(jsonStrConsolidadoCargaD);
-        // Getting JSON Array node
-        JSONArray cargaD = jsonObjCargaD.getJSONArray("BuscarConsolidadoDetalleResult");
-
-
-        try {
-            // looping through All Contacts
-            for (int i = 0; i < cargaD.length(); i++) {
-                JSONObject c = cargaD.getJSONObject(i);
-                String IdVehiculo = c.getString("IdVehiculo");
-                String Factura = c.getString("Factura");
-                String ITEM = c.getString("ITEM");
-                String Item_Descripcion = c.getString("Item_Descripcion");
-                String CANTIDAD = c.getString("CANTIDAD");
-                String PRECIO = c.getString("PRECIO");
-                String TOTAL = c.getString("TOTAL");
-                String IVA = c.getString("IVA");
-                String DESCUENTO = c.getString("DESCUENTO");
-                ConsolidadoCargaDetalleH.GuardarConsolidadoCargaDetalle(IdVehiculo, Factura, ITEM, Item_Descripcion, CANTIDAD, PRECIO, TOTAL, IVA, DESCUENTO);
-            }
-            DbOpenHelper.database.setTransactionSuccessful();
-        }catch (Exception ex){
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar ConsolidadoCargaDetalle, Excepcion controlada",variables_publicas.info+ex.getMessage(),"sisago@suplidora.com.ni",variables_publicas.correosErrores);
-        }
-
-        finally {
-            DbOpenHelper.database.endTransaction();
-        }
-        return jsonStrConsolidadoCargaD;
-    }
 
     private boolean ActualizarUsuario() {
 
@@ -849,51 +705,6 @@ public class SincronizarDatos {
        return false;
     }
 
-    private boolean ObtenerMotivos() {
-
-        HttpHandler sh = new HttpHandler();
-        String urlString = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerMotivos";;
-        String encodeUrl = "";
-        try {
-            URL Url = new URL(urlString);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String jsonStr = sh.makeServiceCall(encodeUrl);
-
-        /**********************************MOTIVOS**************************************/
-        if (jsonStr != null) {
-
-            try {
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray motivos = jsonObj.getJSONArray("ObtenerMotivosResult");
-                if (motivos.length() == 0) {
-                    return false;
-                }
-                DevolucionesH.EliminarMotivos();
-                // looping through All Contacts
-
-                for (int i = 0; i < motivos.length(); i++) {
-                    JSONObject c = motivos.getJSONObject(i);
-                    DevolucionesH.GuardarMotivos(c.get("id").toString(),c.get("motivo").toString());
-                }
-            } catch (Exception ex) {
-                Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al obtener los motivos de devolucion,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                return false;
-            }
-
-        } else {
-            new Funciones().SendMail("Ha ocurrido un error al obtener los motivos de devolucion,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-            return false;
-        }
-        return false;
-    }
-
     private boolean ObtenerDptosMuniBarrios() {
 
         HttpHandler sh = new HttpHandler();
@@ -915,7 +726,7 @@ public class SincronizarDatos {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
-                JSONArray dptosMunBarr = jsonObj.getJSONArray("ObtenerDptoMuniBarriosResult");
+                JSONArray dptosMunBarr = jsonObj.getJSONArray("GetDptoMuniBarriosResult");
                 if (dptosMunBarr.length() == 0) {
                     return false;
                 }
@@ -1009,73 +820,6 @@ public class SincronizarDatos {
 
     }
 
-    public static String SincronizarDevolucion(DevolucionesHelper DevolucionesH, DevolucionesDetalleHelper DevolucionesDetalleH,ConsolidadoCargaHelper ConsolidadoCargaH, String ndevolucion,String rango,String factura, String jsonDevolucion, boolean Editar) {
-
-        HttpHandler sh = new HttpHandler();
-        String encodeUrl = "";
-        Gson gson = new Gson();
-        List<HashMap<String, String>> devolucionDetalle = DevolucionesDetalleH.ObtenerDevolucionDetalle(ndevolucion);
-        for (HashMap<String, String> item : devolucionDetalle) {
-            item.put("subtotal", item.get("subtotal").replace(",", ""));
-            item.put("total", item.get("total").replace(",", ""));
-            item.put("iva", item.get("iva").replace(",", ""));
-            item.put("precio", item.get("precio").replace(",", ""));
-            item.put("descuento", item.get("descuento").replace(",", ""));
-
-        }
-        String jsonDevolucionDetalle = gson.toJson(devolucionDetalle);
-        final String urlDetalle = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/SincronizarDevoluciones/";
-        final String urlStringDetalle = urlDetalle  + String.valueOf(Editar) + "/"  + jsonDevolucion + "/" + jsonDevolucionDetalle;
-
-       /* try {
-            URL Url = new URL(urlStringDetalle);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar devolucion, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-            e.printStackTrace();
-            return "false," + e.getMessage();
-        }*/
-
-        HashMap<String,String> postData = new HashMap<>();
-        postData.put("Editar",String.valueOf(Editar));
-        postData.put("devolucion",jsonDevolucion);
-        postData.put("Detalle",jsonDevolucionDetalle)   ;
-
-        String jsonStrDevolucion = sh.performPostCall(urlDetalle,postData);
-
-       // String jsonStrDevolucion = sh.makeServiceCallPost(encodeUrl);
-        if (jsonStrDevolucion == null) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion,Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-            return "false,Ha ocurrido un error al sincronizar el detalle de la devolucion,Respuesta nula";
-        } else {
-            try {
-                JSONObject result = new JSONObject(jsonStrDevolucion);
-                String resultState = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[0];
-                String NoDevolucion = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[1];
-                if (resultState.equals("false")) {
-
-                    if (NoDevolucion.equalsIgnoreCase("devolucion ya existe en base de datos")) {
-                        NoDevolucion = (String) ((String) result.get("SincronizarDevolucionResult")).split(",")[2];
-                    } else {
-                        new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion ,Respuesta false", variables_publicas.info + NoDevolucion, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                        return "false," + NoDevolucion;
-                    }
-                }
-                DevolucionesH.ActualizarDevoluciones(ndevolucion, NoDevolucion);
-                DevolucionesDetalleH.Actualizarndevolucion(ndevolucion, NoDevolucion);
-                ConsolidadoCargaH.ActualizarConsolidadoCarga(rango,factura);
-
-                return "true";
-            } catch (Exception ex) {
-                new Funciones().SendMail("Ha ocurrido un error al sincronizar la devolucion, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                Log.e("Error", ex.getMessage());
-                return "false," + ex.getMessage() + "";
-            }
-        }
-    }
-
     public static String ConsultarExistencias(final Activity activity, PedidosHelper PedidoH, ArticulosHelper ArticulosH, String CodigoArticulo) {
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
@@ -1138,8 +882,13 @@ public class SincronizarDatos {
 
     }
 
-    public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente, boolean Editar) {
-
+    public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente) {
+        boolean Editar=false;
+        if (variables_publicas.vEditando){
+            Editar=true;
+        }else {
+            Editar=false;
+        }
         HttpHandler sh = new HttpHandler();
         String encodeUrl = "";
         Gson gson = new Gson();

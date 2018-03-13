@@ -2,7 +2,6 @@ package com.suplidora.sistemas.sisago.Auxiliar;
 
 
 import com.suplidora.sistemas.sisago.Entidades.Configuraciones;
-import com.suplidora.sistemas.sisago.Entidades.Devoluciones;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 
@@ -11,7 +10,6 @@ public class variables_publicas {
     public static Usuario usuario = null;
     public static Configuraciones Configuracion = null;
     public static Pedido Pedidos = null;
-    public static Devoluciones Devoluciones = null;
     public static String ValorConfigServ = "";
     public static String AplicarPrecioMayoristaXCaja;
     public static String PermitirVentaDetAMayoristaXCaja;
@@ -31,6 +29,7 @@ public class variables_publicas {
     public static  int CantidadItemPromoGaga;
     public static final String diasventas="Dias";
     public static final String descMeses="DescMeses";
+    public static boolean vEditando = false;
 
     public static String noCedula = "";
     public static String nombreCed = "";
@@ -40,7 +39,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 72;
+    public static final int DATABASE_VERSION = 73;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -51,15 +50,10 @@ public class variables_publicas {
     public static final String TABLE_VENDEDORES = "Vendedor";
     public static final String TABLE_CLIENTES_SUCURSALES = "ClientesSucursales";
     public static final String TABLE_FORMA_PAGO = "FormaPago";
-    public static final String TABLE_CONSOLIDADO_CARGA = "ConsolidadoCarga";
-    public static final String TABLE_CONSOLIDADO_CARGA_DETALLE = "ConsolidadoCargaDetalle";
     public static final String TABLE_CARTILLAS_BC = "CartillasBC";
     public static final String TABLE_DETALLE_CARTILLAS_BC = "DetalleCartillasBC";
     public static final String TABLE_PRECIO_ESPECIAL = "ListaPrecioEspeciales";
     public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
-    public static final String TABLE_DEVOLUCIONES = "Devoluciones";
-    public static final String TABLE_DEVOLUCIONES_DETALLE = "DevolucionesDetalle";
-    public static final String TABLE_MOTIVOS="Motivos";
     public static final String TABLE_DPTOMUNIBARRIOS="DptoMuniBarrio";
 
     //Variables CamposTbArticulos
@@ -219,66 +213,6 @@ public class variables_publicas {
     public static final String CONFIGURACION_SISTEMA_COLUMN_Configuracion = "Configuracion";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Valor = "Valor";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Activo = "Activo";
-
-    //Variables CamposTbConsolidadoCarga
-    public static final String CONSOLIDADO_CARGA_COLUMN_IdConsolidado = "IdConsolidado";
-    public static final String CONSOLIDADO_CARGA_COLUMN_Factura = "Factura";
-    public static final String CONSOLIDADO_CARGA_COLUMN_Cliente = "Cliente";
-    public static final String CONSOLIDADO_CARGA_COLUMN_IdCliente = "IdCliente";
-    public static final String CONSOLIDADO_CARGA_COLUMN_IdVendedor = "IdVendedor";
-    public static final String CONSOLIDADO_CARGA_COLUMN_Vendedor = "Vendedor";
-    public static final String CONSOLIDADO_CARGA_COLUMN_Direccion = "Direccion";
-    public static final String CONSOLIDADO_CARGA_COLUMN_Guardada ="Guardada";
-
-    //Variables CamposTbConsolidadoCargaDetalle
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo= "IdVehiculo";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura = "Factura";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM = "ITEM";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion = "Item_Descripcion";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD = "CANTIDAD";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO= "PRECIO";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL = "TOTAL";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA= "IVA";
-    public static final String CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO = "DESCUENTO";
-
-    //Variables CamposTbDevoluciones
-    public static final String DEVOLUCIONES_COLUMN_ndevolucion= "ndevolucion";
-    public static final String DEVOLUCIONES_COLUMN_cliente = "cliente";
-    public static final String DEVOLUCIONES_COLUMN_nombrecliente = "nombrecliente";
-    public static final String DEVOLUCIONES_COLUMN_horagraba = "horagraba";
-    public static final String DEVOLUCIONES_COLUMN_usuario = "usuario";
-    public static final String DEVOLUCIONES_COLUMN_subtotal = "subtotal";
-    public static final String DEVOLUCIONES_COLUMN_iva= "iva";
-    public static final String DEVOLUCIONES_COLUMN_total = "total";
-    public static final String DEVOLUCIONES_COLUMN_estado= "estado";
-    public static final String DEVOLUCIONES_COLUMN_rango = "rango";
-    public static final String DEVOLUCIONES_COLUMN_motivo = "motivo";
-    public static final String DEVOLUCIONES_COLUMN_factura = "factura";
-    public static final String DEVOLUCIONES_COLUMN_tipo = "tipo";
-    public static final String DEVOLUCIONES_COLUMN_IMEI = "IMEI";
-    public static final String DEVOLUCIONES_COLUMN_IdVehiculo = "IdVehiculo";
-    public static final String DEVOLUCIONES_COLUMN_Observaciones="Observaciones";
-    public static final String DEVOLUCIONES_COLUMN_procesado="procesado";
-    public static final String DEVOLUCIONES_COLUMN_ejecutada="ejecutada";
-
-    //Variables CamposTbDevolucionesDetalle
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_ndevolucion= "ndevolucion";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_item = "item";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion = "Item_Descripcion";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_cantidad = "cantidad";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_precio = "precio";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_iva = "iva";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_subtotal= "subtotal";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_total = "total";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_poriva= "poriva";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_descuento = "descuento";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_tipo = "tipo";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_numero = "numero";
-    public static final String DEVOLUCIONES_DETALLE_COLUMN_factura = "factura";
-
-    //Variables CamposTbMotivos
-    public static  final String MOTIVOS_COLUMN_id = "id";
-    public static final String  MOTIVOS_COLUMN_motivo ="motivo";
 
     //Variables CamposTbDptoMuniBarrios
     public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento = "Codigo_Departamento";

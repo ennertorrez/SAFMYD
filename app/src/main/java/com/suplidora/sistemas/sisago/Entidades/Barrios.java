@@ -9,7 +9,6 @@ public class Barrios {
     private String Nombre_Barrio="";
 
     public Barrios( String Codigo_Barrio, String Nombre_Barrio) {
-
         this.Codigo_Barrio = Codigo_Barrio;
         this.Nombre_Barrio = Nombre_Barrio;
     }

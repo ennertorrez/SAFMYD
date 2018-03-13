@@ -36,11 +36,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -101,8 +97,6 @@ public class Login extends Activity {
 
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
-    private ConsolidadoCargaHelper ConsolidadoCargaH;
-    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigH;
@@ -110,8 +104,6 @@ public class Login extends Activity {
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
     private PedidosHelper PedidoH;
-    private DevolucionesHelper DevolucionesH;
-    private DevolucionesDetalleHelper DevolucionesDetalleH;
     private SincronizarDatos sd;
     String MsjLoging = "";
 
@@ -139,17 +131,13 @@ public class Login extends Activity {
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
-        ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
-        ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
-        DevolucionesH = new DevolucionesHelper(DbOpenHelper.database);
-        DevolucionesDetalleH= new DevolucionesDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH,ConsolidadoCargaDetalleH,PedidoH,PedidoDetalleH,DevolucionesH,DevolucionesDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
@@ -446,13 +434,7 @@ public class Login extends Activity {
 
                         //SINCRONIZAR DATOS
                         try {
-                            if(variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo"))
-                            {
-                                sd.SincronizarDevoluciones();
-                            }
-                            else {
-                                sd.SincronizarTodo();
-                            }
+                            sd.SincronizarTodo();
                         } catch (final JSONException e) {
                             Log.e(TAG, "Json parsing error: " + e.getMessage());
 //

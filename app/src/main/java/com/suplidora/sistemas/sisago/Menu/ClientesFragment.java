@@ -1,8 +1,10 @@
 package com.suplidora.sistemas.sisago.Menu;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,10 +39,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
@@ -129,6 +135,149 @@ public class ClientesFragment extends Fragment {
         });
         return myView;
     }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        try {
+            super.onCreateContextMenu(menu, v, menuInfo);
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+
+            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+
+            String CodigoCliente = obj.get("IdCliente");
+            String CodigoCV= obj.get("CodCv");
+            String nombre = obj.get("NombreCliente");
+            String Codigo;
+            if (CodigoCV.equals("") || CodigoCV.isEmpty()){
+                Codigo=CodigoCliente;
+            }else {
+                Codigo=CodigoCV;
+            }
+
+            String HeaderMenu = "Cliente: "+ Codigo + "\n" + nombre;
+
+            menu.setHeaderTitle(HeaderMenu);
+            MenuInflater inflater = getActivity().getMenuInflater();
+
+            inflater.inflate(R.menu.clientes_list_menu_context, menu);
+            MenuItem tv = menu.getItem(0); //Boton Editar
+
+            if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) {
+                tv.setEnabled(false);
+            }
+            else {
+                tv.setEnabled(true);
+            }
+
+
+        } catch (Exception e) {
+            //mensajeAviso(e.getMessage());
+        }
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        HashMap<String, String> clientes = null;
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            switch (item.getItemId()) {
+                case R.id.itemEditarCliente:{
+
+                   // busqueda = txtBusqueda.getText().toString();
+                     //Editar
+                    HashMap<String, String> obj = listaClientes.get(info.position);
+                    String CodigoCliente = obj.get("IdCliente");
+                    String CodigoCV= obj.get("CodCv");
+                    String Codigo;
+                    if (CodigoCV.equals("") || CodigoCV.isEmpty()){
+                        Codigo=CodigoCliente;
+                    }else {
+                        Codigo=CodigoCV;
+                    }
+
+                    //String vValorFiltro = ClienteH.ObtenerDescripcion(variables_publicas.CLIENTES_COLUMN_NombreCliente,variables_publicas.TABLE_CLIENTES,variables_publicas.CLIENTES_COLUMN_IdCliente,Codigo);
+                    clientes = ClienteH.ObtenerClienteGuardado(Codigo);
+                    if (clientes == null) {
+                        Funciones.MensajeAviso(getActivity(), "No se ha encontrado Información del Cliente");
+                        return true;
+                    }
+
+                    String IdCliente = clientes.get("IdCliente");
+                    String CodCv = clientes.get("CodCv");
+                    String Nombre = clientes.get("Nombre");
+                    String NombreCliente = clientes.get("NombreCliente");
+                    String FechaCreacion = clientes.get("FechaCreacion");
+                    String Telefono = clientes.get("Telefono");
+                    String Direccion = clientes.get("Direccion");
+                    String IdDepartamento = clientes.get("IdDepartamento");
+                    String IdMunicipio = clientes.get("IdMunicipio");
+                    String Ciudad = clientes.get("Ciudad");
+                    String Ruc = clientes.get("Ruc");
+                    String Cedula = clientes.get("Cedula");
+                    String LimiteCredito = clientes.get("LimiteCredito");
+                    String IdFormaPago = clientes.get("IdFormaPago");
+                    String IdVendedor = clientes.get("IdVendedor");
+                    String Excento = clientes.get("Excento");
+                    String CodigoLetra = clientes.get("CodigoLetra");
+                    String Ruta = clientes.get("Ruta");
+                    String Frecuencia = clientes.get("Frecuencia");
+                    String PrecioEspecial = clientes.get("PrecioEspecial");
+                    String FechaUltimaCompra = clientes.get("FechaUltimaCompra");
+                    String Tipo = clientes.get("Tipo");
+                    String CodigoGalatea = clientes.get("CodigoGalatea");
+                    String Descuento = clientes.get("Descuento");
+                    String Empleado = clientes.get("Empleado");
+                    String Detallista = clientes.get("Detallista");
+                    String RutaForanea = clientes.get("RutaForanea");
+                    String EsClienteVarios = clientes.get("EsClienteVarios");
+                    String IdBarrio = clientes.get("IdBarrio");
+                    String TipoNegocio = clientes.get("TipoNegocio");
+
+                    Intent in = new Intent(getActivity().getApplicationContext(), ClientesNew.class);
+
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_NombreCliente, NombreCliente);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_FechaCreacion, FechaCreacion);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Telefono, Telefono);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Direccion, Direccion);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdDepartamento, IdDepartamento);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdMunicipio, IdMunicipio);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Ciudad, Ciudad);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Ruc, Ruc);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Cedula, Cedula);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_LimiteCredito, LimiteCredito);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdFormaPago, IdFormaPago);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdVendedor, IdVendedor);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Excento, Excento);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_CodigoLetra, CodigoLetra);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Ruta, Ruta);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Frecuencia, Frecuencia);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, PrecioEspecial);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, FechaUltimaCompra);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Tipo, Tipo);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, CodigoGalatea);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Descuento, Descuento);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Empleado, Empleado);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Detallista, Detallista);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_RutaForanea, RutaForanea);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, EsClienteVarios);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdBarrio, IdBarrio);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_TipoNegocio, TipoNegocio);
+                    // Starting new intent
+                    variables_publicas.vEditando= true;
+                    startActivity(in);
+                    return true;
+                }
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        } catch (Exception e) {
+            //mensajeAviso(e.getMessage());
+        }
+        return false;
+    }
 
     // URL to get contacts JSON
     private static String url = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes/";
@@ -168,6 +317,7 @@ public class ClientesFragment extends Fragment {
                     // Getting JSON Array node
                     JSONArray clientes = jsonObj.getJSONArray("BuscarClientesResult");
 
+                    HashMap<String, String> client = null;
                     // looping through All Contacts
                     for (int i = 0; i < clientes.length(); i++) {
                         JSONObject c = clientes.getJSONObject(i);
@@ -213,6 +363,29 @@ public class ClientesFragment extends Fragment {
                         cliente.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, c.getString("TipoNegocio"));
 
                         listaClientes.add(cliente);
+
+                        if (variables_publicas.usuario.getTipo().equals("Supervisor")||variables_publicas.usuario.getTipo().equals("User")) {
+                            String Codigo;
+
+                            if (c.getString("CodCv").equals("") || c.getString("CodCv").isEmpty()) {
+                                Codigo = c.getString("IdCliente");
+                            } else {
+                                Codigo = c.getString("CodCv");
+                            }
+
+
+                            client = ClienteH.ObtenerClienteGuardado(Codigo);
+                            if (client == null) {
+                                DbOpenHelper.database.beginTransaction();
+                                ClienteH.GuardarTotalClientes(c.getString("IdCliente"), c.getString("CodCv"), c.getString("Nombre"), c.getString("NombreCliente"), c.getString("FechaCreacion"),
+                                        c.getString("Telefono"), c.getString("Direccion"), c.getString("IdDepartamento"), c.getString("IdMunicipio"), c.getString("Ciudad"), c.getString("Ruc"), c.getString("Cedula"), c.getString("LimiteCredito"),
+                                        c.getString("IdFormaPago"), c.getString("IdVendedor"), c.getString("Excento"), c.getString("CodigoLetra"), c.getString("Ruta"), c.getString("Frecuencia"), c.getString("PrecioEspecial"), c.getString("FechaUltimaCompra"),
+                                        c.getString("Tipo"), c.getString("CodigoGalatea"), c.getString("Descuento"), c.getString("Empleado"), c.getString("Detallista"), c.getString("RutaForanea"),
+                                        c.getString("EsClienteVarios"), c.getString("IdBarrio"), c.getString("TipoNegocio"));
+                                DbOpenHelper.database.setTransactionSuccessful();
+                                DbOpenHelper.database.endTransaction();
+                            }
+                        }
                     }
                 } catch (final JSONException e) {
                     Log.e(TAG, "Json parsing error: " + e.getMessage());

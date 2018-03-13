@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Devoluciones.ListaArtDevolucionFragment;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -39,7 +38,7 @@ public class ListaVentasHistClientes extends Activity {
     private String ClienteId="";
     private String cantDias ="";
     private String vClienteVario= "";
-    private String TAG = ListaArtDevolucionFragment.class.getSimpleName();
+    private String TAG = ListaVentasHistClientes.class.getSimpleName();
     private ListView lv;
     private TextView lblFooterCantidad;
     private TextView lblFooterSubtotal;

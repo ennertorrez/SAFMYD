@@ -52,11 +52,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -74,7 +70,6 @@ import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
-import com.suplidora.sistemas.sisago.Entidades.Usuario;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -194,11 +189,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private PedidosDetalleHelper PedidoDetalleH;
     private ConfiguracionSistemaHelper ConfiguracionSistemaH;
     private CartillasBcHelper CartillasBcH;
-    private ConsolidadoCargaHelper ConsolidadoCargaH;
-    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private ConfiguracionSistemaHelper ConfigSistemaH;
-    private DevolucionesHelper DevolucionH;
-    private DevolucionesDetalleHelper DevolucionDetalleH;
     private PedidosHelper PedidoH;
     private String CodigoLetra = "";
     private String jsonPedido = "";
@@ -243,8 +234,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
         ConfigSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
-        DevolucionH = new DevolucionesHelper(DbOpenHelper.database);
-        DevolucionDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
 //        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
 //                CartillasBcDetalleH,
 //                FormaPagoH,
@@ -253,7 +242,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH, DevolucionH, DevolucionDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
 
 
         ValidarUltimaVersion();

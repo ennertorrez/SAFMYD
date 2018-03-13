@@ -32,11 +32,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.ConsolidadoCargaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesDetalleHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DevolucionesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -46,11 +42,9 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Devoluciones.DevolucionesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
-import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
@@ -59,9 +53,6 @@ import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
-/*import com.suplidora.sistemas.sisago.app.ControladorArticulo;
-import com.suplidora.sistemas.sisago.app.ControladorSincronizacion;*/
-
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -78,8 +69,6 @@ public class MenuActivity extends AppCompatActivity
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
-    private ConsolidadoCargaHelper ConsolidadoCargaH;
-    private ConsolidadoCargaDetalleHelper ConsolidadoCargaDetalleH;
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
     private FormaPagoHelper FormaPagoH;
@@ -89,8 +78,6 @@ public class MenuActivity extends AppCompatActivity
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
     private PedidosHelper PedidoH;
-    private DevolucionesHelper DevolucionesH;
-    private DevolucionesDetalleHelper DevolucionesDetalleH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +106,7 @@ public class MenuActivity extends AppCompatActivity
         String userHeaderCodigo = "";
         String VersionSistema = "";
         String Servidor = "";
+
         try {
             userHeader = variables_publicas.usuario.getNombre();
             userHeaderCodigo = variables_publicas.usuario.getCodigo();
@@ -144,17 +132,12 @@ public class MenuActivity extends AppCompatActivity
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
-        ConsolidadoCargaH = new ConsolidadoCargaHelper(DbOpenHelper.database);
-        ConsolidadoCargaDetalleH = new ConsolidadoCargaDetalleHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
-        DevolucionesH = new DevolucionesHelper(DbOpenHelper.database);
-        DevolucionesDetalleH = new DevolucionesDetalleHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
-                CartillasBcDetalleH,
-                FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH, ConsolidadoCargaH, ConsolidadoCargaDetalleH, PedidoH, PedidoDetalleH, DevolucionesH, DevolucionesDetalleH);
+                CartillasBcDetalleH, FormaPagoH,PrecioEspecialH, ConfigH, ClientesSucH,
+                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
 
         try {
             variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";
@@ -162,20 +145,10 @@ public class MenuActivity extends AppCompatActivity
             Log.e("error", ex.getMessage());
             ex.printStackTrace();
         }
-
-        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vehiculo")) {
-            navigationView.getMenu().getItem(0).setVisible(false);
-            navigationView.getMenu().getItem(1).setVisible(false);
-            navigationView.getMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(5).setVisible(false);
-        } else {
-           // navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setEnabled(false);
-            navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setEnabled(false);
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
-            navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false);
-            navigationView.getMenu().getItem(4).setVisible(false);
-        }
-
+            if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
+                navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(true); //Clientes nuevos
+            }
     }
 
     @Override
@@ -215,11 +188,7 @@ public class MenuActivity extends AppCompatActivity
 
                 boolean isOnline = Funciones.TestServerConectivity();
                 if (isOnline) {
-                    if (variables_publicas.TipoUsuario.equalsIgnoreCase("Vehiculo")) {
-                        sd.SincronizarDevoluciones();
-                    } else {
-                        sd.SincronizarTodo();
-                    }
+                    sd.SincronizarTodo();
                 }
 
             } catch (final JSONException e) {
@@ -336,20 +305,6 @@ public class MenuActivity extends AppCompatActivity
                 tran.add(R.id.content_frame, new ListaPedidosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
-                break;
-            case R.id.btnNuevaDevoluciones:
-
-                Intent newActi = new Intent(getApplicationContext(), DevolucionesActivity.class);
-                startActivity(newActi);
-                break;
-            case R.id.btnListaDevoluciones:
-
-                fragmentManager.executePendingTransactions();
-                tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ListaDevolucionesFragment());
-                tran.addToBackStack(null);
-                tran.commit();
-
                 break;
             case R.id.btnNuevoPedido:
                 fragmentManager.executePendingTransactions();

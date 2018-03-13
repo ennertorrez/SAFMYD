@@ -191,68 +191,6 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal + " TEXT ,"
                     + variables_publicas.PEDIDOS_DETALLE_COLUMN_Total + " TEXT )");
 
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA + "( "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdConsolidado + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Factura + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdCliente + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Cliente + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_IdVendedor + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Vendedor + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Guardada + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_COLUMN_Direccion + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE + "( "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IdVehiculo + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Factura + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_ITEM + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_Item_Descripcion + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_CANTIDAD + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_PRECIO + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_TOTAL + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_IVA + " TEXT , "
-                    + variables_publicas.CONSOLIDADO_CARGA_DETALLE_COLUMN_DESCUENTO + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES + "( "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_ndevolucion + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_cliente + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_nombrecliente + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_horagraba + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_usuario + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_subtotal + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_iva + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_total + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_estado + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_rango + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_motivo + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_factura + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_tipo + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_IMEI + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_COLUMN_Observaciones + " TEXT ,"
-                    + variables_publicas.DEVOLUCIONES_COLUMN_ejecutada + " TEXT ,"
-                    + variables_publicas.DEVOLUCIONES_COLUMN_procesado+ " TEXT ,"
-                    + variables_publicas.DEVOLUCIONES_COLUMN_IdVehiculo + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE + "( "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_ndevolucion + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_item + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_Item_Descripcion + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_cantidad + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_precio + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_iva + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_subtotal + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_total + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_poriva + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_descuento + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_tipo + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_numero + " TEXT , "
-                    + variables_publicas.DEVOLUCIONES_DETALLE_COLUMN_factura + " TEXT ) ");
-
-
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_MOTIVOS + "( "
-                    + variables_publicas.MOTIVOS_COLUMN_id + " TEXT , "
-                    + variables_publicas.MOTIVOS_COLUMN_motivo + " TEXT ) ");
-
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DPTOMUNIBARRIOS + "( "
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento + " TEXT , "
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + " TEXT , "
@@ -277,11 +215,6 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONFIGURACION_SISTEMA);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONSOLIDADO_CARGA_DETALLE);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DEVOLUCIONES_DETALLE);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_MOTIVOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DPTOMUNIBARRIOS);
             onCreate(db);
         }

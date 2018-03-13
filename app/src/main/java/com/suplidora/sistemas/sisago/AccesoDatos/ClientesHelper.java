@@ -178,6 +178,7 @@ public class ClientesHelper {
 
             }while (c.moveToNext());
         }
+        c.close();
         return  lst;
     }
 
@@ -227,14 +228,16 @@ public class ClientesHelper {
 
             }while (c.moveToNext());
         }
+        c.close();
         return  lst;
     }
 
     public HashMap<String, String>  ObtenerClienteGuardado(String Busqueda) {
-        Cursor c= database.rawQuery("SELECT *,CASE WHEN CodCv='' THEN CodCv ELSE ('Cod_Cv: ' || CodCv) END AS CodCv2, CASE WHEN Nombre = NombreCliente THEN Nombre ELSE  (Nombre || ' / ' || ifnull(NombreCliente,'') ) END AS NombreCompleto FROM "
+        String sql="SELECT *,CASE WHEN CodCv='' THEN CodCv ELSE ('Cod_Cv: ' || CodCv) END AS CodCv2, CASE WHEN Nombre = NombreCliente THEN Nombre ELSE  (Nombre || ' / ' || ifnull(NombreCliente,'') ) END AS NombreCompleto FROM "
                 + variables_publicas.TABLE_CLIENTES+" WHERE (("+variables_publicas.CLIENTES_COLUMN_IdCliente+" = CASE WHEN '' = '"+Busqueda+"' THEN "+variables_publicas.CLIENTES_COLUMN_IdCliente+" ELSE '"+Busqueda+"' END) "+
                 "OR (CodCv = CASE WHEN '"+Busqueda+"' = '' THEN CodCv ELSE '"+ Busqueda +"' END ) )"+
-                " AND NOT("+variables_publicas.CLIENTES_COLUMN_Nombre+"  LIKE 'CLIENTES VARIOS%' AND CodCv= '' )", null);
+                " AND NOT("+variables_publicas.CLIENTES_COLUMN_Nombre+"  LIKE 'CLIENTES VARIOS%' AND CodCv= '' )";
+        Cursor c= database.rawQuery(sql, null);
        // ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
         HashMap<String, String> vCliente = null;
 
@@ -278,6 +281,7 @@ public class ClientesHelper {
 
             }while (c.moveToNext());
         }
+        c.close();
         return  vCliente;
     }
 
@@ -337,7 +341,7 @@ public class ClientesHelper {
                 );
             }while (c.moveToNext());
         }
-
+        c.close();
         return cli;
     }
 
@@ -378,8 +382,8 @@ public class ClientesHelper {
         List<Barrios> list = new ArrayList<Barrios>();
         //String Query = "SELECT DISTINCT * FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " WHERE "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + "= '"+ DesDepto + "' ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
         String Query = "SELECT DISTINCT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio + " ," + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + " WHERE "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento + "= '"+ DesDepto + "' ORDER BY "+ variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio+";";
+        //String Query = "SELECT " + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio + " ," + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " FROM " + variables_publicas.TABLE_DPTOMUNIBARRIOS + ";";
         Cursor c = database.rawQuery(Query, null);
-        c.getCount();
         if (c.moveToFirst()) {
             do {
                 list.add(new Barrios(
@@ -392,30 +396,6 @@ public class ClientesHelper {
         return list;
     }
 
-    public List<String>  ObtenerListaRutas(String Idvendedor) {
-        Cursor c= database.rawQuery("SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor+ "= '"+ Idvendedor + "' ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";", null);
-        List<String> lst= new ArrayList<String>();
-
-        if(c.moveToFirst()){
-            do{
-                lst.add(c.getString(c.getColumnIndex("Ruta")));
-            }while (c.moveToNext());
-        }
-        c.close();
-        return  lst;
-    }
-
-    public List<String> ObtenerRutas( ) {
-        Cursor c= database.rawQuery("SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_Ruta + " FROM " + variables_publicas.TABLE_CLIENTES + " ORDER BY "+ variables_publicas.CLIENTES_COLUMN_Ruta +";",null);
-        List<String> lst= new ArrayList<String>();
-        if(c.moveToFirst()){
-            do{
-                lst.add(c.getString(c.getColumnIndex("Ruta")));
-            }while (c.moveToNext());
-        }
-        c.close();
-        return  lst;
-    }
     public ArrayList<HashMap<String, String>> BuscarClientesVarios( String Idvendedor) {
         String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
         Cursor c = database.rawQuery(Query, null);
@@ -431,7 +411,23 @@ public class ClientesHelper {
         c.close();
         return lst;
     }
-    public String ObtenerClientesVariosId(String Idvendedor) {
+    public ArrayList<HashMap<String, String>> BuscarCedulaClientes( String vCedula) {
+        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_NombreCliente + ", " + variables_publicas.CLIENTES_COLUMN_CodCv + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_Cedula + "= '"+ vCedula + "' LIMIT 1;";
+        Cursor c = database.rawQuery(Query, null);
+        ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String,String> dtCliente= new HashMap<>();
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString(c.getColumnIndex("NombreCliente")));
+                dtCliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString(c.getColumnIndex("CodCv")));
+                lst.add(dtCliente);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+   /* public String ObtenerClientesVariosId(String Idvendedor) {
 
         String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
         Cursor c = database.rawQuery(Query, null);
@@ -444,6 +440,22 @@ public class ClientesHelper {
         }
         c.close();
         return numero;
+    }*/
+
+    public String ObtenerDescripcion(String campoResultado, String tabla, String campoFiltro, String valorFiltro) {
+
+        String Query = "SELECT DISTINCT " + campoResultado + " FROM " + tabla + " WHERE "+ campoFiltro + "= "+ valorFiltro  +";";
+        //String Query = "SELECT count(*) FROM " + variables_publicas.TABLE_CLIENTES + " ;";
+        Cursor c = database.rawQuery(Query, null);
+        String resultado = "";
+        if (c.moveToFirst()) {
+            do {
+                resultado = c.getString(0);
+
+            } while (c.moveToNext());
+        }
+        c.close();
+        return resultado;
     }
 
     public boolean GuardarDptosMuniBarrios(String codDpto, String DesDepto,String codMun, String DesMun,String codBarr, String DesBarr){
@@ -465,7 +477,7 @@ public class ClientesHelper {
         Log.d("DPTOMUNIBARRIOS_deleted", "Datos eliminados");
         return deletedrows!=-1;
     }
-    public ArrayList<HashMap<String, String>> ObtenerClienteCedula( String vCedula) {
+ /*   public ArrayList<HashMap<String, String>> ObtenerClienteCedula( String vCedula) {
         String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ vCedula + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
         Cursor c = database.rawQuery(Query, null);
         ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
@@ -479,5 +491,5 @@ public class ClientesHelper {
         }
         c.close();
         return lst;
-    }
+    }*/
 }
