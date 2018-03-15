@@ -169,9 +169,13 @@ public class SincronizarDatos {
         DbOpenHelper.database.beginTransaction();
 
         ObtenerDptosMuniBarrios();
-
+        String urlStringC="";
         HttpHandler shC = new HttpHandler();
-        String urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 3;
+        if (variables_publicas.usuario.getTipo().equals("Supervisor") || variables_publicas.usuario.getTipo().equals("User")){
+            urlStringC  = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 4;
+        }else {
+             urlStringC = urlClientes + "/" + variables_publicas.usuario.getCodigo() + "/" + 3;
+        }
         String jsonStrC = shC.makeServiceCall(urlStringC);
 
         if (jsonStrC == null) {
@@ -936,5 +940,6 @@ public class SincronizarDatos {
         }
 
     }
+
 
 }
