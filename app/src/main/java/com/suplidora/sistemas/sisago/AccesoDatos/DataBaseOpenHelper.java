@@ -198,6 +198,54 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " TEXT , "
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio + " TEXT , "
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_INFORMES + "( "
+                    + variables_publicas.INFORMES_COLUMN_CodInforme + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_Fecha + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_IdVendedor + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_Aprobada + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_Anulada + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_FechaCreacion + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_Usuario + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DETALLE_INFORMES + "( "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Idvendedor + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_IdCliente + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Saldo + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Monto + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Abono + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_NoCheque + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_BancoE + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_BancoR + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_FechaCK + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_FechaDep + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Efectivo + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Moneda + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Aprobado + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Posfechado + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Procesado + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Usuario + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FACTURAS_PENDIENTES + "( "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Cliente + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Fecha + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_IVA + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Tipo + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_SubTotal + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Descuento + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_BANCOS + "( "
+                    + variables_publicas.BANCOS_COLUMN_codigo + " TEXT , "
+                    + variables_publicas.BANCOS_COLUMN_nombre + " TEXT ) ");
         }
 
         @Override
@@ -216,6 +264,10 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DPTOMUNIBARRIOS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_INFORMES);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_INFORMES);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_FACTURAS_PENDIENTES);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_BANCOS);
             onCreate(db);
         }
     }

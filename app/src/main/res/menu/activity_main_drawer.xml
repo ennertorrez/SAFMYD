@@ -41,6 +41,21 @@
             android:id="@+id/btnMapa"
             android:icon="@drawable/ic_menu_mapmode"
             android:title="Mapa" />
+        <item
+            android:id="@+id/btnRecibos"
+            android:icon="@drawable/ic_menu_share"
+            android:title="Recibos" >
+            <menu>
+                <item
+                    android:id="@+id/btnNuevoInforme"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Agregar Recibo" />
+                <item
+                    android:id="@+id/btnListaInforme"
+                    android:icon="@drawable/ic_menu_mapmode"
+                    android:title="Lista de Informes" />
+            </menu>
+        </item>
     </group>
 
     <item android:title="Reportes">

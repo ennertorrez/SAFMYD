@@ -39,7 +39,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 73;
+    public static final int DATABASE_VERSION = 74;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -55,6 +55,10 @@ public class variables_publicas {
     public static final String TABLE_PRECIO_ESPECIAL = "ListaPrecioEspeciales";
     public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
     public static final String TABLE_DPTOMUNIBARRIOS="DptoMuniBarrio";
+    public static final String TABLE_INFORMES="Informes";
+    public static final String TABLE_DETALLE_INFORMES="DetalleInformes";
+    public static final String TABLE_FACTURAS_PENDIENTES="FacturasPendientes";
+    public static final String TABLE_BANCOS="Bancos";
 
     //Variables CamposTbArticulos
     //public static final String ARTICULO_COLUMN_Id= "Id";
@@ -74,7 +78,7 @@ public class variables_publicas {
     public static final String ARTICULO_COLUMN_AplicaPrecioDetalle = "AplicaPrecioDetalle";
     public static final String ARTICULO_COLUMN_DescuentoMaximo = "DescuentoMaximo";
     public static final String ARTICULO_COLUMN_Detallista = "Detallista";
-    public static  final String ARTICULO_COLUMN_Existencia="Existencia";
+    public static final String ARTICULO_COLUMN_Existencia="Existencia";
     public static final String ARTICULO_COLUMN_UnidadCajaVenta = "UnidadCajaVenta";
     public static final String ARTICULO_COLUMN_IdProveedor = "IdProveedor";
 
@@ -215,11 +219,55 @@ public class variables_publicas {
     public static final String CONFIGURACION_SISTEMA_COLUMN_Activo = "Activo";
 
     //Variables CamposTbDptoMuniBarrios
-    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento = "Codigo_Departamento";
-    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento ="Nombre_Departamento";
-    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio = "Codigo_Municipio";
-    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio ="Nombre_Municipio";
-    public static  final String DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio = "Codigo_Barrio";
-    public static final String  DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio ="Nombre_Barrio";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Codigo_Departamento = "Codigo_Departamento";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento ="Nombre_Departamento";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio = "Codigo_Municipio";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio ="Nombre_Municipio";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Codigo_Barrio = "Codigo_Barrio";
+    public static final String DPTOMUNIBARRIOS_COLUMN_Nombre_Barrio ="Nombre_Barrio";
+
+    public static  final String INFORMES_COLUMN_CodInforme = "CodInforme";
+    public static  final String INFORMES_COLUMN_Fecha = "Fecha";
+    public static  final String INFORMES_COLUMN_IdVendedor = "IdVendedor";
+    public static  final String INFORMES_COLUMN_Aprobada = "Aprobada";
+    public static  final String INFORMES_COLUMN_Anulada = "Anulada";
+    public static  final String INFORMES_COLUMN_FechaCreacion = "FechaCreacion";
+    public static  final String INFORMES_COLUMN_Usuario = "Usuario";
+
+    public static  final String DETALLEINFORMES_COLUMN_CodInforme = "CodInforme";
+    public static  final String DETALLEINFORMES_COLUMN_Recibo = "Recibo";
+    public static  final String DETALLEINFORMES_COLUMN_Idvendedor = "Idvendedor";
+    public static  final String DETALLEINFORMES_COLUMN_IdCliente = "IdCliente";
+    public static  final String DETALLEINFORMES_COLUMN_Factura = "Factura";
+    public static  final String DETALLEINFORMES_COLUMN_Saldo = "Saldo";
+    public static  final String DETALLEINFORMES_COLUMN_Monto = "Monto";
+    public static  final String DETALLEINFORMES_COLUMN_Abono = "Abono";
+    public static  final String DETALLEINFORMES_COLUMN_NoCheque = "NoCheque";
+    public static  final String DETALLEINFORMES_COLUMN_BancoE = "BancoE";
+    public static  final String DETALLEINFORMES_COLUMN_BancoR = "BancoR";
+    public static  final String DETALLEINFORMES_COLUMN_FechaCK = "FechaCK";
+    public static  final String DETALLEINFORMES_COLUMN_FechaDep = "FechaDep";
+    public static  final String DETALLEINFORMES_COLUMN_Efectivo = "Efectivo";
+    public static  final String DETALLEINFORMES_COLUMN_Moneda = "Moneda";
+    public static  final String DETALLEINFORMES_COLUMN_Aprobado = "Aprobado";
+    public static  final String DETALLEINFORMES_COLUMN_Posfechado = "Posfechado";
+    public static  final String DETALLEINFORMES_COLUMN_Procesado = "Procesado";
+    public static  final String DETALLEINFORMES_COLUMN_Usuario = "Usuario";
+
+    public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Cliente = "Cliente";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_CodigoCliente = "CodigoCliente";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Fecha = "Fecha";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_IVA = "IVA";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Tipo = "Tipo";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_SubTotal = "SubTotal";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Descuento = "Descuento";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Total = "Total";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Abono = "Abono";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Saldo = "Saldo";
+
+    public static  final String BANCOS_COLUMN_codigo = "Codigo";
+    public static final String  BANCOS_COLUMN_nombre ="Nombre";
 
 }

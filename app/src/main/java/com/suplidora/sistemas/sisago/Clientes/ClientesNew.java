@@ -888,8 +888,8 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
         cboDiaVisita.setSelection(getIndex(cboDiaVisita, "No Determinado"));
 
         //Combo Tipo de Negocio
-        String[] valoresTipoNeg = {"Pulperia", "Mini Super", "Hogar con Venta", "Farmacia", "Comedor", "Variedades", "Distribuidora", "Restaurante", "Cafetín",
-                "Hotel", "Ferretería", "Panadería", "Barbería", "Bar", "Veterinaria", "Gasolinera", "Licorería", "Tienda", "Miscelanea", "Otros"};
+        String[] valoresTipoNeg = {"Pulperia", "Distribuidora", "Supermercado", "Hotel-Hospedaje", "Motel", "Veterinaria", "Bar-Restaurante", "Sala de Belleza",
+                "Farmacia", "Ferreteria", "Gimnacio", "Institucion", "Panaderia", "Tienda de Conveniencia", "Zona Franca", "Otros"};
         cboTipoNeg.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, valoresTipoNeg));
         cboTipoNeg.setSelection(getIndex(cboTipoNeg, "Pulperia"));
     }

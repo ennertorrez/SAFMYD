@@ -150,6 +150,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigPromo024;
     Configuraciones ConfigPromoSalnica;
     Configuraciones ConfigPromoGaga;
+    Configuraciones ConfigPromoGaga2;
     Configuraciones ConfigPromoUnicoCliente;
     Configuraciones ConfigPromoHenkel;
     Configuraciones ConfigPromoOrixMayoreo;
@@ -255,6 +256,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigPromo024 = ConfigSistemaH.BuscarValorConfig("Promo 024");
         ConfigPromoSalnica = ConfigSistemaH.BuscarValorConfig("Promo Salnicsa");
         ConfigPromoGaga = ConfigSistemaH.BuscarValorConfig("Promo Gaga");
+        ConfigPromoGaga2 = ConfigSistemaH.BuscarValorConfig("Promo Gaga Exhibidor");
         ConfigPromoUnicoCliente =  ConfigSistemaH.BuscarValorConfig("PromoUnicoCliente");
         ConfigPromoHenkel = ConfigSistemaH.BuscarValorConfig("Promocion Henkel");
         ConfigPromoOrixMayoreo = ConfigSistemaH.BuscarValorConfig("Promo Orix");
@@ -527,6 +529,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       AplicarPromocion024();
                                                       AplicarPromocionSalnica();
                                                       AplicarPromocionGagayOrix();
+                                                      AplicarPromocionGaga();
                                                       AplicarPromocionHenkel();
                                                       AplicarPromocionUnicoCliente();
                                                       AplicarPromocionOrixMayoreo();
@@ -769,7 +772,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void AplicarPromocionHenkel() {
 
-        if (cliente.getTipo().equalsIgnoreCase("Super")) {
+        if (cliente.getTipo().equalsIgnoreCase("Super")|| variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")||variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
             return;
         }
 
@@ -780,7 +783,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         try {
             fechaActual = dateFormat.parse(variables_publicas.FechaActual);
             /*Esta fecha limite la definimos en base a correo de GALA con fecha: 2017-10-07 Titulo:  RE: PROMOCION HENKEL 9 OCTUBRE AL 31 DE DICIEMBRE. */
-            fechaLimite = dateFormat.parse("2018-05-01 00:00:00");
+            fechaLimite = dateFormat.parse("2018-12-31 00:00:00");
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -797,7 +800,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
 
             Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-01-1007");
-            Articulo articuloB2 = ArticulosH.BuscarArticulo("4000-01-01-01-900");
+            Articulo articuloB2 = ArticulosH.BuscarArticulo("4000-01-01-01-1016");
 
             int cantidadB = 0;
             int cantidadB2 = 0;
@@ -805,16 +808,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             int cantidadGeneral =0;
             boolean esContenido = false;
 
-            if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")) {
+          //  if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")) {
                 cantidadB = 9;
-                cantidadB2 = 6;
+                cantidadB2 = 9;
                 cantRequerida = 96;
 
-            } else{
+         /*   } else{
                 cantidadB = 1;
                 cantidadB2 = 1;
                 cantRequerida = 4;
-            }
+            }*/
 
             boolean existe = false;
 
@@ -881,14 +884,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     HashMap<String, String> articuloBonificado2 = new HashMap<>();
                     articuloBonificado2.put("CodigoPedido", pedido.getCodigoPedido());
-                    articuloBonificado2.put("Cod", "900");
+                    articuloBonificado2.put("Cod", "1016");
                     articuloBonificado2.put("CodigoArticulo", articuloB2.getCodigo());
                     articuloBonificado2.put("Um", articuloB2 == null ? "UNIDAD" : articuloB2.getUnidad());
                     int factor2 = (int) Math.floor(cantidadGeneral/cantRequerida) ;
                     articuloBonificado2.put("Cantidad", String.valueOf((int) (factor2 * cantidadB2)));
                     articuloBonificado2.put("Precio", "0");
                     articuloBonificado2.put("TipoPrecio", "0");
-                    articuloBonificado2.put("Descripcion", "**GEL XTREME ATTRACTION 1/12/200G");
+                    articuloBonificado2.put("Descripcion", "**GEL XTREME PROFESSIONAL 1/24/100 GR");
                     articuloBonificado2.put("Costo", "0");
                     articuloBonificado2.put("PorDescuento", "0");
                     articuloBonificado2.put("TipoArt", "B");
@@ -1292,14 +1295,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             return;
         }
 
-        if ((cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2") ||cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoGaga != null && ConfigPromoGaga.getActivo().equalsIgnoreCase("true")) {
+        if ((cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2") ||cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoGaga2 != null && ConfigPromoGaga2.getActivo().equalsIgnoreCase("true")) {
             //Validamos que solamente se puedan ingresar 18 articulos
             if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
                 return;
             }
             Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-04-1088");
-            List<String> items = Arrays.asList(ConfigPromoGaga.getValor().split(","));
+            List<String> items = Arrays.asList(ConfigPromoGaga2.getValor().split(","));
 
 
             boolean existe = false;
@@ -2166,6 +2169,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         AplicarPromocion024();
                         AplicarPromocionSalnica();
                         AplicarPromocionGagayOrix();
+                        AplicarPromocionGaga();
                         AplicarPromocionHenkel();
                         AplicarPromocionUnicoCliente();
                         AplicarPromocionOrixMayoreo();
@@ -2189,6 +2193,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocion024();
                                 AplicarPromocionSalnica();
                                 AplicarPromocionGagayOrix();
+                                AplicarPromocionGaga();
                                 AplicarPromocionHenkel();
                                 AplicarPromocionUnicoCliente();
                                 AplicarPromocionOrixMayoreo();
@@ -2233,6 +2238,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         AplicarPromocion024();
                                                         AplicarPromocionSalnica();
                                                         AplicarPromocionGagayOrix();
+                                                        AplicarPromocionGaga();
                                                         AplicarPromocionHenkel();
                                                         AplicarPromocionUnicoCliente();
                                                         AplicarPromocionOrixMayoreo();
@@ -2273,6 +2279,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocion024();
                                 AplicarPromocionSalnica();
                                 AplicarPromocionGagayOrix();
+                                AplicarPromocionGaga();
                                 AplicarPromocionHenkel();
                                 AplicarPromocionUnicoCliente();
                                 AplicarPromocionOrixMayoreo();
@@ -2333,6 +2340,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             AplicarPromocion024();
                             AplicarPromocionSalnica();
                             AplicarPromocionGagayOrix();
+                            AplicarPromocionGaga();
                             AplicarPromocionHenkel();
                             AplicarPromocionUnicoCliente();
                             AplicarPromocionOrixMayoreo();
@@ -2833,6 +2841,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     AplicarPromocion024();
                     AplicarPromocionSalnica();
                     AplicarPromocionGagayOrix();
+                    AplicarPromocionGaga();
                     AplicarPromocionHenkel();
                     AplicarPromocionUnicoCliente();
                     AplicarPromocionOrixMayoreo();

@@ -42,6 +42,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Informes.InformesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
@@ -146,6 +147,7 @@ public class MenuActivity extends AppCompatActivity
             ex.printStackTrace();
         }
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
+            navigationView.getMenu().getItem(4).setVisible(false); //Recibos
 
             if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
                 navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(true); //Clientes nuevos
@@ -299,6 +301,12 @@ public class MenuActivity extends AppCompatActivity
                 Intent newCli = new Intent(getApplicationContext(), ClientesNew.class);
                 startActivity(newCli);
                 break;
+
+            case R.id.btnNuevoInforme:
+                Intent newRecibo = new Intent(getApplicationContext(), InformesActivity.class);
+                startActivity(newRecibo);
+                break;
+
             case R.id.btnListadoPedidos:
 
                 fragmentManager.executePendingTransactions();

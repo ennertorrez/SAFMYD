@@ -12,6 +12,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
@@ -66,6 +67,7 @@ public class SincronizarDatos {
     private PrecioEspecialHelper PrecioEspecialH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
+    private InformesHelper InformesH;
 
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -607,8 +609,10 @@ public class SincronizarDatos {
                                         if (SincronizarClientesSucursal()) {
                                             if ( SincronizarConfiguracionSistema()) {
                                                 if(ActualizarUsuario()){
-                                                    SincronizarPedidosLocales();
-                                                    return true;
+                                                    if (ObtenerBancos()) {
+                                                        SincronizarPedidosLocales();
+                                                        return true;
+                                                    }
                                                 }
                                             }
                                         }
@@ -630,6 +634,7 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
+        ObtenerBancos();
     }
 
     public boolean SincronizarPedidosLocales() {
@@ -884,6 +889,57 @@ public class SincronizarDatos {
 
         }
 
+    }
+
+    private boolean ObtenerBancos() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerListaBancos";;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************BANCOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                DbOpenHelper.database.beginTransaction();
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray bancos = jsonObj.getJSONArray("ObtenerListaBancosResult");
+                if (bancos.length() == 0) {
+                    return false;
+                }
+                InformesH.EliminarBancos();
+                // looping through All Contacts
+
+                for (int i = 0; i < bancos.length(); i++) {
+                    JSONObject c = bancos.getJSONObject(i);
+                    InformesH.GuardarBancos(c.get("Codigo").toString(),c.get("Nombre").toString());
+                }
+                DbOpenHelper.database.setTransactionSuccessful();
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener el listado de Bancos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+            finally {
+                DbOpenHelper.database.endTransaction();
+            }
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        return false;
     }
 
     public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente) {
