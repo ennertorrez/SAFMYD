@@ -5,8 +5,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.text.TextUtils;
@@ -29,10 +33,20 @@ import android.widget.Toast;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,17 +89,30 @@ public class AgregarRecibo extends Activity {
     private String busqueda = "1";
     private  String tipoBusqueda = "2";
     private ClientesHelper ClientesH;
+    private InformesHelper InformesH;
+    private InformesDetalleHelper InformesDetalleH;
     private DataBaseOpenHelper DbOpenHelper;
     private boolean finalizar = false;
     private Cliente cliente;
     AlertDialog alertDialog;
+    private boolean isOnline = false;
+    private String TAG = AgregarRecibo.class.getSimpleName();
+    final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
+    private SincronizarDatos sd;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recibos);
 
+        ValidarUltimaVersion();
+        if (isOnline) {
+            SincronizarConfig();
+        }
+
         DbOpenHelper = new DataBaseOpenHelper(AgregarRecibo.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
+        InformesH = new InformesHelper(DbOpenHelper.database);
+        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
 
         lblNoInforme = (TextView) findViewById(R.id.lblNoInforme);
         lblTc = (TextView) findViewById(R.id.lblTC);
@@ -113,6 +140,8 @@ public class AgregarRecibo extends Activity {
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
 
+        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH);
+
         //Funciones funciones= new Funciones();
         btnBuscarCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -136,7 +165,6 @@ public class AgregarRecibo extends Activity {
     }
     public void BuscarCliente() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-// ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = null;
 
@@ -186,7 +214,7 @@ public class AgregarRecibo extends Activity {
                         R.id.Direccion});
 
                 lvItem.setAdapter(adapter);
-                lblFooterItem.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientesItem.size()));
+                lblFooterItem.setText("ClienteS Encontrados: " + String.valueOf(listaClientesItem.size()));
 
             }
         });
@@ -235,5 +263,169 @@ public class AgregarRecibo extends Activity {
         dlgAlert.setCancelable(true);
         dlgAlert.create().show();
     }
+    private void ValidarUltimaVersion() {
 
+        String latestVersion = "";
+        String currentVersion = getCurrentVersion();
+        variables_publicas.VersionSistema = currentVersion;
+        try {
+
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new GetLatestVersion().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new GetLatestVersion().execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private String getCurrentVersion() {
+        PackageManager pm = this.getPackageManager();
+        PackageInfo pInfo = null;
+
+        try {
+            pInfo = pm.getPackageInfo(this.getPackageName(), 0);
+
+        } catch (PackageManager.NameNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        String currentVersion = pInfo.versionName;
+
+        return currentVersion;
+    }
+
+    private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
+        String latestVersion;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                CheckConnectivity();
+                if (isOnline) {
+                    //It retrieves the latest version by scraping the content of current version from play store at runtime
+                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+                    Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+          /*  if (pDialog.isShowing())
+                pDialog.dismiss();
+*/
+            String currentVersion = getCurrentVersion();
+            variables_publicas.VersionSistema = currentVersion;
+            if (latestVersion != null && !currentVersion.equals(latestVersion)) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(ClientesNew.this);
+                builder.setTitle("Nueva version disponible");
+                builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
+                builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Click button action
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.suplidora.sistemas.sisago&hl=es")));
+                        dialog.dismiss();
+                    }
+                });
+                builder.setCancelable(false);
+                if (isFinishing()) {
+                    return;
+                }
+                builder.show();
+            }
+        }
+    }
+
+    private void CheckConnectivity() {
+        isOnline = Funciones.TestServerConectivity();
+    }
+    private void SincronizarConfig() {
+        if (Build.VERSION.SDK_INT >= 11) {
+            //--post GB use serial executor by default --
+            new GetValorConfig().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+        } else {
+            //--GB uses ThreadPoolExecutor by default--
+            new GetValorConfig().execute();
+        }
+    }
+    //region ObtieneValorConfiguracion
+    private class GetValorConfig extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            HttpHandler sh = new HttpHandler();
+            String urlString = urlGetConfiguraciones;
+
+            String jsonStr = sh.makeServiceCall(urlString);
+
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            /**********************************USUARIOS**************************************/
+            if (jsonStr != null) {
+
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    JSONArray Usuarios = jsonObj.getJSONArray("GetConfiguracionesResult");
+
+                    for (int i = 0; i < Usuarios.length(); i++) {
+                        JSONObject c = Usuarios.getJSONObject(i);
+                        String Valor = c.getString("Valor");
+                        String Configuracion = c.getString("Configuracion");
+                        String ConfigVDatos = "VersionDatos";
+                        if (Configuracion.equals(ConfigVDatos)) {
+                            variables_publicas.ValorConfigServ = Valor;
+
+                            int ValorConfigLocal = Integer.parseInt(variables_publicas.Configuracion.getValor());
+                            int ValorConfigServidor = Integer.parseInt(variables_publicas.ValorConfigServ);
+
+                            if (ValorConfigLocal < ValorConfigServidor) {
+                                sd.SincronizarTablas();
+                            }
+
+                        }
+                    }
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "No se ha podido establecer contacto con el servidor");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "No se ha podido establecer contacto con el servidor",
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+                }
+            } else {
+
+                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "No se ha podido establecer contacto con el servidor",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+
+            return null;
+        }
+    }
 }

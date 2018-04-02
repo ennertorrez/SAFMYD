@@ -11,7 +11,9 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -53,6 +55,7 @@ public class SincronizarDatos {
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
     static final String urlConsultarExistencias = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerInventarioArticulo/";
+    final String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
     private String TAG = SincronizarDatos.class.getSimpleName();
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
@@ -68,6 +71,8 @@ public class SincronizarDatos {
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
     private InformesHelper InformesH;
+    private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
 
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -105,6 +110,13 @@ public class SincronizarDatos {
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh ) {
         DbOpenHelper = dbh;
+        ClientesH = Clientesh;
+    }
+
+    public SincronizarDatos(DataBaseOpenHelper dbh, InformesHelper Informessh,InformesDetalleHelper InformesDetallesh ,ClientesHelper Clientesh) {
+        DbOpenHelper = dbh;
+        InformesH = Informessh;
+        InformesDetalleH = InformesDetallesh;
         ClientesH = Clientesh;
     }
 
@@ -610,8 +622,11 @@ public class SincronizarDatos {
                                             if ( SincronizarConfiguracionSistema()) {
                                                 if(ActualizarUsuario()){
                                                     if (ObtenerBancos()) {
-                                                        SincronizarPedidosLocales();
-                                                        return true;
+                                                        if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0"))
+                                                        {
+                                                            SincronizarPedidosLocales();
+                                                            return true;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -635,6 +650,7 @@ public class SincronizarDatos {
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
         ObtenerBancos();
+        SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0");
     }
 
     public boolean SincronizarPedidosLocales() {
@@ -894,7 +910,7 @@ public class SincronizarDatos {
     private boolean ObtenerBancos() {
 
         HttpHandler sh = new HttpHandler();
-        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerListaBancos";;
+        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerListaBancos";
         String encodeUrl = "";
         try {
             URL Url = new URL(urlString);
@@ -997,5 +1013,51 @@ public class SincronizarDatos {
 
     }
 
+    private boolean SincronizarFacturasPendientes(String vVendedor, String vCliente) throws JSONException {
+        HttpHandler shC = new HttpHandler();
+        String urlStringC = urlGetFacturasPendientes + vVendedor + "/" + vCliente;
+        String jsonStrC = shC.makeServiceCall(urlStringC);
 
+        if (jsonStrC == null) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Facturas Pendientes, Respuesta nula GET", variables_publicas.info + urlStringC, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        //Log.e(TAG, "Response from url: " + jsonStrC);
+        DbOpenHelper.database.beginTransaction();
+
+        FacturasPendientesH.EliminaFacturasPendientes();
+        JSONObject jsonObjC = new JSONObject(jsonStrC);
+        // Getting JSON Array node
+        JSONArray articulos = jsonObjC.getJSONArray("SpObtieneFacturasSaldoPendienteResult");
+
+
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < articulos.length(); i++) {
+                JSONObject c = articulos.getJSONObject(i);
+
+                String codvendedor = c.getString("codvendedor");
+                String No_Factura = c.getString("No_Factura");
+                String Cliente = c.getString("Cliente");
+                String CodigoCliente = c.getString("CodigoCliente");
+                String Fecha = c.getString("Fecha");
+                String IVA = c.getString("IVA");
+                String Tipo = c.getString("Tipo");
+                String SubTotal = c.getString("SubTotal");
+                String Descuento = c.getString("Descuento");
+                String Total = c.getString("Total");
+                String Abono = c.getString("Abono");
+                String Saldo = c.getString("Saldo");
+                FacturasPendientesH.GuardarFacturasPendientes(codvendedor,Fecha, No_Factura, Cliente, CodigoCliente, IVA, Tipo, SubTotal, Descuento, Total, Abono, Saldo);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Facturas Pendientes, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        } finally {
+            DbOpenHelper.database.endTransaction();
+        }
+
+    }
 }
