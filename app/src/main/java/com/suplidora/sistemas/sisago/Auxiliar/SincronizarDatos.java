@@ -96,28 +96,41 @@ public class SincronizarDatos {
         PedidosDetalleH = pedidosDetalleH;
     }
 
-  /*   public SincronizarDatos(DataBaseOpenHelper dbh,  ConfiguracionSistemaHelper ConfigSistemah,
-                             ArticulosHelper Articulosh, UsuariosHelper usuariosH) {
+    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
+                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
+                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
+                            PrecioEspecialHelper PrecioEspecialh, ConfiguracionSistemaHelper ConfigSistemah,
+                            ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, InformesHelper Informesh, InformesDetalleHelper InformesDetalleh,FacturasPendientesHelper FacturasPendientesh ) {
         DbOpenHelper = dbh;
+        ClientesH = Clientesh;
+        VendedoresH = Vendedoresh;
+        CartillasBcH = CatillasBch;
+        CartillasBcDetalleH = CartillasBcDetalleh;
+        FormaPagoH = FormaPagoh;
+        PrecioEspecialH = PrecioEspecialh;
         ConfigSistemasH = ConfigSistemah;
+        ClientesSucH = ClientesSuch;
         ArticulosH = Articulosh;
         UsuariosH = usuariosH;
-       ConsolidadoCargaH = ConsolidadoCargah;
-        ConsolidadoCargaDetalleH = ConsolidadoCargaDetalleh;
-        DevolucionesH =devolucionesH;
-        DevolucionesDetalleH =devolucionesDetalleH;
-    }*/
+        PedidosH = pedidoH;
+        PedidosDetalleH = pedidosDetalleH;
+        InformesH=Informesh;
+        InformesDetalleH=InformesDetalleh;
+        FacturasPendientesH=FacturasPendientesh;
+    }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh ) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
     }
 
-    public SincronizarDatos(DataBaseOpenHelper dbh, InformesHelper Informessh,InformesDetalleHelper InformesDetallesh ,ClientesHelper Clientesh) {
+    public SincronizarDatos(DataBaseOpenHelper dbh, InformesHelper Informessh,InformesDetalleHelper InformesDetallesh ,ClientesHelper Clientesh, FacturasPendientesHelper FacturasPendientesh) {
         DbOpenHelper = dbh;
         InformesH = Informessh;
         InformesDetalleH = InformesDetallesh;
         ClientesH = Clientesh;
+        FacturasPendientesH = FacturasPendientesh;
     }
 
     private boolean SincronizarArticulos() throws JSONException {
@@ -611,22 +624,20 @@ public class SincronizarDatos {
 
     public boolean SincronizarTodo() throws JSONException {
 
-            if (SincronizarArticulos()) {
-                if (SincronizarClientes()) {
-                    if (SincronizarVendedores()) {
-                        if (SincronizarCartillasBc()) {
-                            if (SincronizarCartillasBcDetalle()) {
-                                if (SincronizarFormaPago()) {
-                                    if (SincronizarPrecioEspecial()) {
-                                        if (SincronizarClientesSucursal()) {
-                                            if ( SincronizarConfiguracionSistema()) {
-                                                if(ActualizarUsuario()){
-                                                    if (ObtenerBancos()) {
-                                                        if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0"))
-                                                        {
-                                                            SincronizarPedidosLocales();
-                                                            return true;
-                                                        }
+        if (SincronizarArticulos()) {
+            if (SincronizarClientes()) {
+                if (SincronizarVendedores()) {
+                    if (SincronizarCartillasBc()) {
+                        if (SincronizarCartillasBcDetalle()) {
+                            if (SincronizarFormaPago()) {
+                                if (SincronizarPrecioEspecial()) {
+                                    if (SincronizarClientesSucursal()) {
+                                        if ( SincronizarConfiguracionSistema()) {
+                                            if(ActualizarUsuario()){
+                                                if (ObtenerBancos()) {
+                                                    if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0")) {
+                                                        SincronizarPedidosLocales();
+                                                        return true;
                                                     }
                                                 }
                                             }
@@ -638,8 +649,10 @@ public class SincronizarDatos {
                     }
                 }
             }
+        }
         return false;
     }
+
 
     public void SincronizarTablas() throws JSONException {
         SincronizarArticulos();
@@ -649,8 +662,6 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
-        ObtenerBancos();
-        SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0");
     }
 
     public boolean SincronizarPedidosLocales() {
@@ -926,7 +937,7 @@ public class SincronizarDatos {
         if (jsonStr != null) {
 
             try {
-                DbOpenHelper.database.beginTransaction();
+                //DbOpenHelper.database.beginTransaction();
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
                 JSONArray bancos = jsonObj.getJSONArray("ObtenerListaBancosResult");
@@ -940,22 +951,23 @@ public class SincronizarDatos {
                     JSONObject c = bancos.getJSONObject(i);
                     InformesH.GuardarBancos(c.get("Codigo").toString(),c.get("Nombre").toString());
                 }
-                DbOpenHelper.database.setTransactionSuccessful();
+                return true;
+               // DbOpenHelper.database.setTransactionSuccessful();
             } catch (Exception ex) {
                 Log.e("Error", ex.getMessage());
                 new Funciones().SendMail("Ha ocurrido un error al obtener el listado de Bancos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
                 return false;
             }
 
-            finally {
+          /*  finally {
                 DbOpenHelper.database.endTransaction();
-            }
+            }*/
 
         } else {
             new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
-        return false;
+        //return false;
     }
 
     public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente) {

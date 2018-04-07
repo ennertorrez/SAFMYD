@@ -1391,6 +1391,17 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             return;
         }
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date fechaActual = new Date();
+        Date fechaLimite = new Date();
+        try {
+            fechaActual = dateFormat.parse(variables_publicas.FechaActual);
+            fechaLimite = dateFormat.parse("2018-05-01 00:00:00");
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         if ((cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2") ||cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoGaga != null && ConfigPromoGaga.getActivo().equalsIgnoreCase("true")) {
             //Validamos que solamente se puedan ingresar 18 articulos
             if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
@@ -1420,16 +1431,29 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             }
             int factor=0;
-            if (cantidad >=12 && cantxTipoCliente ==2) {
-                factor = (int) Math.floor(cantidad/ 12);
-                cantidadB = factor * 1;
-            }else if (cantidad >=24 && cantxTipoCliente ==1){
-                factor = (int) Math.floor(cantidad/ 24);
-                cantidadB = factor * 2;
-            }
-            else
-            {
-                cantidadB=0;
+
+            if (fechaActual.before(fechaLimite)){
+                if (cantidad >=6 && cantxTipoCliente ==2) {
+                    factor = (int) Math.floor(cantidad/ 6);
+                    cantidadB = factor * 1;
+                }else if (cantidad >=24 && cantxTipoCliente ==1){
+                    factor = (int) Math.floor(cantidad/ 24);
+                    cantidadB = factor * 2;
+                }
+                else
+                {
+                    cantidadB=0;
+                }
+            }else {
+                if (cantidad >= 12 && cantxTipoCliente == 2) {
+                    factor = (int) Math.floor(cantidad / 12);
+                    cantidadB = factor * 1;
+                } else if (cantidad >= 24 && cantxTipoCliente == 1) {
+                    factor = (int) Math.floor(cantidad / 24);
+                    cantidadB = factor * 2;
+                } else {
+                    cantidadB = 0;
+                }
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/

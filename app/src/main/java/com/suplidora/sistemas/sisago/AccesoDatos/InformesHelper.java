@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Entidades.Pedido;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,14 +42,14 @@ public class InformesHelper {
         else return false;
     }
 
-    public boolean ActualizarInforme(String CodInforme) {
+   /* public boolean ActualizarInforme(String CodInforme) {
         ContentValues con = new ContentValues();
         con.put("CodInforme", CodInforme);
         long rowInserted = database.update(variables_publicas.TABLE_INFORMES, con, variables_publicas.INFORMES_COLUMN_CodInforme + "= '" + CodInforme+"'", null);
         if (rowInserted != -1)
             return true;
         else return false;
-    }
+    }*/
 
     public List<HashMap<String, String>> ObtenerListaInformes() {
         HashMap<String, String> informe = null;
@@ -116,11 +114,25 @@ public class InformesHelper {
         return informe;
     }
 
+    /*public void EliminarBancos() {
+        database.execSQL("DELETE FROM "+variables_publicas.TABLE_BANCOS+";");
+        Log.d("bancos_deleted", "Datos eliminados");
+    }*/
+
     public boolean EliminarBancos() {
         long deletedrows=  database.delete( variables_publicas.TABLE_BANCOS,null,null);
         Log.d("bancos_deleted", "Datos eliminados");
         return deletedrows!=-1;
     }
+
+ /*   public void GuardarBancos(String cod, String banco){
+        long rows = 0;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.BANCOS_COLUMN_codigo, cod);
+        contentValues.put(variables_publicas.BANCOS_COLUMN_nombre, banco);
+        database.insert(variables_publicas.TABLE_BANCOS, null, contentValues);
+    }*/
+
     public boolean GuardarBancos(String cod, String banco){
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -131,4 +143,5 @@ public class InformesHelper {
             return true;
         else return false;
     }
+
 }

@@ -33,7 +33,10 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
@@ -78,6 +81,9 @@ public class MenuActivity extends AppCompatActivity
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
+    private InformesHelper InformesH;
+    private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
 
     @Override
@@ -135,10 +141,13 @@ public class MenuActivity extends AppCompatActivity
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
+        InformesH = new InformesHelper(DbOpenHelper.database);
+        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
+        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH, FormaPagoH,PrecioEspecialH, ConfigH, ClientesSucH,
-                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
+                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH);
 
         try {
             variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";
@@ -147,7 +156,7 @@ public class MenuActivity extends AppCompatActivity
             ex.printStackTrace();
         }
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
-            //navigationView.getMenu().getItem(4).setVisible(false); //Recibos
+            navigationView.getMenu().getItem(4).setVisible(false); //Recibos
 
             if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
                 navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(true); //Clientes nuevos

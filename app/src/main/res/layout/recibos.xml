@@ -156,7 +156,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
 
                     <TextView
                         android:id="@+id/lblFactura"
@@ -169,10 +169,19 @@
                         android:textSize="13dp"
                         android:textStyle="bold" />
 
-                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-                        android:id="@+id/cboFactura"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                    <TextView
+                        android:id="@+id/lblSearch"
+                        android:layout_width="97dp"
+                        android:layout_height="wrap_content"
+
+                        android:background="@drawable/spinner_background_big"
+                        android:cursorVisible="false"
+                        android:focusableInTouchMode="false"
+                        android:gravity="center"
+                        android:text="Seleccionar"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 

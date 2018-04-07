@@ -3,6 +3,7 @@ package com.suplidora.sistemas.sisago.Informes;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -111,6 +112,13 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                 Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
                 agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
                 startActivity(agrRecibo);
+
+            }
+        });
+        btnCancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InformesActivity.this.onBackPressed();
             }
         });
     }
@@ -174,5 +182,19 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             }
         }
         return index;
+    }
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage("Esta seguro que desea cancelar el Informe actual?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        InformesActivity.this.finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 }

@@ -37,7 +37,10 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
@@ -103,6 +106,9 @@ public class Login extends Activity {
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
+    private InformesHelper InformesH;
+    private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
     private SincronizarDatos sd;
     String MsjLoging = "";
@@ -133,11 +139,14 @@ public class Login extends Activity {
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
+        InformesH = new InformesHelper(DbOpenHelper.database);
+        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
+        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH);
+                PrecioEspecialH, ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);

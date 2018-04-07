@@ -2,6 +2,7 @@ package com.suplidora.sistemas.sisago.Informes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +14,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,15 +25,19 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
@@ -39,6 +46,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 
@@ -48,8 +56,17 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
+
+import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
 /**
  * Created by Sistemas on 19/3/2018.
@@ -61,13 +78,18 @@ public class AgregarRecibo extends Activity {
     private TextView lblTc;
     private TextView lblNoRecibo;
     private TextView txtFechaRecibo;
+    private String fechaRecibo = "";
+    private String fechaDoc = "";
     private TextView lblIdCliente;
     private EditText txtNombreCliente;
     private Button btnBuscarCliente;
-    private Spinner cboFactura;
+    private TextView lblSearch;
     private TextView lblSaldo;
     private EditText txtMonto;
     private TextView lblMontoLetras;
+    private RadioButton rbEfectivo;
+    private RadioButton rbCheque;
+    private RadioButton rbDeposito;
     private RadioGroup rgFormaPago;
     private TextView lblDescTipoPago;
     private EditText txtValorDocPago;
@@ -91,6 +113,7 @@ public class AgregarRecibo extends Activity {
     private ClientesHelper ClientesH;
     private InformesHelper InformesH;
     private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
     private DataBaseOpenHelper DbOpenHelper;
     private boolean finalizar = false;
     private Cliente cliente;
@@ -99,6 +122,13 @@ public class AgregarRecibo extends Activity {
     private String TAG = AgregarRecibo.class.getSimpleName();
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
     private SincronizarDatos sd;
+    java.util.ArrayList<String> CcFactura;
+    SpinnerDialog spinnerDialog;
+    List<HashMap<String, String>> ObtieneCFactura = null;
+    public double saldoFactura;
+    private DecimalFormat df;
+    public Calendar myCalendar = Calendar.getInstance();
+    private String vNoInforme;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,10 +139,18 @@ public class AgregarRecibo extends Activity {
             SincronizarConfig();
         }
 
+        df = new DecimalFormat("#0.00");
+        DecimalFormatSymbols fmts = new DecimalFormatSymbols();
+        fmts.setGroupingSeparator(',');
+        df.setGroupingSize(3);
+        df.setGroupingUsed(true);
+        df.setDecimalFormatSymbols(fmts);
+
         DbOpenHelper = new DataBaseOpenHelper(AgregarRecibo.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         InformesH = new InformesHelper(DbOpenHelper.database);
         InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
+        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
 
         lblNoInforme = (TextView) findViewById(R.id.lblNoInforme);
         lblTc = (TextView) findViewById(R.id.lblTC);
@@ -121,7 +159,7 @@ public class AgregarRecibo extends Activity {
         lblIdCliente = (TextView) findViewById(R.id.lblIdCliente);
         txtNombreCliente = (EditText) findViewById(R.id.txtNombreCliente);
         btnBuscarCliente = (Button) findViewById(R.id.btnBuscarCliente);
-        cboFactura = (Spinner) findViewById(R.id.cboFactura);
+        lblSearch = (TextView) findViewById(R.id.lblSearch);
         lblSaldo = (TextView) findViewById(R.id.txtSaldo);
         txtMonto = (EditText) findViewById(R.id.txtMonto);
         lblMontoLetras = (TextView) findViewById(R.id.lblMontoLetras);
@@ -139,9 +177,21 @@ public class AgregarRecibo extends Activity {
         lblFooter = (TextView) findViewById(R.id.lblFooter);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
+        rbEfectivo = (RadioButton) findViewById(R.id.rbEfectivo);
+        rbCheque = (RadioButton) findViewById(R.id.rbCheque);
+        rbDeposito = (RadioButton) findViewById(R.id.rbDeposito);
 
-        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH);
+        txtFechaRecibo.setText(getDatePhone());
+        fechaRecibo = txtFechaRecibo.getText().toString();
 
+        txtFechaDocPago.setText(getDatePhone());
+        fechaDoc = txtFechaDocPago.getText().toString();
+
+        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
+
+        Intent in = getIntent();
+        vNoInforme=in.getStringExtra(variables_publicas.INFORMES_COLUMN_CodInforme).toString();
+        lblNoInforme.setText("No. Informe: "+ vNoInforme);
         //Funciones funciones= new Funciones();
         btnBuscarCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -149,6 +199,35 @@ public class AgregarRecibo extends Activity {
                 btnOKCliente.performClick();
             }
         });
+
+        lblIdCliente.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() != 0){
+                    CargarFacturasPendientes();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        lblSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //provideSimpleDialog();
+                spinnerDialog.showSpinerDialog();
+            }
+        });
+
+
         txtMonto.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 Funciones.Convertir(txtMonto.getText().toString(),true);
@@ -160,6 +239,59 @@ public class AgregarRecibo extends Activity {
                     return false;
                 }
                 return true;
+            }
+        });
+
+        final DatePickerDialog.OnDateSetListener date1 = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel();
+            }
+        };
+
+        final DatePickerDialog.OnDateSetListener date2 = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel2();
+            }
+        };
+
+        txtFechaRecibo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                new DatePickerDialog(AgregarRecibo.this, date1, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                InputMethodManager inputManager = (InputMethodManager)AgregarRecibo.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(AgregarRecibo.this.getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+
+            }
+        });
+        txtFechaDocPago.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                new DatePickerDialog(AgregarRecibo.this, date2, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                InputMethodManager inputManager = (InputMethodManager)
+                        AgregarRecibo.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(AgregarRecibo.this.getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        });
+        btnCancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AgregarRecibo.this.onBackPressed();
             }
         });
     }
@@ -183,6 +315,8 @@ public class AgregarRecibo extends Activity {
         lblFooterItem = (TextView) dialogView.findViewById(R.id.lblFooter);
         txtNombreCliente.setText("");
         lblIdCliente.setText("");
+        lblSearch.setText("");
+        lblSaldo.setText("0.00");
         txtBusquedaItem.setText(txtNombreCliente.getText());
         btnOKCliente.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,6 +383,27 @@ public class AgregarRecibo extends Activity {
 
         alertDialog = dialogBuilder.create();
         alertDialog.show();
+    }
+    private void CargarFacturasPendientes() {
+        if (!lblIdCliente.equals("")) {
+            CcFactura = FacturasPendientesH.ObtenerFacturasPendientesArrayList(variables_publicas.usuario.getCodigo(),lblIdCliente.getText().toString().replace("00000","0"));
+        } else {
+            CcFactura = new java.util.ArrayList<String>();
+        }
+
+        spinnerDialog = new SpinnerDialog(AgregarRecibo.this, CcFactura, "Seleccione o busque la factura", R.style.DialogAnimations_SmileWindow);
+
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                //Toast.makeText(AgregarRecibos.this, item + "  " + position+"", Toast.LENGTH_SHORT).show();
+                ObtieneCFactura = FacturasPendientesH.ObtenerDatosFacturaPendiente(item);
+                lblSearch.setText(item);
+                saldoFactura=FacturasPendientesH.BuscarSaldoFactura(item);
+                lblSaldo.setText(df.format(saldoFactura));
+            }
+        });
+
     }
     public void MensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
@@ -329,7 +484,7 @@ public class AgregarRecibo extends Activity {
             String currentVersion = getCurrentVersion();
             variables_publicas.VersionSistema = currentVersion;
             if (latestVersion != null && !currentVersion.equals(latestVersion)) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(ClientesNew.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(AgregarRecibo.this);
                 builder.setTitle("Nueva version disponible");
                 builder.setMessage("Es necesario actualizar la aplicacion para poder continuar.");
                 builder.setPositiveButton("Actualizar", new DialogInterface.OnClickListener() {
@@ -427,5 +582,38 @@ public class AgregarRecibo extends Activity {
 
             return null;
         }
+    }
+    private String getDatePhone() {
+        Calendar cal = new GregorianCalendar();
+        Date date = cal.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formatteDate = df.format(date);
+        return formatteDate;
+    }
+    private void updateLabel() {
+        String myFormat = ("yyyy-MM-dd");
+        ; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
+        txtFechaRecibo.setText(sdf.format(myCalendar.getTime()));
+    }
+    private void updateLabel2() {
+        String myFormat = ("yyyy-MM-dd");
+        ; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat);
+        txtFechaDocPago.setText(sdf.format(myCalendar.getTime()));
+    }
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage("Esta seguro que desea cancelar el Recibo actual?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        AgregarRecibo.this.finish();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 }

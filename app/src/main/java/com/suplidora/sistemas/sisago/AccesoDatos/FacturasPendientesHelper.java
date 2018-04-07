@@ -97,9 +97,10 @@ public class FacturasPendientesHelper {
         return lst;
     }
 
-    public ArrayList<HashMap<String, String>> ObtenerFacturasPendientesArrayList(String vVendedor, String vCliente) {
-        ArrayList<HashMap<String,String>> lst= new ArrayList<>();
-        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "ELSE " + vCliente + " END;" ,null);
+    public ArrayList<HashMap<String, String>> ObtenerDatosFacturaPendiente(String vFactura) {
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " = '"+ vFactura + "';" ,null);
         if (c.moveToFirst()) {
             do {
                 HashMap<String, String> detalle = new HashMap<>();
@@ -121,10 +122,47 @@ public class FacturasPendientesHelper {
         c.close();
         return lst;
     }
+    public java.util.ArrayList<String> ObtenerFacturasPendientesArrayList(String vVendedor, String vCliente) {
+        java.util.ArrayList<String> lst = new java.util.ArrayList<String>();
+        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END;";
+        Cursor c = database.rawQuery(sql,null);
+        if (c.moveToFirst()) {
+            do {
+                lst.add(new String(
+                        //c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura))
+                       /* c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Cliente)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Fecha)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_IVA)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Tipo)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_SubTotal)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Descuento)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono)),
+                        c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo))*/
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
 
     public void EliminaFacturasPendientes() {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + ";");
         Log.d("fact_pend_eliminadas", "Datos eliminados");
     }
-
+    public Double  BuscarSaldoFactura(String Factura) {
+        String Query = "select printf(\"%.2f\",SUM("+variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo+")) as vSaldo from " + variables_publicas.TABLE_FACTURAS_PENDIENTES +" WHERE  "+variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura+" = '"+ Factura +"'";
+        double salFacturaoriginal=0;
+        Cursor c = database.rawQuery(Query, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                salFacturaoriginal=c.getDouble(c.getColumnIndex("vSaldo"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return salFacturaoriginal;
+    }
 }
