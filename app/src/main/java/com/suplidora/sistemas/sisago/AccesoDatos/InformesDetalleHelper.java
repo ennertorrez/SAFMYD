@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Bancos;
+import com.suplidora.sistemas.sisago.Entidades.Departamentos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,4 +178,21 @@ public class InformesDetalleHelper {
             return true;
         else return false;
     }
+
+    public List<Bancos> ObtenerListaBancos() {
+        List<Bancos> list = new ArrayList<Bancos>();
+        String Query = "SELECT DISTINCT " + variables_publicas.BANCOS_COLUMN_codigo + " ," + variables_publicas.BANCOS_COLUMN_nombre + " FROM " + variables_publicas.TABLE_BANCOS + " ORDER BY "+ variables_publicas.BANCOS_COLUMN_codigo+";";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                list.add(new Bancos(
+                        c.getString(c.getColumnIndex("Codigo")),
+                        c.getString(c.getColumnIndex("Nombre"))
+                ));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return list;
+    }
+
 }

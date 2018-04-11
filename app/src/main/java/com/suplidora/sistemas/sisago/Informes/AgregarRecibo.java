@@ -9,21 +9,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -44,7 +48,9 @@ import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Bancos;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.Departamentos;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
@@ -56,8 +62,11 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.net.URI;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,6 +90,7 @@ public class AgregarRecibo extends Activity {
     private String fechaRecibo = "";
     private String fechaDoc = "";
     private TextView lblIdCliente;
+    private TextView lblDescFormapago;
     private EditText txtNombreCliente;
     private Button btnBuscarCliente;
     private TextView lblSearch;
@@ -93,6 +103,7 @@ public class AgregarRecibo extends Activity {
     private RadioGroup rgFormaPago;
     private TextView lblDescTipoPago;
     private EditText txtValorDocPago;
+    private EditText txtValorMinuta;
     private TextView txtFechaDocPago;
     private Spinner cboBancoOrigen;
     private Spinner cboBancoDestino;
@@ -109,9 +120,16 @@ public class AgregarRecibo extends Activity {
     private Button btnGuardar;
     private Button btnCancelar;
     private String busqueda = "1";
-    private  String tipoBusqueda = "2";
+    private String tipoBusqueda = "2";
     private ClientesHelper ClientesH;
     private InformesHelper InformesH;
+    public static ArrayList<HashMap<String, String>> listaRecibos;
+    private double total;
+    private double tasaCambio = 0;
+    private int vEfectivo=0;
+    private String vTipo;
+    private SimpleAdapter adapter;
+
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
     private DataBaseOpenHelper DbOpenHelper;
@@ -129,6 +147,7 @@ public class AgregarRecibo extends Activity {
     private DecimalFormat df;
     public Calendar myCalendar = Calendar.getInstance();
     private String vNoInforme;
+    private String vVendedor;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +165,8 @@ public class AgregarRecibo extends Activity {
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
 
+        listaRecibos = new ArrayList<HashMap<String, String>>();
+        listaRecibos.clear();
         DbOpenHelper = new DataBaseOpenHelper(AgregarRecibo.this);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         InformesH = new InformesHelper(DbOpenHelper.database);
@@ -161,6 +182,7 @@ public class AgregarRecibo extends Activity {
         btnBuscarCliente = (Button) findViewById(R.id.btnBuscarCliente);
         lblSearch = (TextView) findViewById(R.id.lblSearch);
         lblSaldo = (TextView) findViewById(R.id.txtSaldo);
+        txtValorMinuta = (EditText) findViewById(R.id.txtValorMinuta);
         txtMonto = (EditText) findViewById(R.id.txtMonto);
         lblMontoLetras = (TextView) findViewById(R.id.lblMontoLetras);
         rgFormaPago = (RadioGroup) findViewById(R.id.rgFormaPago);
@@ -177,21 +199,63 @@ public class AgregarRecibo extends Activity {
         lblFooter = (TextView) findViewById(R.id.lblFooter);
         btnGuardar = (Button) findViewById(R.id.btnGuardar);
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
+        rgFormaPago = (RadioGroup) findViewById(R.id.rgFormaPago);
         rbEfectivo = (RadioButton) findViewById(R.id.rbEfectivo);
         rbCheque = (RadioButton) findViewById(R.id.rbCheque);
         rbDeposito = (RadioButton) findViewById(R.id.rbDeposito);
+        lblDescFormapago = (TextView) findViewById(R.id.lblDescFormapago);
+
+        rbEfectivo.setChecked(true);
+        vTipo="Efectivo";
+        cboBancoOrigen.setEnabled(false);
+        cboBancoOrigen.setSelection(getIndex(cboBancoOrigen, "SELECCIONE"));
 
         txtFechaRecibo.setText(getDatePhone());
         fechaRecibo = txtFechaRecibo.getText().toString();
 
         txtFechaDocPago.setText(getDatePhone());
         fechaDoc = txtFechaDocPago.getText().toString();
-
+        tasaCambio = Double.parseDouble(variables_publicas.usuario.getTasaCambio());
+        lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
         sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
+
+        CargarCombos();
+
+        rgFormaPago.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                if(group.getCheckedRadioButtonId()== R.id.rbEfectivo){
+                    lblDescFormapago.setText("No. Minuta");
+                    cboBancoOrigen.setEnabled(false);
+                    vEfectivo=1;
+                    vTipo="Efectivo";
+                    txtValorMinuta.requestFocus();
+                   // lblDescFormapago.setInputType(InputType.TYPE_CLASS_NUMBER);
+                }
+                else if (group.getCheckedRadioButtonId()== R.id.rbCheque){
+                    lblDescFormapago.setText("No. Cheque");
+                    cboBancoOrigen.setEnabled(true);
+                    vEfectivo=0;
+                    vTipo="Cheque";
+                    txtValorMinuta.requestFocus();
+                    //txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
+                }else {
+                    lblDescFormapago.setText("No. Deposito");
+                    cboBancoOrigen.setEnabled(false);
+                    vEfectivo=0;
+                    vTipo="Deposito";
+                    txtValorMinuta.requestFocus();
+                }
+            }
+
+        });
+
 
         Intent in = getIntent();
         vNoInforme=in.getStringExtra(variables_publicas.INFORMES_COLUMN_CodInforme).toString();
         lblNoInforme.setText("No. Informe: "+ vNoInforme);
+        vVendedor = in.getStringExtra(variables_publicas.CodigoVendedor).toString();
+        obtenerIdRecibo();
         //Funciones funciones= new Funciones();
         btnBuscarCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -239,6 +303,34 @@ public class AgregarRecibo extends Activity {
                     return false;
                 }
                 return true;
+            }
+        });
+
+        txtMonto.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                double vmonto=0;
+                double vsaldo = Double.parseDouble(lblSaldo.getText().toString().replace(",", ""));
+                if (!s.equals("")){
+                    vmonto = Double.parseDouble(s.toString());
+                }else {
+                    vmonto=0;
+                }
+                if (vmonto> vsaldo){
+                    MensajeAviso("El Abono debe ser menor o Igual al saldo de la Factura.");
+                    txtMonto.setText("0.00");
+                    return;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
 
@@ -294,6 +386,59 @@ public class AgregarRecibo extends Activity {
                 AgregarRecibo.this.onBackPressed();
             }
         });
+        btnAgregar.setOnClickListener(new View.OnClickListener() {
+                                          public void onClick(View v) {
+
+                                              try {
+
+                                                  if (Double.parseDouble(txtMonto.getText().toString()) < 1) {
+                                                      txtMonto.setError("Ingrese un Monto mayor a 0");
+                                                      return;
+                                                  }
+
+                                                  boolean repetido = EsFacturaRepetida(lblSearch.getText().toString());
+                                                  if (repetido) {
+                                                      MensajeAviso("Esta Factura ya ha sigo agregada al Recibo.");
+                                                      return;
+                                                  }
+
+                                                  String vBancoI = cboBancoOrigen.getSelectedItem().toString();
+                                                  String vBancoF = cboBancoDestino.getSelectedItem().toString();
+
+                                                  if (rbCheque.isChecked() && (vBancoI.equals("SELECCIONE") || vBancoF.equals("SELECCIONE"))){
+                                                      MensajeAviso("Debe seleccionar un Banco Emisor y Destino");
+                                                      cboBancoOrigen.requestFocus();
+                                                      return ;
+                                                  }
+                                                  if (rbDeposito.isChecked() && vBancoF.equals("SELECCIONE")){
+                                                      MensajeAviso("Debe seleccionar un Banco Destino");
+                                                      cboBancoDestino.requestFocus();
+                                                      return ;
+                                                  }
+                                                  HashMap<String, String> itemRecibos = new HashMap<>();
+                                                  if (AgregarDetalle(itemRecibos)) {
+
+
+                                                    /*  for (HashMap<String, String> item : listaRecibos) {
+                                                          subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
+                                                      }*/
+                                                      CalcularTotales();
+                                                      LimipiarDatos();
+                                                      InputMethodManager inputManager = (InputMethodManager)
+                                                              getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                                                      inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                                                              InputMethodManager.RESULT_SHOWN);
+                                                  }
+
+
+                                              } catch (Exception e) {
+                                                  //cliente = ClientesH.BuscarCliente(pedido.getIdCliente(), pedido.getCod_cv());
+                                                  MensajeAviso(e.getMessage());
+                                              }
+                                          }
+                                      }
+        );
     }
     public void BuscarCliente() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -348,7 +493,7 @@ public class AgregarRecibo extends Activity {
                         R.id.Direccion});
 
                 lvItem.setAdapter(adapter);
-                lblFooterItem.setText("ClienteS Encontrados: " + String.valueOf(listaClientesItem.size()));
+                lblFooterItem.setText("Clientes Encontrados: " + String.valueOf(listaClientesItem.size()));
 
             }
         });
@@ -358,7 +503,7 @@ public class AgregarRecibo extends Activity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 txtNombreCliente.setText("");
-                lblIdCliente.setText("");
+                lblIdCliente.setText("00000");
 
                 String NombreCliente;
                 String patron = "/";
@@ -384,6 +529,54 @@ public class AgregarRecibo extends Activity {
         alertDialog = dialogBuilder.create();
         alertDialog.show();
     }
+    private void obtenerIdRecibo() {
+
+        String encodeUrl = "";
+        HttpHandler sh = new HttpHandler();
+
+        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerConsecutivoRecibo/";
+        urlString = urlString  + vVendedor;
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+            if (jsonStr == null) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener el Nuevo Id del Recibo, Respuesta nula GET", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            } else {
+                Log.e(TAG, "Response from url: " + jsonStr);
+
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                String resultState = (String) ((String) jsonObj.get("ObtenerConsecutivoReciboResult")).split(",")[0];
+                String NoRecibo = (String) ((String) jsonObj.get("ObtenerConsecutivoReciboResult")).split(",")[1];
+                if (resultState.equals("true")) {
+                    lblNoRecibo.setText(NoRecibo);
+                }
+            }
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al obtener el Nuevo Id del Recibo, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+
+        }
+    }
+    private void CargarCombos(){
+        //Combo Departamentos
+        final List<Bancos> CBancoO;
+        CBancoO = InformesDetalleH.ObtenerListaBancos();
+        ArrayAdapter<Bancos> adapterBancoO = new ArrayAdapter<Bancos>(this, android.R.layout.simple_spinner_item, CBancoO);
+        adapterBancoO.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboBancoOrigen.setAdapter(adapterBancoO);
+
+        final List<Bancos> CBancoD;
+        CBancoD = InformesDetalleH.ObtenerListaBancos();
+        ArrayAdapter<Bancos> adapterBancoD = new ArrayAdapter<Bancos>(this, android.R.layout.simple_spinner_item, CBancoD);
+        adapterBancoD.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboBancoDestino.setAdapter(adapterBancoD);
+    }
     private void CargarFacturasPendientes() {
         if (!lblIdCliente.equals("")) {
             CcFactura = FacturasPendientesH.ObtenerFacturasPendientesArrayList(variables_publicas.usuario.getCodigo(),lblIdCliente.getText().toString().replace("00000","0"));
@@ -401,6 +594,7 @@ public class AgregarRecibo extends Activity {
                 lblSearch.setText(item);
                 saldoFactura=FacturasPendientesH.BuscarSaldoFactura(item);
                 lblSaldo.setText(df.format(saldoFactura));
+                txtMonto.requestFocus();
             }
         });
 
@@ -450,7 +644,6 @@ public class AgregarRecibo extends Activity {
 
         return currentVersion;
     }
-
     private class GetLatestVersion extends AsyncTask<Void, Void, Void> {
         String latestVersion;
 
@@ -503,7 +696,6 @@ public class AgregarRecibo extends Activity {
             }
         }
     }
-
     private void CheckConnectivity() {
         isOnline = Funciones.TestServerConectivity();
     }
@@ -516,7 +708,6 @@ public class AgregarRecibo extends Activity {
             new GetValorConfig().execute();
         }
     }
-    //region ObtieneValorConfiguracion
     private class GetValorConfig extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {
@@ -615,5 +806,108 @@ public class AgregarRecibo extends Activity {
                 })
                 .setNegativeButton("No", null)
                 .show();
+    }
+    private boolean EsFacturaRepetida(String s) {
+
+        for (HashMap<String, String> item : listaRecibos) {
+            if (item.get("Factura").equals(s) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private void CalcularTotales() {
+
+        total = 0;
+        for (int i = 0; i < listaRecibos.size(); i++) {
+            HashMap<String, String> item = listaRecibos.get(i);
+
+            try {
+                total += (df.parse(item.get("Abono"))).doubleValue();
+            } catch (ParseException e) {
+                MensajeAviso(e.getMessage());
+            }
+        }
+        lblTotalCor.setText(df.format(total));
+
+        if (tasaCambio > 0) {
+            lblTotalDol.setText(String.valueOf(df.format(total / tasaCambio)));
+        }
+        lblFooter.setText("Total items:" + String.valueOf(listaRecibos.size()));
+
+    }
+    private boolean AgregarDetalle(HashMap<String, String> itemRecibos) {
+
+        double nuevosaldo, saldo,monto;
+
+        saldo = Double.parseDouble(lblSaldo.getText().toString().replace(",", ""));
+        monto = Double.parseDouble(txtMonto.getText().toString().replace(",", ""));
+        nuevosaldo = saldo - monto;
+
+        itemRecibos.put("Factura", lblSearch.getText().toString());
+        itemRecibos.put("Fecha", txtFechaRecibo.getText().toString());
+        itemRecibos.put("Saldo", String.valueOf(df.format(nuevosaldo)));
+        itemRecibos.put("Abono", String.valueOf(df.format(monto)));
+        itemRecibos.put("Tipo", vTipo);
+        itemRecibos.put("Documento", txtValorMinuta.getText().toString());
+        itemRecibos.put("FechaDoc", txtFechaDocPago.getText().toString());
+        itemRecibos.put("BancoE", cboBancoOrigen.getSelectedItem().toString());
+        itemRecibos.put("BancoR", cboBancoDestino.getSelectedItem().toString());
+        itemRecibos.put("Observacion", txtObservacion.getText().toString());
+        listaRecibos.add(itemRecibos);
+        RefrescarGrid();
+        CalcularTotales();
+        return true;
+
+    }
+    private void RefrescarGrid() {
+        adapter = new SimpleAdapter(
+                getApplicationContext(), listaRecibos,
+                R.layout.recibos_list_item, new
+                String[]{"Factura", "Fecha", "Saldo", "Abono", "Tipo", "Documento", "FechaDoc", "BancoE", "BancoR", "Observacion"}, new
+                int[]{R.id.lblDetalleFactura, R.id.lblDetalleFecha, R.id.lblDetalleSaldo, R.id.lblDetalleAbono, R.id.lblDetalleTipo, R.id.lblDetalleDocumento, R.id.lblDetalleFechaDoc, R.id.lblDetalleBancoE, R.id.lblDetalleBancoD, R.id.lblDetalleObservacion}) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View currView = super.getView(position, convertView, parent);
+                HashMap<String, String> currItem = (HashMap<String, String>) getItem(position);
+                return currView;
+            }
+        };
+
+        lv.setAdapter(adapter);
+    }
+    private void LimipiarDatos() {
+            lblIdCliente.setText("00000");
+            txtNombreCliente.setText(null);
+            lblSearch.setText(null);
+            lblSaldo.setText("0.00");
+            txtMonto.setText("0.00");
+            rbEfectivo.setChecked(true);
+            lblDescFormapago.setText("No. Documento");
+            txtValorMinuta.setText("0");
+            txtFechaDocPago.setText(getDatePhone());
+            cboBancoOrigen.setSelection(getIndex(cboBancoOrigen, "SELECCIONE"));
+            cboBancoDestino.setSelection(getIndex(cboBancoDestino, "SELECCIONE"));
+            txtObservacion.setText("");
+            lblFooter.setText("Total items:" + String.valueOf(listaRecibos.size()));
+            InputMethodManager inputManager = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+    private int getIndex(Spinner spinner, String myString){
+
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            String nn=spinner.getItemAtPosition(i).toString();
+
+            if (nn.equals(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }

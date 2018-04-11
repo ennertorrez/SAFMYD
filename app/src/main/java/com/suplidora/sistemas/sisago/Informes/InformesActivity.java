@@ -41,6 +41,7 @@ import java.net.URI;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +68,8 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
     private DataBaseOpenHelper DbOpenHelper;
     private String vVededor = "";
     private DecimalFormat df;
+    private String vVendedor;
+    private Vendedor vendedor;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +107,21 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         }
         cargarCboVendedor();
 
+        cboVendedor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                vendedor = (Vendedor) adapter.getItemAtPosition(position);
+                vVededor = vendedor.getCODIGO().toString();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+        if (variables_publicas.usuario.getTipo().equals("User") || variables_publicas.usuario.getTipo().equals("Supervisor")) {
+            vVededor = vendedor.getCODIGO().toString();
+        }else {
+            vVendedor= variables_publicas.usuario.getCodigo();
+        }
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
 
         btnAgregarRecibo.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +129,7 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             public void onClick(View v) {
                 Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
                 agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
+                agrRecibo.putExtra(variables_publicas.CodigoVendedor, vVendedor);
                 startActivity(agrRecibo);
 
             }

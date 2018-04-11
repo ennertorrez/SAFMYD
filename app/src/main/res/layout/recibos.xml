@@ -402,7 +402,7 @@
 
                         <LinearLayout
                             android:id="@+id/layout_list_header"
-                            android:layout_width="1125dp"
+                            android:layout_width="1165dp"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
@@ -419,7 +419,7 @@
 
                             <TextView
                                 android:id="@+id/lblColFecha"
-                                android:layout_width="60dp"
+                                android:layout_width="100dp"
                                 android:layout_height="wrap_content"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:paddingLeft="0dp"
