@@ -114,24 +114,31 @@ public class InformesHelper {
         return informe;
     }
 
-    /*public void EliminarBancos() {
-        database.execSQL("DELETE FROM "+variables_publicas.TABLE_BANCOS+";");
-        Log.d("bancos_deleted", "Datos eliminados");
-    }*/
-
     public boolean EliminarBancos() {
         long deletedrows=  database.delete( variables_publicas.TABLE_BANCOS,null,null);
         Log.d("bancos_deleted", "Datos eliminados");
         return deletedrows!=-1;
     }
 
- /*   public void GuardarBancos(String cod, String banco){
+    public boolean EliminarSeries() {
+        long deletedrows=  database.delete( variables_publicas.TABLE_SERIE_RECIBOS,null,null);
+        Log.d("series_deleted", "Datos eliminados");
+        return deletedrows!=-1;
+    }
+
+    public boolean GuardarSeries(String vid, String vvendedor, String vinicio, String vfin, String vnumero){
         long rows = 0;
         ContentValues contentValues = new ContentValues();
-        contentValues.put(variables_publicas.BANCOS_COLUMN_codigo, cod);
-        contentValues.put(variables_publicas.BANCOS_COLUMN_nombre, banco);
-        database.insert(variables_publicas.TABLE_BANCOS, null, contentValues);
-    }*/
+        contentValues.put(variables_publicas.SERIERECIBOS_COLUMN_IdSerie, vid);
+        contentValues.put(variables_publicas.SERIERECIBOS_COLUMN_CodVendedor, vvendedor);
+        contentValues.put(variables_publicas.SERIERECIBOS_COLUMN_nInicial, vinicio);
+        contentValues.put(variables_publicas.SERIERECIBOS_COLUMN_nFinal, vfin);
+        contentValues.put(variables_publicas.SERIERECIBOS_COLUMN_Numero, vnumero);
+        long rowInserted = database.insert(variables_publicas.TABLE_SERIE_RECIBOS, null, contentValues);
+        if (rowInserted != -1)
+            return true;
+        else return false;
+    }
 
     public boolean GuardarBancos(String cod, String banco){
         long rows = 0;

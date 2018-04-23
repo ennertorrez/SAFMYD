@@ -31,7 +31,8 @@ public class FacturasPendientesHelper {
                                       String descuento,
                                       String total,
                                       String abono,
-                                      String saldo
+                                      String saldo,
+                                      String guardada
     ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -47,6 +48,7 @@ public class FacturasPendientesHelper {
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total, total);
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, abono);
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, saldo);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, guardada);
         database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
     }
 
@@ -66,6 +68,7 @@ public class FacturasPendientesHelper {
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total));
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono));
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo));
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada));
         long rowInserted=database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
         if(rowInserted != -1)
            return true;
@@ -90,6 +93,7 @@ public class FacturasPendientesHelper {
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total)));
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono)));
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo)));
+                detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -116,6 +120,7 @@ public class FacturasPendientesHelper {
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total)));
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono)));
                 detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo)));
+                detalle.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, c.getString(c.getColumnIndex(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -124,7 +129,7 @@ public class FacturasPendientesHelper {
     }
     public java.util.ArrayList<String> ObtenerFacturasPendientesArrayList(String vVendedor, String vCliente) {
         java.util.ArrayList<String> lst = new java.util.ArrayList<String>();
-        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END;";
+        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND "+ variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada +"= 'false';";
         Cursor c = database.rawQuery(sql,null);
         if (c.moveToFirst()) {
             do {
@@ -164,5 +169,13 @@ public class FacturasPendientesHelper {
         }
         c.close();
         return salFacturaoriginal;
+    }
+    public boolean ActualizarFacturasPendientes(String factura,String estado ) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,estado);
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + "= '" + factura+"'", null);
+        if (rowsUpdated != -1)
+            return true;
+        else return false;
     }
 }

@@ -18,11 +18,12 @@ public class FacturasPendientes {
     String Total ="";
     String Abono="";
     String Saldo="";
+    String Guardada="";
 
     public FacturasPendientes() {
     }
     public FacturasPendientes(String idvendedor, String factura, String cliente, String idCliente, String fecha, String iva, String tipo, String subtotal, String descuento,
-                              String total, String abono, String saldo) {
+                              String total, String abono, String saldo, String guardada) {
         codvendedor = idvendedor;
         No_Factura = factura;
         Cliente = cliente;
@@ -35,6 +36,7 @@ public class FacturasPendientes {
         Total = total;
         Abono = abono;
         Saldo = saldo;
+        Guardada = guardada;
     }
 
     public String getcodvendedor() {
@@ -131,6 +133,14 @@ public class FacturasPendientes {
 
     public void setSaldo(String saldo  ) {
         Saldo =saldo;
+    }
+
+    public String getGuardada() {
+        return Guardada;
+    }
+
+    public void setGuardada(String guardada  ) {
+        Guardada =guardada;
     }
 
 }

@@ -227,7 +227,11 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DETALLEINFORMES_COLUMN_Aprobado + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_Posfechado + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_Procesado + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Usuario + " TEXT ) ");
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Usuario + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Vendedor + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Cliente + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_CantLetra + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FACTURAS_PENDIENTES + "( "
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " TEXT , "
@@ -241,11 +245,19 @@ public class DataBaseOpenHelper {
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Descuento + " TEXT , "
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total + " TEXT , "
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " TEXT ) ");
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " TEXT , "
+                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_BANCOS + "( "
                     + variables_publicas.BANCOS_COLUMN_codigo + " TEXT , "
                     + variables_publicas.BANCOS_COLUMN_nombre + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_SERIE_RECIBOS + "( "
+                    + variables_publicas.SERIERECIBOS_COLUMN_IdSerie + " TEXT , "
+                    + variables_publicas.SERIERECIBOS_COLUMN_CodVendedor + " TEXT , "
+                    + variables_publicas.SERIERECIBOS_COLUMN_nInicial + " TEXT , "
+                    + variables_publicas.SERIERECIBOS_COLUMN_nFinal + " TEXT , "
+                    + variables_publicas.SERIERECIBOS_COLUMN_Numero + " TEXT ) ");
         }
 
         @Override
@@ -268,6 +280,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_INFORMES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_FACTURAS_PENDIENTES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_BANCOS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_SERIE_RECIBOS);
             onCreate(db);
         }
     }

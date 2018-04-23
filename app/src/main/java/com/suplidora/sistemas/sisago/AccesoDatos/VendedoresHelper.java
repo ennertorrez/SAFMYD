@@ -101,7 +101,7 @@ public class VendedoresHelper {
     public List<Vendedor> ObtenerListaVendedores2() {
         List<Vendedor> list = new ArrayList<Vendedor>();
 
-        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE " + variables_publicas.VENDEDORES_COLUMN_detalle + "= 'true' ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
+        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE " + variables_publicas.VENDEDORES_COLUMN_detalle + "= 'false' ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
 
         Cursor cursor = database.rawQuery(selectQuery, null);
 

@@ -22,7 +22,7 @@ public class InformesDetalleHelper {
         database = db;
     }
 
-    public void GuardarDetalleInforme(String CodInforme,
+    public boolean GuardarDetalleInforme(String CodInforme,
                                       String Recibo,
                                       String IdVendedor,
                                       String IdCliente,
@@ -40,7 +40,11 @@ public class InformesDetalleHelper {
                                       String Aprobado,
                                       String Posfechado,
                                       String Procesado,
-                                      String Usuario
+                                      String Usuario,
+                                      String Vendedor,
+                                      String Cliente,
+                                      String CodigoLetra,
+                                      String CantLetra
     ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -63,7 +67,15 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado, Posfechado);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Procesado, Procesado);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Usuario, Usuario);
-        database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor, Vendedor);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, Cliente);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, CodigoLetra);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, CantLetra);
+        //database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
+        long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
+        if(rowInserted != -1)
+            return true;
+        else return false;
     }
 
 
@@ -89,6 +101,10 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Procesado, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Procesado));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Usuario, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Usuario));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Cliente));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra));
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
            return true;
@@ -120,6 +136,10 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Procesado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Procesado)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Usuario)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Cliente)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -152,6 +172,10 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Procesado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Procesado)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Usuario)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Cliente)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -164,12 +188,17 @@ public class InformesDetalleHelper {
         Log.d("pedidos detalle_elimina", "Datos eliminados");
     }
     public boolean EliminarDetalleInforme(String idInforme) {
-        int rowsAffected =database.delete( variables_publicas.TABLE_DETALLE_INFORMES, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme+ "='" +idInforme+"'",null) ;
+        int rowsAffected =database.delete( variables_publicas.TABLE_DETALLE_INFORMES, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme+ "=" +idInforme ,null) ;
         if(rowsAffected != -1)
             return true;
         else return false;
     }
-
+    public boolean EliminarDetalleInforme2(String idInforme, String idRecibo) {
+        int rowsAffected =database.delete( variables_publicas.TABLE_DETALLE_INFORMES, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme+ "=" +idInforme+" AND " + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + "=" +idInforme ,null) ;
+        if(rowsAffected != -1)
+            return true;
+        else return false;
+    }
     public boolean ActualizarCodigoInforme(String idInforme, String NoInforme){
         ContentValues con = new ContentValues();
         con.put("CodInforme", NoInforme);

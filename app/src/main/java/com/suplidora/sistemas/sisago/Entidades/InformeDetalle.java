@@ -25,11 +25,16 @@ public class InformeDetalle {
     String Posfechado ="";
     String Procesado ="";
     String Usuario ="";
+    String Vendedor ="";
+    String Cliente ="";
+    String CodigoLetra ="";
+    String CantLetra ="";
 
     public InformeDetalle() {
     }
     public InformeDetalle(String codigoInf, String recibo, String idvendedor, String idCliente, String factura, String saldo, String monto, String abono, String noCheque,
-                          String bancoE, String bancoR, String fechaCK, String fechaDep, String efectivo, String moneda, String aprobado, String posfechado, String procesado, String usuario) {
+                          String bancoE, String bancoR, String fechaCK, String fechaDep, String efectivo, String moneda, String aprobado, String posfechado, String procesado,
+                          String usuario, String vendedor, String cliente, String codigoletra, String cantletra) {
         CodInforme = codigoInf;
         Recibo = recibo;
         Idvendedor = idvendedor;
@@ -49,6 +54,10 @@ public class InformeDetalle {
         Posfechado = posfechado;
         Procesado=procesado;
         Usuario=usuario;
+        Vendedor=vendedor;
+        Cliente=cliente;
+        CodigoLetra= codigoletra;
+        CantLetra=cantletra;
     }
 
     public String getCodInforme() {
@@ -201,4 +210,37 @@ public class InformeDetalle {
     public void setUsuario(String usuario) {
         Usuario = usuario;
     }
+
+    public String getVendedor() {
+        return Vendedor;
+    }
+
+    public void setVendedor(String vendedor) {
+        Vendedor = vendedor;
+    }
+
+    public String getCliente() {
+        return Cliente;
+    }
+
+    public void setCliente(String cliente) {
+        Cliente = cliente;
+    }
+
+    public String getCodigoLetra() {
+        return CodigoLetra;
+    }
+
+    public void setCodigoLetra(String codigoLetra) {
+        CodigoLetra = codigoLetra;
+    }
+
+    public String getCantLetra() {
+        return CantLetra;
+    }
+
+    public void setCantLetra(String cantLetra) {
+        CantLetra = cantLetra;
+    }
+
 }

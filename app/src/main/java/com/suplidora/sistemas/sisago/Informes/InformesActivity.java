@@ -5,15 +5,24 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 
+import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
+import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Informe;
+import com.suplidora.sistemas.sisago.Entidades.InformeDetalle;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
@@ -41,8 +50,12 @@ import java.net.URI;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,16 +79,31 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
     private String TAG = InformesActivity.class.getSimpleName();
     private VendedoresHelper VendedoresH;
     private DataBaseOpenHelper DbOpenHelper;
-    private String vVededor = "";
+    private SincronizarDatos sd;
     private DecimalFormat df;
-    private String vVendedor;
+    private String vIdVendedor;
+    private String vnombreVendedor;
     private Vendedor vendedor;
+    private boolean finalizar = false;
+
+    private Informe informe;
+    String IMEI = "";
+    private InformesHelper InformesH;
+    private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
+    private ClientesHelper ClientesH;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.informepago);
+
+        informe = new Informe();
+
         DbOpenHelper = new DataBaseOpenHelper(InformesActivity.this);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
+        InformesH = new InformesHelper(DbOpenHelper.database);
+
+        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -111,27 +139,37 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 vendedor = (Vendedor) adapter.getItemAtPosition(position);
-                vVededor = vendedor.getCODIGO().toString();
+                vIdVendedor = vendedor.getCODIGO().toString();
+                vnombreVendedor = vendedor.getNOMBRE().toString();
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
         if (variables_publicas.usuario.getTipo().equals("User") || variables_publicas.usuario.getTipo().equals("Supervisor")) {
-            vVededor = vendedor.getCODIGO().toString();
+            vIdVendedor = vendedor.getCODIGO().toString();
+            vnombreVendedor = vendedor.getNOMBRE().toString();
         }else {
-            vVendedor= variables_publicas.usuario.getCodigo();
+            vIdVendedor= variables_publicas.usuario.getCodigo();
+            vnombreVendedor = variables_publicas.usuario.getNombre();
         }
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
 
         btnAgregarRecibo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
-                agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
-                agrRecibo.putExtra(variables_publicas.CodigoVendedor, vVendedor);
-                startActivity(agrRecibo);
-
+                DbOpenHelper.database.beginTransaction();
+                if (GuardarInforme()) {
+                    DbOpenHelper.database.setTransactionSuccessful();
+                    DbOpenHelper.database.endTransaction();
+                    Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
+                    agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
+                    agrRecibo.putExtra(variables_publicas.KEY_IdVendedor, vIdVendedor);
+                    agrRecibo.putExtra(variables_publicas.KEY_NombreVendedor, vnombreVendedor);
+                    startActivity(agrRecibo);
+                }else {
+                    DbOpenHelper.database.endTransaction();
+                }
             }
         });
         btnCancelar.setOnClickListener(new View.OnClickListener() {
@@ -140,6 +178,30 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                 InformesActivity.this.onBackPressed();
             }
         });
+    }
+
+    private boolean GuardarInforme() {
+
+        IMEI = variables_publicas.IMEI;
+        informe.setCodigoInforme(txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
+        informe.setFechaCreacion(getDatePhone());
+        informe.setIdVendedor(vIdVendedor);
+        informe.setAprobada("false");
+        informe.setAnulada("false");
+        informe.setFecha(getDatePhone());
+        informe.setUsuario("SISAGO");
+
+        //Esto lo ponemos para cuando es editar
+        InformesH.EliminaInforme(informe.getCodigoInforme());
+        Funciones.GetLocalDateTime();
+
+        boolean saved = InformesH.GuardarInforme(informe.getCodigoInforme(),informe.getFecha(),informe.getIdVendedor(),informe.getAprobada(),informe.getAnulada(),informe.getFechaCreacion(),informe.getUsuario());
+
+        if (!saved) {
+            MensajeAviso("Ha Ocurrido un error al guardar los datos");
+            return false;
+        }
+        return true;
     }
 
     private void obtenerIdInforme() {
@@ -184,7 +246,8 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         cboVendedor.setAdapter(adapterVendedor);
 
         if (variables_publicas.usuario.getTipo().equals("Vendedor")){
-            vVededor = variables_publicas.usuario.getCodigo();
+            vIdVendedor = variables_publicas.usuario.getCodigo();
+            vnombreVendedor = variables_publicas.usuario.getNombre();
             cboVendedor.setSelection(getIndex(cboVendedor,variables_publicas.usuario.getNombre()));
         }
     }
@@ -215,5 +278,25 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                 })
                 .setNegativeButton("No", null)
                 .show();
+    }
+    private String getDatePhone() {
+        Calendar cal = new GregorianCalendar();
+        Date date = cal.getTime();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formatteDate = df.format(date);
+        return formatteDate;
+    }
+    public void MensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (finalizar) {
+                    finish();
+                }
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 }

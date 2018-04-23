@@ -427,20 +427,6 @@ public class ClientesHelper {
         c.close();
         return lst;
     }
-   /* public String ObtenerClientesVariosId(String Idvendedor) {
-
-        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ Idvendedor + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
-        Cursor c = database.rawQuery(Query, null);
-        String numero = "0";
-        if (c.moveToFirst()) {
-            do {
-                numero = c.getString(0);
-
-            } while (c.moveToNext());
-        }
-        c.close();
-        return numero;
-    }*/
 
     public String ObtenerDescripcion(String campoResultado, String tabla, String campoFiltro, String valorFiltro) {
 
@@ -477,19 +463,23 @@ public class ClientesHelper {
         Log.d("DPTOMUNIBARRIOS_deleted", "Datos eliminados");
         return deletedrows!=-1;
     }
- /*   public ArrayList<HashMap<String, String>> ObtenerClienteCedula( String vCedula) {
-        String Query = "SELECT DISTINCT " + variables_publicas.CLIENTES_COLUMN_IdCliente + ", " + variables_publicas.CLIENTES_COLUMN_Nombre + " FROM " + variables_publicas.TABLE_CLIENTES + " WHERE "+ variables_publicas.CLIENTES_COLUMN_IdVendedor + "= '"+ vCedula + "' AND "+ variables_publicas.CLIENTES_COLUMN_Nombre +" LIKE 'CLIENTES VARIOS%' LIMIT 1;";
-        Cursor c = database.rawQuery(Query, null);
-        ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
+
+    public String ObtenerCodLetra(String valorFiltro) {
+
+        String sql="SELECT " + variables_publicas.CLIENTES_COLUMN_CodigoLetra + " AS codletra FROM "
+                + variables_publicas.TABLE_CLIENTES+" WHERE (("+variables_publicas.CLIENTES_COLUMN_IdCliente+" = CASE WHEN '' = '"+valorFiltro+"' THEN "+variables_publicas.CLIENTES_COLUMN_IdCliente+" ELSE '"+valorFiltro+"' END) "+
+                "OR (CodCv = CASE WHEN '"+valorFiltro+"' = '' THEN CodCv ELSE '"+ valorFiltro +"' END ) )"+
+                " AND NOT("+variables_publicas.CLIENTES_COLUMN_Nombre+"  LIKE 'CLIENTES VARIOS%' AND CodCv= '' )";
+        Cursor c= database.rawQuery(sql, null);
+
+        String resultado = "";
         if (c.moveToFirst()) {
             do {
-                HashMap<String,String> dtCliente= new HashMap<>();
-                dtCliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex("IdCliente")));
-                dtCliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex("Nombre")));
-                lst.add(dtCliente);
+                resultado = c.getString(0);
+
             } while (c.moveToNext());
         }
         c.close();
-        return lst;
-    }*/
+        return resultado;
+    }
 }

@@ -635,9 +635,11 @@ public class SincronizarDatos {
                                         if ( SincronizarConfiguracionSistema()) {
                                             if(ActualizarUsuario()){
                                                 if (ObtenerBancos()) {
-                                                    if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(),"0")) {
-                                                        SincronizarPedidosLocales();
-                                                        return true;
+                                                    if (ObtenerSerieRecibos()) {
+                                                        if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
+                                                            SincronizarPedidosLocales();
+                                                            return true;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -970,6 +972,58 @@ public class SincronizarDatos {
         //return false;
     }
 
+    private boolean ObtenerSerieRecibos() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerSerieRecibos";
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************SERIE RECIBOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                //DbOpenHelper.database.beginTransaction();
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray series = jsonObj.getJSONArray("ObtenerSerieRecibosResult");
+                if (series.length() == 0) {
+                    return false;
+                }
+                InformesH.EliminarSeries();
+                // looping through All Contacts
+
+                for (int i = 0; i < series.length(); i++) {
+                    JSONObject c = series.getJSONObject(i);
+                    InformesH.GuardarSeries(c.get("id").toString(),c.get("vendedor").toString(),c.get("ninicial").toString(),c.get("nfinal").toString(),c.get("numero").toString());
+                }
+                return true;
+                // DbOpenHelper.database.setTransactionSuccessful();
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+          /*  finally {
+                DbOpenHelper.database.endTransaction();
+            }*/
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Respuesta nula", variables_publicas.info + urlString, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        //return false;
+    }
+
     public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente) {
         boolean Editar=false;
         if (variables_publicas.vEditando){
@@ -1060,7 +1114,8 @@ public class SincronizarDatos {
                 String Total = c.getString("Total");
                 String Abono = c.getString("Abono");
                 String Saldo = c.getString("Saldo");
-                FacturasPendientesH.GuardarFacturasPendientes(codvendedor,Fecha, No_Factura, Cliente, CodigoCliente, IVA, Tipo, SubTotal, Descuento, Total, Abono, Saldo);
+                String Guardada = c.getString("Guardada");
+                FacturasPendientesH.GuardarFacturasPendientes(codvendedor,Fecha, No_Factura, Cliente, CodigoCliente, IVA, Tipo, SubTotal, Descuento, Total, Abono, Saldo, Guardada);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;

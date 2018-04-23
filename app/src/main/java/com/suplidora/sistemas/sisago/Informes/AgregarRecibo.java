@@ -1,5 +1,6 @@
 package com.suplidora.sistemas.sisago.Informes;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -14,14 +15,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.IdRes;
+import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -35,11 +44,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
@@ -51,6 +62,8 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Bancos;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.Departamentos;
+import com.suplidora.sistemas.sisago.Entidades.Informe;
+import com.suplidora.sistemas.sisago.Entidades.InformeDetalle;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
@@ -96,7 +109,6 @@ public class AgregarRecibo extends Activity {
     private TextView lblSearch;
     private TextView lblSaldo;
     private EditText txtMonto;
-    private TextView lblMontoLetras;
     private RadioButton rbEfectivo;
     private RadioButton rbCheque;
     private RadioButton rbDeposito;
@@ -126,16 +138,17 @@ public class AgregarRecibo extends Activity {
     public static ArrayList<HashMap<String, String>> listaRecibos;
     private double total;
     private double tasaCambio = 0;
-    private int vEfectivo=0;
     private String vTipo;
     private SimpleAdapter adapter;
-
+    private Informe informe;
+    private InformeDetalle informedetalle;
+    String IMEI = "";
+    private boolean guardadoOK = false;
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
     private DataBaseOpenHelper DbOpenHelper;
     private boolean finalizar = false;
     private Cliente cliente;
-    AlertDialog alertDialog;
     private boolean isOnline = false;
     private String TAG = AgregarRecibo.class.getSimpleName();
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioClientes.svc/GetConfiguraciones";
@@ -148,10 +161,22 @@ public class AgregarRecibo extends Activity {
     public Calendar myCalendar = Calendar.getInstance();
     private String vNoInforme;
     private String vVendedor;
+    private String nVendedor;
+    private String vCodLetraCliente="";
+
+    private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+    private ProgressDialog pDialog;
+    AlertDialog alertDialog;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recibos);
+
+        //Inicializando las clases de Entidades
+        informe = new Informe();
+        informedetalle = new InformeDetalle();
+        cliente = new Cliente();
 
         ValidarUltimaVersion();
         if (isOnline) {
@@ -165,6 +190,7 @@ public class AgregarRecibo extends Activity {
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
 
+        //inicializando componentes de Formulario
         listaRecibos = new ArrayList<HashMap<String, String>>();
         listaRecibos.clear();
         DbOpenHelper = new DataBaseOpenHelper(AgregarRecibo.this);
@@ -184,7 +210,6 @@ public class AgregarRecibo extends Activity {
         lblSaldo = (TextView) findViewById(R.id.txtSaldo);
         txtValorMinuta = (EditText) findViewById(R.id.txtValorMinuta);
         txtMonto = (EditText) findViewById(R.id.txtMonto);
-        lblMontoLetras = (TextView) findViewById(R.id.lblMontoLetras);
         rgFormaPago = (RadioGroup) findViewById(R.id.rgFormaPago);
         lblDescTipoPago = (TextView) findViewById(R.id.lblDescFormapago);
         txtValorDocPago =(EditText) findViewById(R.id.txtValorMinuta);
@@ -205,7 +230,7 @@ public class AgregarRecibo extends Activity {
         rbDeposito = (RadioButton) findViewById(R.id.rbDeposito);
         lblDescFormapago = (TextView) findViewById(R.id.lblDescFormapago);
 
-        rbEfectivo.setChecked(true);
+        //definición de valores iniciales para componentes de Formulatio
         vTipo="Efectivo";
         cboBancoOrigen.setEnabled(false);
         cboBancoOrigen.setSelection(getIndex(cboBancoOrigen, "SELECCIONE"));
@@ -215,8 +240,12 @@ public class AgregarRecibo extends Activity {
 
         txtFechaDocPago.setText(getDatePhone());
         fechaDoc = txtFechaDocPago.getText().toString();
+
+         //Obteniendo el valkre de la Tasa de cambio.
         tasaCambio = Double.parseDouble(variables_publicas.usuario.getTasaCambio());
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
+
+        //Inicializando los valores de los Helper
         sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
 
         CargarCombos();
@@ -227,36 +256,65 @@ public class AgregarRecibo extends Activity {
                 if(group.getCheckedRadioButtonId()== R.id.rbEfectivo){
                     lblDescFormapago.setText("No. Minuta");
                     cboBancoOrigen.setEnabled(false);
-                    vEfectivo=1;
                     vTipo="Efectivo";
+                    cboBancoDestino.setSelection(1);
                     txtValorMinuta.requestFocus();
-                   // lblDescFormapago.setInputType(InputType.TYPE_CLASS_NUMBER);
                 }
                 else if (group.getCheckedRadioButtonId()== R.id.rbCheque){
                     lblDescFormapago.setText("No. Cheque");
                     cboBancoOrigen.setEnabled(true);
-                    vEfectivo=0;
                     vTipo="Cheque";
                     txtValorMinuta.requestFocus();
-                    //txtBusqueda.setInputType(InputType.TYPE_CLASS_TEXT);
                 }else {
                     lblDescFormapago.setText("No. Deposito");
                     cboBancoOrigen.setEnabled(false);
-                    vEfectivo=0;
                     vTipo="Deposito";
                     txtValorMinuta.requestFocus();
                 }
             }
 
         });
-
+        rbEfectivo.setChecked(true);
 
         Intent in = getIntent();
+
+        //Obteniendo el No de Informe del Formulario de Informes. si mismo el ID y Nombre del venedor
         vNoInforme=in.getStringExtra(variables_publicas.INFORMES_COLUMN_CodInforme).toString();
         lblNoInforme.setText("No. Informe: "+ vNoInforme);
-        vVendedor = in.getStringExtra(variables_publicas.CodigoVendedor).toString();
+        vVendedor = in.getStringExtra(variables_publicas.KEY_IdVendedor);
+        nVendedor =in.getStringExtra(variables_publicas.KEY_NombreVendedor);
+
+        //Obteniendo el Id del Recibo
         obtenerIdRecibo();
-        //Funciones funciones= new Funciones();
+
+        //Definición de la Lista de Recibos
+        registerForContextMenu(lv);
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView1);
+        //Eventos para a lista de Recibos
+        lv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                scrollView.requestDisallowInterceptTouchEvent(true);
+                int action = event.getActionMasked();
+                switch (action) {
+                    case MotionEvent.ACTION_UP:
+                        scrollView.requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                return false;
+            }
+        });
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+                adapter.notifyDataSetChanged();
+                lv.setAdapter(adapter);
+            }
+        });
+
+        //Buscar Clientes
         btnBuscarCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 BuscarCliente();
@@ -264,6 +322,7 @@ public class AgregarRecibo extends Activity {
             }
         });
 
+        //Eventos para Lista de clientes
         lblIdCliente.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -283,6 +342,7 @@ public class AgregarRecibo extends Activity {
             }
         });
 
+        //Eventos para cargar la lista de Facturas
         lblSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,32 +351,26 @@ public class AgregarRecibo extends Activity {
             }
         });
 
-
-        txtMonto.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Funciones.Convertir(txtMonto.getText().toString(),true);
-                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                    Funciones.Convertir(txtMonto.getText().toString(),true);
-                    if (!txtMonto.equals("0.00")) {
-                        lblMontoLetras.setText(Funciones.Convertir(txtMonto.getText().toString(),true));
-                    }
-                    return false;
-                }
-                return true;
-            }
-        });
-
+        //Evento para validar el monto que se está pagando
         txtMonto.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
                 double vmonto=0;
-                double vsaldo = Double.parseDouble(lblSaldo.getText().toString().replace(",", ""));
-                if (!s.equals("")){
+                double vsaldo = 0;
+                if (lblSaldo.getText().toString().replace(",", "").isEmpty() ||lblSaldo.getText().toString().replace(",", "").equals("") ){
+                    vsaldo=0;
+                }else {
+                    vsaldo=Double.parseDouble(lblSaldo.getText().toString().replace(",", ""));
+                }
+                if (!s.toString().isEmpty()){
                     vmonto = Double.parseDouble(s.toString());
                 }else {
                     vmonto=0;
@@ -327,13 +381,9 @@ public class AgregarRecibo extends Activity {
                     return;
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
         });
 
+        //Eventos para definir y validar los valores de las fechas de Recibo y de Documentos
         final DatePickerDialog.OnDateSetListener date1 = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -380,12 +430,15 @@ public class AgregarRecibo extends Activity {
                         InputMethodManager.HIDE_NOT_ALWAYS);
             }
         });
+
+        //Boton de cancelar y salir
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AgregarRecibo.this.onBackPressed();
             }
         });
+        //Botón para agregar el detalle del recibo.
         btnAgregar.setOnClickListener(new View.OnClickListener() {
                                           public void onClick(View v) {
 
@@ -405,6 +458,13 @@ public class AgregarRecibo extends Activity {
                                                   String vBancoI = cboBancoOrigen.getSelectedItem().toString();
                                                   String vBancoF = cboBancoDestino.getSelectedItem().toString();
 
+
+                                                  if (rbEfectivo.isChecked() && vBancoF.equals("SELECCIONE")){
+                                                      MensajeAviso("Debe seleccionar un Banco Destino");
+                                                      cboBancoDestino.requestFocus();
+                                                      return ;
+                                                  }
+
                                                   if (rbCheque.isChecked() && (vBancoI.equals("SELECCIONE") || vBancoF.equals("SELECCIONE"))){
                                                       MensajeAviso("Debe seleccionar un Banco Emisor y Destino");
                                                       cboBancoOrigen.requestFocus();
@@ -417,11 +477,6 @@ public class AgregarRecibo extends Activity {
                                                   }
                                                   HashMap<String, String> itemRecibos = new HashMap<>();
                                                   if (AgregarDetalle(itemRecibos)) {
-
-
-                                                    /*  for (HashMap<String, String> item : listaRecibos) {
-                                                          subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
-                                                      }*/
                                                       CalcularTotales();
                                                       LimipiarDatos();
                                                       InputMethodManager inputManager = (InputMethodManager)
@@ -430,16 +485,30 @@ public class AgregarRecibo extends Activity {
                                                       inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                                                               InputMethodManager.RESULT_SHOWN);
                                                   }
-
-
                                               } catch (Exception e) {
-                                                  //cliente = ClientesH.BuscarCliente(pedido.getIdCliente(), pedido.getCod_cv());
                                                   MensajeAviso(e.getMessage());
                                               }
                                           }
                                       }
         );
+
+        //Evento para guardar los datos del detalle de Informe
+        btnGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+
+                    Guardar();
+
+                } catch (Exception e) {
+                    DbOpenHelper.database.endTransaction();
+                    MensajeAviso(e.getMessage());
+                }
+            }
+        });
     }
+
+    //Funcion para Buscar el cliente. se habilita la ventana emergente para la busqueda de los mismos.
     public void BuscarCliente() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -518,6 +587,9 @@ public class AgregarRecibo extends Activity {
                 }else {
                     codCliente=CodCV;
                 }
+
+                vCodLetraCliente=ClientesH.ObtenerCodLetra(codCliente);
+
                 lblIdCliente.setText(codCliente);
                 txtNombreCliente.setText(NombreCliente);
 
@@ -529,6 +601,260 @@ public class AgregarRecibo extends Activity {
         alertDialog = dialogBuilder.create();
         alertDialog.show();
     }
+
+    //Funcion para Guardar
+    private boolean Guardar() {
+        if (lv.getCount() <= 0) {
+            MensajeAviso("No se puede guardar el Recibo, Debe ingresar al menos 1 item");
+            return false;
+        }
+
+        String mensaje = "";
+        mensaje = "Esta seguro que desea guardar el pedido?";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Guardandorecibo();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+
+        return true;
+    }
+
+    //Funcion para  llamar el evento asincrono de guardado localmente
+    private boolean Guardandorecibo() {
+
+        try {
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new GuardandoDetalleinforme().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new GuardandoDetalleinforme().execute();
+            }
+        } catch (final Exception ex) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            ex.getMessage(),
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+
+        return false;
+    }
+
+    //Funcion asincrona para guardar el detalle
+    private class GuardandoDetalleinforme extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(AgregarRecibo.this);
+            pDialog.setMessage("Guardando datos, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            DbOpenHelper.database.beginTransaction();
+            if (GuardarDetalleInforme()) {
+                guardadoOK=true;
+                DbOpenHelper.database.setTransactionSuccessful();
+                DbOpenHelper.database.endTransaction();
+            } else {
+                guardadoOK=false;
+                DbOpenHelper.database.endTransaction();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (AgregarRecibo.this.isFinishing() == false) {
+                MostrarMensajeGuardar();
+            }
+
+        }
+    }
+
+    //Funcion para guardar localmente el recibo en el detalle de informe.
+    private boolean GuardarDetalleInforme() {
+        double  montoTotal;
+        String valorLetra="";
+
+        valorLetra=Funciones.Convertir(lblTotalCor.getText().toString().replace(",", ""),true);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date fechaActual = new Date();
+        Date fechaDocumento = new Date();
+
+        try {
+            fechaActual = dateFormat.parse(variables_publicas.FechaActual);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        montoTotal = Double.parseDouble(lblTotalCor.getText().toString().replace(",", ""));
+
+        IMEI = variables_publicas.IMEI;
+        informe.setCodigoInforme(lblNoInforme.getText().toString().replace("No. Informe: ",""));
+        informedetalle.setCodInforme(lblNoInforme.getText().toString().replace("No. Informe: ",""));
+        informedetalle.setRecibo(lblNoRecibo.getText().toString());
+        informedetalle.setIdvendedor(vVendedor);
+        informedetalle.setIdCliente(lblIdCliente.getText().toString());
+        informedetalle.setMonto(String.valueOf(montoTotal));
+        informedetalle.setMoneda("01");
+
+        if (IMEI == null) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmación Requerida")
+                    .setMessage("Es necesario configurar el permiso \"Administrar llamadas telefonicas\" para porder guardar un Recibo, Desea continuar ? ")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                            loadIMEI();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+            return false;
+
+        }
+
+        Funciones.GetLocalDateTime();
+
+        informedetalle.setVendedor(nVendedor);
+        informedetalle.setCliente(txtNombreCliente.getText().toString());
+        informedetalle.setCodigoLetra(vCodLetraCliente);
+        informedetalle.setCantLetra(valorLetra);
+
+        InformesDetalleH.EliminarDetalleInforme2(informedetalle.getCodInforme(),informedetalle.getRecibo());
+
+        boolean saved;
+        String tipo;
+
+        //Guardamos el detalle del Informe
+        for (HashMap<String, String> item : listaRecibos) {
+            informedetalle.setFactura(item.get("Factura"));
+            informedetalle.setSaldo(item.get("Saldo"));
+            informedetalle.setAbono(item.get("Abono"));
+            informedetalle.setNoCheque(item.get("Documento"));
+            tipo= item.get("Tipo");
+            if (tipo.equals("Efectivo")){
+                informedetalle.setBancoE("");
+                informedetalle.setEfectivo("1");
+            }else {
+                informedetalle.setBancoE(item.get("BancoE"));
+                informedetalle.setEfectivo("0");
+            }
+            informedetalle.setBancoR(item.get("BancoR"));
+            informedetalle.setFechaCK(item.get("FechaDoc"));
+            informedetalle.setFechaDep(item.get("FechaDoc"));
+            try {
+                fechaDocumento = dateFormat.parse(item.get("FechaDoc"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (fechaActual.before(fechaDocumento)){
+                informedetalle.setPosfechado("1");
+            }else {
+                informedetalle.setPosfechado("0");
+            }
+            informedetalle.setAprobado("0");
+            informedetalle.setProcesado("0");
+            informedetalle.setUsuario("SISAGO");
+
+            saved=InformesDetalleH.GuardarDetalleInforme(informedetalle.getCodInforme(),informedetalle.getRecibo(),informedetalle.getIdvendedor(),informedetalle.getIdCliente(),informedetalle.getFactura(),informedetalle.getSaldo(),
+                    informedetalle.getMonto(),informedetalle.getAbono(),informedetalle.getNoCheque(),informedetalle.getBancoE(),informedetalle.getBancoR(),informedetalle.getFechaCK(),informedetalle.getFechaDep(),informedetalle.getEfectivo(),
+                    informedetalle.getMoneda(),informedetalle.getAprobado(),informedetalle.getPosfechado(),informedetalle.getProcesado(),informedetalle.getUsuario(),informedetalle.getVendedor(),informedetalle.getCliente(),
+                    informedetalle.getCodigoLetra(),informedetalle.getCantLetra());
+            FacturasPendientesH.ActualizarFacturasPendientes(informedetalle.getFactura(),"true");
+
+            if (!saved) {
+                break;
+            }
+        }
+
+        return true;
+    }
+
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+            requestReadPhoneStatePermission();
+        } else {
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
+        }
+    }
+    public void doPermissionGrantedStuffs() {
+        //Have an  object of TelephonyManager
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
+        variables_publicas.IMEI = tm.getDeviceId();
+
+
+    }
+
+   private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            new AlertDialog.Builder(AgregarRecibo.this)
+                    .setTitle("Permission Request")
+                    .setMessage("Se necesita permiso para acceder al estado del telefono")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //re-request
+                            ActivityCompat.requestPermissions(AgregarRecibo.this,
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
+    }
+
+    //Funcion para Obtener el id del recibo.
     private void obtenerIdRecibo() {
 
         String encodeUrl = "";
@@ -877,8 +1203,8 @@ public class AgregarRecibo extends Activity {
         lv.setAdapter(adapter);
     }
     private void LimipiarDatos() {
-            lblIdCliente.setText("00000");
-            txtNombreCliente.setText(null);
+            //lblIdCliente.setText("00000");
+            //txtNombreCliente.setText(null);
             lblSearch.setText(null);
             lblSaldo.setText("0.00");
             txtMonto.setText("0.00");
@@ -909,5 +1235,94 @@ public class AgregarRecibo extends Activity {
             }
         }
         return index;
+    }
+    public void MostrarMensajeGuardar() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = null;
+        dialogBuilder.setCancelable(false);
+        if (guardadoOK) {
+            dialogView = inflater.inflate(R.layout.dialog_ok_layout, null);
+
+            Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
+            btnOK.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+
+            dialogView = inflater.inflate(R.layout.offline_layout, null);
+            dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+        }
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        try {
+            super.onCreateContextMenu(menu, v, menuInfo);
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+
+            String HeaderMenu = obj.get("Factura");
+            //String HeaderMenu = obj.get("Factura") + "\n" + obj.get("Descripcion");
+            menu.setHeaderTitle(HeaderMenu);
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.eliminar_item_pedido, menu);
+        } catch (Exception e) {
+            MensajeAviso(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            switch (item.getItemId()) {
+                case R.id.Elimina_Item:
+                    HashMap<String, String> itemRecibo = listaRecibos.get(info.position);
+                    listaRecibos.remove(itemRecibo);
+                    for (int i = 0; i < listaRecibos.size() - 1; i++) {
+                        HashMap<String, String> a = listaRecibos.get(i);
+                        if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura))) {
+                            listaRecibos.remove(a);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    lv.setAdapter(adapter);
+
+                    CalcularTotales();
+                    RefrescarGrid();
+                    LimipiarDatos();
+
+                    return true;
+
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        } catch (Exception e) {
+            MensajeAviso(e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 }

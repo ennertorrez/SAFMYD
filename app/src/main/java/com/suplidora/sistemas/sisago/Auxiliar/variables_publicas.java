@@ -15,8 +15,10 @@ public class variables_publicas {
     public static String PermitirVentaDetAMayoristaXCaja;
     public static String[] lstDepartamentosForaneo1;
     public static String UsuarioLogin = "";
-    public static String NombreVendedor = "";
-    public static String CodigoVendedor = "";
+    public static  String NombreVendedor = "";
+    public static  String CodigoVendedor = "";
+    public static final String KEY_IdVendedor = "vIdVendedor";
+    public static final String KEY_NombreVendedor = "vnombreVendedor";
     public static String TipoUsuario = "";
     public static boolean LoginOk = false;
     public static String MensajeLogin = "";
@@ -39,7 +41,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 75;
+    public static final int DATABASE_VERSION = 78;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -59,6 +61,7 @@ public class variables_publicas {
     public static final String TABLE_DETALLE_INFORMES="DetalleInformes";
     public static final String TABLE_FACTURAS_PENDIENTES="FacturasPendientes";
     public static final String TABLE_BANCOS="Bancos";
+    public static final String TABLE_SERIE_RECIBOS="SerieRecibos";
 
     //Variables CamposTbArticulos
     //public static final String ARTICULO_COLUMN_Id= "Id";
@@ -253,6 +256,10 @@ public class variables_publicas {
     public static  final String DETALLEINFORMES_COLUMN_Posfechado = "Posfechado";
     public static  final String DETALLEINFORMES_COLUMN_Procesado = "Procesado";
     public static  final String DETALLEINFORMES_COLUMN_Usuario = "Usuario";
+    public static  final String DETALLEINFORMES_COLUMN_Vendedor = "Vendedor";
+    public static  final String DETALLEINFORMES_COLUMN_Cliente = "Cliente";
+    public static  final String DETALLEINFORMES_COLUMN_CodigoLetra = "CodigoLetra";
+    public static  final String DETALLEINFORMES_COLUMN_CantLetra = "CantLetra";
 
     public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
     public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";
@@ -266,8 +273,15 @@ public class variables_publicas {
     public static  final String FACTURAS_PENDIENTES_COLUMN_Total = "Total";
     public static  final String FACTURAS_PENDIENTES_COLUMN_Abono = "Abono";
     public static  final String FACTURAS_PENDIENTES_COLUMN_Saldo = "Saldo";
+    public static  final String FACTURAS_PENDIENTES_COLUMN_Guardada = "Guardada";
 
     public static  final String BANCOS_COLUMN_codigo = "Codigo";
     public static final String  BANCOS_COLUMN_nombre ="Nombre";
+
+    public static final String  SERIERECIBOS_COLUMN_IdSerie ="IdSerie";
+    public static final String  SERIERECIBOS_COLUMN_CodVendedor ="CodVendedor";
+    public static final String  SERIERECIBOS_COLUMN_nInicial ="nInicial";
+    public static final String  SERIERECIBOS_COLUMN_nFinal ="nFinal";
+    public static final String  SERIERECIBOS_COLUMN_Numero ="Numero";
 
 }
