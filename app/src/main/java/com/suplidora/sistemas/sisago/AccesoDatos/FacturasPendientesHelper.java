@@ -178,4 +178,20 @@ public class FacturasPendientesHelper {
             return true;
         else return false;
     }
+    public boolean ActualizarTodasFacturasPendientes(String informe ) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,"false");
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"="+ informe +")", null);
+        if (rowsUpdated != -1)
+            return true;
+        else return false;
+    }
+    public boolean ActualizarTodasFacturasPendientesRecibo(String vRecibo ) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,"false");
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +"="+ vRecibo +")", null);
+        if (rowsUpdated != -1)
+            return true;
+        else return false;
+    }
 }

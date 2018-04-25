@@ -114,6 +114,27 @@ public class InformesHelper {
         return informe;
     }
 
+    public ArrayList<HashMap<String, String>> ObtenerInformeDet(String CodigoInforme) {
+        ArrayList<HashMap<String,String>> lst= new ArrayList<>();
+        String selectQuery="SELECT DISTINCT "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +", "+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +", "+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +",SUM(" + variables_publicas.DETALLEINFORMES_COLUMN_Abono + ") Monto " +
+                " from " + variables_publicas.TABLE_DETALLE_INFORMES  + " Where " + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + " = " + CodigoInforme +
+                " GROUP BY "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +","+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +","+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +";";
+        Cursor c= database.rawQuery(selectQuery , null);
+
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> detinforme = new HashMap<>();
+                detinforme.put("Recibo", c.getString(c.getColumnIndex("Recibo")));
+                detinforme.put("Id", c.getString(c.getColumnIndex("IdCliente")));
+                detinforme.put("Cliente", c.getString(c.getColumnIndex("Cliente")));
+                detinforme.put("Monto", c.getString(c.getColumnIndex("Monto")));
+                lst.add(detinforme);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+
     public boolean EliminarBancos() {
         long deletedrows=  database.delete( variables_publicas.TABLE_BANCOS,null,null);
         Log.d("bancos_deleted", "Datos eliminados");

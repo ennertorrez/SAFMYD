@@ -71,7 +71,6 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, Cliente);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, CodigoLetra);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, CantLetra);
-        //database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
             return true;
@@ -222,6 +221,33 @@ public class InformesDetalleHelper {
         }
         c.close();
         return list;
+}
+    public ArrayList<HashMap<String, String>> ObtenerUltimoCodigoRecibo(String vVendedor) {
+
+        String selectQuery = "SELECT "+ variables_publicas.SERIERECIBOS_COLUMN_IdSerie +","+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" FROM " + variables_publicas.TABLE_SERIE_RECIBOS + " where "+ variables_publicas.SERIERECIBOS_COLUMN_nFinal +"-"+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" > 0 AND "+ variables_publicas.SERIERECIBOS_COLUMN_CodVendedor +"="+ vVendedor +" Limit 1;";
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
+
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String,String> dtSerie= new HashMap<>();
+                dtSerie.put(variables_publicas.SERIERECIBOS_COLUMN_IdSerie, c.getString(c.getColumnIndex("IdSerie")));
+                dtSerie.put(variables_publicas.SERIERECIBOS_COLUMN_Numero, c.getString(c.getColumnIndex("Numero")));
+                lst.add(dtSerie);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
+    public boolean ActualizarCodigoRecibo(String idserie, String vnumero){
+        ContentValues con = new ContentValues();
+        con.put("Numero", vnumero);
+        long rowInserted= database.update(variables_publicas.TABLE_SERIE_RECIBOS, con, variables_publicas.SERIERECIBOS_COLUMN_IdSerie +"="+idserie+";", null );
+        if(rowInserted != -1)
+            return true;
+        else return false;
+    }
+
 
 }

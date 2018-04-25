@@ -163,6 +163,9 @@ public class AgregarRecibo extends Activity {
     private String vVendedor;
     private String nVendedor;
     private String vCodLetraCliente="";
+    private String vFacturatemp;
+    private String vRecibo;
+    private String vIdSerie;
 
     private static final int REQUEST_READ_PHONE_STATE = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
@@ -283,9 +286,13 @@ public class AgregarRecibo extends Activity {
         lblNoInforme.setText("No. Informe: "+ vNoInforme);
         vVendedor = in.getStringExtra(variables_publicas.KEY_IdVendedor);
         nVendedor =in.getStringExtra(variables_publicas.KEY_NombreVendedor);
+        vRecibo= String.valueOf( Integer.parseInt(in.getStringExtra(variables_publicas.KEY_ultRecibo))+1);
+        vIdSerie= in.getStringExtra(variables_publicas.KEY_idSerie);
 
         //Obteniendo el Id del Recibo
-        obtenerIdRecibo();
+        lblNoRecibo.setText(vRecibo);
+
+        //obtenerIdRecibo();
 
         //Definición de la Lista de Recibos
         registerForContextMenu(lv);
@@ -475,10 +482,13 @@ public class AgregarRecibo extends Activity {
                                                       cboBancoDestino.requestFocus();
                                                       return ;
                                                   }
+                                                  vFacturatemp= lblSearch.getText().toString();
                                                   HashMap<String, String> itemRecibos = new HashMap<>();
                                                   if (AgregarDetalle(itemRecibos)) {
                                                       CalcularTotales();
+                                                      FacturasPendientesH.ActualizarFacturasPendientes(vFacturatemp,"true");
                                                       LimipiarDatos();
+                                                      CargarFacturasPendientes();
                                                       InputMethodManager inputManager = (InputMethodManager)
                                                               getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -803,6 +813,7 @@ public class AgregarRecibo extends Activity {
                 break;
             }
         }
+        InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,informedetalle.getRecibo());
 
         return true;
     }
@@ -1295,6 +1306,7 @@ public class AgregarRecibo extends Activity {
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemRecibo = listaRecibos.get(info.position);
                     listaRecibos.remove(itemRecibo);
+                    FacturasPendientesH.ActualizarFacturasPendientes(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura),"false");
                     for (int i = 0; i < listaRecibos.size() - 1; i++) {
                         HashMap<String, String> a = listaRecibos.get(i);
                         if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura))) {
@@ -1305,6 +1317,7 @@ public class AgregarRecibo extends Activity {
                     lv.setAdapter(adapter);
 
                     CalcularTotales();
+                    CargarFacturasPendientes();
                     RefrescarGrid();
                     LimipiarDatos();
 

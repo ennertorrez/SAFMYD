@@ -19,6 +19,8 @@ public class variables_publicas {
     public static  String CodigoVendedor = "";
     public static final String KEY_IdVendedor = "vIdVendedor";
     public static final String KEY_NombreVendedor = "vnombreVendedor";
+    public static final String KEY_idSerie = "vIdSerie";
+    public static final String KEY_ultRecibo = "vUltNumero";
     public static String TipoUsuario = "";
     public static boolean LoginOk = false;
     public static String MensajeLogin = "";
