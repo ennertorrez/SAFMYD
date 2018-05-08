@@ -2,6 +2,7 @@ package com.suplidora.sistemas.sisago.Auxiliar;
 
 
 import com.suplidora.sistemas.sisago.Entidades.Configuraciones;
+import com.suplidora.sistemas.sisago.Entidades.Informe;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.Usuario;
 
@@ -10,6 +11,7 @@ public class variables_publicas {
     public static Usuario usuario = null;
     public static Configuraciones Configuracion = null;
     public static Pedido Pedidos = null;
+    public static Informe Informes = null;
     public static String ValorConfigServ = "";
     public static String AplicarPrecioMayoristaXCaja;
     public static String PermitirVentaDetAMayoristaXCaja;
@@ -34,6 +36,8 @@ public class variables_publicas {
     public static final String diasventas="Dias";
     public static final String descMeses="DescMeses";
     public static boolean vEditando = false;
+    public static String noInforme = "Informe";
+    public static String estadoInforme = "Estado";
 
     public static String noCedula = "";
     public static String nombreCed = "";
@@ -43,7 +47,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 78;
+    public static final int DATABASE_VERSION = 80;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -236,7 +240,7 @@ public class variables_publicas {
     public static  final String INFORMES_COLUMN_IdVendedor = "IdVendedor";
     public static  final String INFORMES_COLUMN_Aprobada = "Aprobada";
     public static  final String INFORMES_COLUMN_Anulada = "Anulada";
-    public static  final String INFORMES_COLUMN_FechaCreacion = "FechaCreacion";
+    public static  final String INFORMES_COLUMN_Imei = "Imei";
     public static  final String INFORMES_COLUMN_Usuario = "Usuario";
 
     public static  final String DETALLEINFORMES_COLUMN_CodInforme = "CodInforme";
@@ -262,6 +266,8 @@ public class variables_publicas {
     public static  final String DETALLEINFORMES_COLUMN_Cliente = "Cliente";
     public static  final String DETALLEINFORMES_COLUMN_CodigoLetra = "CodigoLetra";
     public static  final String DETALLEINFORMES_COLUMN_CantLetra = "CantLetra";
+    public static  final String DETALLEINFORMES_COLUMN_Observacion = "Observacion";
+    public static  final String DETALLEINFORMES_COLUMN_Concepto = "Concepto";
 
     public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
     public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";

@@ -19,6 +19,7 @@ allprojects {
         //Para listar un searchView con Spinner
         maven { url "https://jitpack.io" }
         maven { url "https://maven.google.com" }
+        maven {url "https://clojars.org/repo/"}
     }
 
 }

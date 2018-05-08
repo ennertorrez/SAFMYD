@@ -8,6 +8,7 @@ import android.util.Log;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Bancos;
 import com.suplidora.sistemas.sisago.Entidades.Departamentos;
+import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,9 @@ public class InformesDetalleHelper {
                                       String Vendedor,
                                       String Cliente,
                                       String CodigoLetra,
-                                      String CantLetra
+                                      String CantLetra,
+                                      String Observacion,
+                                      String Concepto
     ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -71,6 +74,8 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, Cliente);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, CodigoLetra);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, CantLetra);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, Observacion);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, Concepto);
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
             return true;
@@ -104,6 +109,8 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Cliente));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Observacion));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Concepto));
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
            return true;
@@ -139,6 +146,8 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Cliente)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -175,6 +184,8 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Cliente)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -240,14 +251,37 @@ public class InformesDetalleHelper {
         c.close();
         return lst;
     }
-    public boolean ActualizarCodigoRecibo(String idserie, String vnumero){
+    public boolean ActualizarCodigoRecibo(String idserie, String vnumero, String vendedor){
         ContentValues con = new ContentValues();
         con.put("Numero", vnumero);
-        long rowInserted= database.update(variables_publicas.TABLE_SERIE_RECIBOS, con, variables_publicas.SERIERECIBOS_COLUMN_IdSerie +"="+idserie+";", null );
+        long rowInserted= database.update(variables_publicas.TABLE_SERIE_RECIBOS, con, variables_publicas.SERIERECIBOS_COLUMN_IdSerie +"="+idserie+" and "+ variables_publicas.SERIERECIBOS_COLUMN_CodVendedor +"= "+ vendedor +";", null );
         if(rowInserted != -1)
             return true;
         else return false;
     }
+    public ArrayList<HashMap<String, String>> ObtenerDetalleInformesLocales(String informe) {
 
+        String selectQuery = "SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +" Recibo, "+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +" Id,"+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +" Cliente, " +
+                            "printf(\"%.2f\",SUM("+ variables_publicas.DETALLEINFORMES_COLUMN_Abono +")) Monto, group_concat("+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +") Facturas, "+
+                            "'PENDIENTE' END Estado FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE LENGTH("+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +")>=13 AND "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"= "+ informe +" "+
+                            "GROUP BY "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +","+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +","+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +";";
 
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> informes = new HashMap<>();
+                informes.put("Recibo", c.getString(c.getColumnIndex("Recibo")));
+                informes.put("Id", c.getString(c.getColumnIndex("Id")));
+                informes.put("Cliente", c.getString(c.getColumnIndex("Cliente")));
+                informes.put("Monto", c.getString(c.getColumnIndex("Monto")));
+                informes.put("Facturas", c.getString(c.getColumnIndex("Facturas")));
+                informes.put("Estado", c.getString(c.getColumnIndex("Estado")));
+                lst.add(informes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
 }

@@ -5,14 +5,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.HttpHandler;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class FacturasPendientesHelper {
 
+    private DataBaseOpenHelper DbOpenHelper;
 
     private SQLiteDatabase database;
 
@@ -21,18 +30,18 @@ public class FacturasPendientesHelper {
     }
 
     public void GuardarFacturasPendientes(String vendedor,
-                                      String fecha,
-                                      String factura,
-                                      String nombrecliente,
-                                      String idcliente,
-                                      String iva,
-                                      String tipo,
-                                      String subtotal,
-                                      String descuento,
-                                      String total,
-                                      String abono,
-                                      String saldo,
-                                      String guardada
+                                          String fecha,
+                                          String factura,
+                                          String nombrecliente,
+                                          String idcliente,
+                                          String iva,
+                                          String tipo,
+                                          String subtotal,
+                                          String descuento,
+                                          String total,
+                                          String abono,
+                                          String saldo,
+                                          String guardada
     ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -53,7 +62,7 @@ public class FacturasPendientesHelper {
     }
 
 
-    public boolean GuardarFacturasPendientes(HashMap<String,String> lstFacturas) {
+    public boolean GuardarFacturasPendientes(HashMap<String, String> lstFacturas) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor));
@@ -69,15 +78,15 @@ public class FacturasPendientesHelper {
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono));
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo));
         contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, lstFacturas.get(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada));
-        long rowInserted=database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
-        if(rowInserted != -1)
-           return true;
+        long rowInserted = database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
+        if (rowInserted != -1)
+            return true;
         else return false;
     }
 
     public List<HashMap<String, String>> ObtenerFacturasPendientes(String vVendedor, String vCliente) {
-        List<HashMap<String,String>> lst= new ArrayList<>();
-        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "ELSE " + vCliente + " END;" ,null);
+        List<HashMap<String, String>> lst = new ArrayList<>();
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = " + vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN " + vCliente + "=0 THEN " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "ELSE " + vCliente + " END;", null);
         if (c.moveToFirst()) {
             do {
                 HashMap<String, String> detalle = new HashMap<>();
@@ -104,7 +113,7 @@ public class FacturasPendientesHelper {
     public ArrayList<HashMap<String, String>> ObtenerDatosFacturaPendiente(String vFactura) {
         ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
 
-        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " = '"+ vFactura + "';" ,null);
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " = '" + vFactura + "';", null);
         if (c.moveToFirst()) {
             do {
                 HashMap<String, String> detalle = new HashMap<>();
@@ -127,10 +136,11 @@ public class FacturasPendientesHelper {
         c.close();
         return lst;
     }
+
     public java.util.ArrayList<String> ObtenerFacturasPendientesArrayList(String vVendedor, String vCliente) {
         java.util.ArrayList<String> lst = new java.util.ArrayList<String>();
-        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = "+ vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN "+ vCliente + "=0 THEN " +  variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND "+ variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada +"= 'false';";
-        Cursor c = database.rawQuery(sql,null);
+        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = " + vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN " + vCliente + "=0 THEN " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "= 'false';";
+        Cursor c = database.rawQuery(sql, null);
         if (c.moveToFirst()) {
             do {
                 lst.add(new String(
@@ -157,41 +167,111 @@ public class FacturasPendientesHelper {
         database.execSQL("DELETE FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + ";");
         Log.d("fact_pend_eliminadas", "Datos eliminados");
     }
-    public Double  BuscarSaldoFactura(String Factura) {
-        String Query = "select printf(\"%.2f\",SUM("+variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo+")) as vSaldo from " + variables_publicas.TABLE_FACTURAS_PENDIENTES +" WHERE  "+variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura+" = '"+ Factura +"'";
-        double salFacturaoriginal=0;
+
+    public Double BuscarSaldoFactura(String Factura) {
+        String Query = "select printf(\"%.2f\",SUM(" + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + ")) as vSaldo from " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE  " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " = '" + Factura + "'";
+        double salFacturaoriginal = 0;
         Cursor c = database.rawQuery(Query, null);
         // looping through all rows and adding to list
         if (c.moveToFirst()) {
             do {
-                salFacturaoriginal=c.getDouble(c.getColumnIndex("vSaldo"));
+                salFacturaoriginal = c.getDouble(c.getColumnIndex("vSaldo"));
             } while (c.moveToNext());
         }
         c.close();
         return salFacturaoriginal;
     }
-    public boolean ActualizarFacturasPendientes(String factura,String estado ) {
+
+    public boolean ActualizarFacturasPendientes(String factura, String estado) {
         ContentValues con = new ContentValues();
-        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,estado);
-        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + "= '" + factura+"'", null);
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, estado);
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + "= '" + factura + "'", null);
         if (rowsUpdated != -1)
             return true;
         else return false;
     }
-    public boolean ActualizarTodasFacturasPendientes(String informe ) {
+
+    public boolean ActualizarTodasFacturasPendientes(String informe) {
         ContentValues con = new ContentValues();
-        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,"false");
-        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"="+ informe +")", null);
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "false");
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT " + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + "=" + informe + ")", null);
         if (rowsUpdated != -1)
             return true;
         else return false;
     }
-    public boolean ActualizarTodasFacturasPendientesRecibo(String vRecibo ) {
+
+    public boolean ActualizarTodasFacturasPendientesRecibo(String vRecibo) {
         ContentValues con = new ContentValues();
-        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada,"false");
-        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +"="+ vRecibo +")", null);
+        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "false");
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT " + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + "=" + vRecibo + ")", null);
         if (rowsUpdated != -1)
             return true;
         else return false;
+    }
+
+    public boolean SincronizarFacturasSaldos(String vVendedor, String vCliente)  {
+       // public String SincronizarFacturasSaldos(String vVendedor, String vCliente) throws JSONException {
+
+        HttpHandler shC = new HttpHandler();
+        String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
+        String urlStringC = urlGetFacturasPendientes + vVendedor + "/" + vCliente;
+
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlStringC);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStrC = shC.makeServiceCall(encodeUrl);
+
+        if (jsonStrC != null) {
+
+            try {
+                //DbOpenHelper.database.beginTransaction();
+                JSONObject jsonObj = new JSONObject(jsonStrC);
+                // Getting JSON Array node
+                JSONArray articulos = jsonObj.getJSONArray("SpObtieneFacturasSaldoPendienteResult");
+                if (articulos.length() == 0) {
+                    return false;
+                }
+                EliminaFacturasPendientes();
+                // looping through All Contacts
+
+                for (int i = 0; i < articulos.length(); i++) {
+                    JSONObject c = articulos.getJSONObject(i);
+                    String codvendedor = c.getString("codvendedor");
+                    String No_Factura = c.getString("No_Factura");
+                    String Cliente = c.getString("Cliente");
+                    String CodigoCliente = c.getString("CodigoCliente");
+                    String Fecha = c.getString("Fecha");
+                    String IVA = c.getString("IVA");
+                    String Tipo = c.getString("Tipo");
+                    String SubTotal = c.getString("SubTotal");
+                    String Descuento = c.getString("Descuento");
+                    String Total = c.getString("Total");
+                    String Abono = c.getString("Abono");
+                    String Saldo = c.getString("Saldo");
+                    String Guardada = c.getString("Guardada");
+                    GuardarFacturasPendientes(codvendedor, Fecha, No_Factura, Cliente, CodigoCliente, IVA, Tipo, SubTotal, Descuento, Total, Abono, Saldo, Guardada);
+                }
+                return true;
+                // DbOpenHelper.database.setTransactionSuccessful();
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener el listado de facturas pendientes. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+          /*  finally {
+                DbOpenHelper.database.endTransaction();
+            }*/
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al actualizar listado de facturas pendientes. Ha ocurrido un error al sincronizar las Facturas Pendientes,Respuesta nula", variables_publicas.info + urlStringC, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
     }
 }

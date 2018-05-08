@@ -49,6 +49,7 @@ import com.suplidora.sistemas.sisago.Informes.InformesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
@@ -329,6 +330,16 @@ public class MenuActivity extends AppCompatActivity
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
+
+            case R.id.btnListaInforme:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaInformesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
             case R.id.btnNuevoPedido:
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();

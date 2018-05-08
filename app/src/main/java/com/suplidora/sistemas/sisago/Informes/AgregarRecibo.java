@@ -172,6 +172,8 @@ public class AgregarRecibo extends Activity {
     private ProgressDialog pDialog;
     AlertDialog alertDialog;
 
+    public final static String TEXTO_CAPTURADO = "";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recibos);
@@ -324,8 +326,13 @@ public class AgregarRecibo extends Activity {
         //Buscar Clientes
         btnBuscarCliente.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                BuscarCliente();
-                btnOKCliente.performClick();
+                if(listaRecibos.size()>0){
+                    MensajeAviso("Ya tiene un cliente asociado. Cada recibo es para Un cliente.");
+                    lblSearch.requestFocus();
+                }else {
+                    BuscarCliente();
+                    btnOKCliente.performClick();
+                }
             }
         });
 
@@ -451,17 +458,25 @@ public class AgregarRecibo extends Activity {
 
                                               try {
 
-                                                  if (Double.parseDouble(txtMonto.getText().toString()) < 1) {
-                                                      txtMonto.setError("Ingrese un Monto mayor a 0");
+                                                  if (Double.parseDouble(txtMonto.getText().toString().equals("") ? "0" :txtMonto.getText().toString()) < 1) {
+                                                      MensajeAviso("Ingrese un Monto mayor a 0");
                                                       return;
                                                   }
 
+                                                  if (lblSearch.getText().toString().equals("") || lblSearch.getText().toString().isEmpty()) {
+                                                      MensajeAviso("Debe seleccionar un número de factura.");
+                                                      return;
+                                                  }
                                                   boolean repetido = EsFacturaRepetida(lblSearch.getText().toString());
                                                   if (repetido) {
                                                       MensajeAviso("Esta Factura ya ha sigo agregada al Recibo.");
                                                       return;
                                                   }
 
+                                                  if (txtValorMinuta.getText().toString().equals("") || txtValorMinuta.getText().toString().isEmpty() || txtValorMinuta.getText().toString().equals("0")) {
+                                                      MensajeAviso("Debe indicar el número de documento.");
+                                                      return;
+                                                  }
                                                   String vBancoI = cboBancoOrigen.getSelectedItem().toString();
                                                   String vBancoF = cboBancoDestino.getSelectedItem().toString();
 
@@ -620,7 +635,7 @@ public class AgregarRecibo extends Activity {
         }
 
         String mensaje = "";
-        mensaje = "Esta seguro que desea guardar el pedido?";
+        mensaje = "Esta seguro que desea guardar el recibo?";
 
         new AlertDialog.Builder(this)
                 .setTitle("Confirmación Requerida")
@@ -716,7 +731,8 @@ public class AgregarRecibo extends Activity {
 
         valorLetra=Funciones.Convertir(lblTotalCor.getText().toString().replace(",", ""),true);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date fechaActual = new Date();
         Date fechaDocumento = new Date();
 
@@ -775,46 +791,51 @@ public class AgregarRecibo extends Activity {
         //Guardamos el detalle del Informe
         for (HashMap<String, String> item : listaRecibos) {
             informedetalle.setFactura(item.get("Factura"));
-            informedetalle.setSaldo(item.get("Saldo"));
-            informedetalle.setAbono(item.get("Abono"));
+            informedetalle.setSaldo(item.get("Saldo").replace(",",""));
+            informedetalle.setAbono(item.get("Abono").replace(",",""));
             informedetalle.setNoCheque(item.get("Documento"));
             tipo= item.get("Tipo");
             if (tipo.equals("Efectivo")){
                 informedetalle.setBancoE("");
-                informedetalle.setEfectivo("1");
+                informedetalle.setEfectivo("true");
             }else {
                 informedetalle.setBancoE(item.get("BancoE"));
-                informedetalle.setEfectivo("0");
+                informedetalle.setEfectivo("false");
             }
             informedetalle.setBancoR(item.get("BancoR"));
-            informedetalle.setFechaCK(item.get("FechaDoc"));
-            informedetalle.setFechaDep(item.get("FechaDoc"));
+            informedetalle.setFechaCK(item.get("FechaDoc").replace("-",""));
+            informedetalle.setFechaDep(item.get("FechaDoc").replace("-",""));
             try {
                 fechaDocumento = dateFormat.parse(item.get("FechaDoc"));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
             if (fechaActual.before(fechaDocumento)){
-                informedetalle.setPosfechado("1");
+                informedetalle.setPosfechado("true");
             }else {
-                informedetalle.setPosfechado("0");
+                informedetalle.setPosfechado("false");
             }
-            informedetalle.setAprobado("0");
-            informedetalle.setProcesado("0");
+            informedetalle.setAprobado("false");
+            informedetalle.setProcesado("false");
             informedetalle.setUsuario("SISAGO");
+            informedetalle.setObservacion(txtObservacion.getText().toString());
+            if (Double.parseDouble(item.get("Saldo").replace(",",""))==0){
+                informedetalle.setConcepto("CANCELA Y ABONA A FACTURA No: "+ item.get("Factura"));
+            }else {
+                informedetalle.setConcepto("ABONO A FACTURA No: "+ item.get("Factura"));
+            }
 
             saved=InformesDetalleH.GuardarDetalleInforme(informedetalle.getCodInforme(),informedetalle.getRecibo(),informedetalle.getIdvendedor(),informedetalle.getIdCliente(),informedetalle.getFactura(),informedetalle.getSaldo(),
                     informedetalle.getMonto(),informedetalle.getAbono(),informedetalle.getNoCheque(),informedetalle.getBancoE(),informedetalle.getBancoR(),informedetalle.getFechaCK(),informedetalle.getFechaDep(),informedetalle.getEfectivo(),
                     informedetalle.getMoneda(),informedetalle.getAprobado(),informedetalle.getPosfechado(),informedetalle.getProcesado(),informedetalle.getUsuario(),informedetalle.getVendedor(),informedetalle.getCliente(),
-                    informedetalle.getCodigoLetra(),informedetalle.getCantLetra());
+                    informedetalle.getCodigoLetra(),informedetalle.getCantLetra(),informedetalle.getObservacion(),informedetalle.getConcepto());
             FacturasPendientesH.ActualizarFacturasPendientes(informedetalle.getFactura(),"true");
 
             if (!saved) {
                 break;
             }
         }
-        InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,informedetalle.getRecibo());
-
+        InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,informedetalle.getRecibo(),vVendedor);
         return true;
     }
 
@@ -1138,6 +1159,9 @@ public class AgregarRecibo extends Activity {
                 .setCancelable(false)
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Intent intentRetornoDatos = new Intent();
+                        intentRetornoDatos.putExtra(TEXTO_CAPTURADO, lblNoInforme.getText().toString().replace("No. Informe: ",""));
+                        setResult(Activity.RESULT_OK, intentRetornoDatos);
                         AgregarRecibo.this.finish();
                     }
                 })
@@ -1260,6 +1284,9 @@ public class AgregarRecibo extends Activity {
             btnOK.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent intentRetornoDatos = new Intent();
+                    intentRetornoDatos.putExtra(TEXTO_CAPTURADO, lblNoInforme.getText().toString().replace("No. Informe: ",""));
+                    setResult(Activity.RESULT_OK, intentRetornoDatos);
                     finish();
                 }
             });
@@ -1316,9 +1343,9 @@ public class AgregarRecibo extends Activity {
                     adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
 
+                    RefrescarGrid();
                     CalcularTotales();
                     CargarFacturasPendientes();
-                    RefrescarGrid();
                     LimipiarDatos();
 
                     return true;

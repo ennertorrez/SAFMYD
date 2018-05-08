@@ -2,11 +2,13 @@ package com.suplidora.sistemas.sisago.Informes;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -30,6 +32,8 @@ import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 import android.os.Bundle;
+import com.google.gson.Gson;
+import android.widget.Toast;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -59,6 +63,7 @@ import org.jsoup.nodes.Document;
 
 import java.net.URI;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
@@ -70,6 +75,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
+
+import icepick.Icepick;
+
 
 /**
  * Created by Sistemas on 16/3/2018.
@@ -108,10 +117,19 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
     private boolean isOnline = false;
     public static ArrayList<HashMap<String, String>> lista;
     private double total;
-
+    private String valText;
     private String vIdSerie;
     private String vUltNumero;
+    static final String VALINFORME = "CodInforme";
+    public static boolean editar;
+    public static boolean veditar;
+    private final int PETICION_ACTIVITY_SEGUNDA = 1;
+    private boolean guardadoOK;
+    private String jsonInforme = "";
+    private ProgressDialog pDialog;
+    AlertDialog alertDialog;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.informepago);
@@ -124,15 +142,12 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
         FacturasPendientesH =  new FacturasPendientesHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
-
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
-
 
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
@@ -146,20 +161,20 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         btnCancelar = (Button) findViewById(R.id.btnCancelar);
         lv = (ListView) findViewById(R.id.listrecibos);
 
+        //Obteniendo el valkre de la Tasa de cambio.
+        lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
+
+        sd = new SincronizarDatos(DbOpenHelper,InformesH,InformesDetalleH,ClientesH,FacturasPendientesH);
+
         listaInformes = new ArrayList<HashMap<String, String>>();
         listaInformes.clear();
 
-        txtCodigoInforme.setText("No. Informe: " + InformesH.ObtenerNuevoCodigoInforme());
-
-        /*if (isOnline){
-            obtenerIdInforme();
-        }else {
-            txtCodigoInforme.setText("No. Informe: " + InformesH.ObtenerNuevoCodigoInforme());
-        }*/
-
+        cargarCboVendedor();
+        if (editar==false){
+            GenerarCodigoInforme();
+        }
 
         listaInformes=InformesH.ObtenerInformeDet(txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
-
         //Definición de la Lista de Recibos
         registerForContextMenu(lv);
         final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollView1);
@@ -196,7 +211,6 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             cboVendedor.setEnabled(true);
 
         }
-        cargarCboVendedor();
 
         cboVendedor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -216,7 +230,6 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             vIdVendedor= variables_publicas.usuario.getCodigo();
             vnombreVendedor = variables_publicas.usuario.getNombre();
         }
-        lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
 
         btnAgregarRecibo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -240,9 +253,11 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                         agrRecibo.putExtra(variables_publicas.KEY_NombreVendedor, vnombreVendedor);
                         agrRecibo.putExtra(variables_publicas.KEY_idSerie, vIdSerie);
                         agrRecibo.putExtra(variables_publicas.KEY_ultRecibo, vUltNumero);
-                        startActivity(agrRecibo);
+                        startActivityForResult(agrRecibo, PETICION_ACTIVITY_SEGUNDA);
+                        editar=true;
                     } else {
                         DbOpenHelper.database.endTransaction();
+                        editar=false;
                     }
                 }else {
                     MensajeAviso("El Vendedor Seleccionado no tiene talonario de Recibos asignado.");
@@ -256,23 +271,158 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
             }
         });
 
+        btnGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
 
+                    Guardar();
+                } catch (Exception e) {
+                    DbOpenHelper.database.endTransaction();
+                    MensajeAviso(e.getMessage());
+                }
+            }
+        });
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
-        String valText = txtCodigoInforme.getText().toString().replace("No. Informe: ","");
-        savedInstanceState.putCharSequence("savedText", valText);
-        super.onSaveInstanceState(savedInstanceState);
+    private boolean Guardar() {
+        if (lv.getCount() <= 0) {
+            MensajeAviso("No se puede guardar el Informe, Debe ingresar al menos 1 recibo");
+            return false;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmación Requerida")
+                .setMessage("Esta seguro que desea guardar el informe?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SincronizarInforme(InformesH.ObtenerInforme(informe.getCodigoInforme()));
+                        editar=false;
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+
+        return true;
+    }
+    private boolean SincronizarInforme(HashMap<String, String> informe) {
+        Gson gson = new Gson();
+
+        jsonInforme = gson.toJson(informe);
+
+        try {
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new SincronizardorInformes().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new SincronizardorInformes().execute();
+            }
+        } catch (final Exception ex) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),
+                            ex.getMessage(),
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+
+        return false;
+    }
+    private class SincronizardorInformes extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            pDialog = new ProgressDialog(InformesActivity.this);
+            pDialog.setMessage("Guardando datos, por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            CheckConnectivity();
+            if (isOnline) {
+                if (Boolean.parseBoolean(SincronizarDatos.SincronizarInforme(InformesH, InformesDetalleH, vIdVendedor,  informe.getCodigoInforme(), jsonInforme, false).split(",")[0])) {
+                    FacturasPendientesH.SincronizarFacturasSaldos(vIdVendedor,"0");
+                    guardadoOK = true;
+                }
+            } else {
+                guardadoOK = false;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (InformesActivity.this.isFinishing() == false) {
+                MostrarMensajeGuardar();
+            }
+
+        }
     }
 
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState){
-        super.onRestoreInstanceState(savedInstanceState);
-        CharSequence userText = savedInstanceState.getCharSequence("savedText");
-        txtCodigoInforme.setText(userText);
+    public void MostrarMensajeGuardar() {
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = null;
+        dialogBuilder.setCancelable(false);
+        if (guardadoOK) {
+            dialogView = inflater.inflate(R.layout.dialog_ok_inf_layout, null);
+
+            String auxValorNuevo=variables_publicas.noInforme;
+
+            Button btnOK = (Button) dialogView.findViewById(R.id.btnOkDialogo);
+            TextView nuevoValor = (TextView) dialogView.findViewById(R.id.nuevoIdInforme);
+            nuevoValor.setText(auxValorNuevo);
+            nuevoValor.setTextColor(Color.parseColor("#FFBF5300"));
+
+            btnOK.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        } else {
+
+            dialogView = inflater.inflate(R.layout.offline_layout, null);
+            dialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+        }
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==PETICION_ACTIVITY_SEGUNDA) {
+            if(resultCode==Activity.RESULT_OK) {
+                String textoCapturado = data.getStringExtra(AgregarRecibo.TEXTO_CAPTURADO);
+                listaInformes=InformesH.ObtenerInformeDet(textoCapturado);
+                RefrescarGrid();
+                CalcularTotales();
+            }
+        }
+    }
     private void RefrescarGrid() {
         adapter = new SimpleAdapter(
                 getApplicationContext(), listaInformes,
@@ -289,11 +439,12 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
 
         lv.setAdapter(adapter);
     }
+
     private boolean GuardarInforme() {
 
         IMEI = variables_publicas.IMEI;
         informe.setCodigoInforme(txtCodigoInforme.getText().toString().replace("No. Informe: ",""));
-        informe.setFechaCreacion(getDatePhone());
+        informe.setImei(IMEI);
         informe.setIdVendedor(vIdVendedor);
         informe.setAprobada("false");
         informe.setAnulada("false");
@@ -304,7 +455,7 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         InformesH.EliminaInforme(informe.getCodigoInforme());
         Funciones.GetLocalDateTime();
 
-        boolean saved = InformesH.GuardarInforme(informe.getCodigoInforme(),informe.getFecha(),informe.getIdVendedor(),informe.getAprobada(),informe.getAnulada(),informe.getFechaCreacion(),informe.getUsuario());
+        boolean saved = InformesH.GuardarInforme(informe.getCodigoInforme(),informe.getFecha(),informe.getIdVendedor(),informe.getAprobada(),informe.getAnulada(),informe.getImei(),informe.getUsuario());
 
         if (!saved) {
             MensajeAviso("Ha Ocurrido un error al guardar los datos");
@@ -382,9 +533,15 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                 .setCancelable(false)
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        int valrecibo = InformesH.BuscarMinimoRecibo(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
+                        if (valrecibo>0){
+                            InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(valrecibo-1),vIdVendedor);
+                        }
                         InformesH.EliminaInforme(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
                         FacturasPendientesH.ActualizarTodasFacturasPendientes(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
                         InformesDetalleH.EliminarDetalleInforme(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
+                        editar=false;
+
                         InformesActivity.this.finish();
                     }
                 })
@@ -509,6 +666,8 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                     HashMap<String, String> itemRecibo = listaInformes.get(info.position);
                     listaInformes.remove(itemRecibo);
                     FacturasPendientesH.ActualizarTodasFacturasPendientesRecibo(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
+                    InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(Integer.parseInt(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))-1),vIdVendedor);
+                    InformesDetalleH.EliminarDetalleInforme2(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""),itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
                     for (int i = 0; i < listaInformes.size() - 1; i++) {
                         HashMap<String, String> a = listaInformes.get(i);
                         if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))) {
@@ -557,5 +716,17 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         }
         lblFooter.setText("Total items:" + String.valueOf(listaInformes.size()));
 
+    }
+    private void GenerarCodigoInforme() {
+        informe.setCodigoInforme(GetFechaISO() + vIdVendedor);
+        txtCodigoInforme.setText("No. Informe: " + informe.getCodigoInforme());
+    }
+
+    private String GetFechaISO() {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyMMddHHmms");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+        return nowAsISO;
     }
 }

@@ -12,19 +12,19 @@ public class Informe {
    String IdVendedor = "";
    String Aprobada = "";
     String Anulada="";
-   String FechaCreacion = "";
+   String Imei = "";
     String Usuario="";
 
     public Informe() {
     }
 
-    public Informe(String codigoInforme, String fecha, String idVendedor, String aprobado, String anulado, String fechaCreacion, String usuario) {
+    public Informe(String codigoInforme, String fecha, String idVendedor, String aprobado, String anulado, String imei, String usuario) {
         CodInforme =codigoInforme;
         Fecha=fecha;
         IdVendedor =idVendedor;
         Aprobada = aprobado;
         Anulada=anulado;
-        FechaCreacion = fechaCreacion;
+        Imei = imei;
         Usuario=usuario;
     }
 
@@ -68,12 +68,12 @@ public class Informe {
         Anulada = anulada;
     }
 
-    public String getFechaCreacion() {
-        return Fecha;
+    public String getImei() {
+        return Imei;
     }
 
-    public void setFechaCreacion(String fechaCreacion) {
-        FechaCreacion = fechaCreacion;
+    public void setImei(String imei) {
+        Imei = imei;
     }
 
     public String getUsuario() {

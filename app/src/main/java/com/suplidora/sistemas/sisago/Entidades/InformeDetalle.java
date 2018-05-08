@@ -29,12 +29,14 @@ public class InformeDetalle {
     String Cliente ="";
     String CodigoLetra ="";
     String CantLetra ="";
+    String Observacion ="";
+    String Concepto ="";
 
     public InformeDetalle() {
     }
     public InformeDetalle(String codigoInf, String recibo, String idvendedor, String idCliente, String factura, String saldo, String monto, String abono, String noCheque,
                           String bancoE, String bancoR, String fechaCK, String fechaDep, String efectivo, String moneda, String aprobado, String posfechado, String procesado,
-                          String usuario, String vendedor, String cliente, String codigoletra, String cantletra) {
+                          String usuario, String vendedor, String cliente, String codigoletra, String cantletra, String observacion, String concepto) {
         CodInforme = codigoInf;
         Recibo = recibo;
         Idvendedor = idvendedor;
@@ -58,6 +60,8 @@ public class InformeDetalle {
         Cliente=cliente;
         CodigoLetra= codigoletra;
         CantLetra=cantletra;
+        Observacion = observacion;
+        Concepto = concepto;
     }
 
     public String getCodInforme() {
@@ -243,4 +247,18 @@ public class InformeDetalle {
         CantLetra = cantLetra;
     }
 
+    public String getObservacion() {
+        return Observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        Observacion = observacion;
+    }
+    public String getConcepto() {
+        return Concepto;
+    }
+
+    public void setConcepto(String concepto) {
+        Concepto = concepto;
+    }
 }

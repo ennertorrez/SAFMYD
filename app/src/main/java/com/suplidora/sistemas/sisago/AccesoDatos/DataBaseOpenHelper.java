@@ -205,7 +205,7 @@ public class DataBaseOpenHelper {
                     + variables_publicas.INFORMES_COLUMN_IdVendedor + " TEXT , "
                     + variables_publicas.INFORMES_COLUMN_Aprobada + " TEXT , "
                     + variables_publicas.INFORMES_COLUMN_Anulada + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_FechaCreacion + " TEXT , "
+                    + variables_publicas.INFORMES_COLUMN_Imei + " TEXT , "
                     + variables_publicas.INFORMES_COLUMN_Usuario + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DETALLE_INFORMES + "( "
@@ -231,7 +231,9 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DETALLEINFORMES_COLUMN_Vendedor + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_Cliente + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_CantLetra + " TEXT ) ");
+                    + variables_publicas.DETALLEINFORMES_COLUMN_CantLetra + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Observacion + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Concepto + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FACTURAS_PENDIENTES + "( "
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " TEXT , "

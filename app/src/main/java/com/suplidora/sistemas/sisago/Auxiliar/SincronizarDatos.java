@@ -1127,4 +1127,81 @@ public class SincronizarDatos {
         }
 
     }
+
+    public static String SincronizarInforme(InformesHelper InformesH, InformesDetalleHelper InformesDetalleH, String vvendedor, String CodInforme, String jsonInforme, boolean Editar) {
+
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+        Gson gson = new Gson();
+        List<HashMap<String, String>> informeDetalle = InformesDetalleH.ObtenerInformeDetalle(CodInforme);
+        for (HashMap<String, String> item : informeDetalle) {
+            item.put("CodInforme", item.get("CodInforme"));
+            item.put("Recibo", item.get("Recibo"));
+            item.put("Idvendedor", item.get("Idvendedor"));
+            item.put("IdCliente", item.get("IdCliente"));
+            item.put("Factura", item.get("Factura"));
+            item.put("Saldo", item.get("Saldo").replace(",", ""));
+            item.put("Monto", item.get("Monto").replace(",", ""));
+            item.put("Abono", item.get("Abono").replace(",", ""));
+            item.put("NoCheque", item.get("NoCheque"));
+            item.put("BancoE", item.get("BancoE"));
+            item.put("BancoR", item.get("BancoR"));
+            item.put("FechaCK", item.get("FechaCK"));
+            item.put("FechaDep", item.get("FechaDep"));
+            item.put("Efectivo", item.get("Efectivo"));
+            item.put("Moneda", item.get("Moneda"));
+            item.put("Aprobado", item.get("Aprobado"));
+            item.put("Posfechado", item.get("Posfechado"));
+            item.put("Procesado", item.get("Procesado"));
+            item.put("Usuario", item.get("Usuario"));
+            item.put("Vendedor", item.get("Vendedor"));
+            item.put("Cliente", item.get("Cliente"));
+            item.put("CodigoLetra", item.get("CodigoLetra"));
+            item.put("CantLetra", item.get("CantLetra"));
+            item.put("Observacion", item.get("Observacion"));
+            item.put("Concepto", item.get("Concepto"));
+        }
+        String jsonInformeDetalle = gson.toJson(informeDetalle);
+        final String urlDetalle = variables_publicas.direccionIp + "/ServicioRecibos.svc/SincronizarInformeTotal/";
+        final String urlStringDetalle = urlDetalle + String.valueOf(Editar) + "/" + vvendedor + "/" + jsonInforme + "/" + jsonInformeDetalle;
+
+        HashMap<String,String> postData = new HashMap<>();
+        postData.put("Editar",String.valueOf(Editar));
+        postData.put("IdVendedor",vvendedor);
+        postData.put("informe",jsonInforme);
+        postData.put("Detalle",jsonInformeDetalle)   ;
+
+        String jsonStrInforme= sh.performPostCall(urlDetalle,postData);
+
+        //  String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
+        if (jsonStrInforme == null || jsonInforme.isEmpty()) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar el informe, Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return "false,Ha ocurrido un error al sincronizar el detalle del informe, Respuesta nula";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrInforme);
+                String resultState = (String) ((String) result.get("SincronizarInformeTotalResult")).split(",")[0];
+                String NoInforme = (String) ((String) result.get("SincronizarInformeTotalResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    if (NoInforme.equalsIgnoreCase("Informe ya existe en base de datos")) {
+                        NoInforme =  ((String) result.get("SincronizarInformeTotalResult")).split(",")[1];
+                    } else {
+                        new Funciones().SendMail("Ha ocurrido un error al sincronizar el Informe ,Respuesta false", variables_publicas.info + NoInforme +" *** "+urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                        return "false," + NoInforme;
+                    }
+                }
+                InformesH.ActualizarInforme(CodInforme, NoInforme);
+                InformesDetalleH.ActualizarCodigoInforme(CodInforme, NoInforme);
+                variables_publicas.noInforme=NoInforme;
+                return "true";
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al sincronizar el Informe, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "false," + ex.getMessage() + "";
+            }
+
+        }
+
+    }
 }
