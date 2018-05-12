@@ -1,18 +1,27 @@
 package com.suplidora.sistemas.sisago.Informes;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.gson.Gson;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
@@ -20,6 +29,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
@@ -46,6 +56,7 @@ public class ListaDetalleInformesClientes extends Activity {
     private boolean isOnline = false;
 
     private String InformeId="";
+    private String ReciboId="";
     private String EstadoInf="";
     private String TAG = ListaDetalleInformesClientes.class.getSimpleName();
     private ListView lv;
@@ -57,6 +68,10 @@ public class ListaDetalleInformesClientes extends Activity {
     private SimpleAdapter adapter;
     private DecimalFormat df;
     final String urlGetDetalleInforme = variables_publicas.direccionIp + "/ServicioRecibos.svc/BuscarRecibos/";
+
+    private ProgressDialog pDialog;
+    private boolean guardadoOK = true;
+    private String jsonAnulaRecibo;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +86,8 @@ public class ListaDetalleInformesClientes extends Activity {
         lv = (ListView) findViewById(R.id.listDetalleRecibos);
         registerForContextMenu(lv);
 
+        DbOpenHelper = new DataBaseOpenHelper(getApplicationContext());
+        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
         Intent in = getIntent();
 
         InformeId= in.getStringExtra(KEY_IdInforme);
@@ -193,7 +210,7 @@ public class ListaDetalleInformesClientes extends Activity {
                     hasRecibos.put("Recibo", vRecibo);
                     hasRecibos.put("Id", vIdCliente);
                     hasRecibos.put("Cliente", vCliente);
-                    hasRecibos.put("Monto", vMonto);
+                    hasRecibos.put("Monto", df.format(Double.parseDouble(vMonto)));
                     hasRecibos.put("Facturas", vFacturas);
                     hasRecibos.put("Estado", vEstado);
                     listaInformes.add(hasRecibos);
@@ -203,5 +220,226 @@ public class ListaDetalleInformesClientes extends Activity {
             new Funciones().SendMail("Ha ocurrido un error al obtener lista de recibos. Excepcion controlada", variables_publicas.info+ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
 
         }
+    }
+    //region ServiceAnularInforme
+    private class AnulaRecibo extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Showing progress dialog
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismiss();
+
+            pDialog = new ProgressDialog(ListaDetalleInformesClientes.this);
+            pDialog.setMessage("Anulando Recibo...Por favor espere...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if(ListaDetalleInformesClientes.this==null) return null;
+            HttpHandler sh = new HttpHandler();
+
+            final String url = variables_publicas.direccionIp + "/ServicioRecibos.svc/AnularRecibo/" + InformeId + "/" + ReciboId;
+           // final String url = variables_publicas.direccionIp + "/ServicioRecibos.svc/AnularRecibo/" + IdInforme + "/" + IdRecibo;
+
+            String urlString = url;
+            String urlStr = urlString;
+            String encodeUrl = "";
+            try {
+                URL Url = new URL(urlStr);
+                URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                encodeUrl = uri.toURL().toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+
+            if (jsonStr != null) {
+                try {
+                    JSONObject result = new JSONObject(jsonStr);
+                    String resultState = ((String) result.get("AnularReciboResult")).split(",")[0];
+                    final String mensaje = ((String) result.get("AnularReciboResult")).split(",")[1];
+                    if (resultState.equals("false")) {
+                        if(ListaDetalleInformesClientes.this==null) return null;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                Toast.makeText(getApplicationContext(),
+                                        mensaje,
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    } else {
+                        guardadoOK = true;
+                    }
+
+
+                } catch (final Exception ex) {
+                    guardadoOK = false;
+                    new Funciones().SendMail("Ha ocurrido un error al Anular el Recibo. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    if(ListaDetalleInformesClientes.this==null) return null;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            for (int i = 0; i < 2; i++) {
+                                Toast.makeText(getApplicationContext(),
+                                        ex.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                }
+            } else {
+                new Funciones().SendMail("Ha ocurrido un error al Anular el Recibo. Respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                if(ListaDetalleInformesClientes.this==null) return null;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 2; i++) {
+
+                            Toast.makeText(getApplicationContext(),
+                                    "No se ha podido obtener los datos del servidor ",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            try {
+
+                // Dismiss the progress dialog
+                if (pDialog != null && pDialog.isShowing())
+                    pDialog.dismiss();
+             //   btnBuscar.performClick();
+
+
+            } catch (final Exception ex) {
+                if(ListaDetalleInformesClientes.this==null) return ;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(getApplicationContext(),
+                                "Anular Recibo onPostExecute: " + ex.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }
+
+    }
+    private boolean AnularRecibo(HashMap<String, String> detalleInforme) {
+        Gson gson = new Gson();
+
+        jsonAnulaRecibo = gson.toJson(detalleInforme);
+        try {
+            new AnulaRecibo().execute();
+        } catch (Exception ex) {
+            Funciones.MensajeAviso(getApplicationContext(), ex.getMessage());
+        }
+        return false;
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        try {
+            super.onCreateContextMenu(menu, v, menuInfo);
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+
+            HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
+
+            String HeaderMenu = "Recibo: " +obj.get("Recibo") + " Cliente: " + obj.get("Cliente");
+
+            menu.setHeaderTitle(HeaderMenu);
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.recibos_list_menu_context, menu);
+
+            if (obj.get("Estado").equalsIgnoreCase("PENDIENTE"))
+            {
+                ((MenuItem) menu.getItem(0)).setEnabled(true);
+
+            }else {
+                ((MenuItem) menu.getItem(0)).setEnabled(false);
+            }
+        } catch (Exception e) {
+            mensajeAviso(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        HashMap<String, String> informeDetalle = null;
+        try {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+            switch (item.getItemId()) {
+                case R.id.itemAnularRecibo:
+                    listaInformes.clear();
+
+                    CargarRecibos();
+
+                    ActualizarFooter();
+
+                    HashMap<String, String> itemInforme = listaInformes.get(info.position);
+                    informeDetalle = InformesDetalleH.ObtenerInformeDetalleHas(InformeId);
+
+                    ReciboId = itemInforme.get("Recibo");
+                    if (Funciones.checkInternetConnection(ListaDetalleInformesClientes.this)) {
+
+                        final HashMap<String, String> finalInforme = itemInforme;
+                        new AlertDialog.Builder(ListaDetalleInformesClientes.this)
+                                .setTitle("Confirmación Requerida")
+                                .setMessage("Esta seguro que desea Anular el recibo?")
+                                .setCancelable(false)
+                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        AnularRecibo (finalInforme);
+                                        CargarRecibos();
+                                        ActualizarFooter();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if (pDialog.isShowing())
+                                            pDialog.dismiss();
+                                    }
+                                })
+                                .show();
+
+                    } else {
+                        mensajeAviso("No es posible connectarse con el servidor, por favor verifique su conexión a internet");
+                    }
+
+                    return true;
+
+               default:
+                    return super.onContextItemSelected(item);
+            }
+        } catch (Exception e) {
+            mensajeAviso(e.getMessage());
+        }
+        return false;
+    }
+
+    public void mensajeAviso(String texto) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(ListaDetalleInformesClientes.this);
+        dlgAlert.setMessage(texto);
+        dlgAlert.setPositiveButton(R.string.aceptar, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
     }
 }

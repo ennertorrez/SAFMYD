@@ -13,13 +13,13 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/lblRecibo"
-            android:layout_width="80dp"
+            android:id="@+id/lblFactura"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:ellipsize="end"
             android:focusable="false"
-            android:gravity="center_horizontal"
+            android:gravity="center"
             android:maxLines="1"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
@@ -28,13 +28,13 @@
             />
 
         <TextView
-            android:id="@+id/lblIdCliente"
-            android:layout_width="60dp"
+            android:id="@+id/lblFecha"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:ellipsize="end"
             android:focusable="false"
-            android:gravity="left"
+            android:gravity="center"
             android:maxLines="1"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
@@ -42,19 +42,19 @@
             android:textStyle="bold"
             />
         <TextView
-            android:id="@+id/lblCliente"
-            android:layout_width="220dp"
+            android:id="@+id/lblTotal"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
-            android:gravity="left"
+            android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
             android:textStyle="bold" />
         <TextView
-            android:id="@+id/lblMonto"
-            android:layout_width="100dp"
+            android:id="@+id/lblAbono"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:ellipsize="end"
@@ -68,27 +68,29 @@
             />
 
         <TextView
-            android:id="@+id/lblFacturas"
-            android:layout_width="170dp"
+            android:id="@+id/lblSaldo"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
-            android:gravity="center_horizontal"
+            android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
             android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/lblEstado"
-            android:layout_width="90dp"
+            android:id="@+id/lblDiasMora"
+            android:layout_width="70dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
-            android:gravity="center_horizontal"
+            android:gravity="right"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
             android:textStyle="bold" />
+
 
     </LinearLayout>
 

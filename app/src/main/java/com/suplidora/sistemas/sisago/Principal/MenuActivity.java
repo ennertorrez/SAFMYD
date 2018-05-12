@@ -48,6 +48,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Informes.InformesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
+import com.suplidora.sistemas.sisago.Menu.FacturasMoraClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
@@ -162,6 +163,17 @@ public class MenuActivity extends AppCompatActivity
 
         if ((!variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
             navigationView.getMenu().getItem(4).setVisible(true); //Recibos
+            if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")){
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setVisible(false); //Agregar Recibos
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
+            }else {
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setVisible(true); //Agregar Recibos
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
+            }
+            //navigationView.getMenu().getItem(4).setVisible(true); //Recibos
+
         }
 
         if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
@@ -336,6 +348,14 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaInformesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnEstadoCta:
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new FacturasMoraClienteFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

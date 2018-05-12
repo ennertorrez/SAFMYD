@@ -54,6 +54,16 @@ public class InformesHelper {
         else return false;
     }
 
+    public boolean AnularInforme(String NoInforme) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.INFORMES_COLUMN_Anulada, "true");
+        con.put(variables_publicas.INFORMES_COLUMN_Aprobada, "false");
+        long rowInserted = database.update(variables_publicas.TABLE_INFORMES, con, variables_publicas.INFORMES_COLUMN_CodInforme + "= " + NoInforme+"", null);
+        if (rowInserted != -1)
+            return true;
+        else return false;
+    }
+
     public List<HashMap<String, String>> ObtenerListaInformes() {
         HashMap<String, String> informe = null;
         List<HashMap<String, String>> lst = new ArrayList<>();

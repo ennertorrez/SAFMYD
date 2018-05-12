@@ -520,8 +520,8 @@
 
                             <ListView
                                 android:id="@+id/listFacurasRecibos"
-                                android:layout_width="1125dp"
-                                android:layout_height="75dp"
+                                android:layout_width="1165dp"
+                                android:layout_height="100dp"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:minHeight="13dp"
@@ -538,7 +538,7 @@
 
                             <TextView
                                 android:id="@+id/lblFooter"
-                                android:layout_width="1125dp"
+                                android:layout_width="1165dp"
                                 android:layout_height="20dp"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:text="Total items: 0"

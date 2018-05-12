@@ -38,6 +38,7 @@ public class variables_publicas {
     public static boolean vEditando = false;
     public static String noInforme = "Informe";
     public static String estadoInforme = "Estado";
+    public static String CodInforme = "Informe";
 
     public static String noCedula = "";
     public static String nombreCed = "";

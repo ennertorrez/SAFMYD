@@ -155,6 +155,44 @@ public class InformesDetalleHelper {
         return lst;
     }
 
+    public HashMap<String, String> ObtenerInformeDetalleHas(String idInforme) {
+        List<HashMap<String,String>> lst= new ArrayList<>();
+        Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + " = ? ", new String[]{idInforme});
+        HashMap<String, String> detalle = null;
+        if (c.moveToFirst()) {
+            do {
+                detalle = new HashMap<>();
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodInforme, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodInforme)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Recibo, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Recibo)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Idvendedor, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Idvendedor)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_IdCliente)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Factura, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Factura)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Saldo, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Saldo)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Monto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Monto)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Abono, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Abono)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_NoCheque, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_NoCheque)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_BancoE, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_BancoE)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_BancoR, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_BancoR)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_FechaCK, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_FechaCK)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_FechaDep, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_FechaDep)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Efectivo, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Efectivo)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Moneda, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Moneda)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Aprobado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Aprobado)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Posfechado)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Procesado, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Procesado)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Usuario)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Vendedor)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Cliente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Cliente)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
+                //lst.add(detalle);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return detalle;
+    }
     public ArrayList<HashMap<String, String>> ObtenerInformeDetalleArrayList(String idInforme) {
         ArrayList<HashMap<String,String>> lst= new ArrayList<>();
         Cursor c = database.rawQuery("SELECT  * FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + " = ? ", new String[]{idInforme});
@@ -259,11 +297,21 @@ public class InformesDetalleHelper {
             return true;
         else return false;
     }
+
+/*    public boolean AnularDetalleInforme(String noInforme){
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.DETALLEINFORMES_COLUMN_Aprobado, "false");
+        con.put(variables_publicas.DETALLEINFORMES_COLUMN_Anulado, "true");
+        long rowInserted= database.update(variables_publicas.TABLE_DETALLE_INFORMES, con, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"="+noInforme+" and "+ variables_publicas.DETALLEINFORMES_COLUMN_Aprobado +"=false AND "+ variables_publicas.DETALLEINFORMES_COLUMN_Anulado +"=false;", null );
+        if(rowInserted != -1)
+            return true;
+        else return false;
+    }*/
     public ArrayList<HashMap<String, String>> ObtenerDetalleInformesLocales(String informe) {
 
-        String selectQuery = "SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +" Recibo, "+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +" Id,"+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +" Cliente, " +
-                            "printf(\"%.2f\",SUM("+ variables_publicas.DETALLEINFORMES_COLUMN_Abono +")) Monto, group_concat("+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +") Facturas, "+
-                            "'PENDIENTE' END Estado FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE LENGTH("+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +")>=13 AND "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"= "+ informe +" "+
+        String selectQuery = "SELECT "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +" as Recibo, "+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +" as Id,"+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +" as Cliente, " +
+                            "printf(\"%.2f\",SUM("+ variables_publicas.DETALLEINFORMES_COLUMN_Abono +")) as Monto, group_concat("+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +") as Facturas, "+
+                            "'PENDIENTE' Estado FROM "+ variables_publicas.TABLE_DETALLE_INFORMES +" WHERE LENGTH("+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +")>=13 AND "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"= "+ informe +" "+
                             "GROUP BY "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +","+ variables_publicas.DETALLEINFORMES_COLUMN_IdCliente +","+ variables_publicas.DETALLEINFORMES_COLUMN_Cliente +";";
 
         Cursor c = database.rawQuery(selectQuery, null);

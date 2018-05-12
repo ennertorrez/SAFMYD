@@ -261,4 +261,5 @@ public class InformeDetalle {
     public void setConcepto(String concepto) {
         Concepto = concepto;
     }
+
 }

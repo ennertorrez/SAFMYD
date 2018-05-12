@@ -47,7 +47,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
-            android:gravity="right"
+            android:gravity="left"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"
@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/lblMonto"
-            android:layout_width="80dp"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
@@ -68,11 +68,11 @@
 
         <TextView
             android:id="@+id/lblFacturasList"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
             android:focusable="false"
-            android:gravity="right"
+            android:gravity="left"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16dp"

@@ -54,6 +54,10 @@
                     android:id="@+id/btnListaInforme"
                     android:icon="@drawable/ic_menu_mapmode"
                     android:title="Lista de Informes" />
+                <item
+                    android:id="@+id/btnEstadoCta"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="Estado de Cuenta" />
             </menu>
         </item>
     </group>

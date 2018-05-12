@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
@@ -42,6 +43,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.Entidades.FacturasPendientes;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Informes.ListaDetalleInformesClientes;
@@ -91,6 +93,7 @@ public class ListaInformesFragment extends Fragment {
     public Calendar myCalendar = Calendar.getInstance();
     //  private SimpleAdapter adapter;
     final String urlInformeVendedor = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerInformeVendedor";
+    final String urlInformeSupervisor = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerInformeSupervisor";
     final String urlAnularInforme = variables_publicas.direccionIp + "/ServicioRecibos.svc/AnularInforme";
     private String jsonInforme;
     private String jsonAnulaInforme;
@@ -102,6 +105,10 @@ public class ListaInformesFragment extends Fragment {
 
     private InformesHelper InformesH;
     private InformesDetalleHelper InformesDetalleH;
+    private FacturasPendientesHelper FacturasPendientesH;
+    private String vIdSerie;
+    private String vIdVendedor;
+    public static ArrayList<HashMap<String, String>> lista;
 
     @Nullable
     @Override
@@ -137,6 +144,7 @@ public class ListaInformesFragment extends Fragment {
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         InformesH = new InformesHelper(DbOpenHelper.database);
         InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
+        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         //variables_publicas.Informes = InformesH.BuscarInformesSinconizar();
         txtFechaInforme.setText(getDatePhone());
@@ -207,7 +215,7 @@ public class ListaInformesFragment extends Fragment {
                 // Starting new intent
                 Intent in = new Intent(getActivity().getApplicationContext(), ListaDetalleInformesClientes.class);
 
-                in.putExtra(variables_publicas.noInforme, IdInforme);
+                in.putExtra(variables_publicas.CodInforme, IdInforme);
                 in.putExtra(variables_publicas.estadoInforme, Estado);
 
                 startActivity(in);
@@ -276,17 +284,17 @@ public class ListaInformesFragment extends Fragment {
         return false;
     }
 
- /*   private boolean AnularPedido(HashMap<String, String> pedido) {
+    private boolean AnularInforme(HashMap<String, String> informe) {
         Gson gson = new Gson();
 
-        jsonAnulaPedido = gson.toJson(pedido);
+        jsonAnulaInforme = gson.toJson(informe);
         try {
-            new AnulaPedido().execute();
+            new AnulaInforme().execute();
         } catch (Exception ex) {
             Funciones.MensajeAviso(getActivity().getApplicationContext(), ex.getMessage());
         }
         return false;
-    }*/
+    }
 
     private class GetListaInformes extends AsyncTask<Void, Void, Void> {
         @Override
@@ -437,11 +445,25 @@ public class ListaInformesFragment extends Fragment {
     }
 
     private void GetInformesService() throws Exception {
-        String CodigoVendedor = variables_publicas.usuario.getCodigo();
-        String encodeUrl = "";
-        HttpHandler sh = new HttpHandler();
+        String CodigoVendedor= variables_publicas.usuario.getCodigo();
+        String urlString= "";
+        String vResultado="";
         busqueda = busqueda.isEmpty() ? "0" : busqueda;
-        String urlString = urlInformeVendedor + "/" + CodigoVendedor + "/" + fecha + "/" + busqueda;
+        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor")) {
+            urlString = urlInformeSupervisor + "/" + CodigoVendedor + "/" + fecha + "/" + busqueda;
+            vResultado="ObtenerInformeSupervisorResult";
+        }else if ( variables_publicas.usuario.getTipo().equalsIgnoreCase("User")){
+            urlString = urlInformeSupervisor + "/0/" + fecha + "/" + busqueda;
+            vResultado="ObtenerInformeSupervisorResult";
+        }else {
+            urlString = urlInformeVendedor + "/" + CodigoVendedor + "/" + fecha + "/" + busqueda;
+            vResultado="ObtenerInformeVendedorResult";
+        }
+
+        String encodeUrl = "";
+
+        HttpHandler sh = new HttpHandler();
+        //String urlString = urlInformeVendedor + "/" + CodigoVendedor + "/" + fecha + "/" + busqueda;
         try {
             URL Url = new URL(urlString);
             URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
@@ -460,7 +482,7 @@ public class ListaInformesFragment extends Fragment {
                 //listainforme.clear();
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
-                JSONArray Informes = jsonObj.getJSONArray("ObtenerInformeVendedorResult");
+                JSONArray Informes = jsonObj.getJSONArray(vResultado);
 
                 for (int i = 0; i < Informes.length(); i++) {
                     JSONObject c = Informes.getJSONObject(i);
@@ -476,7 +498,7 @@ public class ListaInformesFragment extends Fragment {
                     informes.put("Estado", Estado);
                     informes.put("Fecha", Fecha);
                     informes.put("Informe", Informe);
-                    informes.put("Monto", Monto);
+                    informes.put("Monto",df.format(Double.parseDouble(Monto)));
                     informes.put("Recibos", Recibos);
                     informes.put("Vendedor", Vendedor);
                     listainforme.add(informes);
@@ -561,9 +583,8 @@ public class ListaInformesFragment extends Fragment {
         }
     }
 
-    //region ServiceAnularPedido
-   /* private class AnulaPedido extends AsyncTask<Void, Void, Void> {
-        private String NoPedido;
+    //region ServiceAnularInforme
+    private class AnulaInforme extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -573,7 +594,7 @@ public class ListaInformesFragment extends Fragment {
                 pDialog.dismiss();
 
             pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage("Anulando Pedido...Por favor espere...");
+            pDialog.setMessage("Anulando Informe...Por favor espere...");
             pDialog.setCancelable(false);
             pDialog.show();
         }
@@ -582,7 +603,7 @@ public class ListaInformesFragment extends Fragment {
         protected Void doInBackground(Void... params) {
             if(getActivity()==null) return null;
             HttpHandler sh = new HttpHandler();
-            final String url = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido/" + IdPedido + "/" + variables_publicas.usuario.getUsuario();
+            final String url = variables_publicas.direccionIp + "/ServicioRecibos.svc/AnularInforme/" + IdInforme;
 
             String urlString = url;
             String urlStr = urlString;
@@ -599,8 +620,8 @@ public class ListaInformesFragment extends Fragment {
             if (jsonStr != null) {
                 try {
                     JSONObject result = new JSONObject(jsonStr);
-                    String resultState = ((String) result.get("AnularPedidoResult")).split(",")[0];
-                    final String mensaje = ((String) result.get("AnularPedidoResult")).split(",")[1];
+                    String resultState = ((String) result.get("AnularInformeResult")).split(",")[0];
+                    final String mensaje = ((String) result.get("AnularInformeResult")).split(",")[1];
                     if (resultState.equals("false")) {
                         if(getActivity()==null) return null;
                         getActivity().runOnUiThread(new Runnable() {
@@ -620,7 +641,7 @@ public class ListaInformesFragment extends Fragment {
 
                 } catch (final Exception ex) {
                     guardadoOK = false;
-                    new Funciones().SendMail("Ha ocurrido un error al Anular pedido,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    new Funciones().SendMail("Ha ocurrido un error al Anular el Informe. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                     if(getActivity()==null) return null;
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -635,7 +656,7 @@ public class ListaInformesFragment extends Fragment {
                     });
                 }
             } else {
-                new Funciones().SendMail("Ha ocurrido un error al obtener lista de pedidos,respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al Anular el Informe. Respuesta nulla GET", variables_publicas.info + urlStr, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 if(getActivity()==null) return null;
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -670,17 +691,17 @@ public class ListaInformesFragment extends Fragment {
                     public void run() {
 
                         Toast.makeText(getActivity().getApplicationContext(),
-                                "Anular Pedido onPostExecute: " + ex.getMessage(),
+                                "Anular Informe onPostExecute: " + ex.getMessage(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
             }
         }
 
-    }*/
+    }
 
     //endregion
-  /*  @Override
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         try {
             super.onCreateContextMenu(menu, v, menuInfo);
@@ -689,32 +710,24 @@ public class ListaInformesFragment extends Fragment {
 
             HashMap<String, String> obj = (HashMap<String, String>) lv.getItemAtPosition(info.position);
 
-            String HeaderMenu = obj.get("CodigoPedido") + "\n" + obj.get("NombreCliente");
+            String HeaderMenu = "Informe: " +obj.get("Informe") + " Recibos: " + obj.get("Recibos");
 
             menu.setHeaderTitle(HeaderMenu);
             MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.informes_list_menu_context, menu);
 
-            inflater.inflate(R.menu.pedidos_list_menu_context, menu);
-            MenuItem tv = menu.getItem(1); //Boton Eliminar
-            if (!obj.get("CodigoPedido").startsWith("-"))
-                tv.setTitle("Anular Pedido");
-
-            if (!obj.get("Factura").equalsIgnoreCase("") || obj.get("Estado").equalsIgnoreCase("Anulado")) {
-                tv.setEnabled(false);
-
-            } else {
-                tv.setEnabled(true);
-            }
-            if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase("")
-                    || (obj.get("Estado").equalsIgnoreCase("APROBADO") && obj.get("Detallista").equalsIgnoreCase("false")) )
+            if (obj.get("Estado").equalsIgnoreCase("NO ENVIADO"))
             {
-                //Ponemos el boton Editar en falso
                 ((MenuItem) menu.getItem(0)).setEnabled(false);
-            }else{
+                ((MenuItem) menu.getItem(1)).setEnabled(true);
+
+            }else if (obj.get("Estado").equalsIgnoreCase("PENDIENTE")){
                 ((MenuItem) menu.getItem(0)).setEnabled(true);
+                ((MenuItem) menu.getItem(1)).setEnabled(false);
+            }else if (obj.get("Estado").equalsIgnoreCase("ANULADO") || obj.get("Estado").equalsIgnoreCase("APROBADO")){
+                ((MenuItem) menu.getItem(0)).setEnabled(false);
+                ((MenuItem) menu.getItem(1)).setEnabled(false);
             }
-
-
         } catch (Exception e) {
             mensajeAviso(e.getMessage());
         }
@@ -722,59 +735,38 @@ public class ListaInformesFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        HashMap<String, String> pedido = null;
+        HashMap<String, String> informe = null;
         try {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
             switch (item.getItemId()) {
-                case R.id.itemEliminarPedido:
-                    fecha = txtFechaPedido.getText().toString();
-                    listapedidos.clear();
+                case R.id.itemAnularInforme:
+                    fecha = txtFechaInforme.getText().toString();
+                    listainforme.clear();
                     InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
                     inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                     busqueda = txtBusqueda.getText().toString();
 
-                        new GetListaPedidos().execute().get();
+                        new GetListaInformes().execute().get();
 
 
                     ActualizarFooter();
 
-                    HashMap<String, String> itemPedido = listapedidos.get(info.position);
-                    pedido = PedidosH.ObtenerPedido(itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido));
+                    HashMap<String, String> itemInforme = listainforme.get(info.position);
+                    informe = InformesH.ObtenerInforme(itemInforme.get("Informe"));
 
-                    IdPedido = itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
-                    if (itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).startsWith("-")) {
-                        final HashMap<String, String> finalPedido = pedido;
+                    IdInforme = itemInforme.get("Informe");
+                    if (Funciones.checkInternetConnection(getActivity())) {
+
+                        final HashMap<String, String> finalInforme = itemInforme;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea eliminar el pedido?")
+                                .setMessage("Esta seguro que desea Anular el informe?")
                                 .setCancelable(false)
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        PedidosH.EliminaPedido(IdPedido);
-                                        PedidosDetalleH.EliminarDetallePedido(IdPedido);
-                                        btnBuscar.performClick();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        if (pDialog.isShowing())
-                                            pDialog.dismiss();
-                                    }
-                                })
-                                .show();
-
-                    } else if (Funciones.checkInternetConnection(getActivity())) {
-
-                        final HashMap<String, String> finalPedido = itemPedido;
-                        new AlertDialog.Builder(getActivity())
-                                .setTitle("Confirmación Requerida")
-                                .setMessage("Esta seguro que desea anular el pedido?")
-                                .setCancelable(false)
-                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        AnularPedido(finalPedido);
+                                        AnularInforme(finalInforme);
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -791,52 +783,56 @@ public class ListaInformesFragment extends Fragment {
 
                     return true;
 
-                case R.id.itemEditarPedido: {
-                    fecha = txtFechaPedido.getText().toString();
-                    listapedidos.clear();
-                    inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
-                    busqueda = txtBusqueda.getText().toString();
-                    try {
-                        new GetListaPedidos().execute().get();
-                    } catch (Exception e) {
+                case R.id.itemEliminarInforme: {
+                    fecha = txtFechaInforme.getText().toString();
+                    listainforme.clear();
+                    InputMethodManager inputMethodManager2 = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                    }
+                    inputMethodManager2.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
+                    busqueda = txtBusqueda.getText().toString();
+
+                    new GetListaInformes().execute().get();
+
+
                     ActualizarFooter();
 
-                    if (listapedidos.size() == 0) {
-                        return true;
+                    HashMap<String, String> itemInforme2 = listainforme.get(info.position);
+                    informe = InformesH.ObtenerInforme(itemInforme2.get("Informe"));
+
+                    IdInforme = itemInforme2.get("Informe");
+                    vIdVendedor = informe.get("IdVendedor");
+                    lista = new ArrayList<HashMap<String, String>>();
+                    lista = InformesDetalleH.ObtenerUltimoCodigoRecibo(vIdVendedor);
+
+                    for (int i = 0; i < lista.size(); i++) {
+                        vIdSerie = lista.get(i).get("IdSerie");
                     }
+                    if (itemInforme2.get("Informe").length()>=13) {
 
-                    //Editar
-                    HashMap<String, String> obj = listapedidos.get(info.position);
-                    String CodigoPedido = obj.get("CodigoPedido");
-                    if (obj.get("Factura").equalsIgnoreCase("")) {
-                        if (((obj.get("FormaPago").equalsIgnoreCase("Contado") || obj.get("FormaPago").equalsIgnoreCase("CONTADO (*)")) && (obj.get("Estado").equalsIgnoreCase("Aprobado")) || obj.get("Estado").equalsIgnoreCase("NO ENVIADO") || obj.get("Estado").equalsIgnoreCase("Pendiente"))) {
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Confirmación Requerida")
+                                .setMessage("Esta seguro que desea Eliminar el informe?")
+                                .setCancelable(false)
+                                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        int valrecibo = InformesH.BuscarMinimoRecibo(IdInforme);
+                                        if (valrecibo>0){
+                                            InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(valrecibo-1),vIdVendedor);
+                                        }
+                                        InformesH.EliminaInforme(IdInforme);
+                                        FacturasPendientesH.ActualizarTodasFacturasPendientes(IdInforme);
+                                        InformesDetalleH.EliminarDetalleInforme(IdInforme);
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        if (pDialog.isShowing())
+                                            pDialog.dismiss();
+                                    }
+                                })
+                                .show();
 
-                            pedido = PedidosH.ObtenerPedido(CodigoPedido);
-                            if (pedido == null) {
-                                Funciones.MensajeAviso(getActivity(), "Este pedido no se puede editar, ya que no fue creado en este dispositivo");
-                                return true;
-                            }
-
-                            String IdCliente = pedido.get("IdCliente");
-                            String CodCv = pedido.get("Cod_cv");
-                            Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
-                            String Nombre = cliente.getNombreCliente();
-                            // Starting new intent
-                            Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
-
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
-                            in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
-                            in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
-                            startActivity(in);
-                        }
-                    } else {
-                        Funciones.MensajeAviso(getActivity(), "Este pedido no se puede anular, ya que fue facturado");
                     }
-
 
                     return true;
                 }
@@ -849,7 +845,6 @@ public class ListaInformesFragment extends Fragment {
         return false;
     }
 
-*/
     public void mensajeAviso(String texto) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(getActivity());
         dlgAlert.setMessage(texto);

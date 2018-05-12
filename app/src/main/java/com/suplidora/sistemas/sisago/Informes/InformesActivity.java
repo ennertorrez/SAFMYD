@@ -234,33 +234,36 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         btnAgregarRecibo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                lista = new ArrayList<HashMap<String, String>>();
-                lista = InformesDetalleH.ObtenerUltimoCodigoRecibo(vIdVendedor);
-
-                for (int i = 0; i < lista.size(); i++) {
-                    vIdSerie = lista.get(i).get("IdSerie");
-                    vUltNumero = lista.get(i).get("Numero");
-                }
-                if (lista.size()>0) {
-                    DbOpenHelper.database.beginTransaction();
-                    if (GuardarInforme()) {
-                        DbOpenHelper.database.setTransactionSuccessful();
-                        DbOpenHelper.database.endTransaction();
-                        Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
-                        agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
-                        agrRecibo.putExtra(variables_publicas.KEY_IdVendedor, vIdVendedor);
-                        agrRecibo.putExtra(variables_publicas.KEY_NombreVendedor, vnombreVendedor);
-                        agrRecibo.putExtra(variables_publicas.KEY_idSerie, vIdSerie);
-                        agrRecibo.putExtra(variables_publicas.KEY_ultRecibo, vUltNumero);
-                        startActivityForResult(agrRecibo, PETICION_ACTIVITY_SEGUNDA);
-                        editar=true;
-                    } else {
-                        DbOpenHelper.database.endTransaction();
-                        editar=false;
-                    }
+                if (vIdVendedor.equals("0") || vIdVendedor==null){
+                    MensajeAviso("Debe Seleccionar un vendedor.");
                 }else {
-                    MensajeAviso("El Vendedor Seleccionado no tiene talonario de Recibos asignado.");
+                    lista = new ArrayList<HashMap<String, String>>();
+                    lista = InformesDetalleH.ObtenerUltimoCodigoRecibo(vIdVendedor);
+
+                    for (int i = 0; i < lista.size(); i++) {
+                        vIdSerie = lista.get(i).get("IdSerie");
+                        vUltNumero = lista.get(i).get("Numero");
+                    }
+                    if (lista.size() > 0) {
+                        DbOpenHelper.database.beginTransaction();
+                        if (GuardarInforme()) {
+                            DbOpenHelper.database.setTransactionSuccessful();
+                            DbOpenHelper.database.endTransaction();
+                            Intent agrRecibo = new Intent(v.getContext(), AgregarRecibo.class);
+                            agrRecibo.putExtra(variables_publicas.INFORMES_COLUMN_CodInforme, txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
+                            agrRecibo.putExtra(variables_publicas.KEY_IdVendedor, vIdVendedor);
+                            agrRecibo.putExtra(variables_publicas.KEY_NombreVendedor, vnombreVendedor);
+                            agrRecibo.putExtra(variables_publicas.KEY_idSerie, vIdSerie);
+                            agrRecibo.putExtra(variables_publicas.KEY_ultRecibo, vUltNumero);
+                            startActivityForResult(agrRecibo, PETICION_ACTIVITY_SEGUNDA);
+                            editar = true;
+                        } else {
+                            DbOpenHelper.database.endTransaction();
+                            editar = false;
+                        }
+                    } else {
+                        MensajeAviso("El Vendedor Seleccionado no tiene talonario de Recibos asignado.");
+                    }
                 }
             }
         });
@@ -663,19 +666,25 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
 
             switch (item.getItemId()) {
                 case R.id.Elimina_Item:
-                    HashMap<String, String> itemRecibo = listaInformes.get(info.position);
-                    listaInformes.remove(itemRecibo);
-                    FacturasPendientesH.ActualizarTodasFacturasPendientesRecibo(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
-                    InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(Integer.parseInt(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))-1),vIdVendedor);
-                    InformesDetalleH.EliminarDetalleInforme2(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""),itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
-                    for (int i = 0; i < listaInformes.size() - 1; i++) {
-                        HashMap<String, String> a = listaInformes.get(i);
-                        if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))) {
-                            listaInformes.remove(a);
+                    int valorUltLista= listaInformes.size()==0 ? 0 :listaInformes.size()-1;
+                    if (valorUltLista==info.position){
+                        HashMap<String, String> itemRecibo = listaInformes.get(info.position);
+                        listaInformes.remove(itemRecibo);
+                        FacturasPendientesH.ActualizarTodasFacturasPendientesRecibo(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
+                        InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(Integer.parseInt(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))-1),vIdVendedor);
+                        InformesDetalleH.EliminarDetalleInforme2(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""),itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo));
+                        for (int i = 0; i < listaInformes.size() - 1; i++) {
+                            HashMap<String, String> a = listaInformes.get(i);
+                            if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Recibo))) {
+                                listaInformes.remove(a);
+                            }
                         }
+                        adapter.notifyDataSetChanged();
+                        lv.setAdapter(adapter);
+
+                    }else{
+                        MensajeAviso("Recibo no se puede Eliminar. Debe Eliminar el último.");
                     }
-                    adapter.notifyDataSetChanged();
-                    lv.setAdapter(adapter);
 
                     RefrescarGrid();
                     CalcularTotales();
@@ -718,6 +727,9 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
 
     }
     private void GenerarCodigoInforme() {
+        if (vIdVendedor==null){
+            vIdVendedor="0";
+        }
         informe.setCodigoInforme(GetFechaISO() + vIdVendedor);
         txtCodigoInforme.setText("No. Informe: " + informe.getCodigoInforme());
     }

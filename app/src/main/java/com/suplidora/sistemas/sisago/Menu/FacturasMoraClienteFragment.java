@@ -9,15 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,40 +21,36 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-//import android.widget.Toolbar;
+
+import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Clientes.ListaVentasHistClientes;
+import com.suplidora.sistemas.sisago.HttpHandler;
+import com.suplidora.sistemas.sisago.Informes.ListaFacturasMoraClientes;
+import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
-import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
-import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
-import com.suplidora.sistemas.sisago.Clientes.ListaVentasHistClientes;
-import com.suplidora.sistemas.sisago.Entidades.Cliente;
-import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
-import com.suplidora.sistemas.sisago.Principal.Login;
-import com.suplidora.sistemas.sisago.R;
+//import android.widget.Toolbar;
+
 /**
  * Created by Sistemas on 8/2/2018.
  */
 
-public class HistoricoventasClienteFragment extends Fragment{
+public class FacturasMoraClienteFragment extends Fragment{
     View myView;
-    private String TAG = HistoricoventasClienteFragment.class.getSimpleName();
+    private String TAG = FacturasMoraClienteFragment.class.getSimpleName();
     private String busqueda = "1";
     private String tipoBusqueda = "1";
     private ProgressDialog pDialog;
@@ -67,18 +59,15 @@ public class HistoricoventasClienteFragment extends Fragment{
     private EditText txtBusqueda;
     private RadioGroup rgGrupo;
     private Button btnBuscar;
-    private Spinner cboMeses;
     private ClientesHelper ClienteH;
     private DataBaseOpenHelper DbOpenHelper;
-    public static ArrayList<HashMap<String, String>> listaVentas;
-    private String dias="30";
     private static String url = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes/";
     public static ArrayList<HashMap<String, String>> listaClientes;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        myView = inflater.inflate(R.layout.historicoclientesmeses, container, false);
-        getActivity().setTitle("Histórico Ventas Cliente");
+        myView = inflater.inflate(R.layout.facturasclientesmora, container, false);
+        getActivity().setTitle("Facturas con Saldo y Mora");
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         ClienteH = new ClientesHelper(DbOpenHelper.database);
         lv = (ListView) myView.findViewById(R.id.list);
@@ -88,40 +77,6 @@ public class HistoricoventasClienteFragment extends Fragment{
         lblFooter = (TextView) myView.findViewById(R.id.lblFooter);
         rgGrupo = (RadioGroup) myView.findViewById(R.id.rgGrupo);
         txtBusqueda = (EditText) myView.findViewById(R.id.txtBusqueda);
-
-        listaVentas = new ArrayList<>();
-
-        cboMeses = (Spinner) myView.findViewById(R.id.cboMeses);
-
-        String[] valores = {"1 Mes","2 Meses","3 Meses","4 Meses","5 Meses","6 Meses"};
-
-        cboMeses.setAdapter(new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item, valores));
-
-        cboMeses.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                // On selecting a spinner item
-                  String text = cboMeses.getSelectedItem().toString();
-                if (text.equals("1 Mes")){
-                   dias="30";
-                }else if (text.equals("2 Meses")){
-                    dias="60";
-                }else if (text.equals("3 Meses")) {
-                    dias = "90";
-                }else if (text.equals("4 Meses")) {
-                     dias = "120";
-                }else if (text.equals("5 Meses")) {
-                    dias = "150";
-                }else if (text.equals("6 Meses")) {
-                     dias = "180";
-                }
-               // btnBuscar.performClick();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
 
         listaClientes = new ArrayList<>();
 
@@ -135,22 +90,11 @@ public class HistoricoventasClienteFragment extends Fragment{
                 String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
                 String CodCV = ((TextView) view.findViewById(R.id.CodCv)).getText().toString();
                 // Starting new intent
-                Intent in = new Intent(getActivity().getApplicationContext(), ListaVentasHistClientes.class);
+                Intent in = new Intent(getActivity().getApplicationContext(), ListaFacturasMoraClientes.class);
 
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCV );
-                in.putExtra(variables_publicas.diasventas, dias );
-                in.putExtra(variables_publicas.descMeses,cboMeses.getSelectedItem().toString());
-
-                /*Guardamos el cliente seleccionado*/
-                for (HashMap<String, String> cliente : listaClientes) {
-                    if (cliente.get(variables_publicas.CLIENTES_COLUMN_IdCliente).equals(IdCliente) && cliente.get(variables_publicas.CLIENTES_COLUMN_CodCv).equals(CodCV.replace("Cod_Cv: ",""))) {
-                        ClienteH.EliminaCliente(IdCliente);
-                        ClienteH.GuardarTotalClientes(cliente);
-
-                    }
-                }
 
                 startActivity(in);
             }

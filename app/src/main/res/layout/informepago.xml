@@ -156,7 +156,7 @@
 
                         <LinearLayout
                             android:id="@+id/layout_list_header"
-                            android:layout_width="555dp"
+                            android:layout_width="635dp"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
@@ -196,7 +196,7 @@
 
                             <TextView
                                 android:id="@+id/lblColMonto"
-                                android:layout_width="80dp"
+                                android:layout_width="110dp"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top"
                                 android:background="@drawable/borde_campos_pedidos"
@@ -208,7 +208,7 @@
 
                             <TextView
                                 android:id="@+id/lblColFacturas"
-                                android:layout_width="150dp"
+                                android:layout_width="200dp"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top"
                                 android:background="@drawable/borde_campos_pedidos"
@@ -226,13 +226,13 @@
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_below="@+id/layout_list_header"
-                            android:minHeight="125dp"
+                            android:minHeight="250dp"
                             android:orientation="vertical">
 
                             <ListView
                                 android:id="@+id/listrecibos"
-                                android:layout_width="555dp"
-                                android:layout_height="125dp"
+                                android:layout_width="635dp"
+                                android:layout_height="250dp"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:minHeight="13dp"
@@ -251,7 +251,7 @@
 
                             <TextView
                                 android:id="@+id/lblFooter"
-                                android:layout_width="555dp"
+                                android:layout_width="635dp"
                                 android:layout_height="20dp"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:text="Total items: 0"
