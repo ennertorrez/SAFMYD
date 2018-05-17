@@ -95,7 +95,6 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
     private TextView lblTotalDol;
     private TextView lblTotalCor;
     private TextView lblFooter;
-    private TextView lblFooterItem;
     private double tasaCambio = 0;
     private String TAG = InformesActivity.class.getSimpleName();
     private VendedoresHelper VendedoresH;
@@ -117,7 +116,6 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
     private boolean isOnline = false;
     public static ArrayList<HashMap<String, String>> lista;
     private double total;
-    private String valText;
     private String vIdSerie;
     private String vUltNumero;
     static final String VALINFORME = "CodInforme";

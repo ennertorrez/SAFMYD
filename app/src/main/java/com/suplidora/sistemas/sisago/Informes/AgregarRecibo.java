@@ -113,8 +113,6 @@ public class AgregarRecibo extends Activity {
     private RadioButton rbCheque;
     private RadioButton rbDeposito;
     private RadioGroup rgFormaPago;
-    private TextView lblDescTipoPago;
-    private EditText txtValorDocPago;
     private EditText txtValorMinuta;
     private TextView txtFechaDocPago;
     private Spinner cboBancoOrigen;
@@ -216,8 +214,6 @@ public class AgregarRecibo extends Activity {
         txtValorMinuta = (EditText) findViewById(R.id.txtValorMinuta);
         txtMonto = (EditText) findViewById(R.id.txtMonto);
         rgFormaPago = (RadioGroup) findViewById(R.id.rgFormaPago);
-        lblDescTipoPago = (TextView) findViewById(R.id.lblDescFormapago);
-        txtValorDocPago =(EditText) findViewById(R.id.txtValorMinuta);
         txtFechaDocPago = (TextView) findViewById(R.id.txtFecha);
         cboBancoOrigen = (Spinner) findViewById(R.id.cboBancoEmisor);
         cboBancoDestino = (Spinner) findViewById(R.id.cboBancoDepositado);

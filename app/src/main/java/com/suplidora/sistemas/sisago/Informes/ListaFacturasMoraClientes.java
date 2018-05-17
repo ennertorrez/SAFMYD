@@ -34,7 +34,6 @@ public class ListaFacturasMoraClientes extends Activity {
 
     private String Nombre="";
     private String ClienteId="";
-    private String cantDias ="";
     private String vClienteVario= "";
     private String TAG = ListaFacturasMoraClientes.class.getSimpleName();
     private ListView lv;

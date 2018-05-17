@@ -71,7 +71,6 @@ public class variables_publicas {
     public static final String TABLE_SERIE_RECIBOS="SerieRecibos";
 
     //Variables CamposTbArticulos
-    //public static final String ARTICULO_COLUMN_Id= "Id";
     public static final String ARTICULO_COLUMN_Codigo = "Codigo";
     public static final String ARTICULO_COLUMN_Nombre = "Nombre";
     public static final String ARTICULO_COLUMN_Costo = "Costo";
