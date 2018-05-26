@@ -35,6 +35,10 @@
                     android:id="@+id/btnNuevoCliente"
                     android:icon="@drawable/ic_menu_plussign"
                     android:title="Agregar Cliente" />
+                <item
+                    android:id="@+id/btnActivarCliente"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Activar Cliente" />
             </menu>
         </item>
         <item

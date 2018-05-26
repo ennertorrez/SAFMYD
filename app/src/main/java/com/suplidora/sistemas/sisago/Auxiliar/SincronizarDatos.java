@@ -1079,6 +1079,53 @@ public class SincronizarDatos {
 
     }
 
+    public static String SincronizarClientesInactivo(Cliente cliente, String jsonCliente) {
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+        Gson gson = new Gson();
+
+        final String urlCliente = variables_publicas.direccionIp + "/ServicioClientes.svc/SincronizarClienteInactivo/";
+        final String urlStringDetalle = urlCliente + cliente.getIdCliente() + "/" + cliente.getCodCv() + "/" + jsonCliente;
+
+
+        HashMap<String,String> postData = new HashMap<>();
+        postData.put("IdCliente",cliente.getIdCliente());
+        postData.put("IdClienteVario",cliente.getCodCv());
+        postData.put("cliente",jsonCliente);
+
+        String jsonStrCliente = sh.performPostCall(urlCliente,postData);
+
+        //  String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
+        if (jsonStrCliente == null || jsonCliente.isEmpty()) {
+            new Funciones().SendMail("Ha ocurrido un error al activar al cliente. Respuesta nula POST", variables_publicas.info + urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return "false,Ha ocurrido un error al activar al cliente. Respuesta nula";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrCliente);
+                String resultState = (String) ((String) result.get("SincronizarClienteInactivoResult")).split(",")[0];
+                String NoCliente = (String) ((String) result.get("SincronizarClienteInactivoResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    if (NoCliente.equalsIgnoreCase("Cliente ya existe en base de datos")) {
+                        NoCliente =  ((String) result.get("SincronizarClienteInactivoResult")).split(",")[1];
+                    } else {
+                        new Funciones().SendMail("Ha ocurrido un error al activar el Cliente. Respuesta false", variables_publicas.info + NoCliente +" *** "+urlStringDetalle, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                        return "false," + NoCliente;
+                    }
+                }
+                // PedidoH.ActualizarPedido(IdPedido, NoPedido);
+//
+                return "true";
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al activar el Cliente. Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "false," + ex.getMessage() + "";
+            }
+
+        }
+
+    }
+
     private boolean SincronizarFacturasPendientes(String vVendedor, String vCliente) throws JSONException {
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlGetFacturasPendientes + vVendedor + "/" + vCliente;

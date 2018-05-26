@@ -48,6 +48,7 @@ import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Informes.InformesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
+import com.suplidora.sistemas.sisago.Menu.ClientesInactivosFragment;
 import com.suplidora.sistemas.sisago.Menu.FacturasMoraClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
@@ -159,6 +160,7 @@ public class MenuActivity extends AppCompatActivity
         }
 
         navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
+        navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(false); //Activar Clientes
         navigationView.getMenu().getItem(4).setVisible(false); //Recibos
 
         if ((!variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
@@ -178,6 +180,10 @@ public class MenuActivity extends AppCompatActivity
 
         if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
             navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(true); //Clientes nuevos
+        }
+
+        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(true); //Activar Clientes
         }
     }
 
@@ -327,6 +333,14 @@ public class MenuActivity extends AppCompatActivity
             case R.id.btnNuevoCliente:
                 Intent newCli = new Intent(getApplicationContext(), ClientesNew.class);
                 startActivity(newCli);
+                break;
+
+            case R.id.btnActivarCliente:
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ClientesInactivosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
                 break;
 
             case R.id.btnNuevoInforme:

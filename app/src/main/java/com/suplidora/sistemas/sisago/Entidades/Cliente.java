@@ -26,7 +26,7 @@ public class Cliente {
     private String Excento= "";
     private String CodigoLetra= "";
     private String Ruta= "";
-    private  String Frecuencia= "";
+    private String Frecuencia= "";
     private String PrecioEspecial= "";
     private String FechaUltimaCompra= "";
     private String Tipo="";

@@ -44,7 +44,7 @@ public class variables_publicas {
     public static String nombreCed = "";
     public static String direccionCedula = "";
 
-    public static final String direccionIp = "http://186.1.18.75:8080";
+    public static final String direccionIp = "http://186.1.18.75:8085";
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD

@@ -482,4 +482,27 @@ public class ClientesHelper {
         c.close();
         return resultado;
     }
+    public HashMap<String, String> ObtenerDatosClientesParcial(String Codigo,String CodCv) {
+
+        String sql="select IdCliente,CodCv,Nombre,NombreCliente,Telefono,Direccion,Cedula,IdVendedor,Ruta,Frecuencia from " + variables_publicas.TABLE_CLIENTES + " Where IdCliente = "+Codigo +" AND CodCv = '"+CodCv.replace("Cod_Cv: ","")+"' ";
+        Cursor c = database.rawQuery(sql,null);
+        HashMap<String, String> cliente = null;
+        if (c.moveToFirst()) {
+            do {
+                cliente = new HashMap<>();
+                cliente.put(variables_publicas.CLIENTES_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdCliente)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_CodCv)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Nombre)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_NombreCliente)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Telefono)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Direccion)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Cedula, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Cedula)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_IdVendedor)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Ruta, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Ruta)));
+                cliente.put(variables_publicas.CLIENTES_COLUMN_Frecuencia, c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Frecuencia)));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return cliente;
+    }
 }

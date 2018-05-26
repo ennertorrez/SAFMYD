@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:minHeight="220dp"
+    android:orientation="vertical" >
+
+
+
+    <TextView
+        android:id="@+id/lblHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CLIENTE ACTIVADO  EXITOSAMENTE"
+        android:textAlignment="center"
+        android:textColor="#6f6f6f"
+        android:background="#FFFFFF"
+        android:textStyle="bold"
+        android:layout_below="@+id/imgOK"
+        android:layout_alignParentStart="true"
+        android:textSize="24sp"/>
+
+
+
+    <ImageView
+        android:id="@+id/imgOK"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@mipmap/ic_check_circle_black_48dp"
+        android:backgroundTint="#6ec543"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:background="#6ec543"
+        android:text="OK"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:layout_below="@+id/lblHeader"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:id="@+id/btnOkDialogo"/>
+
+
+
+</RelativeLayout>
