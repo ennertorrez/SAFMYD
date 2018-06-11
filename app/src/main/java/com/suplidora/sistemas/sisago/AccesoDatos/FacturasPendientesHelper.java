@@ -139,7 +139,8 @@ public class FacturasPendientesHelper {
 
     public java.util.ArrayList<String> ObtenerFacturasPendientesArrayList(String vVendedor, String vCliente) {
         java.util.ArrayList<String> lst = new java.util.ArrayList<String>();
-        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = " + vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN " + vCliente + "=0 THEN " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "= 'false';";
+        //String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " = " + vVendedor + " AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN " + vCliente + "=0 THEN " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "= 'false';";
+        String sql = "SELECT  * FROM " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + "= CASE WHEN " + vCliente + "=0 THEN " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " ELSE " + vCliente + " END AND " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "= 'false';";
         Cursor c = database.rawQuery(sql, null);
         if (c.moveToFirst()) {
             do {
