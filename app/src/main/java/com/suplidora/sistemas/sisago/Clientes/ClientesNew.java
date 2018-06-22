@@ -611,11 +611,25 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
             cliente.setFrecuencia(vFrecuencia);
             cliente.setPrecioEspecial("false");
             cliente.setFechaUltimaCompra(variables_publicas.FechaActual);
-            cliente.setTipo("Detalle");
+            if (variables_publicas.usuario.getCanal().equals("Detalle")){
+                cliente.setTipo("Detalle");
+                cliente.setDetallista("true");
+            }else if(variables_publicas.usuario.getCanal().equals("Mayorista")) {
+                cliente.setTipo("Mayorista");
+                cliente.setDetallista("false");
+            }else if(variables_publicas.usuario.getCanal().equals("Horeca")) {
+                cliente.setTipo("Horeca");
+                cliente.setDetallista("false");
+            }else if(variables_publicas.usuario.getCanal().equals("Super")) {
+                cliente.setTipo("Super");
+                cliente.setDetallista("false");
+            }else {
+                cliente.setTipo("Detalle");
+                cliente.setDetallista("true");
+            }
             cliente.setCodigoGalatea("NULL");
             cliente.setDescuento("0");
             cliente.setEmpleado("0");
-            cliente.setDetallista("true");
             if (dpto.getCodigo_Departamento().equals("6")) {
                 cliente.setRutaForanea("false");
             }else {
@@ -834,7 +848,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
     private void CargaDatosCombo() {
 
         //Combo Vendedores
-        List<Vendedor> vendedores = VendedoresH.ObtenerListaVendedores2();
+        List<Vendedor> vendedores = VendedoresH.ObtenerListaVendedores();
         ArrayAdapter<Vendedor> adapterVendedor = new ArrayAdapter<Vendedor>(this, android.R.layout.simple_spinner_item, vendedores);
         adapterVendedor.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboVendedor.setAdapter(adapterVendedor);

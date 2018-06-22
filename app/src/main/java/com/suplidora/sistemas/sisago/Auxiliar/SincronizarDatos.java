@@ -920,6 +920,48 @@ public class SincronizarDatos {
 
     }
 
+    public static String ConsultarExistencia2(ArticulosHelper ArticulosH, String CodigoArticulo) {
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+
+        final String urlConsulta = urlConsultarExistencias + CodigoArticulo;
+
+        try {
+            URL Url = new URL(urlConsulta);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            e.printStackTrace();
+            return "N/A";
+        }
+
+        String jsonExistencia = sh.makeServiceCall(encodeUrl);
+        if (jsonExistencia == null) {
+            return "0";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonExistencia);
+                String resultState = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[0];
+                final String existencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false", variables_publicas.info + " --- " + existencia, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    return "0";
+                }
+                /*Si no hubo ningun problema procedemos a actualizar las existencias locales*/
+                ArticulosH.ActualizarExistencias(CodigoArticulo, existencia);
+                return existencia;
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ", variables_publicas.info + ex.getMessage() + " ---json: " + urlConsulta + " ---Response: " + jsonExistencia, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "0";
+            }
+
+        }
+
+    }
     private boolean ObtenerBancos() {
 
         HttpHandler sh = new HttpHandler();
@@ -1244,6 +1286,41 @@ public class SincronizarDatos {
                 return "true";
             } catch (Exception ex) {
                 new Funciones().SendMail("Ha ocurrido un error al sincronizar el Informe, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return "false," + ex.getMessage() + "";
+            }
+
+        }
+
+    }
+
+    public static String InsertarCoordenada(String jsonCoordenadas) {
+
+        HttpHandler sh = new HttpHandler();
+
+        final String urlCoord= variables_publicas.direccionIp + "/ServicioLogin.svc/GuardarLocalizacion";
+        final String urlStringCoord = urlCoord + "/" + jsonCoordenadas;
+
+        HashMap<String,String> postData = new HashMap<>();
+        postData.put("Coordenadas",jsonCoordenadas);
+
+        String jsonStrCoord = sh.performPostCall(urlCoord,postData);
+
+        if (jsonStrCoord == null || jsonCoordenadas.isEmpty()) {
+            new Funciones().SendMail("Ha ocurrido un error al guardar la Coordenada. Respuesta nula POST", variables_publicas.info + urlStringCoord, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return "false,Ha ocurrido un error al guardar la Coordenada. Respuesta nula.";
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonStrCoord);
+                String resultState = (String) ((String) result.get("GuardarLocalizacionResult")).split(",")[0];
+                String NoLoc = (String) ((String) result.get("GuardarLocalizacionResult")).split(",")[1];
+                if (resultState.equals("false")) {
+                    new Funciones().SendMail("Ha ocurrido un error al guardar la Coordenada. Respuesta false", variables_publicas.info + NoLoc +" *** "+urlStringCoord, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    return "false," + NoLoc;
+                }
+                return "true";
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al guardar la Coordenada. Excepcion controlada ", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());
                 return "false," + ex.getMessage() + "";
             }

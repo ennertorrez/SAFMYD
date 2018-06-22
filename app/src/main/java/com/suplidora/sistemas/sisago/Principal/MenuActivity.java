@@ -1,31 +1,53 @@
 package com.suplidora.sistemas.sisago.Principal;
 
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.multidex.MultiDex;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Handler;
+import com.google.android.gms.maps.GoogleMap;
+
+import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.ArticulosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.CartillasBcHelper;
@@ -45,12 +67,15 @@ import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Entidades.Cliente;
+import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.Informes.InformesActivity;
 import com.suplidora.sistemas.sisago.Menu.ClientesFragment;
 import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
 import com.suplidora.sistemas.sisago.Menu.ClientesInactivosFragment;
 import com.suplidora.sistemas.sisago.Menu.FacturasMoraClienteFragment;
 import com.suplidora.sistemas.sisago.Menu.HistoricoventasClienteFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
@@ -60,10 +85,16 @@ import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    private Handler handler = new Handler();
     private String TAG = ClientesFragment.class.getSimpleName();
     private ProgressDialog pDialog;
     TextView lblUsuarioHeader;
@@ -89,12 +120,42 @@ public class MenuActivity extends AppCompatActivity
     private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
 
+    private String jsonCoord= "";
+    String IMEI = "";
+    private static final int REQUEST_READ_PHONE_STATE = 0;
+    private static final int ACCESS_FINE_LOCATION = 0;
+    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
+    String longitud="0";
+    String latitud="0";
+    String direccion="";
+    private boolean isOnline = false;
+    private boolean guardadoOK = false;
+
+    private LocationManager locManager;
+    private LocationListener locListener;
+    private GoogleMap googleMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+      /*  locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        MyLocationListener mlocListener = new MyLocationListener();
+        mlocListener.setMainActivity(this);
+
+        if (!checkLocation())
+            return;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 20 * 1000, 10, locationListenerGPS);
+        }
+
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 20 * 1000, 10, locationListenerGPS);*/
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -105,6 +166,7 @@ public class MenuActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
 
         View header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
         navigationView.addHeaderView(header);
@@ -184,8 +246,215 @@ public class MenuActivity extends AppCompatActivity
 
         if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
             navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(true); //Activar Clientes
+            navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false); //Lista de Devoluciones
+        }
+
+        IMEI = variables_publicas.IMEI;
+        if (IMEI == null) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirmación Requerida")
+                    .setMessage("Es necesario configurar el permiso \"Administrar llamadas telefonicas\" para porder guardar un Cliente, Desea continuar ? ")
+                    .setCancelable(false)
+                    .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                            intent.setData(uri);
+                            startActivity(intent);
+                            loadIMEI();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
+
+    }
+
+ /*   private boolean checkLocation() {
+        if (!isLocationEnabled())
+            showAlert();
+        return isLocationEnabled();
+    }
+
+    private void showAlert() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Enable Location")
+                .setMessage("Su ubicación esta desactivada.\npor favor active su ubicación " +
+                        "usa esta app")
+                .setPositiveButton("Configuración de ubicación", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    }
+                });
+        dialog.show();
+    }
+
+    private boolean isLocationEnabled() {
+        return locManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }*/
+
+   // private final LocationListener locationListenerGPS = new LocationListener() {
+      // public void onLocationChanged(Location location) {
+          //  longitud = String.valueOf(location.getLongitude());
+           // latitud = String.valueOf(location.getLatitude());
+           /* Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> list = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (!list.isEmpty()) {
+                Address address = list.get(0);
+                direccion= address.getAddressLine(0);
+            }*/
+        //    runOnUiThread(new Runnable() {
+           //     @Override
+             //   public void run() {
+                //    launchLocator();
+            //    }
+          //  });
+     //   }
+     //   @Override
+     //   public void onStatusChanged(String s, int i, Bundle bundle) {
+     //   }
+
+     //   @Override
+      //  public void onProviderEnabled(String s) {
+      //  }
+      //  @Override
+      //  public void onProviderDisabled(String s) {
+      //  }
+  //  };
+
+
+  /*  private void launchLocator()
+    {
+        locManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locListener = new LocationListener()
+
+        {
+
+            @Override
+            public void onLocationChanged(Location location)
+            {
+                latitud = String.valueOf(location.getLatitude());
+                longitud = String.valueOf(location.getLongitude());
+                try {
+
+
+                    Gson gson = new Gson();
+                    HashMap<String, String> vDatosCoordenadas = null;
+                    vDatosCoordenadas = new HashMap<>();
+                    vDatosCoordenadas.put("latitud", latitud);
+                    vDatosCoordenadas.put("longitud", longitud);
+                    vDatosCoordenadas.put("direccion", "Prueba");
+                    vDatosCoordenadas.put("imei", IMEI);
+
+                    jsonCoord = gson.toJson(vDatosCoordenadas);
+
+                    try {
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            new Insertar().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            new Insertar().execute();
+                        }
+
+                    } catch (final Exception ex) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(),
+                                        ex.getMessage(),
+                                        Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        });
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onProviderDisabled(String provider)
+            {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider)
+            {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras)
+            {
+
+            }
+
+        };
+
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locListener);
+
+    }*/
+
+    public void loadIMEI() {
+        // Check if the READ_PHONE_STATE permission is already available.
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // READ_PHONE_STATE permission has not been granted.
+            requestReadPhoneStatePermission();
+        } else {
+            // READ_PHONE_STATE permission is already been granted.
+            doPermissionGrantedStuffs();
         }
     }
+    public void doPermissionGrantedStuffs() {
+        //Have an  object of TelephonyManager
+        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
+        variables_publicas.IMEI = tm.getDeviceId();
+
+
+    }
+
+    private void requestReadPhoneStatePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.READ_PHONE_STATE)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            new AlertDialog.Builder(MenuActivity.this)
+                    .setTitle("Permission Request")
+                    .setMessage("Se necesita permiso para acceder al estado del telefono")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //re-request
+                            ActivityCompat.requestPermissions(MenuActivity.this,
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            // READ_PHONE_STATE permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -195,6 +464,7 @@ public class MenuActivity extends AppCompatActivity
         } else {
 
             removeAllFragments(getFragmentManager());
+          //  locManager.removeUpdates(locListener);
         }
     }
 
@@ -278,7 +548,6 @@ public class MenuActivity extends AppCompatActivity
                     //--GB uses ThreadPoolExecutor by default--
                     new SincronizaDatos().execute();
                 }
-
             }
             //noinspection SimplifiableIfStatement
             if (id == R.id.Salir) {
@@ -398,6 +667,15 @@ public class MenuActivity extends AppCompatActivity
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
+
+            case R.id.btnReporteDevoluciones:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaDevolucionesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -437,6 +715,29 @@ public class MenuActivity extends AppCompatActivity
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(MenuActivity.this);
+    }
+
+
+  /*  private class Insertar extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            CheckConnectivity();
+            if (isOnline) {
+
+                if (Boolean.parseBoolean(SincronizarDatos.InsertarCoordenada(jsonCoord))) {
+                    guardadoOK = true;
+                }else {
+                    guardadoOK = false;
+                }
+            } else {
+                guardadoOK = false;
+            }
+            return null;
+        }
+
+    }*/
+    private void CheckConnectivity() {
+        isOnline = Funciones.TestServerConectivity();
     }
 
 }

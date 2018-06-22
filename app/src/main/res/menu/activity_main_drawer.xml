@@ -76,6 +76,10 @@
                 android:id="@+id/btnReporteHistVentas"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Histórico de Ventas" />
+            <item
+                android:id="@+id/btnReporteDevoluciones"
+                android:icon="@drawable/ic_menu_mapmode"
+                android:title="Reporte Devoluciones" />
         </menu>
     </item>
 
