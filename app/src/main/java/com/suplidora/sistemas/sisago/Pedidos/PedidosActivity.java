@@ -215,7 +215,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     static final int DEFAULT_THREAD_POOL_SIZE = 4;
     ExecutorService executorService = Executors.newCachedThreadPool();
     //endregion
-
+    private boolean vClientePI;
 
     //region OnCreate
     @Override
@@ -1981,6 +1981,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }else { //if (cliente.getTipo().equalsIgnoreCase("Detalle") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2")){
                 cantxTipoCliente=2;
             }
+
             /*Primero sumamos las cantidades de los items promocionados*/
             for (HashMap<String, String> item : listaArticulos) {
                 if (items.contains(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
@@ -2113,7 +2114,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private boolean Guardar() {
         if (lv.getCount() <= 0) {
-            MensajeAviso("No se puede guardar el pedido, Debe ingresar al menos 1 item");
+            MensajeAviso("No se puede guardar el pedido. Debe ingresar al menos 1 item");
+            return false;
+        }
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && total< 300){ // cambio solicitado por ***09-07-2018
+            MensajeAviso("No se puede guardar el pedido. Debe facturar al menos C$300");
             return false;
         }
 
@@ -2402,7 +2407,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             } else {
                 cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
 
-                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")){
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && !cliente.getTipo().equalsIgnoreCase("Detalle") ){
                     if (cantidadItems < CantidadMinima) {
                         cumpleCantMinima = false;
                     } else {
@@ -2674,12 +2679,12 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         if (cliente.getTipo().equalsIgnoreCase("Detalle")) {
                             if (Boolean.parseBoolean(cliente.getRutaForanea())) {
                                 if (AplicarPrecioDetalle) {
-                                    tipoprecio = "Mayorista";
+                                    tipoprecio = "Foraneo2"; //CAMBIO SOLICITADO POR DAREK SE DARA EN VEZ DE PRECIO MAYORISTA SE DARA FORANEO 2 ***09-07-2018
                                 } else {
                                     tipoprecio = TipoForaneo.replace("Precio", "");
                                 }
                             } else {
-                                tipoprecio = "Mayorista";
+                                tipoprecio = "Foraneo2"; //CAMBIO SOLICITADO POR DAREK SE DARA EN VEZ DE PRECIO MAYORISTA SE DARA FORANEO 2 ***09-07-2018
                             }
                         } else if (cliente.getTipo().equalsIgnoreCase("Foraneo") || (cliente.getTipo().equalsIgnoreCase("Mayorista") && IdDepartamento != 6)) {
                             tipoprecio = TipoForaneo.replace("Precio", "");
@@ -3138,8 +3143,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     MensajeAviso("Este producto no esta autorizado para venderlo a este cliente");
                     return;
                 }
+
+                vClientePI= ClientesH.EsClientePI(cliente.getNombre());
                // if (cliente.getTipo().equalsIgnoreCase("Detalle") && articulo.getIdProveedor().equalsIgnoreCase("230") && !CodigoArticulo.equals("4000-01-01-01-661")){
-                if (cliente.getTipo().equalsIgnoreCase("Detalle") && articulo.getIdProveedor().equalsIgnoreCase("230") ){
+                if (cliente.getTipo().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && articulo.getIdProveedor().equalsIgnoreCase("230") && vClientePI==false){
                     alertDialog.dismiss();
                     MensajeAviso("Este producto no esta autorizado para venderlo en canal Detalle");
                     return;
@@ -3160,8 +3167,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     //--GB uses ThreadPoolExecutor by default--
                     new ConsultarExistencias().execute();
                 }
-
-
                 MensajeCaja = true;
                 ObtenerPrecio(null, CodigoArticulo, false);
 

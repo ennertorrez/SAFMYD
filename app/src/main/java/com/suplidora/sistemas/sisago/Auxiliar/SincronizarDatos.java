@@ -1298,8 +1298,8 @@ public class SincronizarDatos {
 
         HttpHandler sh = new HttpHandler();
 
-        final String urlCoord= variables_publicas.direccionIp + "/ServicioLogin.svc/GuardarLocalizacion";
-        final String urlStringCoord = urlCoord + "/" + jsonCoordenadas;
+        final String urlCoord= variables_publicas.direccionIp + "/ServicioLogin.svc/GuardarLocalizacion/";
+        final String urlStringCoord = urlCoord  + jsonCoordenadas;
 
         HashMap<String,String> postData = new HashMap<>();
         postData.put("Coordenadas",jsonCoordenadas);

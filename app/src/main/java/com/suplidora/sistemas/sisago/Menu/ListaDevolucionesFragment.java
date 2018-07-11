@@ -24,20 +24,26 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
+import com.suplidora.sistemas.sisago.Clientes.ClientesNew;
+import com.suplidora.sistemas.sisago.Entidades.Supervisor;
+import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
 
@@ -69,6 +75,7 @@ public class ListaDevolucionesFragment extends Fragment {
     private ListView lv;
     private TextView lblFooterCantidad;
     private TextView lblFooterSubtotal;
+    private Spinner cboVendedor;
     private Button btnBuscarDev;
     private TextView txtFechaIni;
     private String fechadesde = "";
@@ -76,8 +83,12 @@ public class ListaDevolucionesFragment extends Fragment {
     private SimpleAdapter adapter;
     public static ArrayList<HashMap<String, String>> listadevoluciones;
     public Calendar myCalendar = Calendar.getInstance();
+    private VendedoresHelper VendedoresH;
+    private String vVendedor = "";
+    private Vendedor vendedor = null;
     //  private SimpleAdapter adapter;
     final String urlDevoluciones = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerListaDevVendedor";
+   // final String urlDevoluciones2 = variables_publicas.direccionIp + "/ServicioDevoluciones.svc/ObtenerListaDevSup2";
 
     private DecimalFormat df;
     private boolean isOnline;
@@ -85,7 +96,10 @@ public class ListaDevolucionesFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
+
         myView = inflater.inflate(R.layout.lista_devoluciones_layout, container, false);
+        DbOpenHelper = new DataBaseOpenHelper(getActivity());
+        VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
@@ -95,14 +109,9 @@ public class ListaDevolucionesFragment extends Fragment {
         getActivity().setTitle("Lista de Devoluciones");
         lv = (ListView) myView.findViewById(R.id.listResumenDevoluciones);
         registerForContextMenu(lv);
-      /*  lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-
-            }
-        });*/
         btnBuscarDev = (Button) myView.findViewById(R.id.btnBuscaDev);
         txtFechaIni = (EditText) myView.findViewById(R.id.txtFechaDevolucion);
+        cboVendedor = (Spinner) myView.findViewById(R.id.cboVendedor);
         lblFooterCantidad = (TextView) myView.findViewById(R.id.lblFooterCantidad);
         lblFooterSubtotal = (TextView) myView.findViewById(R.id.lblFooterSubtotal);
         LayoutInflater inflate = getActivity().getLayoutInflater();
@@ -110,6 +119,15 @@ public class ListaDevolucionesFragment extends Fragment {
         DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
         txtFechaIni.setText(getDatePhone());
         fechadesde = txtFechaIni.getText().toString();
+
+        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) {
+            cboVendedor.setEnabled(false);
+        } else {
+            cboVendedor.setEnabled(true);
+
+        }
+
+        CargaComboVendedor();
 
         /***DatePicker***/
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
@@ -139,6 +157,18 @@ public class ListaDevolucionesFragment extends Fragment {
             Log.e("Error", e.getMessage());
         }
 
+        cboVendedor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
+                vendedor = (Vendedor) adapter.getItemAtPosition(position);
+                vVendedor = vendedor.getCODIGO().toString();
+                btnBuscarDev.performClick();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
         btnBuscarDev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,7 +179,19 @@ public class ListaDevolucionesFragment extends Fragment {
         return myView;
     }
 
+    private void CargaComboVendedor(){
+        //Combo Vendedores
+        List<Vendedor> vendedores = VendedoresH.ObtenerListaVendedores();
+        ArrayAdapter<Vendedor> adapterVendedor = new ArrayAdapter<Vendedor>(getActivity(), android.R.layout.simple_spinner_item, vendedores);
+        adapterVendedor.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboVendedor.setAdapter(adapterVendedor);
 
+        if (variables_publicas.usuario.getTipo().equals("Vendedor")){
+            vVendedor = variables_publicas.usuario.getCodigo();
+            cboVendedor.setSelection(getIndex(cboVendedor,variables_publicas.usuario.getNombre()));
+        }
+
+    }
 
     private void CargarDevoluciones() {
         listadevoluciones.clear();
@@ -265,13 +307,23 @@ public class ListaDevolucionesFragment extends Fragment {
                 double subtotal = Double.parseDouble(item.get("MONTO").replace("C$", "").replace(",", ""));
                 item.put("MONTO", df.format(subtotal));
             }
-            adapter = new SimpleAdapter(
-                    getActivity(), listadevoluciones,
-                    R.layout.lista_devoluciones_guardados, new String[]{"FACTURA", "CLIENTE",
-                    "RANGO",  "MONTO", "TIPO", "ESTADO"},
-                    new int[]{R.id.nFactura, R.id.nCliente, R.id.nRango,
-                            R.id.nMonto, R.id.nTipo, R.id.nEstado}) {
-            };
+           /* if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor")){
+                adapter = new SimpleAdapter(
+                        getActivity(), listadevoluciones,
+                        R.layout.lista_devoluciones_guardados2, new String[]{"VENDEDOR","FACTURA", "CLIENTE",
+                        "RANGO",  "MONTO", "TIPO", "ESTADO"},
+                        new int[]{R.id.nVendedor,R.id.nFactura, R.id.nCliente, R.id.nRango,
+                                R.id.nMonto, R.id.nTipo, R.id.nEstado}) {
+                };
+            }else {*/
+                adapter = new SimpleAdapter(
+                        getActivity(), listadevoluciones,
+                        R.layout.lista_devoluciones_guardados, new String[]{"FACTURA", "CLIENTE",
+                        "RANGO", "MONTO", "TIPO", "ESTADO"},
+                        new int[]{R.id.nFactura, R.id.nCliente, R.id.nRango,
+                                R.id.nMonto, R.id.nTipo, R.id.nEstado}) {
+                };
+           // }
             lv.setAdapter(adapter);
             adapter.notifyDataSetChanged();
             ActualizarFooter();
@@ -296,8 +348,13 @@ public class ListaDevolucionesFragment extends Fragment {
         fechahasta= txtFechaIni.getText().toString();
         String FormatFechaIni = fechadesde.replace("-", "");
         String FormatFechaFin = fechahasta.replace("-", "");
-        String codVendedor = variables_publicas.usuario.getCodigo();
-        String urlString = urlDevoluciones + "/" + FormatFechaIni + "/" + FormatFechaFin + "/" + codVendedor;
+       // String codVendedor = variables_publicas.usuario.getCodigo();
+        String urlString="";
+      //  if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor")){
+          //  urlString = urlDevoluciones2 + "/" + FormatFechaIni + "/" + FormatFechaFin + "/" + codVendedor;
+       // }else {
+            urlString = urlDevoluciones + "/" + FormatFechaIni + "/" + FormatFechaFin + "/" + vVendedor;
+       // }
         try {
             URL Url = new URL(urlString);
             URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
@@ -315,36 +372,61 @@ public class ListaDevolucionesFragment extends Fragment {
                 Log.e(TAG, "Response from url: " + jsonStr);
 
                 JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray Devoluciones = jsonObj.getJSONArray("ObtenerListaDevVendedorResult");
 
-                /*Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");*/
+            /*    if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor")){
 
+                    JSONArray Devoluciones = jsonObj.getJSONArray("ObtenerListaDevSup2Result");
+                    for (int i = 0; i < Devoluciones.length(); i++) {
+                        JSONObject c = Devoluciones.getJSONObject(i);
 
-                for (int i = 0; i < Devoluciones.length(); i++) {
-                    JSONObject c = Devoluciones.getJSONObject(i);
-
-                    String factura = c.getString("FACTURA");
-                    String cliente = c.getString("CLIENTE");
-                    String rango = c.getString("RANGO");
-                    String monto = c.getString("MONTO");
-                    String tipo = c.getString("TIPO");
-                    String estado = c.getString("ESTADO");
+                        String vendedor = c.getString("VENDEDOR");
+                        String factura = c.getString("FACTURA");
+                        String cliente = c.getString("CLIENTE");
+                        String rango = c.getString("RANGO");
+                        String monto = c.getString("MONTO");
+                        String tipo = c.getString("TIPO");
+                        String estado = c.getString("ESTADO");
 
 
-                    HashMap<String, String> devoluciones = new HashMap<>();
+                        HashMap<String, String> devoluciones = new HashMap<>();
 
-                    devoluciones.put("FACTURA", factura);
-                    devoluciones.put("CLIENTE", cliente);
-                    devoluciones.put("RANGO", rango);
-                    devoluciones.put("MONTO", monto);
-                    devoluciones.put("TIPO", tipo);
-                    devoluciones.put("ESTADO", estado);
+                        devoluciones.put("VENDEDOR", vendedor);
+                        devoluciones.put("FACTURA", factura);
+                        devoluciones.put("CLIENTE", cliente);
+                        devoluciones.put("RANGO", rango);
+                        devoluciones.put("MONTO", monto);
+                        devoluciones.put("TIPO", tipo);
+                        devoluciones.put("ESTADO", estado);
 
-                    listadevoluciones.add(devoluciones);
-                }
+                        listadevoluciones.add(devoluciones);
+                    }
+
+                }else {*/
+                    // Getting JSON Array node
+                    JSONArray Devoluciones = jsonObj.getJSONArray("ObtenerListaDevVendedorResult");
+                    for (int i = 0; i < Devoluciones.length(); i++) {
+                        JSONObject c = Devoluciones.getJSONObject(i);
+
+                        String factura = c.getString("FACTURA");
+                        String cliente = c.getString("CLIENTE");
+                        String rango = c.getString("RANGO");
+                        String monto = c.getString("MONTO");
+                        String tipo = c.getString("TIPO");
+                        String estado = c.getString("ESTADO");
+
+
+                        HashMap<String, String> devoluciones = new HashMap<>();
+
+                        devoluciones.put("FACTURA", factura);
+                        devoluciones.put("CLIENTE", cliente);
+                        devoluciones.put("RANGO", rango);
+                        devoluciones.put("MONTO", monto);
+                        devoluciones.put("TIPO", tipo);
+                        devoluciones.put("ESTADO", estado);
+
+                        listadevoluciones.add(devoluciones);
+                    }
+                //}
             }
         } catch (Exception ex) {
             new Funciones().SendMail("Ha ocurrido un error al obtener lista de devoluciones. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
@@ -390,5 +472,19 @@ public class ListaDevolucionesFragment extends Fragment {
         } catch (Exception ex) {
                 Log.e("Error",ex.getMessage());
         }*/
+    }
+    private int getIndex(Spinner spinner, String myString){
+
+        int index = 0;
+
+        for (int i=0;i<spinner.getCount();i++){
+            String nn=spinner.getItemAtPosition(i).toString();
+
+            if (nn.equals(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }

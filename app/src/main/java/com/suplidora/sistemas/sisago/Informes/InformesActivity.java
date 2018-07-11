@@ -501,7 +501,7 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
 
     private void cargarCboVendedor(){
         //Combo Vendedores
-        List<Vendedor> vendedores = VendedoresH.ObtenerListaVendedores2();
+        List<Vendedor> vendedores = VendedoresH.ObtenerListaVendedores();
         ArrayAdapter<Vendedor> adapterVendedor = new ArrayAdapter<Vendedor>(this, android.R.layout.simple_spinner_item, vendedores);
         adapterVendedor.setDropDownViewResource(android.R.layout.simple_list_item_checked);
         cboVendedor.setAdapter(adapterVendedor);

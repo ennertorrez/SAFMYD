@@ -505,4 +505,18 @@ public class ClientesHelper {
         c.close();
         return cliente;
     }
+    public boolean EsClientePI(String nombrecliente){
+        String sql="select Nombre from " + variables_publicas.TABLE_CLIENTES + " Where Nombre LIKE  'PUNTO%IDEAL%' ";
+        Cursor c = database.rawQuery(sql,null);
+        HashMap<String, String> cliente = null;
+        if (c.moveToFirst()) {
+            do {
+               if (c.getString(c.getColumnIndex(variables_publicas.CLIENTES_COLUMN_Nombre)).equals(nombrecliente)) {
+                   return true;
+               }
+            } while (c.moveToNext());
+        }
+        c.close();
+        return false;
+    }
 }

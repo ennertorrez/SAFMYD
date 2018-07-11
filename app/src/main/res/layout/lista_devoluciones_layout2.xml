@@ -49,12 +49,6 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/Rl1">
 
-        <Spinner
-            android:id="@+id/cboVendedor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"></Spinner>
-
     </RelativeLayout>
 
     <LinearLayout
@@ -78,6 +72,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <TextView
+                        android:id="@+id/lblColVendedor"
+                        android:layout_width="230dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:gravity="center"
+                        android:paddingLeft="0dp"
+                        android:text="Vendedor"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="#000000"
+                        android:typeface="monospace" />
                     <TextView
                         android:id="@+id/lblColFactura"
                         android:layout_width="100dp"
@@ -158,8 +163,8 @@
                     android:orientation="vertical">
 
                     <ListView
-                        android:id="@+id/listResumenDevoluciones"
-                        android:layout_width="720dp"
+                        android:id="@+id/listResumenDevoluciones2"
+                        android:layout_width="950dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
