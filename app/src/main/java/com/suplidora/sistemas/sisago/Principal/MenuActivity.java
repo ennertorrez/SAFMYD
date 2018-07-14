@@ -129,8 +129,6 @@ public class MenuActivity extends AppCompatActivity
                         public void onClick(DialogInterface dialog, int id) {
                             Intent intent = new Intent();
                             intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                           /* Uri uri = Uri.fromParts("package", getPackageName(), null);
-                            intent.setData(uri)*/;
                             startActivity(intent);
                         }
                     })
@@ -562,28 +560,5 @@ public class MenuActivity extends AppCompatActivity
         super.attachBaseContext(base);
         MultiDex.install(MenuActivity.this);
     }
-    public void showSettingsAlert(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialogBuilder.setMessage("GPS is not enabled. Do you want to go to settings menu?");
-        alertDialog.setTitle("GPS is settings");
 
-        // On pressing Settings button
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog,int which) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        });
-
-  /*      // on pressing cancel button
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-*/
-        // Showing Alert Message
-        alertDialog.show();
-    }
-}
+  }

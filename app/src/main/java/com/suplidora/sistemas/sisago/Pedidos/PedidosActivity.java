@@ -830,7 +830,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -839,15 +839,15 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             //lo borramos si no cumple con la promocion
             if (cantidad<cantidadA || montoAcumulado <vMontoEvaluar) {
-                for (HashMap<String, String> item : listaArticulos) {
+           /*     for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
-                if (existe == false) {
+                if (existe == false && cantidadB>0) {
 
                     HashMap<String, String> articuloBonificado = new HashMap<>();
                     articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
@@ -945,10 +945,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantRequerida) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB>0) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
-                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantRequerida) {
+                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB2>0) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB2));
                 }
@@ -956,13 +956,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             //lo borramos si no cumple con la promocion
             if (cantidadGeneral < cantRequerida) {
-                for (HashMap<String, String> item : listaArticulos) {
+/*                for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }else if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
@@ -1080,10 +1080,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantidadB) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&   cantidadB>0) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
-                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantidadB2) {
+                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB2>0) {
+//                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantidadB2) {
                     existe2 = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB2));
                 }
@@ -1091,7 +1092,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             //lo borramos si no cumple con la promocion
             if (cantidadGeneral < cantRequerida1) {
-                for (HashMap<String, String> item : listaArticulos) {
+/*                for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }else if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
@@ -1103,11 +1104,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
            } else {
 
                /*Si no existe lo agregamos*/
-                if (existe == false ) {
+                if (existe == false && cantidadB>0) {
 
                     //Validamos que solamente se puedan ingresar 18 articulos
                     HashMap<String, String> articuloBonificado = new HashMap<>();
@@ -1134,7 +1135,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
                     listaArticulos.add(articuloBonificado);
                 }
-                if (existe2 == false ) {
+                if (existe2 == false && cantidadB2>0) {
                     HashMap<String, String> articuloBonificado2 = new HashMap<>();
                     articuloBonificado2.put("CodigoPedido", pedido.getCodigoPedido());
                     articuloBonificado2.put("Cod", "1049");
@@ -1218,7 +1219,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -1228,11 +1229,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
             //lo borramos si no cumple con la promocion
             if (cantidad < 1) {
-                for (HashMap<String, String> item : listaArticulos) {
+                /*for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
@@ -1446,7 +1447,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -1455,11 +1456,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
             if (cantidad <=0 ) {
-                for (HashMap<String, String> item : listaArticulos) {
+/*                for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
@@ -1550,7 +1551,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                 for (HashMap<String, String> item : listaArticulos) {
                        /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidad1 >= 2 || cantidad2>=6)) {
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidadB>0)) {
                         existe = true;
                         item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                         break;
@@ -1558,11 +1559,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
 
                 if (cantidadB==0) {
-                    for (HashMap<String, String> item : listaArticulos) {
+                /*    for (HashMap<String, String> item : listaArticulos) {
                         if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                             listaArticulos.remove(item);
                         }
-                    }
+                    }*/
                 } else {
 
                    /*Si no existe lo agregamos*/
@@ -1679,18 +1680,18 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     for (HashMap<String, String> item : listaArticulos) {
                            /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                        if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidad1 >= 2 || cantidad2>=6)) {
+                        if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidadB>0)) {
                             item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                             break;
                         }
                     }
 
                     if (cantidadB==0) {
-                        for (HashMap<String, String> item : listaArticulos) {
+              /*          for (HashMap<String, String> item : listaArticulos) {
                             if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                                 listaArticulos.remove(item);
                             }
-                        }
+                        }*/
                     } else if(aplica && cantidadB>0) {
 
                        /*Si no existe lo agregamos*/
@@ -1802,7 +1803,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -1811,11 +1812,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
             if (cantidadB <=0 ) {
-                for (HashMap<String, String> item : listaArticulos) {
+      /*          for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
@@ -1904,7 +1905,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -1913,11 +1914,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
             if (cantidadB <=0 ) {
-                for (HashMap<String, String> item : listaArticulos) {
+    /*            for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
@@ -2004,7 +2005,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidad >= 1) {
+                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
                     existe = true;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
@@ -2013,11 +2014,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
 
             if (cantidadB <=0 ) {
-                for (HashMap<String, String> item : listaArticulos) {
+           /*     for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
                     }
-                }
+                }*/
             } else {
 
                /*Si no existe lo agregamos*/
