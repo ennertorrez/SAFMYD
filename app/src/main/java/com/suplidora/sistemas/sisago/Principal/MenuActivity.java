@@ -116,7 +116,7 @@ public class MenuActivity extends AppCompatActivity
 
         //SE ACTIVA EL GPS DEL CELULAR
        /* Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivity(myIntent);*/
+        startActivity(myIntent);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -133,10 +133,31 @@ public class MenuActivity extends AppCompatActivity
                         }
                     })
                     .show();
-        }
+        }*/
         //SE LANZA EL SERVICIO DE LOCALIZACION
+/*        Intent intent = new Intent(this,GPSTracker.class);
+        startService(intent);*/
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                //Location Permission already granted
+            } else {
+                //Request Location Permission
+                checkLocationPermission();
+            }
+        }
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!isGPSEnabled) {
+            showSettingsAlert();
+        }
+
         Intent intent = new Intent(this,GPSTracker.class);
-        startService(intent);
+        AutoArranque ar = new AutoArranque();
+        ar.onReceive(this,intent);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -561,4 +582,68 @@ public class MenuActivity extends AppCompatActivity
         MultiDex.install(MenuActivity.this);
     }
 
+    public void showSettingsAlert(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        // Setting Dialog Title
+        alertDialog.setTitle("Configuración GPS");
+        // Setting Dialog Message
+        alertDialog.setMessage("GPS no está habilitado. Favor activarlo");
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Activar", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+                dialog.cancel();
+            }
+        });
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(this)
+                        .setTitle("Necesita permiso de Localización")
+                        .setMessage("Esta aplicación necesita permiso de Localizacion.Presione Aceptar para poder usarla.")
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(MenuActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION );
+
+                            }
+                        })
+                        .create()
+                        .show();
+
+
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION );
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+/*        Intent intent = new Intent(this,GPSTracker.class);
+        startService(intent);*/
+        Intent intent = new Intent(this,GPSTracker.class);
+        AutoArranque ar = new AutoArranque();
+        ar.onReceive(this,intent);
+    }
   }

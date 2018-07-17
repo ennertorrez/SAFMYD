@@ -207,10 +207,14 @@ public class GPSTracker extends Service implements LocationListener {
     private void CheckConnectivity() {
         isOnline = Funciones.TestServerConectivity();
     }
-
+    @Override
     public void onDestroy() {
         super.onDestroy();
+/*        Intent intent = new Intent(this,GPSTracker.class);
+        startService(intent);*/
+
         Intent intent = new Intent(this,GPSTracker.class);
-        startService(intent);
+        AutoArranque ar = new AutoArranque();
+        ar.onReceive(this,intent);
     }
 }
