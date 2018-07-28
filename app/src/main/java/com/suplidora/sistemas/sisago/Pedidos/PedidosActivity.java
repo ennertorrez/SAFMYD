@@ -79,6 +79,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -93,6 +94,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 public class PedidosActivity extends Activity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -143,7 +145,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private String CodigoItemAgregado = "";
     private SincronizarDatos sd;
     private boolean isOnline = false;
-
+    private String visualizando="False";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
     //endregion
 
@@ -403,6 +405,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 pedidoLocal = false;
             }
 
+            visualizando=in.getSerializableExtra(variables_publicas.vVisualizar).toString();
+
             editar = true;
 
             listaArticulos.clear();
@@ -583,6 +587,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         } else {
             cboVendedor.setEnabled(true);
 
+        }
+
+        if (visualizando.equals("True")){
+            btnBuscar.setEnabled(false);
+            btnAgregar.setEnabled(false);
+            btnGuardar.setEnabled(false);
+            lv.setContextClickable(false);
         }
 
     }
@@ -1754,7 +1765,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
                 return;
             }
-            Articulo articuloB = ArticulosH.BuscarArticulo("4000-01-01-04-1112");
+
+            Articulo articuloB;
             List<String> items = Arrays.asList(ConfigPromoGaga.getValor().split(","));
 
 
@@ -1764,8 +1776,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             int cantxTipoCliente =0;
 
             if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") ){
+                articuloB = ArticulosH.BuscarArticulo("4000-02-01-02-995");
                 cantxTipoCliente=1;
             }else { //if (cliente.getTipo().equalsIgnoreCase("Detalle") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2")){
+                articuloB = ArticulosH.BuscarArticulo("4000-01-02-02-683");
                 cantxTipoCliente=2;
             }
             /*Primero sumamos las cantidades de los items promocionados*/
@@ -1778,29 +1792,16 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             int factor=0;
 
-            if (fechaActual.before(fechaLimite)){
-                if (cantidad >=6 && cantxTipoCliente ==2) {
-                    factor = (int) Math.floor(cantidad/ 6);
-                    cantidadB = factor * 1;
-                }else if (cantidad >=24 && cantxTipoCliente ==1){
-                    factor = (int) Math.floor(cantidad/ 24);
-                    cantidadB = factor * 2;
-                }
-                else
-                {
-                    cantidadB=0;
-                }
-            }else {
-                if (cantidad >= 12 && cantxTipoCliente == 2) {
-                    factor = (int) Math.floor(cantidad / 12);
-                    cantidadB = factor * 1;
-                } else if (cantidad >= 24 && cantxTipoCliente == 1) {
-                    factor = (int) Math.floor(cantidad / 24);
-                    cantidadB = factor * 2;
-                } else {
-                    cantidadB = 0;
-                }
+            if (cantidad >= 6 && cantxTipoCliente == 2) {
+                factor = (int) Math.floor(cantidad / 6);
+                cantidadB = factor * 1;
+            } else if (cantidad >= 24 && cantxTipoCliente == 1) {
+                factor = (int) Math.floor(cantidad / 24);
+                cantidadB = factor * 1;
+            } else {
+                cantidadB = 0;
             }
+
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
                 if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
@@ -1825,13 +1826,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
                     HashMap<String, String> articuloBonificado = new HashMap<>();
                     articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
-                    articuloBonificado.put("Cod", "1112");
+                    articuloBonificado.put("Cod", articuloB.getCodigo().split("-")[articuloB.getCodigo().split("-").length - 1]);
                     articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
-                    articuloBonificado.put("Um", "UNIDAD");
+                    articuloBonificado.put("Um", articuloB.getUnidad());
                     articuloBonificado.put("Cantidad", String.valueOf(cantidadB)); //
                     articuloBonificado.put("Precio", "0");
                     articuloBonificado.put("TipoPrecio", "0");
-                    articuloBonificado.put("Descripcion", "**" + "TOALLA HUMEDA BABY STAR PROMO");
+                    articuloBonificado.put("Descripcion",  "**" + articuloB.getNombre());
                     articuloBonificado.put("Costo", "0");
                     articuloBonificado.put("PorDescuento", "0");
                     articuloBonificado.put("TipoArt", "B");
@@ -2585,7 +2586,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         }
                     }
                     else if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
-                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) { //SE AGREGO CANAL MAYORISTA PARA QUE PERMITA VENTAS CUNQUE NO SEAN CAJAS COMPLETAS
                             if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;
                                 if (!ActualizarItem) {
@@ -3392,12 +3393,30 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         @Override
         protected Void doInBackground(Void... params) {
             try {
+
                 CheckConnectivity();
                 if (isOnline) {
                     //It retrieves the latest version by scraping the content of current version from play store at runtime
-                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+/*                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
                     Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();*/
+
+                    Document doc2 = Jsoup
+                            .connect(
+                                    "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es")
+                            .get()
+                            ;
+
+                    Elements Version = doc2.select(".htlgb ");
+
+                    for (int i = 0; i < 7 ; i++) {
+                        latestVersion = Version.get(i).text();
+                        if (Pattern.matches("^[0-9]{1}.[0-9]{1}.[0-9]{1}$", latestVersion)) {
+                            break;
+                        }
+                    }
+//                    latestVersion = doc.getElementsByAttributeValue()
+
                 }
             } catch (Exception e) {
                 e.printStackTrace();

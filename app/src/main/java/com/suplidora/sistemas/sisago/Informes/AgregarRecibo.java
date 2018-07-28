@@ -74,6 +74,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.net.URI;
 import java.net.URL;
@@ -87,6 +88,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 
@@ -231,7 +233,7 @@ public class AgregarRecibo extends Activity {
         rbDeposito = (RadioButton) findViewById(R.id.rbDeposito);
         lblDescFormapago = (TextView) findViewById(R.id.lblDescFormapago);
 
-        //definición de valores iniciales para componentes de Formulatio
+        //definición de valores iniciales para componentes del Formulario
         vTipo="Efectivo";
         cboBancoOrigen.setEnabled(false);
         cboBancoOrigen.setSelection(getIndex(cboBancoOrigen, "SELECCIONE"));
@@ -242,7 +244,7 @@ public class AgregarRecibo extends Activity {
         txtFechaDocPago.setText(getDatePhone());
         fechaDoc = txtFechaDocPago.getText().toString();
 
-         //Obteniendo el valkre de la Tasa de cambio.
+         //Obteniendo el valor de la Tasa de cambio.
         tasaCambio = Double.parseDouble(variables_publicas.usuario.getTasaCambio());
         lblTc.setText(df.format(Double.parseDouble(variables_publicas.usuario.getTasaCambio())));
 
@@ -497,7 +499,7 @@ public class AgregarRecibo extends Activity {
                                                   HashMap<String, String> itemRecibos = new HashMap<>();
                                                   if (AgregarDetalle(itemRecibos)) {
                                                       CalcularTotales();
-                                                      FacturasPendientesH.ActualizarFacturasPendientes(vFacturatemp,"true");
+                                                      FacturasPendientesH.ActualizarFacturasPendientes2(vFacturatemp,"true");
                                                       LimipiarDatos();
                                                       CargarFacturasPendientes();
                                                       InputMethodManager inputManager = (InputMethodManager)
@@ -600,8 +602,11 @@ public class AgregarRecibo extends Activity {
                 String IdCliente = ((TextView) view.findViewById(R.id.IdCliente)).getText().toString();
                 String CodCV = ((TextView) view.findViewById(R.id.CodCv)).getText().toString().replace("Cod_Cv: ", "");
                 String Nombre = ((TextView) view.findViewById(R.id.Nombre)).getText().toString();
-                NombreCliente= Nombre.substring(Nombre.indexOf(patron) + patron.length());
-
+                if (CodCV.equals("")){
+                    NombreCliente=Nombre;
+                }else {
+                    NombreCliente = Nombre.substring(Nombre.indexOf(patron) + patron.length());
+                }
                 String codCliente="";
                 if (CodCV.equals("")){
                     codCliente=IdCliente;
@@ -825,7 +830,7 @@ public class AgregarRecibo extends Activity {
                     informedetalle.getMonto(),informedetalle.getAbono(),informedetalle.getNoCheque(),informedetalle.getBancoE(),informedetalle.getBancoR(),informedetalle.getFechaCK(),informedetalle.getFechaDep(),informedetalle.getEfectivo(),
                     informedetalle.getMoneda(),informedetalle.getAprobado(),informedetalle.getPosfechado(),informedetalle.getProcesado(),informedetalle.getUsuario(),informedetalle.getVendedor(),informedetalle.getCliente(),
                     informedetalle.getCodigoLetra(),informedetalle.getCantLetra(),informedetalle.getObservacion(),informedetalle.getConcepto());
-            FacturasPendientesH.ActualizarFacturasPendientes(informedetalle.getFactura(),"true");
+            FacturasPendientesH.ActualizarFacturasPendientes(informedetalle.getFactura(),"true", Double.parseDouble(informedetalle.getSaldo()),Double.parseDouble(informedetalle.getMonto()));
 
             if (!saved) {
                 break;
@@ -1012,9 +1017,23 @@ public class AgregarRecibo extends Activity {
                 CheckConnectivity();
                 if (isOnline) {
                     //It retrieves the latest version by scraping the content of current version from play store at runtime
-                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+/*                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
                     Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();*/
+                    Document doc2 = Jsoup
+                            .connect(
+                                    "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es")
+                            .get()
+                            ;
+
+                    Elements Version = doc2.select(".htlgb ");
+
+                    for (int i = 0; i < 7 ; i++) {
+                        latestVersion = Version.get(i).text();
+                        if (Pattern.matches("^[0-9]{1}.[0-9]{1}.[0-9]{1}$", latestVersion)) {
+                            break;
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1329,7 +1348,7 @@ public class AgregarRecibo extends Activity {
                 case R.id.Elimina_Item:
                     HashMap<String, String> itemRecibo = listaRecibos.get(info.position);
                     listaRecibos.remove(itemRecibo);
-                    FacturasPendientesH.ActualizarFacturasPendientes(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura),"false");
+                    FacturasPendientesH.ActualizarFacturasPendientes2(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura),"false");
                     for (int i = 0; i < listaRecibos.size() - 1; i++) {
                         HashMap<String, String> a = listaRecibos.get(i);
                         if (a.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura).equals(itemRecibo.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura))) {

@@ -767,6 +767,7 @@ public class ListaInformesFragment extends Fragment {
                                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         AnularInforme(finalInforme);
+                                        FacturasPendientesH.SincronizarFacturasSaldos(variables_publicas.usuario.getCodigo(),"0");
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

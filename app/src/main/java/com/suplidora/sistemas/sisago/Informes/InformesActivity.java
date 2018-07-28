@@ -60,6 +60,7 @@ import android.widget.TextView;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.net.URI;
 import java.net.URL;
@@ -76,6 +77,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import icepick.Icepick;
 
@@ -146,6 +148,8 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
+
+        ValidarUltimaVersion();
 
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
         lblFooter = (TextView) findViewById(R.id.lblFooter);
@@ -337,6 +341,25 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
         }
 
         return false;
+    }
+
+    private void ValidarUltimaVersion() {
+
+        String latestVersion = "";
+        String currentVersion = getCurrentVersion();
+        variables_publicas.VersionSistema = currentVersion;
+        try {
+
+            if (Build.VERSION.SDK_INT >= 11) {
+                //--post GB use serial executor by default --
+                new GetLatestVersion().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+            } else {
+                //--GB uses ThreadPoolExecutor by default--
+                new GetLatestVersion().execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     private class SincronizardorInformes extends AsyncTask<Void, Void, Void> {
         @Override
@@ -583,9 +606,23 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                 CheckConnectivity();
                 if (isOnline) {
                     //It retrieves the latest version by scraping the content of current version from play store at runtime
-                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+/*                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
                     Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();*/
+                    Document doc2 = Jsoup
+                            .connect(
+                                    "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es")
+                            .get()
+                            ;
+
+                    Elements Version = doc2.select(".htlgb ");
+
+                    for (int i = 0; i < 7 ; i++) {
+                        latestVersion = Version.get(i).text();
+                        if (Pattern.matches("^[0-9]{1}.[0-9]{1}.[0-9]{1}$", latestVersion)) {
+                            break;
+                        }
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

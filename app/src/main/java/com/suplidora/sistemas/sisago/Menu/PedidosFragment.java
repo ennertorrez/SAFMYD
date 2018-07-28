@@ -145,6 +145,7 @@ public class PedidosFragment extends Fragment {
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente );
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre );
                 in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCV );
+                in.putExtra(variables_publicas.vVisualizar,"False");
                 startActivity(in);
             }
         });

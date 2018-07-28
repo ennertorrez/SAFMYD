@@ -13,11 +13,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import clojure.asm.commons.LocalVariablesSorter;
 
 public class FacturasPendientesHelper {
 
@@ -183,36 +186,83 @@ public class FacturasPendientesHelper {
         return salFacturaoriginal;
     }
 
-    public boolean ActualizarFacturasPendientes(String factura, String estado) {
+    public Double BuscarAbonoTotalFactura(String Factura) {
+        String Query = "select printf(\"%.2f\",SUM(" + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono+ ")) as vAbono from " + variables_publicas.TABLE_FACTURAS_PENDIENTES + " WHERE  " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " = '" + Factura + "'";
+        double montoFacturaoriginal = 0;
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                montoFacturaoriginal = c.getDouble(c.getColumnIndex("vAbono"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return montoFacturaoriginal;
+    }
+    public boolean ActualizarFacturasPendientes(String factura, String estado,double vSaldo,double vMonto) {
+        ContentValues con = new ContentValues();
+        double AbonoTotal= 0;
+        double nuevoAbono=0;
+        AbonoTotal=BuscarAbonoTotalFactura(factura);
+        nuevoAbono=AbonoTotal + vMonto;
+        if (vSaldo>0){
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, nuevoAbono);
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, vSaldo);
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "false");
+        }else{
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, nuevoAbono);
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, vSaldo);
+            con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "true");
+        }
+//        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, estado);
+        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + "= '" + factura + "'", null);
+        if (rowsUpdated != -1)
+            return true;
+        else
+            return false;
+    }
+    public boolean ActualizarFacturasPendientes2(String factura, String estado) {
         ContentValues con = new ContentValues();
         con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, estado);
         long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + "= '" + factura + "'", null);
         if (rowsUpdated != -1)
             return true;
-        else return false;
+        else
+            return false;
     }
 
     public boolean ActualizarTodasFacturasPendientes(String informe) {
-        ContentValues con = new ContentValues();
-        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "false");
-        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT " + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + "=" + informe + ")", null);
-        if (rowsUpdated != -1)
-            return true;
-        else return false;
+        String Query = "select printf(\"%.2f\",SUM(" + variables_publicas.DETALLEINFORMES_COLUMN_Abono + ")) as vAbono, "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" as fact from " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE  "+ variables_publicas.DETALLEINFORMES_COLUMN_CodInforme +"=" + informe + " GROUP BY "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +"";
+        double valorAbonado = 0;
+        String vFactura="";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                valorAbonado = c.getDouble(c.getColumnIndex("vAbono"));
+                vFactura = c.getString(c.getColumnIndex("fact"));
+                database.execSQL("Update "+ variables_publicas.TABLE_FACTURAS_PENDIENTES +" SET " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " = " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " - "+ valorAbonado +", " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + "= " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " + "+ valorAbonado +"," + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "='false' WHERE "+ variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura +" ='"+ vFactura +"'");
+            } while (c.moveToNext());
+        }
+        c.close();
+        return true;
     }
 
     public boolean ActualizarTodasFacturasPendientesRecibo(String vRecibo) {
-        ContentValues con = new ContentValues();
-        con.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, "false");
-        long rowsUpdated = database.update(variables_publicas.TABLE_FACTURAS_PENDIENTES, con, variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " IN (SELECT " + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " FROM " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE " + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + "=" + vRecibo + ")", null);
-        if (rowsUpdated != -1)
-            return true;
-        else return false;
+        String Query = "select printf(\"%.2f\",SUM(" + variables_publicas.DETALLEINFORMES_COLUMN_Abono + ")) as vAbono, "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +" as fact from " + variables_publicas.TABLE_DETALLE_INFORMES + " WHERE  "+ variables_publicas.DETALLEINFORMES_COLUMN_Recibo +"=" + vRecibo + " GROUP BY "+ variables_publicas.DETALLEINFORMES_COLUMN_Factura +"";
+        double valorAbonado = 0;
+        String vFactura="";
+        Cursor c = database.rawQuery(Query, null);
+        if (c.moveToFirst()) {
+            do {
+                valorAbonado = c.getDouble(c.getColumnIndex("vAbono"));
+                vFactura = c.getString(c.getColumnIndex("fact"));
+                database.execSQL("Update "+ variables_publicas.TABLE_FACTURAS_PENDIENTES +" SET " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " = " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " - "+ valorAbonado +", " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + "= " + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " + "+ valorAbonado +"," + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + "='false' WHERE "+ variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura +" ='"+ vFactura +"'");
+            } while (c.moveToNext());
+        }
+        c.close();
+        return true;
     }
 
     public boolean SincronizarFacturasSaldos(String vVendedor, String vCliente)  {
-       // public String SincronizarFacturasSaldos(String vVendedor, String vCliente) throws JSONException {
-
         HttpHandler shC = new HttpHandler();
         String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
         String urlStringC = urlGetFacturasPendientes + vVendedor + "/" + vCliente;

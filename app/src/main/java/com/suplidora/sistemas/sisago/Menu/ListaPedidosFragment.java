@@ -838,12 +838,55 @@ public class ListaPedidosFragment extends Fragment {
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
                             in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
+                            in.putExtra(variables_publicas.vVisualizar,"False");
                             startActivity(in);
                         }
                     } else {
                         Funciones.MensajeAviso(getActivity(), "Este pedido no se puede anular, ya que fue facturado");
                     }
 
+
+                    return true;
+                }
+                case R.id.itemVerPedido: {
+
+                    fecha = txtFechaPedido.getText().toString();
+                    listapedidos.clear();
+                    inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
+                    busqueda = txtBusqueda.getText().toString();
+                    try {
+                        new GetListaPedidos().execute().get();
+                    } catch (Exception e) {
+
+                    }
+                    ActualizarFooter();
+
+                    if (listapedidos.size() == 0) {
+                        return true;
+                    }
+
+                    //Visualizar
+                    HashMap<String, String> obj = listapedidos.get(info.position);
+                    String CodigoPedido = obj.get("CodigoPedido");
+                    pedido = PedidosH.ObtenerPedido(CodigoPedido);
+                    if (pedido == null) {
+                        Funciones.MensajeAviso(getActivity(), "Este pedido no se puede Visualizar, ya que no fue creado en este dispositivo");
+                        return true;
+                    }
+                     String IdCliente = pedido.get("IdCliente");
+                    String CodCv = pedido.get("Cod_cv");
+                    Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
+                    String Nombre = cliente.getNombreCliente();
+                    // Starting new intent
+                    Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
+                    in.putExtra(variables_publicas.PEDIDOS_COLUMN_CodigoPedido, CodigoPedido);
+                    in.putExtra(variables_publicas.CLIENTES_COLUMN_CodCv, CodCv);
+                    in.putExtra(variables_publicas.vVisualizar,"True");
+                    startActivity(in);
 
                     return true;
                 }

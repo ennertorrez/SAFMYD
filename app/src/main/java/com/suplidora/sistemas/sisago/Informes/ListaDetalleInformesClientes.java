@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
@@ -72,6 +73,7 @@ public class ListaDetalleInformesClientes extends Activity {
     private ProgressDialog pDialog;
     private boolean guardadoOK = true;
     private String jsonAnulaRecibo;
+    private FacturasPendientesHelper FacturasPendientesH;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +90,7 @@ public class ListaDetalleInformesClientes extends Activity {
 
         DbOpenHelper = new DataBaseOpenHelper(getApplicationContext());
         InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
+        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
         Intent in = getIntent();
 
         InformeId= in.getStringExtra(KEY_IdInforme);
@@ -407,6 +410,7 @@ public class ListaDetalleInformesClientes extends Activity {
                                         AnularRecibo (finalInforme);
                                         CargarRecibos();
                                         ActualizarFooter();
+                                        FacturasPendientesH.SincronizarFacturasSaldos(variables_publicas.usuario.getCodigo(),"0");
                                     }
                                 })
                                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -242,7 +242,7 @@ public class InformesDetalleHelper {
         else return false;
     }
     public boolean EliminarDetalleInforme2(String idInforme, String idRecibo) {
-        int rowsAffected =database.delete( variables_publicas.TABLE_DETALLE_INFORMES, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme+ "=" +idInforme+" AND " + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + "=" +idInforme ,null) ;
+        int rowsAffected =database.delete( variables_publicas.TABLE_DETALLE_INFORMES, variables_publicas.DETALLEINFORMES_COLUMN_CodInforme+ "=" +idInforme+" AND " + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + "=" +idRecibo ,null) ;
         if(rowsAffected != -1)
             return true;
         else return false;

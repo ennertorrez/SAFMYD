@@ -58,6 +58,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.URI;
@@ -65,6 +66,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 
 /**
@@ -651,9 +653,24 @@ public class Login extends Activity {
                 CheckConnectivity();
                 if(isOnline){
                     //It retrieves the latest version by scraping the content of current version from play store at runtime
-                    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
+                /*    String urlOfAppFromPlayStore = "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es";
                     Document doc = Jsoup.connect(urlOfAppFromPlayStore).get();
-                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();
+                    latestVersion = doc.getElementsByAttributeValue("itemprop", "softwareVersion").first().text();*/
+
+                    Document doc2 = Jsoup
+                            .connect(
+                                    "https://play.google.com/store/apps/details?id=com.suplidora.sistemas.sisago&hl=es")
+                            .get()
+                            ;
+
+                    Elements Version = doc2.select(".htlgb ");
+
+                    for (int i = 0; i < 7 ; i++) {
+                        latestVersion = Version.get(i).text();
+                        if (Pattern.matches("^[0-9]{1}.[0-9]{1}.[0-9]{1}$", latestVersion)) {
+                            break;
+                        }
+                    }
                 }
 
 

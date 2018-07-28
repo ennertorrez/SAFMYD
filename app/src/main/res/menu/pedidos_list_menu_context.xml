@@ -17,6 +17,11 @@
         android:icon="@mipmap/ic_delete_forever_black_24dp"
         app:showAsAction="never" />
 
-
+    <item
+        android:id="@+id/itemVerPedido"
+        android:orderInCategory="100"
+        android:title="Ver Pedido"
+        android:icon="@mipmap/ic_search_black_48dp"
+        app:showAsAction="never" />
 
     </menu>
