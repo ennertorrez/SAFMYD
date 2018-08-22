@@ -87,6 +87,9 @@ public class Login extends Activity {
     private boolean isOnline=false;
 
     // URL to get contacts JSON
+    // URL to get contacts JSON
+    // URL to get contacts JSON
+    // URL to get contacts JSON
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
