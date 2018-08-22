@@ -1174,6 +1174,11 @@ public class AgregarRecibo extends Activity {
                 .setCancelable(false)
                 .setPositiveButton("Si", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+
+                        for (int i = 0; i < listaRecibos.size(); i++) {
+                            HashMap<String, String> a = listaRecibos.get(i);
+                            FacturasPendientesH.ActualizarFacturasPendientes2(a.get(variables_publicas.DETALLEINFORMES_COLUMN_Factura),"false");
+                        }
                         Intent intentRetornoDatos = new Intent();
                         intentRetornoDatos.putExtra(TEXTO_CAPTURADO, lblNoInforme.getText().toString().replace("No. Informe: ",""));
                         setResult(Activity.RESULT_OK, intentRetornoDatos);

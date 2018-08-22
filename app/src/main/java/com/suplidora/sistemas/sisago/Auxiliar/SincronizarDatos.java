@@ -999,7 +999,7 @@ public class SincronizarDatos {
                // DbOpenHelper.database.setTransactionSuccessful();
             } catch (Exception ex) {
                 Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al obtener el listado de Bancos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener el listado de Bancos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 return false;
             }
 
@@ -1008,7 +1008,7 @@ public class SincronizarDatos {
             }*/
 
         } else {
-            new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
         //return false;
@@ -1051,7 +1051,7 @@ public class SincronizarDatos {
                 // DbOpenHelper.database.setTransactionSuccessful();
             } catch (Exception ex) {
                 Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+                new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 return false;
             }
 
@@ -1060,7 +1060,7 @@ public class SincronizarDatos {
             }*/
 
         } else {
-            new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Respuesta nula", variables_publicas.info + urlString, "sisrutas@suplidora.com.ni", variables_publicas.correosErrores);
+            new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
         //return false;
@@ -1327,5 +1327,132 @@ public class SincronizarDatos {
 
         }
 
+    }
+
+    public static boolean ObtenerPedidoGuardado(String vPedido, PedidosHelper vpedidoh) {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidoCabecera/" + vPedido;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************PEDIDOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                JSONArray pedido = jsonObj.getJSONArray("ObtenerPedidoCabeceraResult");
+                if (pedido.length() == 0) {
+                    return false;
+                }
+                vpedidoh.EliminaPedido(vPedido);
+                for (int i = 0; i < pedido.length(); i++) {
+                    JSONObject c = pedido.getJSONObject(i);
+                    vpedidoh.GuardarPedido(c.get("CodigoPedido").toString(),c.get("IdVendedor").toString(),c.get("IdCliente").toString(),c.get("Cod_cv").toString(),c.get("Tipo").toString(),c.get("Observacion").toString(),c.get("IdFormaPago").toString(),c.get("IdSucursal").toString(),c.get("Fecha").toString(),c.get("Usuario").toString(),c.get("IMEI").toString(),c.get("Subtotal").toString(),c.get("Total").toString());
+                }
+                return true;
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener el Pedido. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener el Pedido. Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+    }
+
+    public static boolean ObtenerPedidoGuardadoDetalle(String vPedido,PedidosDetalleHelper vpedidodetalleh) {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidoDetalle/" + vPedido;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************PEDIDOS DETALLE**************************************/
+        if (jsonStr != null) {
+            try {
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                JSONArray pedido = jsonObj.getJSONArray("ObtenerPedidoDetalleResult");
+                if (pedido.length() == 0) {
+                    return false;
+                }
+                vpedidodetalleh.EliminarDetallePedido(vPedido);
+                for (int i = 0; i < pedido.length(); i++) {
+                    JSONObject c = pedido.getJSONObject(i);
+                    vpedidodetalleh.GuardarDetallePedido(c.get("CodigoPedido").toString(),c.get("CodigoArticulo").toString(),c.get("Descripcion").toString(),c.get("Cantidad").toString().substring(0,c.get("Cantidad").toString().indexOf(".")),c.get("BonificaA").toString(),c.get("TipoArt").toString(),c.get("PorDescuento").toString(),c.get("Descuento").toString(),c.get("Isc").toString(),c.get("Costo").toString(),c.get("Precio").toString(),c.get("TipoPrecio").toString(),c.get("PorcentajeIva").toString(),c.get("Iva").toString(),c.get("Um").toString(),c.get("Subtotal").toString(),c.get("Total").toString());
+                }
+                return true;
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al obtener el detalle del pedido. Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al obtener el detalle del pedido. Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+    }
+
+    public static int ConsultarPromoUnicavez(String CodigoArticulo, String codCliente, String codCV) {
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+
+        if (codCV.equals("")){
+            codCV="0";
+        }
+        final String urlConsulta = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerCantidadPromoUnicaVez/" + CodigoArticulo + "/"  + codCliente + "/"  + codCV;
+
+        try {
+            URL Url = new URL(urlConsulta);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            new Funciones().SendMail("Ha ocurrido un error al obtener el valor de la promocion Unica Vez, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            e.printStackTrace();
+            return 0;
+        }
+
+        String jsonPromoUnicaVez = sh.makeServiceCall(encodeUrl);
+        if (jsonPromoUnicaVez == null) {
+
+            return 0;
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonPromoUnicaVez);
+                String resultState = (String) ((String) result.get("ObtenerCantidadPromoUnicaVezResult")).split(",")[0];
+                final String valorUnicaVez = (String) ((String) result.get("ObtenerCantidadPromoUnicaVezResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    new Funciones().SendMail("Ha ocurrido un error el valor de la promocion Unica Vez, Respuesta false", variables_publicas.info + " --- " + valorUnicaVez, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    return 0;
+                }
+                Integer valor= Integer.parseInt(valorUnicaVez);
+                return valor;
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener el valor de la promocion Unica Vez, Excepcion controlada ", variables_publicas.info + ex.getMessage() + " ---json: " + urlConsulta + " ---Response: " + jsonPromoUnicaVez, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return 0;
+            }
+        }
     }
 }

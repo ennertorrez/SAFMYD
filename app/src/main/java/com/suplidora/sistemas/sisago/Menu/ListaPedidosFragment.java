@@ -871,10 +871,15 @@ public class ListaPedidosFragment extends Fragment {
                     String CodigoPedido = obj.get("CodigoPedido");
                     pedido = PedidosH.ObtenerPedido(CodigoPedido);
                     if (pedido == null) {
-                        Funciones.MensajeAviso(getActivity(), "Este pedido no se puede Visualizar, ya que no fue creado en este dispositivo");
-                        return true;
+                        if (SincronizarDatos.ObtenerPedidoGuardado(CodigoPedido,PedidosH)){
+                            SincronizarDatos.ObtenerPedidoGuardadoDetalle(CodigoPedido,PedidosDetalleH);
+                            pedido = PedidosH.ObtenerPedido(CodigoPedido);
+                        }else{
+                            Funciones.MensajeAviso(getActivity(), "Este pedido no se puede Visualizar. Ocurrió un error al obtener los datos.");
+                            return true;
+                        }
                     }
-                     String IdCliente = pedido.get("IdCliente");
+                    String IdCliente = pedido.get("IdCliente");
                     String CodCv = pedido.get("Cod_cv");
                     Cliente cliente = ClientesH.BuscarCliente(IdCliente, CodCv);
                     String Nombre = cliente.getNombreCliente();

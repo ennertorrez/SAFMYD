@@ -107,6 +107,19 @@ public class InformesHelper {
         return recibominimo;
     }
 
+    public String  BuscarSerieMinimoRecibo(String recibo,String vendedor) {
+        String Query = "SELECT "+ variables_publicas.SERIERECIBOS_COLUMN_IdSerie +" as serie FROM "+ variables_publicas.TABLE_SERIE_RECIBOS +" WHERE "+ recibo +" BETWEEN "+ variables_publicas.SERIERECIBOS_COLUMN_nInicial +" AND "+  variables_publicas.SERIERECIBOS_COLUMN_nFinal +" AND "+ variables_publicas.SERIERECIBOS_COLUMN_CodVendedor +"= "+ vendedor +"";
+        String vserie="0";
+        Cursor c = database.rawQuery(Query, null);
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                vserie=c.getString(c.getColumnIndex("serie"));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return vserie;
+    }
     public HashMap<String, String> ObtenerInforme(String CodigoInforme) {
 
         Cursor c = database.rawQuery("select * from " + variables_publicas.TABLE_INFORMES  + " Where " + variables_publicas.INFORMES_COLUMN_CodInforme + " = ?", new String[]{CodigoInforme});

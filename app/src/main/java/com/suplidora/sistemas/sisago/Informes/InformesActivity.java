@@ -559,6 +559,7 @@ public class InformesActivity extends Activity implements ActivityCompat.OnReque
                     public void onClick(DialogInterface dialog, int id) {
                         int valrecibo = InformesH.BuscarMinimoRecibo(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));
                         if (valrecibo>0){
+                            vIdSerie=InformesH.BuscarSerieMinimoRecibo(String.valueOf(valrecibo),vIdVendedor);
                             InformesDetalleH.ActualizarCodigoRecibo(vIdSerie,String.valueOf(valrecibo-1),vIdVendedor);
                         }
                         InformesH.EliminaInforme(txtCodigoInforme.getText().toString().replace("No. Informe: ", ""));

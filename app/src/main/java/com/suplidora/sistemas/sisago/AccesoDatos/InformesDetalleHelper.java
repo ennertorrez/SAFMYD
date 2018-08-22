@@ -273,7 +273,7 @@ public class InformesDetalleHelper {
 }
     public ArrayList<HashMap<String, String>> ObtenerUltimoCodigoRecibo(String vVendedor) {
 
-        String selectQuery = "SELECT "+ variables_publicas.SERIERECIBOS_COLUMN_IdSerie +","+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" FROM " + variables_publicas.TABLE_SERIE_RECIBOS + " where "+ variables_publicas.SERIERECIBOS_COLUMN_nFinal +"-"+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" > 0 AND "+ variables_publicas.SERIERECIBOS_COLUMN_CodVendedor +"="+ vVendedor +" Limit 1;";
+        String selectQuery = "SELECT "+ variables_publicas.SERIERECIBOS_COLUMN_IdSerie +","+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" FROM " + variables_publicas.TABLE_SERIE_RECIBOS + " where "+ variables_publicas.SERIERECIBOS_COLUMN_nFinal +"-"+ variables_publicas.SERIERECIBOS_COLUMN_Numero +" > 0 AND "+ variables_publicas.SERIERECIBOS_COLUMN_CodVendedor +"="+ vVendedor +" ORDER BY "+ variables_publicas.SERIERECIBOS_COLUMN_IdSerie +" asc Limit 1;";
         Cursor c = database.rawQuery(selectQuery, null);
 
         ArrayList<HashMap<String, String>> lst= new ArrayList<HashMap<String, String>> () ;
