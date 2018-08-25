@@ -9,9 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -62,11 +60,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
-
-/**
- * Created by usuario on 20/3/2017.
- */
-
 public class ListaPedidosFragment extends Fragment {
     View myView;
     private DataBaseOpenHelper DbOpenHelper;
@@ -93,13 +86,13 @@ public class ListaPedidosFragment extends Fragment {
     public Calendar myCalendar = Calendar.getInstance();
     //  private SimpleAdapter adapter;
     final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
-    final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
+    //final String urlAnularPedido = variables_publicas.direccionIp + "/ServicioPedidos.svc/AnularPedido";
     //AnularPedido/{Pedido}/{Usuario}
-    private String jsonPedido;
+/*    private String jsonPedido;*/
     private String jsonAnulaPedido;
     private String IdPedido;
-    private Cliente Clientes;
-    private String IdVendedor;
+/*    private Cliente Clientes;
+    private String IdVendedor;*/
     private boolean guardadoOK = true;
     private DecimalFormat df;
     private boolean isOnline = false;
@@ -145,8 +138,6 @@ public class ListaPedidosFragment extends Fragment {
         txtFechaPedido.setText(getDatePhone());
         fecha = txtFechaPedido.getText().toString();
 
-
-        /***DatePicker***/
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -172,8 +163,6 @@ public class ListaPedidosFragment extends Fragment {
                         InputMethodManager.RESULT_HIDDEN);*/
             }
         });
-
-        /******/
 
         txtBusqueda = (EditText) myView.findViewById(R.id.txtBusqueda);
         txtBusqueda.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -368,9 +357,6 @@ public class ListaPedidosFragment extends Fragment {
             // Dismiss the progress dialog
             if (pDialog != null && pDialog.isShowing())
                 pDialog.dismiss();
-            /**
-             * Updating parsed JSON data into ListView
-             * */
 
             DecimalFormat df = new DecimalFormat("C$ #0.00");
             DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -494,7 +480,6 @@ public class ListaPedidosFragment extends Fragment {
     //endregion
 
     private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
-        private String NoPedido;
 
         @Override
         protected void onPreExecute() {
@@ -752,7 +737,7 @@ public class ListaPedidosFragment extends Fragment {
 
                     IdPedido = itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido);
                     if (itemPedido.get(variables_publicas.PEDIDOS_COLUMN_CodigoPedido).startsWith("-")) {
-                        final HashMap<String, String> finalPedido = pedido;
+                        //final HashMap<String, String> finalPedido = pedido;
                         new AlertDialog.Builder(getActivity())
                                 .setTitle("Confirmación Requerida")
                                 .setMessage("Esta seguro que desea eliminar el pedido?")
