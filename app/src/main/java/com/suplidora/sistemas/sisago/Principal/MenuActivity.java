@@ -70,6 +70,7 @@ import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
+import com.suplidora.sistemas.sisago.Menu.reporteComisionesFragment;
 import com.suplidora.sistemas.sisago.R;
 
 import org.json.JSONException;
@@ -238,8 +239,6 @@ public class MenuActivity extends AppCompatActivity
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
             }
-            //navigationView.getMenu().getItem(4).setVisible(true); //Recibos
-
         }
 
         if ((variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
@@ -248,7 +247,10 @@ public class MenuActivity extends AppCompatActivity
 
         if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
             navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(true); //Activar Clientes
-            //navigationView.getMenu().getItem(5).getSubMenu().getItem(2).setVisible(false); //Lista de Devoluciones
+        }
+
+        if (variables_publicas.usuario.getTipo().equalsIgnoreCase("User")  ) {
+            navigationView.getMenu().getItem(5).getSubMenu().getItem(3).setVisible(false); //Reporte de Comisiones
         }
 
         IMEI = variables_publicas.IMEI;
@@ -524,6 +526,7 @@ public class MenuActivity extends AppCompatActivity
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
+
             case R.id.btnReporteHistVentas:
 
                 fragmentManager.executePendingTransactions();
@@ -538,6 +541,15 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaDevolucionesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnReporteComisiones:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new reporteComisionesFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

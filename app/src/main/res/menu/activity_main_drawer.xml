@@ -80,6 +80,10 @@
                 android:id="@+id/btnReporteDevoluciones"
                 android:icon="@drawable/ic_menu_mapmode"
                 android:title="Reporte Devoluciones" />
+            <item
+                android:id="@+id/btnReporteComisiones"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Reporte Comisiones" />
         </menu>
     </item>
 

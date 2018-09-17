@@ -418,10 +418,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             listaArticulos = PedidoDetalleH.ObtenerPedidoDetalleArrayList(pedido.getCodigoPedido());
             for (HashMap<String, String> item : listaArticulos) {
                 Articulo art = ArticulosH.BuscarArticulo(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo));
-                item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
-                item.put("IdProveedor", art.getIdProveedor());
-                item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
-                item.put("UnidadCaja",art.getUnidadCaja());
+                if (art==null) {
+                }else{
+                    item.put("Cod", item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).substring(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).length() - 3));
+                    item.put("IdProveedor", art.getIdProveedor());
+                    item.put("UnidadCajaVenta", art.getUnidadCajaVenta());
+                    item.put("UnidadCaja",art.getUnidadCaja());
+                }
             }
             txtObservaciones.setText(pedido.getObservacion());
             lblNoPedido.setText("PEDIDO N°: " + pedido.getCodigoPedido());
