@@ -83,7 +83,7 @@
             <item
                 android:id="@+id/btnReporteComisiones"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Reporte Comisiones" />
+                android:title="Reporte Ingresos" />
         </menu>
     </item>
 

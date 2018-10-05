@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:gravity="center"
-            android:text="Reporte de Comisiones"
+            android:text="Reporte de Ingresos"
             android:textColor="@color/colorAccent"
             android:textSize="18dp"
             android:textStyle="bold" />
@@ -169,7 +169,7 @@
                         android:background="@drawable/borde_campos_pedidos"
                         android:gravity="center"
                         android:paddingLeft="0dp"
-                        android:text="Comisión"
+                        android:text="Ingreso"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="#000000"
                         android:typeface="monospace" />
@@ -223,7 +223,7 @@
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:gravity="right"
-            android:text="Comisión: C$0.00"
+            android:text="Ingreso: C$0.00"
             android:textColor="@color/White"
             android:textSize="14sp"
             android:textStyle="bold" />

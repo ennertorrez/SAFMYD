@@ -64,7 +64,7 @@ public class reporteComisionesFragment extends Fragment {
         df.setGroupingSize(3);
         df.setGroupingUsed(true);
         df.setDecimalFormatSymbols(fmts);
-        getActivity().setTitle("Reporte de Comisiones");
+        getActivity().setTitle("Reporte de Ingresos");
         lv = (ListView) myView.findViewById(R.id.listComisiones);
         registerForContextMenu(lv);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -170,7 +170,7 @@ public class reporteComisionesFragment extends Fragment {
             vrecuperado += Double.parseDouble(comisiones.get("Recuperado").replace("C$", "").replace(",", ""));
         }
         lblFooterRecuperado.setText("Recuperado: C$" + df.format(vrecuperado));
-        lblFooterComision.setText("Comisión: C$" + df.format(vcomision));
+        lblFooterComision.setText("Ingreso: C$" + df.format(vcomision));
         if (adapter!=null) adapter.notifyDataSetChanged();
     }
 
