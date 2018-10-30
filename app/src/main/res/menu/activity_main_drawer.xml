@@ -20,6 +20,11 @@
                     android:id="@+id/btnNuevoPedido"
                     android:icon="@drawable/ic_menu_plussign"
                     android:title="Nuevo Pedido"/>
+
+                <item
+                    android:id="@+id/btnPromociones"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Promociones"/>
             </menu>
         </item>
         <item

@@ -70,6 +70,7 @@ import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
+import com.suplidora.sistemas.sisago.Menu.PromocionesFragment;
 import com.suplidora.sistemas.sisago.Menu.reporteComisionesFragment;
 import com.suplidora.sistemas.sisago.R;
 
@@ -489,6 +490,15 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaPedidosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnPromociones:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new PromocionesFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

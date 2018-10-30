@@ -83,4 +83,25 @@ public class CartillasBcDetalleHelper {
         return cartillaDetalle;
     }
 
+        public ArrayList<HashMap<String, String>> ListaBonificacionesCanal(String Canal)  {
+
+        String selectQuery = "SELECT db.itemV,db.descripcionV,db.cantidad,db.itemB, db.descripcionB,db.cantidadB FROM "+variables_publicas.TABLE_CARTILLAS_BC+" cb INNER JOIN "+variables_publicas.TABLE_DETALLE_CARTILLAS_BC+" db ON cb.codigo= db.codigo " +
+                "WHERE  DATE(cb.fechafinal) >= date('now') AND db.tipo='"+ Canal +"' ORDER BY cb.codigo";
+        Cursor c = database.rawQuery(selectQuery,null);
+            ArrayList<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> promocion = new HashMap<>();
+                promocion.put("itemV",c.getString(c.getColumnIndex("itemV")).split("-")[c.getString(c.getColumnIndex("itemV")).split("-").length -1]);
+                promocion.put("descripcionV",c.getString(c.getColumnIndex("descripcionV")));
+                promocion.put("cantidad",c.getString(c.getColumnIndex("cantidad")));
+                promocion.put("itemB",c.getString(c.getColumnIndex("itemB")).split("-")[c.getString(c.getColumnIndex("itemB")).split("-").length -1]);
+                promocion.put("descripcionB",c.getString(c.getColumnIndex("descripcionB")));
+                promocion.put("cantidadB",c.getString(c.getColumnIndex("cantidadB")));
+                lista.add(promocion);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lista;
+    }
     }

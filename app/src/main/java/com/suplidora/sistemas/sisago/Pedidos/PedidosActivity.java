@@ -165,6 +165,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigPromoCanels;
     Configuraciones ConfigPromoJaloma;
 
+    Configuraciones ConfigArtBloqueadosDetalle;
+    Configuraciones ConfigArtBloqueadosMayorista;
+    Configuraciones ConfigArtBloqueadosHoreca;
+    Configuraciones ConfigArtBloqueadosSuper;
+
     String IMEI = "";
     String NoPedido = "";
     private String focusedControl = "";
@@ -276,6 +281,10 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigPromoTiras = ConfigSistemaH.BuscarValorConfig("Promo Tiras");
         ConfigPromoCanels = ConfigSistemaH.BuscarValorConfig("Promo Canels");
         ConfigPromoJaloma = ConfigSistemaH.BuscarValorConfig("Promo Jaloma");
+        ConfigArtBloqueadosDetalle = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Detalle");
+        ConfigArtBloqueadosMayorista = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Mayorista");
+        ConfigArtBloqueadosHoreca = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Horeca");
+        ConfigArtBloqueadosSuper = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Super");
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -1064,19 +1073,20 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             List<String> itemsB = Arrays.asList(ConfigPromoOrixMayoreo.getValor().split(","));
 
 
-            Articulo articuloB = ArticulosH.BuscarArticulo("4000-02-01-02-994");
+            //Articulo articuloB = ArticulosH.BuscarArticulo("4000-02-01-02-994");
             Articulo articuloB2 = ArticulosH.BuscarArticulo("4000-01-01-02-1049");
 
-            int cantidadB = 0;
+           // int cantidadB = 0;
             int cantidadB2 = 0;
             int cantRequerida1 = 0;
            int cantRequerida2 = 0;
             int cantidadGeneral =0;
             boolean esContenido = false;
-
+            int cantidadExistente1 =0;
+           int cantidadExistente2 =0;
             if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")) {
-                cantidadB = 1;
-                cantidadB2 = 1;
+               // cantidadB = 1;
+                cantidadB2 = 2;
                 cantRequerida1 = 1;
                 cantRequerida2 = 6;
 
@@ -1095,26 +1105,31 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
 
             }
-            int factor = (int) Math.floor(cantidadGeneral / cantRequerida1);
+          //  int factor = (int) Math.floor(cantidadGeneral / cantRequerida1);
             int factor2 = (int) Math.floor(cantidadGeneral / cantRequerida2) ;
 
-            cantidadB= (int) (factor * cantidadB);
+           // cantidadB= (int) (factor * cantidadB);
            cantidadB2= (int) (factor2 * cantidadB2);
 
             for (HashMap<String, String> item : listaArticulos) {
                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
-                if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&   cantidadB>0) {
+           /*     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&   cantidadB>0) {
                     existe = true;
+                    cantidadExistente1= Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    cantidadB=cantidadB + cantidadExistente1;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
-                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB2>0) {
-//                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  Double.parseDouble(item.get("Cantidad")) >= cantidadB2) {
+                }else */
+                    if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB2>0) {
+//                }else if(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB2.getCodigo())   && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") &&  cantidadB2>0) {
                     existe2 = true;
+                    cantidadExistente2= Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    cantidadB2=cantidadB2 + cantidadExistente2;
                     item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB2));
                 }
             }
 
             //lo borramos si no cumple con la promocion
-            if (cantidadGeneral < cantRequerida1) {
+            if (cantidadGeneral < cantRequerida2) {
 /*                for (HashMap<String, String> item : listaArticulos) {
                     if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
                         listaArticulos.remove(item);
@@ -1130,7 +1145,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }*/
            } else {
 
-               /*Si no existe lo agregamos*/
+              /* *//*Si no existe lo agregamos*//*
                 if (existe == false && cantidadB>0) {
 
                     //Validamos que solamente se puedan ingresar 18 articulos
@@ -1157,7 +1172,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
                     articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
                     listaArticulos.add(articuloBonificado);
-                }
+                }*/
                 if (existe2 == false && cantidadB2>0) {
                     HashMap<String, String> articuloBonificado2 = new HashMap<>();
                     articuloBonificado2.put("CodigoPedido", pedido.getCodigoPedido());
@@ -1737,7 +1752,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 boolean aplica;
                 String artBonificado="";
 
-                String valores = ConfigPromoComboOrix.getValor();
+                String  valores = ConfigPromoComboOrix.getValor();
                 String[] parts = valores.split(";");
 
                 List<String> items1 = Arrays.asList(parts[0].split(","));
@@ -3492,6 +3507,42 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     alertDialog.dismiss();
                     MensajeAviso("Este producto no esta autorizado para venderlo en canal Detalle");
                     return;
+                }
+
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") &&  ConfigArtBloqueadosDetalle.getActivo().equalsIgnoreCase("true")){
+                    List<String> itemsDetalle = Arrays.asList(ConfigArtBloqueadosDetalle.getValor().split(","));
+                    if (itemsDetalle.contains(CodigoArticulo)) {
+                        alertDialog.dismiss();
+                        MensajeAviso("Este producto no esta autorizado para venderlo en canal Detalle");
+                        return;
+                    }
+                }
+
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") &&  ConfigArtBloqueadosHoreca.getActivo().equalsIgnoreCase("true")){
+                    List<String> itemsHoreca = Arrays.asList(ConfigArtBloqueadosHoreca.getValor().split(","));
+                    if (itemsHoreca.contains(CodigoArticulo)) {
+                        alertDialog.dismiss();
+                        MensajeAviso("Este producto no esta autorizado para venderlo en canal Horeca");
+                        return;
+                    }
+                }
+
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") &&  ConfigArtBloqueadosMayorista.getActivo().equalsIgnoreCase("true")){
+                    List<String> itemsMayorista = Arrays.asList(ConfigArtBloqueadosMayorista.getValor().split(","));
+                    if (itemsMayorista.contains(CodigoArticulo)) {
+                        alertDialog.dismiss();
+                        MensajeAviso("Este producto no esta autorizado para venderlo en canal Mayorista");
+                        return;
+                    }
+                }
+
+                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") &&  ConfigArtBloqueadosSuper.getActivo().equalsIgnoreCase("true")){
+                    List<String> itemsSuper = Arrays.asList(ConfigArtBloqueadosSuper.getValor().split(","));
+                    if (itemsSuper.contains(CodigoArticulo)) {
+                        alertDialog.dismiss();
+                        MensajeAviso("Este producto no esta autorizado para venderlo en canal Super");
+                        return;
+                    }
                 }
                 if (!variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") && CodigoArticulo.equals("4000-01-01-01-1018")){
                     alertDialog.dismiss();
