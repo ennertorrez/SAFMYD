@@ -259,7 +259,13 @@ public class Login extends Activity {
             requestReadPhoneStatePermission();
         } else {
             // READ_PHONE_STATE permission is already been granted.
-            doPermissionGrantedStuffs();
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                variables_publicas.IMEI = tm.getImei();
+            } else {
+                variables_publicas.IMEI = tm.getDeviceId();
+            }
         }
     }
 
@@ -300,7 +306,18 @@ public class Login extends Activity {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // READ_PHONE_STATE permission has been granted, proceed with displaying IMEI Number
                 //alertAlert(getString(R.string.permision_available_read_phone_state));
-                doPermissionGrantedStuffs();
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // READ_PHONE_STATE permission has not been granted.
+                } else {
+                    TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        variables_publicas.IMEI = tm.getImei();
+                    } else {
+                        variables_publicas.IMEI = tm.getDeviceId();
+                    }
+                }
             } else {
                 alertAlert("Se necesita permiso para acceder al estado del telefono");
             }
@@ -319,16 +336,6 @@ public class Login extends Activity {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
-    }
-
-
-    public void doPermissionGrantedStuffs() {
-        //Have an  object of TelephonyManager
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
-        variables_publicas.IMEI = tm.getDeviceId();
-
-
     }
 
 

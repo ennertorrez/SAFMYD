@@ -58,9 +58,9 @@ public class CartillasBcDetalleHelper {
 
     public HashMap<String, String> BuscarBonificacion(String ItemV, String Canal, String Fecha,String Cantidad){
         HashMap<String,String> cartillaDetalle = new HashMap<String, String>();
-        if(Canal.equalsIgnoreCase("Super")){
+     /*   if(Canal.equalsIgnoreCase("Super")){
             Canal="MAYORISTA";
-        }
+        }*/
         String selectQuery = "SELECT * FROM "+variables_publicas.TABLE_CARTILLAS_BC+" cb INNER JOIN "+variables_publicas.TABLE_DETALLE_CARTILLAS_BC+" db ON cb.codigo= db.codigo " +
                 "WHERE db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV+"= '"+ItemV+"' AND DB."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_tipo+" = '"+Canal+"' COLLATE NOCASE " +
                 "AND cast(db."+variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad+" as integer) <= cast("+Cantidad+" as integer) AND  ( DATE('"+Fecha+"') BETWEEN DATE(cb.fechaini) AND DATE(cb.fechafinal) )" +

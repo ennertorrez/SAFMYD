@@ -164,6 +164,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigPromoTiras;
     Configuraciones ConfigPromoCanels;
     Configuraciones ConfigPromoJaloma;
+    Configuraciones ConfigPromo2x1;
+    Configuraciones ConfigPromoComboIris;
 
     Configuraciones ConfigArtBloqueadosDetalle;
     Configuraciones ConfigArtBloqueadosMayorista;
@@ -285,6 +287,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigArtBloqueadosMayorista = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Mayorista");
         ConfigArtBloqueadosHoreca = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Horeca");
         ConfigArtBloqueadosSuper = ConfigSistemaH.BuscarValorConfig("Bloqueo Articulo Super");
+        ConfigPromo2x1 = ConfigSistemaH.BuscarValorConfig("Promo2x1xClientes");
+        ConfigPromoComboIris = ConfigSistemaH.BuscarValorConfig("Promo Combo Iris");
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -569,6 +573,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       AplicarPromocionTiraExhibidor();
                                                       AplicarPromocionCanels();
                                                       AplicarPromocionJaloma();
+                                                      AplicarPromocionComboIris();
                                                       RefrescarGrid();
                                                       CalcularTotales();
                                                       InputMethodManager inputManager = (InputMethodManager)
@@ -626,9 +631,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private void AplicarBonificacionCartillas() {
 
 
-        if (cliente.getTipo().equalsIgnoreCase("Super")) {
+   /*     if (cliente.getTipo().equalsIgnoreCase("Super")) {
             return;
-        }
+        }*/
 
         ArrayList<HashMap<String, String>> listaTemp = new ArrayList<HashMap<String, String>>();
         ;
@@ -913,7 +918,237 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
     }
+    private void AplicarPromocionComboIris() {
 
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
+
+            if ((cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2") ||cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoComboIris!= null && ConfigPromoComboIris.getActivo().equalsIgnoreCase("true")) {
+                //Validamos que solamente se puedan ingresar 18 articulos
+                if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
+                    MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
+                    return;
+                }
+
+                boolean existe = false;
+                int cantidad1 = 0;
+                int cantidad2 = 0;
+                int cantidad3 = 0;
+                int cantMin1 = 0;
+                int cantMin2 = 0;
+                int cantMin3 = 0;
+                int cantidadBon =0;
+                int cantidadB =0;
+                int cantidad =0;
+                int cantiMinima=0;
+                boolean aplica;
+                String artBonificado="";
+
+                String  valores = ConfigPromoComboIris.getValor();
+                String[] parts = valores.split(";");
+
+                String Art1 = parts[0];
+                String Art2 = parts[1];
+                String Art3 = parts[2];
+                artBonificado=parts[3];
+                cantMin1=Integer.parseInt(parts[4]);
+                cantMin2=Integer.parseInt(parts[5]);
+                cantMin3=Integer.parseInt(parts[6]);
+                cantidadBon=Integer.parseInt(parts[7]);
+
+                Articulo articuloB = ArticulosH.BuscarArticulo(artBonificado);
+
+                    /*Primero sumamos las cantidades de los items promocionados*/
+                    for (HashMap<String, String> item : listaArticulos) {
+                        if (Art1.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                            cantidad1 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                        }
+
+                    }
+                    for (HashMap<String, String> item : listaArticulos) {
+                        if (Art2.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                            cantidad2 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                        }
+
+                    }
+
+                    for (HashMap<String, String> item : listaArticulos) {
+                        if (Art3.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                            cantidad3 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                        }
+
+                    }
+                    if (cantidad1 >=cantMin1) {
+                        if(cantidad2 >=cantMin2){
+                            if (cantidad3 >=cantMin3){
+                                cantidad=cantidad1+cantidad2+cantidad3;
+                                cantiMinima=cantMin1+ cantMin2+cantMin3;
+                                cantidadB=(int) Math.floor(cantidad/cantiMinima) * cantidadBon;
+                                aplica=true;
+                            }else {
+                                aplica=false;
+                                cantidadB=0;
+                            }
+                        }else {
+                            aplica=false;
+                            cantidadB=0;
+                        }
+                    }else {
+                        aplica=false;
+                        cantidadB=0;
+                    }
+
+                    for (HashMap<String, String> item : listaArticulos) {
+                           /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
+                        if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidadB>0)) {
+                            item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
+                            break;
+                        }
+                    }
+
+                    if (cantidadB==0) {
+              /*          for (HashMap<String, String> item : listaArticulos) {
+                            if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
+                                listaArticulos.remove(item);
+                            }
+                        }*/
+                    } else if(aplica && cantidadB>0) {
+
+                       /*Si no existe lo agregamos*/
+                        if (existe == false && cantidadB>0) {
+
+                            HashMap<String, String> articuloBonificado = new HashMap<>();
+                            articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
+                            articuloBonificado.put("Cod", articuloB.getCodigo().split("-")[articuloB.getCodigo().split("-").length - 1]);
+                            articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
+                            articuloBonificado.put("Um", articuloB.getUnidad());
+                            articuloBonificado.put("Cantidad", String.valueOf(cantidadB)); //
+                            articuloBonificado.put("Precio", "0");
+                            articuloBonificado.put("TipoPrecio", "0");
+                            articuloBonificado.put("Descripcion",  "**" + articuloB.getNombre());
+                            articuloBonificado.put("Costo", "0");
+                            articuloBonificado.put("PorDescuento", "0");
+                            articuloBonificado.put("TipoArt", "B");
+                            articuloBonificado.put("BonificaA", "0");
+                            articuloBonificado.put("Isc", "0");
+                            articuloBonificado.put("PorcentajeIva", "0");
+                            articuloBonificado.put("Descuento", "0");
+                            articuloBonificado.put("Iva", "0");
+                            articuloBonificado.put("SubTotal", "0");
+                            articuloBonificado.put("Total", "0");
+                            articuloBonificado.put("TipoPrecio", "Bonificacion");
+                            articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
+                            articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
+                            listaArticulos.add(articuloBonificado);
+                            CodigoItemAgregado = "";
+                        }
+                    }
+
+                    RefrescarGrid();
+                    CalcularTotales();
+            }
+        }
+    }
+/*    private void AplicarPromocion2x1xCliente() {
+
+        if (ConfigPromo2x1 != null && ConfigPromo2x1.getActivo().equalsIgnoreCase("true")) {
+            //Validamos que solamente se puedan ingresar 18 articulos
+            if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
+                MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
+                return;
+            }
+
+            int cantidad = 0;
+            String ListaClientes ="";
+            String ArticuloA ="";
+            String ArticuloB ="";
+            String ListaCanal ="";
+            int cantidadA =0;
+            int cantidadB =0;
+            String vClientePed = pedido.getIdCliente();
+            String valores = ConfigPromo2x1.getValor();
+            String[] parts = valores.split(";");
+
+            ListaClientes=parts[0];
+            ArticuloA=parts[1];
+            cantidadA=Integer.parseInt(parts[2]);
+            cantidadB=Integer.parseInt(parts[3]);
+            ListaCanal=parts[4];
+
+            if (variables_publicas.usuario.getCanal().contains(ListaCanal) && vClientePed.contains(vClientePed)) {
+
+                ArticuloB = parts[2];
+
+
+                Articulo articuloB = ArticulosH.BuscarArticulo(ArticuloB);
+
+                boolean existe = false;
+
+            *//*Primero sumamos las cantidades de los items promocionados*//*
+                for (HashMap<String, String> item : listaArticulos) {
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                        if ((Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad)) >= 1) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(ArticuloA)) {
+                            cantidad += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                            CodigoItemAgregado = item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo);
+                        }
+
+                    }
+                }
+                if (cantidad < cantidadA || montoAcumulado < vMontoEvaluar) {
+                    return;
+                }
+                for (HashMap<String, String> item : listaArticulos) {
+                   *//*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*//*
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && cantidadB >= 1) {
+                        existe = true;
+                        item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(cantidadB));
+                        item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA, CodigoItemAgregado);
+                        break;
+                    }
+                }
+                //lo borramos si no cumple con la promocion
+                if (cantidad < cantidadA || montoAcumulado < vMontoEvaluar) {
+           *//*     for (HashMap<String, String> item : listaArticulos) {
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
+                        listaArticulos.remove(item);
+                    }
+                }*//*
+                } else {
+
+               *//*Si no existe lo agregamos*//*
+                    if (existe == false && cantidadB > 0) {
+
+                        HashMap<String, String> articuloBonificado = new HashMap<>();
+                        articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
+                        articuloBonificado.put("Cod", articuloB.getCodigo().split("-")[articuloB.getCodigo().split("-").length - 1]);
+                        articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
+                        articuloBonificado.put("Um", articuloB.getUnidad());
+                        articuloBonificado.put("Cantidad", String.valueOf(cantidadB)); //
+                        articuloBonificado.put("Precio", "0");
+                        articuloBonificado.put("TipoPrecio", "0");
+                        articuloBonificado.put("Descripcion", "**" + articuloB.getNombre());
+                        articuloBonificado.put("Costo", "0");
+                        articuloBonificado.put("PorDescuento", "0");
+                        articuloBonificado.put("TipoArt", "B");
+                        articuloBonificado.put("BonificaA", CodigoItemAgregado);
+                        articuloBonificado.put("Isc", "0");
+                        articuloBonificado.put("PorcentajeIva", "0");
+                        articuloBonificado.put("Descuento", "0");
+                        articuloBonificado.put("Iva", "0");
+                        articuloBonificado.put("SubTotal", "0");
+                        articuloBonificado.put("Total", "0");
+                        articuloBonificado.put("TipoPrecio", "Bonificacion");
+                        articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
+                        articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
+                        listaArticulos.add(articuloBonificado);
+                        CodigoItemAgregado = "";
+                    }
+                }
+
+                RefrescarGrid();
+                CalcularTotales();
+            }
+        }
+    }*/
     private void AplicarPromocionHenkel() {
 
         if (cliente.getTipo().equalsIgnoreCase("Super")|| variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")||variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca")) {
@@ -2573,17 +2808,14 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             requestReadPhoneStatePermission();
         } else {
             // READ_PHONE_STATE permission is already been granted.
-            doPermissionGrantedStuffs();
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                variables_publicas.IMEI = tm.getImei();
+            } else {
+                variables_publicas.IMEI = tm.getDeviceId();
+            }
         }
-    }
-
-    public void doPermissionGrantedStuffs() {
-        //Have an  object of TelephonyManager
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
-        variables_publicas.IMEI = tm.getDeviceId();
-
-
     }
 
     private void requestReadPhoneStatePermission() {
@@ -2896,6 +3128,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         AplicarPromocionTiraExhibidor();
                         AplicarPromocionCanels();
                         AplicarPromocionJaloma();
+                        AplicarPromocionComboIris();
                         MensajeAviso("La cantidad Minima para ventas es de " + String.valueOf(CantidadMinima) + " Unidades.");
                         txtCantidad.requestFocus();
                     }
@@ -2926,6 +3159,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocionTiraExhibidor();
                                 AplicarPromocionCanels();
                                 AplicarPromocionJaloma();
+                                AplicarPromocionComboIris();
                                 MensajeAviso("No se puede Facturar cantidades que no sean multiplos de 50.");
                                 txtCantidad.requestFocus();
                             }
@@ -2977,6 +3211,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         AplicarPromocionTiraExhibidor();
                                                         AplicarPromocionCanels();
                                                         AplicarPromocionJaloma();
+                                                        AplicarPromocionComboIris();
                                                         RefrescarGrid();
                                                         CalcularTotales();
                                                         txtCantidad.requestFocus();
@@ -3024,6 +3259,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocionTiraExhibidor();
                                 AplicarPromocionCanels();
                                 AplicarPromocionJaloma();
+                                AplicarPromocionComboIris();
                                 MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                                 txtCantidad.requestFocus();
                             }
@@ -3091,6 +3327,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             AplicarPromocionTiraExhibidor();
                             AplicarPromocionCanels();
                             AplicarPromocionJaloma();
+                            AplicarPromocionComboIris();
                             MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                             txtCantidad.requestFocus();
                         } else {
@@ -3644,6 +3881,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     AplicarPromocionTiraExhibidor();
                     AplicarPromocionCanels();
                     AplicarPromocionJaloma();
+                    AplicarPromocionComboIris();
                     RecalcularDetalle();
                     CalcularTotales();
                     RefrescarGrid();

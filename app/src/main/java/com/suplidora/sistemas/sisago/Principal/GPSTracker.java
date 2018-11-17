@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import android.app.Notification;
 import android.app.Service;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -18,6 +20,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.os.IBinder;
 import android.content.Intent;
@@ -52,8 +55,11 @@ public class GPSTracker extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         Log.i(getClass().getSimpleName(), "Creating service");
+
+        startForeground(1,new Notification());
         getLocation();
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -77,7 +83,12 @@ public class GPSTracker extends Service implements LocationListener {
             } else {
                 if (isGPSEnabled) {
                     if (location == null) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        if (ContextCompat.checkSelfPermission(this,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                                == PackageManager.PERMISSION_GRANTED) {
+                        } else {
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        }
                         canGetLocation = true;
                         Log.d("GPS Enabled", "GPS Enabled");
 
@@ -104,7 +115,12 @@ public class GPSTracker extends Service implements LocationListener {
                 // no network provider is enabled
             } else {
                 if (isNetworkEnabled) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME_BW_UPDATES,MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    if (ContextCompat.checkSelfPermission(this,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED) {
+                    } else {
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    }
                     //                    Preferences.TAG_G_L = "L";
                     Log.d("Network", "Network");
                     if (locationManager != null) {

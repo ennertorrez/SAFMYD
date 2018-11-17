@@ -285,16 +285,14 @@ public class MenuActivity extends AppCompatActivity
             requestReadPhoneStatePermission();
         } else {
             // READ_PHONE_STATE permission is already been granted.
-            doPermissionGrantedStuffs();
+            TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                variables_publicas.IMEI = tm.getImei();
+            } else {
+                variables_publicas.IMEI = tm.getDeviceId();
+            }
         }
-    }
-    public void doPermissionGrantedStuffs() {
-        //Have an  object of TelephonyManager
-        TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        //Get IMEI Number of Phone  //////////////// for this example i only need the IMEI
-        variables_publicas.IMEI = tm.getDeviceId();
-
-
     }
 
     private void requestReadPhoneStatePermission() {
