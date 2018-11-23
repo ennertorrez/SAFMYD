@@ -67,6 +67,7 @@ import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaRecibosPendFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
 import com.suplidora.sistemas.sisago.Menu.PedidosFragment;
@@ -235,10 +236,12 @@ public class MenuActivity extends AppCompatActivity
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setVisible(false); //Agregar Recibos
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(3).setVisible(false); //Estado de cuenta
             }else {
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(0).setVisible(true); //Agregar Recibos
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
                 navigationView.getMenu().getItem(4).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
+                navigationView.getMenu().getItem(4).getSubMenu().getItem(3).setVisible(true); //Estado de cuenta
             }
         }
 
@@ -506,6 +509,15 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaInformesFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnReciboPend:
+
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaRecibosPendFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

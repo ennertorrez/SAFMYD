@@ -1249,6 +1249,7 @@ public class SincronizarDatos {
             item.put("CantLetra", item.get("CantLetra"));
             item.put("Observacion", item.get("Observacion"));
             item.put("Concepto", item.get("Concepto"));
+            item.put("DepPendiente", item.get("DepPendiente"));
         }
         String jsonInformeDetalle = gson.toJson(informeDetalle);
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioRecibos.svc/SincronizarInformeTotal/";

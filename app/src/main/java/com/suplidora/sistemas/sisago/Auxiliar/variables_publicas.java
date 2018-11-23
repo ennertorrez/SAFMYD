@@ -49,7 +49,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 82;
+    public static final int DATABASE_VERSION = 84;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -269,6 +269,7 @@ public class variables_publicas {
     public static  final String DETALLEINFORMES_COLUMN_CantLetra = "CantLetra";
     public static  final String DETALLEINFORMES_COLUMN_Observacion = "Observacion";
     public static  final String DETALLEINFORMES_COLUMN_Concepto = "Concepto";
+    public static  final String DETALLEINFORMES_COLUMN_DepPendiente = "DepPendiente";
 
     public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
     public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#5fb0c9"
@@ -55,21 +56,24 @@
                     android:inputType="textEmailAddress" />
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+           <!-- <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true">-->
 
-                <EditText
+                <com.scottyab.showhidepasswordedittext.ShowHidePasswordEditText
                     android:id="@+id/txtPassword"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:singleLine="true"
+                    app:drawable_show="@drawable/ic_visibility_on"
+                    app:drawable_hide="@drawable/ic_visibility_off"
                     android:drawableLeft="@mipmap/ic_https_black_24dp"
                     android:inputType="textPassword"
                     android:drawableTint="#0d00ff"
                     android:hint="Contraseña" />
-            </android.support.design.widget.TextInputLayout>
+            <!--</android.support.design.widget.TextInputLayout>-->
             <Button
                 android:id="@+id/btnIngresar"
                 android:layout_width="fill_parent"

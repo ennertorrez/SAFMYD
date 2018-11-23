@@ -9,6 +9,8 @@
         <item
             android:id="@+id/btnPedidos"
             android:icon="@drawable/ic_menu_plussign"
+            android:iconTintMode="screen"
+            android:iconTint="@color/colorAccent"
             android:title="Pedidos"
             >
             <menu>
@@ -30,6 +32,7 @@
         <item
             android:id="@+id/btnClientes"
             android:icon="@drawable/ic_menu_slideshow"
+            android:iconTint="@color/colorOrange"
             android:title="Clientes" >
             <menu>
                 <item
@@ -49,6 +52,7 @@
         <item
             android:id="@+id/btnMapa"
             android:icon="@drawable/ic_menu_mapmode"
+            android:iconTint="@color/colorAccent"
             android:title="Mapa" />
         <item
             android:id="@+id/btnRecibos"
@@ -67,15 +71,22 @@
                     android:id="@+id/btnEstadoCta"
                     android:icon="@drawable/ic_menu_slideshow"
                     android:title="Estado de Cuenta" />
+                <item
+                    android:id="@+id/btnReciboPend"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Recibos Pendientes" />
             </menu>
         </item>
-    </group>
-
-    <item android:title="Reportes">
+    <item
+        android:id="@+id/btnReportes"
+        android:icon="@drawable/ic_menu_share"
+        android:iconTint="@color/colorPrimary"
+        android:title="Reportes">
         <menu>
-            <item
+            <item android:iconTint="@color/colorPrimary"
                 android:id="@+id/btnReporteVentasAlDia"
                 android:icon="@drawable/ic_menu_share"
+
                 android:title="Reporte Pre-ventas" />
             <item
                 android:id="@+id/btnReporteHistVentas"
@@ -91,5 +102,5 @@
                 android:title="Reporte Ingresos" />
         </menu>
     </item>
-
+</group>
 </menu>

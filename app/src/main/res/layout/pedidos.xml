@@ -321,8 +321,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:background="@mipmap/ic_check_circle_black_48dp"
-                        android:backgroundTint="#1cd100"
-                        android:onClick="Agregar" />
+                        android:backgroundTint="#1cd100" />
                 </LinearLayout>
 
                 <LinearLayout

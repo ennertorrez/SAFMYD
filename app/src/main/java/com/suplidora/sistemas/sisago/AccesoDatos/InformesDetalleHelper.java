@@ -47,7 +47,8 @@ public class InformesDetalleHelper {
                                       String CodigoLetra,
                                       String CantLetra,
                                       String Observacion,
-                                      String Concepto
+                                      String Concepto,
+                                      String DepPendiente
     ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -76,6 +77,7 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, CantLetra);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, Observacion);
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, Concepto);
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente, DepPendiente);
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
             return true;
@@ -111,6 +113,7 @@ public class InformesDetalleHelper {
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Observacion));
         contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_Concepto));
+        contentValues.put(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente, lstRecibos.get(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente));
         long rowInserted=database.insert(variables_publicas.TABLE_DETALLE_INFORMES, null, contentValues);
         if(rowInserted != -1)
            return true;
@@ -148,6 +151,7 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -187,6 +191,7 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente)));
                 //lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -224,6 +229,7 @@ public class InformesDetalleHelper {
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_CantLetra)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Observacion, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Observacion)));
                 detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_Concepto)));
+                detalle.put(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente, c.getString(c.getColumnIndex(variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }

@@ -233,7 +233,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_CantLetra + " TEXT , "
                     + variables_publicas.DETALLEINFORMES_COLUMN_Observacion + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Concepto + " TEXT ) ");
+                    + variables_publicas.DETALLEINFORMES_COLUMN_Concepto + " TEXT , "
+                    + variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FACTURAS_PENDIENTES + "( "
                     + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " TEXT , "

@@ -533,9 +533,9 @@ public class ListaInformesFragment extends Fragment {
             if(isOnline){
                 List<HashMap<String, String>> InformesLocal = InformesH.ObtenerInformesLocales(fecha, "0");
                 for (HashMap<String, String> item : InformesLocal) {
-                    if (guardadoOK == false) {
+                    /*if (guardadoOK == false) {
                         break;
-                    }
+                    }*/
                     Gson gson = new Gson();
                     String vendedor = variables_publicas.usuario.getCodigo();
                     String jsonInforme = gson.toJson(InformesH.ObtenerInforme(item.get("Informe")));

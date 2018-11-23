@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -20,12 +19,9 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.Editable;
-import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,7 +29,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,7 +45,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.Auxiliar.SpinnerDialog;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
@@ -61,11 +55,9 @@ import com.suplidora.sistemas.sisago.Auxiliar.SincronizarDatos;
 import com.suplidora.sistemas.sisago.Auxiliar.variables_publicas;
 import com.suplidora.sistemas.sisago.Entidades.Bancos;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
-import com.suplidora.sistemas.sisago.Entidades.Departamentos;
 import com.suplidora.sistemas.sisago.Entidades.Informe;
 import com.suplidora.sistemas.sisago.Entidades.InformeDetalle;
 import com.suplidora.sistemas.sisago.HttpHandler;
-import com.suplidora.sistemas.sisago.Pedidos.PedidosActivity;
 import com.suplidora.sistemas.sisago.R;
 import com.suplidora.sistemas.sisago.Auxiliar.Funciones;
 
@@ -115,6 +107,7 @@ public class AgregarRecibo extends Activity {
     private RadioButton rbCheque;
     private RadioButton rbDeposito;
     private RadioGroup rgFormaPago;
+    private RadioGroup rgDepPdt;
     private EditText txtValorMinuta;
     private TextView txtFechaDocPago;
     private Spinner cboBancoOrigen;
@@ -122,6 +115,8 @@ public class AgregarRecibo extends Activity {
     private Button btnAgregar;
     private Button btnOKCliente;
     private EditText txtObservacion;
+    private RadioButton rbDepPdteSi;
+    private RadioButton rbDepPdteNo;
     private ListView lv;
     public static ArrayList<HashMap<String, String>> listaClientesItem;
     private ListView lvItem;
@@ -216,6 +211,7 @@ public class AgregarRecibo extends Activity {
         txtValorMinuta = (EditText) findViewById(R.id.txtValorMinuta);
         txtMonto = (EditText) findViewById(R.id.txtMonto);
         rgFormaPago = (RadioGroup) findViewById(R.id.rgFormaPago);
+        rgDepPdt = (RadioGroup) findViewById(R.id.rgDepPdt);
         txtFechaDocPago = (TextView) findViewById(R.id.txtFecha);
         cboBancoOrigen = (Spinner) findViewById(R.id.cboBancoEmisor);
         cboBancoDestino = (Spinner) findViewById(R.id.cboBancoDepositado);
@@ -232,6 +228,8 @@ public class AgregarRecibo extends Activity {
         rbCheque = (RadioButton) findViewById(R.id.rbCheque);
         rbDeposito = (RadioButton) findViewById(R.id.rbDeposito);
         lblDescFormapago = (TextView) findViewById(R.id.lblDescFormapago);
+        rbDepPdteSi = (RadioButton) findViewById(R.id.rbPdteSi);
+        rbDepPdteNo = (RadioButton) findViewById(R.id.rbPdteNo);
 
         //definición de valores iniciales para componentes del Formulario
         vTipo="Efectivo";
@@ -276,6 +274,15 @@ public class AgregarRecibo extends Activity {
                 }
             }
 
+        });
+        rgDepPdt.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                if(group.getCheckedRadioButtonId()== R.id.rbPdteSi && vTipo.equals("Efectivo")){
+                    lblDescFormapago.setText("No. Minuta");
+                    txtValorMinuta.setText("0");
+                }
+            }
         });
         rbEfectivo.setChecked(true);
 
@@ -471,7 +478,11 @@ public class AgregarRecibo extends Activity {
                                                       return;
                                                   }
 
-                                                  if (txtValorMinuta.getText().toString().equals("") || txtValorMinuta.getText().toString().isEmpty() || txtValorMinuta.getText().toString().equals("0")) {
+                                                  if ((txtValorMinuta.getText().toString().equals("") || txtValorMinuta.getText().toString().isEmpty() || txtValorMinuta.getText().toString().equals("0")) && rbDepPdteNo.isChecked() && rbEfectivo.isChecked()) {
+                                                      MensajeAviso("Debe indicar el número de documento.");
+                                                      return;
+                                                  }
+                                                  if ((txtValorMinuta.getText().toString().equals("") || txtValorMinuta.getText().toString().isEmpty() || txtValorMinuta.getText().toString().equals("0")) && (rbCheque.isChecked() || rbDeposito.isChecked())) {
                                                       MensajeAviso("Debe indicar el número de documento.");
                                                       return;
                                                   }
@@ -826,10 +837,12 @@ public class AgregarRecibo extends Activity {
                 informedetalle.setConcepto("ABONO A FACTURA No: "+ item.get("Factura"));
             }
 
+            informedetalle.setDepPendiente(item.get("DepPendiente"));
+
             saved=InformesDetalleH.GuardarDetalleInforme(informedetalle.getCodInforme(),informedetalle.getRecibo(),informedetalle.getIdvendedor(),informedetalle.getIdCliente(),informedetalle.getFactura(),informedetalle.getSaldo(),
                     informedetalle.getMonto(),informedetalle.getAbono(),informedetalle.getNoCheque(),informedetalle.getBancoE(),informedetalle.getBancoR(),informedetalle.getFechaCK(),informedetalle.getFechaDep(),informedetalle.getEfectivo(),
                     informedetalle.getMoneda(),informedetalle.getAprobado(),informedetalle.getPosfechado(),informedetalle.getProcesado(),informedetalle.getUsuario(),informedetalle.getVendedor(),informedetalle.getCliente(),
-                    informedetalle.getCodigoLetra(),informedetalle.getCantLetra(),informedetalle.getObservacion(),informedetalle.getConcepto());
+                    informedetalle.getCodigoLetra(),informedetalle.getCantLetra(),informedetalle.getObservacion(),informedetalle.getConcepto(),informedetalle.getDepPendiente());
             FacturasPendientesH.ActualizarFacturasPendientes(informedetalle.getFactura(),"true", Double.parseDouble(informedetalle.getSaldo()),Double.parseDouble(informedetalle.getMonto()));
 
             if (!saved) {
@@ -1219,6 +1232,13 @@ public class AgregarRecibo extends Activity {
     private boolean AgregarDetalle(HashMap<String, String> itemRecibos) {
 
         double nuevosaldo, saldo,monto;
+        String vPdte="false";
+
+        if (rbEfectivo.isChecked() && rbDepPdteSi.isChecked()){
+            vPdte="true";
+        }else {
+            vPdte="false";
+        }
 
         saldo = Double.parseDouble(lblSaldo.getText().toString().replace(",", ""));
         monto = Double.parseDouble(txtMonto.getText().toString().replace(",", ""));
@@ -1234,6 +1254,7 @@ public class AgregarRecibo extends Activity {
         itemRecibos.put("BancoE", cboBancoOrigen.getSelectedItem().toString());
         itemRecibos.put("BancoR", cboBancoDestino.getSelectedItem().toString());
         itemRecibos.put("Observacion", txtObservacion.getText().toString());
+        itemRecibos.put("DepPendiente",vPdte);
         listaRecibos.add(itemRecibos);
         RefrescarGrid();
         CalcularTotales();

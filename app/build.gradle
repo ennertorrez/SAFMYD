@@ -15,8 +15,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 113
-        versionName "1.112"
+        versionCode 114
+        versionName "1.113"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -69,7 +69,7 @@ dependencies {
     implementation files('lib/mail.jar')
     implementation files('lib/additionnal.jar')
     implementation files('lib/commons-net-3.6.jar')
-    // compile 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
+    implementation 'com.github.scottyab:showhidepasswordedittext:0.8'
     implementation 'com.github.mirrajabi:search-dialog:1.2.1'
     implementation 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
