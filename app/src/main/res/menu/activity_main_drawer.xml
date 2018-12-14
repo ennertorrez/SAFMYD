@@ -27,6 +27,11 @@
                     android:id="@+id/btnPromociones"
                     android:icon="@drawable/ic_menu_share"
                     android:title="Promociones"/>
+
+                <item
+                    android:id="@+id/btnOtrasPromociones"
+                    android:icon="@drawable/ic_menu_share"
+                    android:title="Otras Promociones"/>
             </menu>
         </item>
         <item

@@ -2130,8 +2130,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             int cantxTipoCliente =0;
 
             if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") ){
-                articuloB = ArticulosH.BuscarArticulo("4000-02-01-02-995");
-                cantxTipoCliente=1;
+                /*articuloB = ArticulosH.BuscarArticulo("4000-02-01-02-995");
+                cantxTipoCliente=1;*/
+                return;
             }else { //if (cliente.getTipo().equalsIgnoreCase("Detalle") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2")){
                 articuloB = ArticulosH.BuscarArticulo("4000-01-02-02-683");
                 cantxTipoCliente=2;
@@ -2694,8 +2695,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             MensajeAviso("No se puede guardar el pedido. Debe ingresar al menos 1 item");
             return false;
         }
-        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && total< 300){ // cambio solicitado por ***09-07-2018
-            MensajeAviso("No se puede guardar el pedido. Debe facturar al menos C$300");
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && total< 200){ // cambio solicitado por Comercial ***26-11-2018
+            MensajeAviso("No se puede guardar el pedido. Debe facturar al menos C$200");
             return false;
         }
 
@@ -3738,13 +3739,13 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     return;
                 }
 
-                vClientePI= ClientesH.EsClientePI(cliente.getNombre());
+              /*  vClientePI= ClientesH.EsClientePI(cliente.getNombre());
                // if (cliente.getTipo().equalsIgnoreCase("Detalle") && articulo.getIdProveedor().equalsIgnoreCase("230") && !CodigoArticulo.equals("4000-01-01-01-661")){
                 if (cliente.getTipo().equalsIgnoreCase("Detalle") && variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && articulo.getIdProveedor().equalsIgnoreCase("230") && vClientePI==false){
                     alertDialog.dismiss();
                     MensajeAviso("Este producto no esta autorizado para venderlo en canal Detalle");
                     return;
-                }
+                }*/
 
                 if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") &&  ConfigArtBloqueadosDetalle.getActivo().equalsIgnoreCase("true")){
                     List<String> itemsDetalle = Arrays.asList(ConfigArtBloqueadosDetalle.getValor().split(","));
@@ -3781,11 +3782,11 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         return;
                     }
                 }
-                if (!variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") && CodigoArticulo.equals("4000-01-01-01-1018")){
+              /*  if (!variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") && CodigoArticulo.equals("4000-01-01-01-1018")){
                     alertDialog.dismiss();
                     MensajeAviso("Este producto no esta autorizado para la venta.");
                     return;
-                }
+                }*/
                 HashMap<String, String> art = ArticulosH.BuscarArticuloHashMap(CodigoArticulo);
                 txtCodigoArticulo.setText(CodigoArticulo);
                 lblDescripcionArticulo.setText(articulo.getNombre());

@@ -254,7 +254,6 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
 //            cboVendedor.setEnabled(false);
 //            cboRuta.setEnabled(false);
             txtCedula.setFocusable(false);
-            txtNombreCliente.setFocusable(false);
 
             Intent in = getIntent();
             if (in.getSerializableExtra(variables_publicas.CLIENTES_COLUMN_CodCv) == null) {
@@ -266,10 +265,12 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                 cvId ="";
                 vnomclientevario="";
                 txtCodCliente.setText(in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdCliente));
+                txtNombreCliente.setFocusable(false);
             } else {
                 vnomclientevario=in.getStringExtra(variables_publicas.CLIENTES_COLUMN_Nombre);
                 cvId=in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdCliente);
                 txtCodCliente.setText(in.getStringExtra(variables_publicas.CLIENTES_COLUMN_CodCv));
+                txtNombreCliente.setFocusable(true);
             }
 
             txtNombreClienteV.setText(vnomclientevario);
