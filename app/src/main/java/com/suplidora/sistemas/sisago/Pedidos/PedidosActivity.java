@@ -56,6 +56,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialCanalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
@@ -70,6 +71,7 @@ import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
 import com.suplidora.sistemas.sisago.Entidades.PrecioEspecial;
+import com.suplidora.sistemas.sisago.Entidades.PrecioEspecialCanal;
 import com.suplidora.sistemas.sisago.Entidades.Vendedor;
 import com.suplidora.sistemas.sisago.HttpHandler;
 import com.suplidora.sistemas.sisago.R;
@@ -167,6 +169,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigPromo2x1;
     Configuraciones ConfigPromoComboIris;
     Configuraciones ConfigPromoJaloma2;
+    Configuraciones ConfigPromoJaloma3;
 
     Configuraciones ConfigArtBloqueadosDetalle;
     Configuraciones ConfigArtBloqueadosMayorista;
@@ -203,7 +206,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private PrecioEspecialHelper PrecioEspecialH;
+    private PrecioEspecialCanalHelper PrecioEspecialCanalH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
+
     private PedidosDetalleHelper PedidoDetalleH;
     private ConfiguracionSistemaHelper ConfiguracionSistemaH;
     private CartillasBcHelper CartillasBcH;
@@ -247,6 +252,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
+        PrecioEspecialCanalH = new PrecioEspecialCanalHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
@@ -260,7 +266,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
+                PrecioEspecialH,PrecioEspecialCanalH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
 
 
         ValidarUltimaVersion();
@@ -291,6 +297,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigPromo2x1 = ConfigSistemaH.BuscarValorConfig("Promo2x1xClientes");
         ConfigPromoComboIris = ConfigSistemaH.BuscarValorConfig("Promo Combo Iris");
         ConfigPromoJaloma2 = ConfigSistemaH.BuscarValorConfig("Promo Jaloma2");
+        ConfigPromoJaloma3 = ConfigSistemaH.BuscarValorConfig("Promo Jaloma3");
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -577,6 +584,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       AplicarPromocionJaloma();
                                                       AplicarPromocionComboIris();
                                                       AplicarPromocionJaloma2();
+                                                      AplicarPromocionJaloma3();
                                                       RefrescarGrid();
                                                       CalcularTotales();
                                                       InputMethodManager inputManager = (InputMethodManager)
@@ -1102,6 +1110,125 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
                 if ((cantidad1 ==1 && cantidad2==1) || (cantidad1 ==1 && cantidad3==1) || (cantidad2 ==1 && cantidad3==1)){
                     cantidadB=cantidadBon;
+                    aplica=true;
+                }else {
+                    aplica=false;
+                    cantidadB=0;
+                }
+                for (HashMap<String, String> item : listaArticulos) {
+                    /*Si ya existe actualizamos la cantidad bonificada actualizamos el valor o borramos segun si aplica a la bonificacion*/
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(articuloB.getCodigo()) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B") && (cantidadB>0)) {
+                        cantNueva = (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad))+ cantidadB;
+                        item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad,String.valueOf(cantNueva));
+                        existe=true;
+                        break;
+                    }
+                }
+
+                if (cantidadB==0) {
+                } else if(aplica && cantidadB>0) {
+                    if (existe == false && cantidadB>0) {
+
+                        HashMap<String, String> articuloBonificado = new HashMap<>();
+                        articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
+                        articuloBonificado.put("Cod", articuloB.getCodigo().split("-")[articuloB.getCodigo().split("-").length - 1]);
+                        articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
+                        articuloBonificado.put("Um", articuloB.getUnidad());
+                        articuloBonificado.put("Cantidad", String.valueOf(cantidadB)); //
+                        articuloBonificado.put("Precio", "0");
+                        articuloBonificado.put("TipoPrecio", "0");
+                        articuloBonificado.put("Descripcion",  "**" + articuloB.getNombre());
+                        articuloBonificado.put("Costo", "0");
+                        articuloBonificado.put("PorDescuento", "0");
+                        articuloBonificado.put("TipoArt", "B");
+                        articuloBonificado.put("BonificaA", "0");
+                        articuloBonificado.put("Isc", "0");
+                        articuloBonificado.put("PorcentajeIva", "0");
+                        articuloBonificado.put("Descuento", "0");
+                        articuloBonificado.put("Iva", "0");
+                        articuloBonificado.put("SubTotal", "0");
+                        articuloBonificado.put("Total", "0");
+                        articuloBonificado.put("TipoPrecio", "Bonificacion");
+                        articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
+                        articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
+                        listaArticulos.add(articuloBonificado);
+                        CodigoItemAgregado = "";
+                    }
+                }
+
+                RefrescarGrid();
+                CalcularTotales();
+            }
+        }
+    }
+    private void AplicarPromocionJaloma3() {
+
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")) {
+
+            if ((cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo") || cliente.getTipo().equalsIgnoreCase("Foraneo2") ||cliente.getTipo().equalsIgnoreCase("Detalle")) && ConfigPromoJaloma3!= null && ConfigPromoJaloma3.getActivo().equalsIgnoreCase("true")) {
+                //Validamos que solamente se puedan ingresar 18 articulos
+                if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
+                    MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
+                    return;
+                }
+
+                boolean existe = false;
+                int cantidad1 = 0;
+                int cantidad2 = 0;
+                int cantidad3 = 0;
+                int cantidad4 = 0;
+                int cantidadMin1 = 0;
+                int cantidadMin2 = 0;
+                int cantidadMin3 = 0;
+                int cantidadMin4 = 0;
+                int cantidadBon =0;
+                int cantidadB =0;
+                int cantNueva=0;
+                double sumtaTotal=0;
+                boolean aplica;
+                String artBonificado="";
+
+                String  valores = ConfigPromoJaloma3.getValor();
+                String[] parts = valores.split(";");
+
+                String Art1 = parts[0];
+                String Art2 = parts[1];
+                String Art3 = parts[2];
+                String Art4 = parts[3];
+                cantidadMin1 = Integer.parseInt(parts[4]);
+                cantidadMin2 = Integer.parseInt(parts[5]);
+                cantidadMin3 = Integer.parseInt(parts[6]);
+                cantidadMin4 = Integer.parseInt(parts[7]);
+                artBonificado=parts[8];
+                cantidadBon=Integer.parseInt(parts[9]);
+
+                Articulo articuloB = ArticulosH.BuscarArticulo(artBonificado);
+
+                /*Primero sumamos las cantidades de los items promocionados*/
+                for (HashMap<String, String> item : listaArticulos) {
+                    if (Art1.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                        cantidad1 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    }
+                }
+                for (HashMap<String, String> item : listaArticulos) {
+                    if (Art2.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                        cantidad2 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    }
+                }
+                for (HashMap<String, String> item : listaArticulos) {
+                    if (Art3.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                        cantidad3 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    }
+                }
+                for (HashMap<String, String> item : listaArticulos) {
+                    if (Art4.equals(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                        cantidad4 += (int) Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
+                    }
+                }
+                
+                if (cantidad1 >=cantidadMin1 && cantidad2 >=cantidadMin2 && cantidad3 >=cantidadMin3  && cantidad4 >=cantidadMin4 ){
+                    sumtaTotal= (cantidad1/cantidadMin1) + (cantidad2/cantidadMin2) + (cantidad3/cantidadMin3) + (cantidad4/cantidadMin4);
+                    cantidadB= cantidadBon * ( (int) Math.floor(sumtaTotal/4));
                     aplica=true;
                 }else {
                     aplica=false;
@@ -2252,8 +2379,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             }
             int factor=0;
 
-            if (cantidad >= 6 && cantxTipoCliente == 2) {
-                factor = (int) Math.floor(cantidad / 6);
+            if (cantidad >= 12 && cantxTipoCliente == 2) {
+                factor = (int) Math.floor(cantidad / 12);
                 cantidadB = factor * 1;
             } else if (cantidad >= 24 && cantxTipoCliente == 1) {
                 factor = (int) Math.floor(cantidad / 24);
@@ -3236,6 +3363,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         AplicarPromocionJaloma();
                         AplicarPromocionComboIris();
                         AplicarPromocionJaloma2();
+                        AplicarPromocionJaloma3();
                         MensajeAviso("La cantidad Minima para ventas es de " + String.valueOf(CantidadMinima) + " Unidades.");
                         txtCantidad.requestFocus();
                     }
@@ -3268,6 +3396,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocionJaloma();
                                 AplicarPromocionComboIris();
                                 AplicarPromocionJaloma2();
+                                AplicarPromocionJaloma3();
                                 MensajeAviso("No se puede Facturar cantidades que no sean multiplos de 50.");
                                 txtCantidad.requestFocus();
                             }
@@ -3321,6 +3450,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         AplicarPromocionJaloma();
                                                         AplicarPromocionComboIris();
                                                         AplicarPromocionJaloma2();
+                                                        AplicarPromocionJaloma3();
                                                         RefrescarGrid();
                                                         CalcularTotales();
                                                         txtCantidad.requestFocus();
@@ -3370,6 +3500,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocionJaloma();
                                 AplicarPromocionComboIris();
                                 AplicarPromocionJaloma2();
+                                AplicarPromocionJaloma3();
                                 MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                                 txtCantidad.requestFocus();
                             }
@@ -3439,6 +3570,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             AplicarPromocionJaloma();
                             AplicarPromocionComboIris();
                             AplicarPromocionJaloma2();
+                            AplicarPromocionJaloma3();
                             MensajeAviso("Para dar precio mayorista se necesita " + String.valueOf(FaltaParaCaja) + " unidades para completar " + String.valueOf(cajas + 1) + " cajas");
                             txtCantidad.requestFocus();
                         } else {
@@ -3468,7 +3600,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         double precioE = 0;
         double descuentoE = 0;
 
-        if (Boolean.parseBoolean(cliente.getPrecioEspecial()) && (cliente.getTipo().equalsIgnoreCase("Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
+        if (Boolean.parseBoolean(cliente.getPrecioEspecial()) && (cliente.getTipo().equalsIgnoreCase("Detalle") ||cliente.getTipo().equalsIgnoreCase("Super") || cliente.getTipo().equalsIgnoreCase("Mayorista") || cliente.getTipo().equalsIgnoreCase("Foraneo"))) {
             txtDescuento.setEnabled(false);
             txtDescuento.setText("0.00");
             //Si existe precio especial
@@ -3495,6 +3627,41 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     MensajeCaja = true;
                 }
             } else {
+                PrecioEspecialCanal precioEspecialCanal = PrecioEspecialCanalH.BuscarPrecioEspecialCanal(variables_publicas.usuario.getCanal(), articulo.getCodigo());
+                if (precioEspecialCanal != null) {
+                    tipoprecio = "Especial";
+                    precioE = Double.parseDouble(precioEspecialCanal.getPrecio());
+                    if (ActualizarItem) {
+                        item.put("Precio", precioEspecialCanal.getPrecio());
+                        item.put("TipoPrecio", "Especial");
+                    } else {
+                        tipoprecio = "Especial";
+                        precio = Double.parseDouble(precioEspecialCanal.getPrecio());
+                        setPrecio(art, tipoprecio, precio, item == null);
+                        MensajeCaja = true;
+                    }
+                }else {
+                    tipoprecio = cliente.getTipo();
+                    setPrecio(art, tipoprecio, precio, item == null);
+                    MensajeCaja = true;
+                }
+            }
+        }else {
+            PrecioEspecialCanal precioEspecialCanal = PrecioEspecialCanalH.BuscarPrecioEspecialCanal(variables_publicas.usuario.getCanal(), articulo.getCodigo());
+            if (precioEspecialCanal != null) {
+                tipoprecio = "Especial";
+                precioE = Double.parseDouble(precioEspecialCanal.getPrecio());
+                if (ActualizarItem) {
+                    item.put("Precio", precioEspecialCanal.getPrecio());
+                    item.put("TipoPrecio", "Especial");
+                } else {
+                    tipoprecio = "Especial";
+                    precio = Double.parseDouble(precioEspecialCanal.getPrecio());
+                    setPrecio(art, tipoprecio, precio, item == null);
+                    MensajeCaja = true;
+                }
+            }
+            else {
                 tipoprecio = cliente.getTipo();
                 setPrecio(art, tipoprecio, precio, item == null);
                 MensajeCaja = true;
@@ -3994,6 +4161,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     AplicarPromocionJaloma();
                     AplicarPromocionComboIris();
                     AplicarPromocionJaloma2();
+                    AplicarPromocionJaloma3();
                     RecalcularDetalle();
                     CalcularTotales();
                     RefrescarGrid();
