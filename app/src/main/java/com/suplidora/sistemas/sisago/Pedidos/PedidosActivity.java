@@ -174,7 +174,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigPromoCartillaManagua2;
     Configuraciones ConfigPromoCartillaManagua3;
     Configuraciones ConfigPromoCartillaManagua4;
-
+    Configuraciones ConfigPromoDescuentos1;
+    Configuraciones ConfigPromoDescuentos2;
     Configuraciones ConfigArtBloqueadosDetalle;
     Configuraciones ConfigArtBloqueadosMayorista;
     Configuraciones ConfigArtBloqueadosHoreca;
@@ -198,6 +199,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     public double total;
     public double subtotal;
     private Cliente cliente;
+    public double subtotalPromoDescuento=0;
     private double tasaCambio = 0;
     private double subTotalPrecioSuper = 0;
     private Pedido pedido;
@@ -306,6 +308,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigPromoCartillaManagua2 = ConfigSistemaH.BuscarValorConfig("Promo Cartilla Managua 2");
         ConfigPromoCartillaManagua3 = ConfigSistemaH.BuscarValorConfig("Promo Cartilla Managua 3");
         ConfigPromoCartillaManagua4 = ConfigSistemaH.BuscarValorConfig("Promo Cartilla Managua 4");
+        ConfigPromoDescuentos1 = ConfigSistemaH.BuscarValorConfig("Promo Porcentaje 1");
+        ConfigPromoDescuentos2 = ConfigSistemaH.BuscarValorConfig("Promo Porcentaje 2");
+
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -598,6 +603,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       AplicarPromocionCartillaManagua3();
                                                       AplicarPromocionCartillaManagua4();
                                                       RefrescarGrid();
+                                                      PromoDescuentos1();
+                                                      PromoDescuentos2();
                                                       CalcularTotales();
                                                       InputMethodManager inputManager = (InputMethodManager)
                                                               getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -3557,6 +3564,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
                 RecalcularDetalle();
                 RefrescarGrid();
+                PromoDescuentos1();
+                PromoDescuentos2();
                 CalcularTotales();
             }
 
@@ -4259,6 +4268,157 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         lv.setAdapter(adapter);
     }
 
+    private void PromoDescuentos1() {
+
+        double iva = 0, descuento = 0;
+        total = 0;
+        subtotal = 0;
+        subtotalPromoDescuento=0;
+        if (cliente.getTipo().equalsIgnoreCase("Super")) {
+            return;
+        }
+
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && ConfigPromoDescuentos1 != null && ConfigPromoDescuentos1.getActivo().equalsIgnoreCase("true")) {
+
+            String  valores = ConfigPromoDescuentos1.getValor();
+            String[] parts = valores.split(";");
+            double vDesc1=0;
+            double vDesc2=0;
+            double vDesc3=0;
+            double vRango1=0;
+            double vRango2=0;
+            double vRango3=0;
+            double subtotal=0;
+            double vPorcentaje=0;
+            double total=0;
+            double porIva=0;
+            String Art1iculos = parts[0];
+            vDesc1=Double.parseDouble(parts[1]);
+            vDesc2=Double.parseDouble(parts[2]);
+            vDesc3=Double.parseDouble(parts[3]);
+            vRango1=Double.parseDouble(parts[4]);
+            vRango2=Double.parseDouble(parts[5]);
+            vRango3=Double.parseDouble(parts[6]);
+
+            for (HashMap<String, String> item : listaArticulos) {
+                if (Art1iculos.contains(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                    subtotal +=  Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",",""));
+                }
+            }
+
+            if (subtotal>=vRango1 && subtotal<vRango2){
+                vPorcentaje=vDesc1;
+            }else if (subtotal>=vRango2 && subtotal<vRango3){
+                vPorcentaje=vDesc2;
+            }else if (subtotal>=vRango3 ){
+                vPorcentaje=vDesc3;
+            }else{
+                vPorcentaje=0;
+            }
+
+            if (vPorcentaje>0) {
+                for (int i = 0; i < listaArticulos.size(); i++) {
+                    HashMap<String, String> item = listaArticulos.get(i);
+
+                        if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).startsWith("**")) {
+                            //
+                        } else {
+                            if (Art1iculos.contains(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                                // item.put("Descuento",String.valueOf(vPorcentaje));
+                                subtotal = Double.parseDouble(item.get("Precio")) * Double.parseDouble(item.get("Cantidad"));
+                                descuento = subtotal * (vPorcentaje / 100);
+                                subtotal = subtotal - descuento;
+                                porIva = Double.parseDouble(item.get("PorIva"));
+                                iva = subtotal * porIva;
+                                total = subtotal + iva;
+                                item.put("PorDescuento",String.valueOf(vPorcentaje));
+                                item.put("Descuento", df.format(descuento));
+                                item.put("Iva", df.format(iva));
+                                item.put("SubTotal", df.format(subtotal));
+                                item.put("Total", df.format(total));
+                            }
+                        }
+                }
+            }
+
+        }
+    }
+
+    private void PromoDescuentos2() {
+
+        double iva = 0, descuento = 0;
+        total = 0;
+        subtotal = 0;
+        subtotalPromoDescuento=0;
+        if (cliente.getTipo().equalsIgnoreCase("Super")) {
+            return;
+        }
+
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && ConfigPromoDescuentos2 != null && ConfigPromoDescuentos2.getActivo().equalsIgnoreCase("true")) {
+
+            String  valores = ConfigPromoDescuentos2.getValor();
+            String[] parts = valores.split(";");
+            double vDesc1=0;
+            double vDesc2=0;
+            double vDesc3=0;
+            double vRango1=0;
+            double vRango2=0;
+            double vRango3=0;
+            double subtotal=0;
+            double vPorcentaje=0;
+            double total=0;
+            double porIva=0;
+            String Art1iculos = parts[0];
+            vDesc1=Double.parseDouble(parts[1]);
+            vDesc2=Double.parseDouble(parts[2]);
+            vDesc3=Double.parseDouble(parts[3]);
+            vRango1=Double.parseDouble(parts[4]);
+            vRango2=Double.parseDouble(parts[5]);
+            vRango3=Double.parseDouble(parts[6]);
+
+            for (HashMap<String, String> item : listaArticulos) {
+                if (Art1iculos.contains(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                    subtotal +=  Double.parseDouble(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Subtotal).replace(",",""));
+                }
+            }
+
+            if (subtotal>=vRango1 && subtotal<vRango2){
+                vPorcentaje=vDesc1;
+            }else if (subtotal>=vRango2 && subtotal<vRango3){
+                vPorcentaje=vDesc2;
+            }else if (subtotal>=vRango3 ){
+                vPorcentaje=vDesc3;
+            }else{
+                vPorcentaje=0;
+            }
+
+            if (vPorcentaje>0) {
+                for (int i = 0; i < listaArticulos.size(); i++) {
+                    HashMap<String, String> item = listaArticulos.get(i);
+
+                    if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).startsWith("**")) {
+                        //
+                    } else {
+                        if (Art1iculos.contains(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo)) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
+                            // item.put("Descuento",String.valueOf(vPorcentaje));
+                            subtotal = Double.parseDouble(item.get("Precio")) * Double.parseDouble(item.get("Cantidad"));
+                            descuento = subtotal * (vPorcentaje / 100);
+                            subtotal = subtotal - descuento;
+                            porIva = Double.parseDouble(item.get("PorIva"));
+                            iva = subtotal * porIva;
+                            total = subtotal + iva;
+                            item.put("PorDescuento",String.valueOf(vPorcentaje));
+                            item.put("Descuento", df.format(descuento));
+                            item.put("Iva", df.format(iva));
+                            item.put("SubTotal", df.format(subtotal));
+                            item.put("Total", df.format(total));
+                        }
+                    }
+                }
+            }
+
+        }
+    }
     private void CalcularTotales() {
 
         double iva = 0, descuento = 0;
@@ -4581,6 +4741,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     AplicarPromocionCartillaManagua3();
                     AplicarPromocionCartillaManagua4();
                     RecalcularDetalle();
+                    PromoDescuentos1();
+                    PromoDescuentos2();
                     CalcularTotales();
                     RefrescarGrid();
                     LimipiarDatos(true);
