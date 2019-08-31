@@ -45,6 +45,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DescuentoEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FacturasPendientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.InformesDetalleHelper;
@@ -99,6 +100,7 @@ public class MenuActivity extends AppCompatActivity
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private PrecioEspecialCanalHelper PrecioEspecialCanalH;
+    private DescuentoEspecialHelper DescuentoEspeciallH;
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
@@ -211,6 +213,7 @@ public class MenuActivity extends AppCompatActivity
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         PrecioEspecialCanalH = new PrecioEspecialCanalHelper(DbOpenHelper.database);
+        DescuentoEspeciallH = new DescuentoEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
@@ -221,7 +224,7 @@ public class MenuActivity extends AppCompatActivity
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH, FormaPagoH,PrecioEspecialH, PrecioEspecialCanalH, ConfigH, ClientesSucH,
-                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH);
+                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH,DescuentoEspeciallH);
 
         try {
             variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";

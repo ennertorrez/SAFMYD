@@ -111,6 +111,7 @@ public class ClientesInactivosEdit extends Activity implements ActivityCompat.On
     private String vciudad;
     private String cvId;
     private String vnomclientevario;
+    private String vCondicion;
     private String vFrecuencia = "LUNES";
     private String vRuta = "MA_101";
     private String vVededor = "";
@@ -199,11 +200,13 @@ public class ClientesInactivosEdit extends Activity implements ActivityCompat.On
             if (codigoCV.equals("")|| codigoCV.equals("0")){
                 cvId ="";
                 vnomclientevario="";
+                vCondicion= in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdFormaPago);
                 txtCodCliente.setText(in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdCliente));
             } else {
                 vnomclientevario=in.getStringExtra(variables_publicas.CLIENTES_COLUMN_Nombre);
                 cvId=in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdCliente);
                 txtCodCliente.setText(in.getStringExtra(variables_publicas.CLIENTES_COLUMN_CodCv));
+                vCondicion= in.getStringExtra(variables_publicas.CLIENTES_COLUMN_IdFormaPago);
             }
 
             txtNombreClienteV.setText(vnomclientevario);
@@ -307,6 +310,11 @@ public class ClientesInactivosEdit extends Activity implements ActivityCompat.On
                     }else if (txtTelefono.getText().length()<8) {
                         MensajeAviso("Número de teléfono inválido.");
                         txtTelefono.requestFocus();
+                        return ;
+                    }
+                    if (vCondicion.equals("115") || vCondicion.equals("125") ) {
+                    }else{
+                        MensajeAviso("Cliente no se puede Activar. Es Cliente de Crédito.");
                         return ;
                     }
                     Guardar();

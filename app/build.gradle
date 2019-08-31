@@ -15,8 +15,8 @@ android {
         applicationId 'com.suplidora.sistemas.sisago'
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 129
-        versionName "1.128"
+        versionCode 131
+        versionName "1.130"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -38,7 +38,6 @@ android {
         }
 
 }
-
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

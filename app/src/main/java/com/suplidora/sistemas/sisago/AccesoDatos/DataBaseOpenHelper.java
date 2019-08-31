@@ -155,6 +155,12 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PRECIO_ESPECIAL_CANAL_COLUMN_Canal + " TEXT , "
                     + variables_publicas.PRECIO_ESPECIAL_CANAL_COLUMN_Precio + " TEXT ) ");
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DESCUENTO_ESPECIAL + "( "
+                    + variables_publicas.DESCUENTO_ESPECIAL_COLUMN_IdCliente + " TEXT , "
+                    + variables_publicas.DESCUENTO_ESPECIAL_COLUMN_CodigoArticulo + " TEXT , "
+                    + variables_publicas.DESCUENTO_ESPECIAL_COLUMN_Porcentaje + " TEXT , "
+                    + variables_publicas.DESCUENTO_ESPECIAL_COLUMN_Canal + " TEXT ) ");
+
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONFIGURACION_SISTEMA + "( "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id + " TEXT , "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Sistema + " TEXT , "
@@ -282,6 +288,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_CARTILLAS_BC);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PRECIO_ESPECIAL);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PRECIO_ESPECIAL_CANAL);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DESCUENTO_ESPECIAL);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONFIGURACION_SISTEMA);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);

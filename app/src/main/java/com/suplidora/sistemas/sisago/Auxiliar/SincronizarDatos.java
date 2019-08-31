@@ -19,6 +19,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialCanalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DescuentoEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -52,6 +53,7 @@ public class SincronizarDatos {
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlListPrecioEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListPrecioEspecial/";
+    final String urlListDescuentoEspecial = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaDescuentoEspecial/";
     final String urlListPrecioEspecialCanal = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarPrecioESPArticulo";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
@@ -71,6 +73,7 @@ public class SincronizarDatos {
     private FormaPagoHelper FormaPagoH;
     private PrecioEspecialHelper PrecioEspecialH;
     private PrecioEspecialCanalHelper PrecioEspecialCanalH;
+    private DescuentoEspecialHelper DescuentoEspecialH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
     private InformesHelper InformesH;
@@ -83,7 +86,7 @@ public class SincronizarDatos {
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh, PrecioEspecialCanalHelper PrecioEspecialCanalh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH ) {
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, DescuentoEspecialHelper descuentoEspecialH ) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -98,6 +101,7 @@ public class SincronizarDatos {
         UsuariosH = usuariosH;
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
+        DescuentoEspecialH = descuentoEspecialH;
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -105,7 +109,7 @@ public class SincronizarDatos {
                             CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
                             PrecioEspecialHelper PrecioEspecialh,PrecioEspecialCanalHelper PrecioEspecialCanalh, ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, InformesHelper Informesh, InformesDetalleHelper InformesDetalleh,FacturasPendientesHelper FacturasPendientesh ) {
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, InformesHelper Informesh, InformesDetalleHelper InformesDetalleh,FacturasPendientesHelper FacturasPendientesh,DescuentoEspecialHelper descuentoEspecialH ) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -123,6 +127,7 @@ public class SincronizarDatos {
         InformesH=Informesh;
         InformesDetalleH=InformesDetalleh;
         FacturasPendientesH=FacturasPendientesh;
+        DescuentoEspecialH = descuentoEspecialH;
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh ) {
@@ -536,6 +541,47 @@ public class SincronizarDatos {
 
     }
 
+    //DescuentoEspecial
+    public boolean SincronizarDescuentoEspecial() throws JSONException {
+        HttpHandler shDescuentoEspecial = new HttpHandler();
+        String urlStringDescuentoEspecial = urlListDescuentoEspecial;
+        String jsonStrDescuentoEspecial = shDescuentoEspecial.makeServiceCall(urlStringDescuentoEspecial);
+
+        if (jsonStrDescuentoEspecial == null) {
+            new Funciones().SendMail("Ha ocurrido un error al Sincronizar ListaDescuentoEspecial, Respuesta nula", variables_publicas.info + urlStringDescuentoEspecial, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+
+        DbOpenHelper.database.beginTransaction();
+        DescuentoEspecialH.EliminaDescuentoEspecial();
+        JSONObject jsonObjDescuentoEspecial = new JSONObject(jsonStrDescuentoEspecial);
+        // Getting JSON Array node
+        JSONArray DescuentoEspecial = jsonObjDescuentoEspecial.getJSONArray("ListaDescuentoEspecialResult");
+
+
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < DescuentoEspecial.length(); i++) {
+                JSONObject c = DescuentoEspecial.getJSONObject(i);
+
+                String IdCliente = c.getString("IdCliente");
+                String CodigoArticulo = c.getString("CodigoArticulo");
+                String Porcentaje = c.getString("Porcentaje");
+                String Canal = c.getString("Canal");
+
+                DescuentoEspecialH.GuardarDescuentoEspecial(IdCliente, CodigoArticulo,  Porcentaje, Canal);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al Sincronizar DescuentoEspecial, Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        } finally {
+            DbOpenHelper.database.endTransaction();
+        }
+
+    }
+
     //ConfiguracionSistema
     public boolean SincronizarConfiguracionSistema() throws JSONException {
         HttpHandler shConfiguracionSistema = new HttpHandler();
@@ -678,14 +724,16 @@ public class SincronizarDatos {
                             if (SincronizarFormaPago()) {
                                 if (SincronizarPrecioEspecial()) {
                                     if (SincronizarPrecioEspecialCanal()) {
-                                        if (SincronizarClientesSucursal()) {
-                                            if (SincronizarConfiguracionSistema()) {
-                                                if (ActualizarUsuario()) {
-                                                    if (ObtenerBancos()) {
-                                                        if (ObtenerSerieRecibos()) {
-                                                            if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
-                                                                SincronizarPedidosLocales();
-                                                                return true;
+                                        if (SincronizarDescuentoEspecial()) {
+                                            if (SincronizarClientesSucursal()) {
+                                                if (SincronizarConfiguracionSistema()) {
+                                                    if (ActualizarUsuario()) {
+                                                        if (ObtenerBancos()) {
+                                                            if (ObtenerSerieRecibos()) {
+                                                                if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
+                                                                    SincronizarPedidosLocales();
+                                                                    return true;
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -711,6 +759,7 @@ public class SincronizarDatos {
         SincronizarCartillasBcDetalle();
         SincronizarPrecioEspecial();
         SincronizarPrecioEspecialCanal();
+        SincronizarDescuentoEspecial();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
     }

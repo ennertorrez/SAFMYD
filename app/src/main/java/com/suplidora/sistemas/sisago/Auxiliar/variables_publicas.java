@@ -49,7 +49,7 @@ public class variables_publicas {
     public static final String correosErrores = "informatica@suplidora.com.ni,sistemas@suplidora.com.ni";
     public  static final String correoError= "sisago@suplidora.com.ni";
     //Variables BD
-    public static final int DATABASE_VERSION = 85;
+    public static final int DATABASE_VERSION = 86;
     public static final String DATABASE_NAME = "SysContabv3.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -71,6 +71,7 @@ public class variables_publicas {
     public static final String TABLE_BANCOS="Bancos";
     public static final String TABLE_SERIE_RECIBOS="SerieRecibos";
     public static final String TABLE_PRECIO_ESPECIAL_CANAL = "PrecioEspecialCanal";
+    public static final String TABLE_DESCUENTO_ESPECIAL = "DescuentoEspecial";
 
     //Variables CamposTbArticulos
     public static final String ARTICULO_COLUMN_Codigo = "Codigo";
@@ -299,6 +300,11 @@ public class variables_publicas {
     public static final String PRECIO_ESPECIAL_CANAL_COLUMN_CodigoArticulo = "CodigoArticulo";
     public static final String PRECIO_ESPECIAL_CANAL_COLUMN_Canal = "Canal";
     public static final String PRECIO_ESPECIAL_CANAL_COLUMN_Precio = "Precio";
+
+    public static final String DESCUENTO_ESPECIAL_COLUMN_CodigoArticulo = "CodigoArticulo";
+    public static final String DESCUENTO_ESPECIAL_COLUMN_IdCliente = "IdCliente";
+    public static final String DESCUENTO_ESPECIAL_COLUMN_Porcentaje = "Porcentaje";
+    public static final String DESCUENTO_ESPECIAL_COLUMN_Canal = "Canal";
 
     public final static int COUNTDOWN_FREQUENCY = 1000;
     public final static int VIBRATE_THRESHOLD = 30 * 1000;

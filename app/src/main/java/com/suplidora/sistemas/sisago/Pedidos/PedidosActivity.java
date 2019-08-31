@@ -53,6 +53,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.ClientesHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ClientesSucursalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.ConfiguracionSistemaHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DataBaseOpenHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.DescuentoEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.FormaPagoHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosDetalleHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
@@ -67,6 +68,7 @@ import com.suplidora.sistemas.sisago.Entidades.Articulo;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
 import com.suplidora.sistemas.sisago.Entidades.ClienteSucursal;
 import com.suplidora.sistemas.sisago.Entidades.Configuraciones;
+import com.suplidora.sistemas.sisago.Entidades.DescuentoEspecial;
 import com.suplidora.sistemas.sisago.Entidades.FormaPago;
 import com.suplidora.sistemas.sisago.Entidades.Pedido;
 import com.suplidora.sistemas.sisago.Entidades.PedidoDetalle;
@@ -213,6 +215,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private ClientesHelper ClientesH;
     private PrecioEspecialHelper PrecioEspecialH;
     private PrecioEspecialCanalHelper PrecioEspecialCanalH;
+    private DescuentoEspecialHelper DescuentoEspecialH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
 
     private PedidosDetalleHelper PedidoDetalleH;
@@ -259,6 +262,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         PrecioEspecialH = new PrecioEspecialHelper(DbOpenHelper.database);
         PrecioEspecialCanalH = new PrecioEspecialCanalHelper(DbOpenHelper.database);
+        DescuentoEspecialH = new DescuentoEspecialHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
@@ -272,7 +276,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
                 CartillasBcDetalleH,
                 FormaPagoH,
-                PrecioEspecialH,PrecioEspecialCanalH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH);
+                PrecioEspecialH,PrecioEspecialCanalH, ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH, DescuentoEspecialH);
 
 
         ValidarUltimaVersion();
@@ -605,6 +609,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       RefrescarGrid();
                                                       PromoDescuentos1();
                                                       PromoDescuentos2();
+                                                      ValidaDescuentoCoDistribuidor();
                                                       CalcularTotales();
                                                       InputMethodManager inputManager = (InputMethodManager)
                                                               getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -3566,6 +3571,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 RefrescarGrid();
                 PromoDescuentos1();
                 PromoDescuentos2();
+                ValidaDescuentoCoDistribuidor();
                 CalcularTotales();
             }
 
@@ -3626,7 +3632,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
             } else {
                 cantidadItems = Integer.parseInt(item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad));
 
-                if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && !cliente.getTipo().equalsIgnoreCase("Detalle") ){
+                //Desactivado el 28-08-2019
+    /*            if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") && !cliente.getTipo().equalsIgnoreCase("Detalle") ){
                     if (cantidadItems < CantidadMinima) {
                         cumpleCantMinima = false;
                     } else {
@@ -3635,7 +3642,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                 }
                 else {
                     cumpleCantMinima = true;
-                }
+                }*/
+                cumpleCantMinima = true;
+
                /* if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Super") ){
                     cumpleCantMinima=true;
                 } else if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") && cliente.getTipo().equalsIgnoreCase("Mayorista")) {
@@ -3822,8 +3831,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             }
                         }
                     }
-                    else if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
-                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") || cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")) { //SE AGREGO CANAL MAYORISTA PARA QUE PERMITA VENTAS CUNQUE NO SEAN CAJAS COMPLETAS
+                    /*else if (FaltaParaCaja > 0 && ModCantidadCajas > 0) {
+                        if (variables_publicas.PermitirVentaDetAMayoristaXCaja.equalsIgnoreCase("1") &&( cliente.getTipo().equalsIgnoreCase("Detalle") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Horeca") || variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")  || variables_publicas.usuario.getTipo().equalsIgnoreCase("User"))) {
                             if (MensajeCaja && !ActualizarItem) {
                                 final String finalTipoprecio = tipoprecio;
                                 if (!ActualizarItem) {
@@ -3933,7 +3942,8 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 txtCantidad.requestFocus();
                             }
                         }
-                    } else {
+                    }*/
+                    else {
                         /*Damos precio Mayorista*/
                         if (cliente.getTipo().equalsIgnoreCase("Detalle")) {
                             if (Boolean.parseBoolean(cliente.getRutaForanea())) {
@@ -4419,6 +4429,65 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
         }
     }
+
+    private void ValidaDescuentoCoDistribuidor() {
+
+        double iva = 0, descuento = 0;
+        String vCanalD="";
+        if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Mayorista")) {
+            vCanalD = "MAYORISTA";
+        } else {
+            vCanalD = variables_publicas.usuario.getCanal();
+        }
+
+        if (!DescuentoEspecialH.ValidaCoDistribuidor(cliente.getIdCliente(),vCanalD)) {
+            return;
+        }else {
+
+            double subtotal = 0;
+            double vPorcentaje = 0;
+            double total = 0;
+            double porIva = 0;
+
+             for (int i = 0; i < listaArticulos.size(); i++) {
+                 HashMap<String, String> item = listaArticulos.get(i);
+                 if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).startsWith("**")) {
+                     if (!item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_Descripcion).contains("PALO")){
+                         listaArticulos.remove(item);
+                     }
+                 } else {
+                      DescuentoEspecial descEspecial  = DescuentoEspecialH.BuscarDescuentoEspecial(cliente.getIdCliente(),item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo),vCanalD);
+                      if (descEspecial!=null){
+                          vPorcentaje= Double.parseDouble(descEspecial.getPorcentaje());
+                      }else {
+                          vPorcentaje=0;
+                      }
+                      // item.put("Descuento",String.valueOf(vPorcentaje));
+                      subtotal = Double.parseDouble(item.get("Precio")) * Double.parseDouble(item.get("Cantidad"));
+                      descuento = subtotal * (vPorcentaje / 100);
+                      subtotal = subtotal - descuento;
+                      porIva = Double.parseDouble(item.get("PorIva"));
+                      iva = subtotal * porIva;
+                      total = subtotal + iva;
+                      item.put("PorDescuento", String.valueOf(vPorcentaje));
+                      item.put("Descuento", df.format(descuento));
+                      item.put("Iva", df.format(iva));
+                      item.put("SubTotal", df.format(subtotal));
+                      item.put("Total", df.format(total));
+                 }
+             }
+/*            HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
+            listaArticulos.remove(itemArticulo);
+            for (int i = 0; i < listaArticulos.size() - 1; i++) {
+                HashMap<String, String> a = listaArticulos.get(i);
+                if (a.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_BonificaA).equals(itemArticulo.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo))) {
+                    listaArticulos.remove(a);
+                }
+            }
+            adapter.notifyDataSetChanged();
+            lv.setAdapter(adapter);*/
+        }
+    }
     private void CalcularTotales() {
 
         double iva = 0, descuento = 0;
@@ -4743,6 +4812,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     RecalcularDetalle();
                     PromoDescuentos1();
                     PromoDescuentos2();
+                    ValidaDescuentoCoDistribuidor();
                     CalcularTotales();
                     RefrescarGrid();
                     LimipiarDatos(true);
