@@ -20,6 +20,7 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialCanalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DescuentoEspecialHelper;
+import com.suplidora.sistemas.sisago.AccesoDatos.PromoUnicaVezHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -60,6 +61,7 @@ public class SincronizarDatos {
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
     static final String urlConsultarExistencias = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerInventarioArticulo/";
     final String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
+    final String urlGetPromoUnicaVez = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetPromoGelBarberLista/";
     private String TAG = SincronizarDatos.class.getSimpleName();
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
@@ -77,6 +79,7 @@ public class SincronizarDatos {
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
     private InformesHelper InformesH;
+    private PromoUnicaVezHelper PromoUnicaVezH;
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
 
@@ -729,10 +732,12 @@ public class SincronizarDatos {
                                                 if (SincronizarConfiguracionSistema()) {
                                                     if (ActualizarUsuario()) {
                                                         if (ObtenerBancos()) {
-                                                            if (ObtenerSerieRecibos()) {
-                                                                if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
-                                                                    SincronizarPedidosLocales();
-                                                                    return true;
+                                                            if (ObtenerPromoUnicaVez()) {
+                                                                if (ObtenerSerieRecibos()) {
+                                                                    if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
+                                                                        SincronizarPedidosLocales();
+                                                                        return true;
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -760,6 +765,7 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarPrecioEspecialCanal();
         SincronizarDescuentoEspecial();
+        ObtenerPromoUnicaVez();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
     }
@@ -1107,6 +1113,58 @@ public class SincronizarDatos {
 
         } else {
             new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            return false;
+        }
+        //return false;
+    }
+
+    private boolean ObtenerPromoUnicaVez() {
+
+        HttpHandler sh = new HttpHandler();
+        String urlString = urlGetPromoUnicaVez;
+        String encodeUrl = "";
+        try {
+            URL Url = new URL(urlString);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String jsonStr = sh.makeServiceCall(encodeUrl);
+
+        /**********************************BANCOS**************************************/
+        if (jsonStr != null) {
+
+            try {
+                //DbOpenHelper.database.beginTransaction();
+                JSONObject jsonObj = new JSONObject(jsonStr);
+                // Getting JSON Array node
+                JSONArray promounicavez = jsonObj.getJSONArray("GetPromoGelBarberListaResult");
+                if (promounicavez.length() == 0) {
+                    return false;
+                }
+                PromoUnicaVezH.EliminaPromoUnicaVez();
+                // looping through All Contacts
+
+                for (int i = 0; i < promounicavez.length(); i++) {
+                    JSONObject c = promounicavez.getJSONObject(i);
+                    PromoUnicaVezH.GuardarPromoUnicaVez(c.get("CLIENTE").toString(),c.get("Item").toString(),c.get("codcv").toString());
+                }
+                return true;
+                // DbOpenHelper.database.setTransactionSuccessful();
+            } catch (Exception ex) {
+                Log.e("Error", ex.getMessage());
+                new Funciones().SendMail("Ha ocurrido un error al cargar lista de clientes PromoUnca Vez,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                return false;
+            }
+
+          /*  finally {
+                DbOpenHelper.database.endTransaction();
+            }*/
+
+        } else {
+            new Funciones().SendMail("Ha ocurrido un error al cargar lista de clientes PromoUnca Vez,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
         //return false;
@@ -1549,6 +1607,49 @@ public class SincronizarDatos {
                 return valor;
             } catch (Exception ex) {
                 new Funciones().SendMail("Ha ocurrido un error al obtener el valor de la promocion Unica Vez, Excepcion controlada ", variables_publicas.info + ex.getMessage() + " ---json: " + urlConsulta + " ---Response: " + jsonPromoUnicaVez, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                Log.e("Error", ex.getMessage());
+                return 0;
+            }
+        }
+    }
+    public static int ConsultarPromoGelBarber(String codCliente, String codCV) {
+        HttpHandler sh = new HttpHandler();
+        String encodeUrl = "";
+
+        if (codCV.equals("")){
+            codCV="0";
+        }
+        final String urlConsulta = variables_publicas.direccionIp + "/ServicioPedidos.svc/ValidaPromoBarber/" + codCliente + "/"  + codCV;
+
+        try {
+            URL Url = new URL(urlConsulta);
+            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+            encodeUrl = uri.toURL().toString();
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            new Funciones().SendMail("Ha ocurrido un error al obtener el valor de la promocion Unica Vez promo Barber, Codificar URL", variables_publicas.info + e.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+            e.printStackTrace();
+            return 0;
+        }
+
+        String jsonPromoUnicaVezPBarber = sh.makeServiceCall(encodeUrl);
+        if (jsonPromoUnicaVezPBarber == null) {
+
+            return 0;
+        } else {
+            try {
+                JSONObject result = new JSONObject(jsonPromoUnicaVezPBarber);
+                String resultState = (String) ((String) result.get("ValidaPromoBarberResult")).split(",")[0];
+                final String valorUnicaVez = (String) ((String) result.get("ValidaPromoBarberResult")).split(",")[1];
+                if (resultState.equals("false")) {
+
+                    new Funciones().SendMail("Ha ocurrido un error el valor de la promocion Unica Vez promo Barber, Respuesta false", variables_publicas.info + " --- " + valorUnicaVez, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
+                    return 0;
+                }
+                Integer valor= Integer.parseInt(valorUnicaVez);
+                return valor;
+            } catch (Exception ex) {
+                new Funciones().SendMail("Ha ocurrido un error al obtener el valor de la promocion Unica Vez promo Barber, Excepcion controlada ", variables_publicas.info + ex.getMessage() + " ---json: " + urlConsulta + " ---Response: " + jsonPromoUnicaVezPBarber, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
                 Log.e("Error", ex.getMessage());
                 return 0;
             }

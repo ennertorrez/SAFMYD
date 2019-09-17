@@ -320,9 +320,9 @@ public class reporteComisionesFragment extends Fragment {
 
                     String Escala = c.getString("ESCALA");
                     if (Escala.equals("1")) {
-                        vEscala="0-15 días";
+                        vEscala="0-30 días";
                     }else if (Escala.equals("2")) {
-                        vEscala="16-60 días";
+                        vEscala="31-60 días";
                     }else{
                         vEscala=" > 60 días";
                     }

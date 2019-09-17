@@ -182,6 +182,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     Configuraciones ConfigArtBloqueadosMayorista;
     Configuraciones ConfigArtBloqueadosHoreca;
     Configuraciones ConfigArtBloqueadosSuper;
+    Configuraciones ConfigPromoGelB;
 
     String IMEI = "";
     String NoPedido = "";
@@ -314,7 +315,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigPromoCartillaManagua4 = ConfigSistemaH.BuscarValorConfig("Promo Cartilla Managua 4");
         ConfigPromoDescuentos1 = ConfigSistemaH.BuscarValorConfig("Promo Porcentaje 1");
         ConfigPromoDescuentos2 = ConfigSistemaH.BuscarValorConfig("Promo Porcentaje 2");
-
+        ConfigPromoGelB = ConfigSistemaH.BuscarValorConfig("Promo Gel Barber");
 
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
@@ -597,6 +598,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       AplicarPromocion500();
                                                       AplicarPromocionComboOrix();
                                                       AplicarPromocionTiraExhibidor();
+                                                      AplicarPromocionGelB();
                                                       AplicarPromocionCanels();
                                                       AplicarPromocionJaloma();
                                                       AplicarPromocionComboIris();
@@ -2506,6 +2508,70 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         }
     }
 
+    private void AplicarPromocionGelB() {
+
+        if (cliente.getTipo().equalsIgnoreCase("Super") || !variables_publicas.usuario.getCanal().equals("Detalle")) {
+            return;
+        }
+        if ((variables_publicas.usuario.getCanal().equals("Detalle")) && ConfigPromoGelB != null && ConfigPromoGelB.getActivo().equalsIgnoreCase("true")) {
+
+            //Validamos que solamente se puedan ingresar 18 articulos
+            if (listaArticulos.size() == 17 && cliente.getDetallista().equalsIgnoreCase("false")) {
+                MensajeAviso("No se puede agregar el producto seleccionado,ya que posee bonificacion y excede el limite de 18 productos para un pedido Mayorista");
+                return;
+            }
+            boolean existe = false;
+            int cantidadB =0;
+            String artBonificado="";
+
+            String valores = ConfigPromoGelB.getValor();
+            String[] parts = valores.split(";");
+            cantidadB = Integer.parseInt(parts[1]);
+            artBonificado=parts[0];
+            Articulo articuloB = ArticulosH.BuscarArticulo(artBonificado);
+
+            if (SincronizarDatos.ConsultarPromoGelBarber(pedido.getIdCliente().toString(),pedido.getCod_cv().toString())>0) {
+                return;
+            }
+            if (listaArticulos.size() == 0){
+                return;
+            }
+            if (cantidadB <=0 ) {
+            } else {
+                /*Si no existe lo agregamos*/
+                if (existe == false && cantidadB>0) {
+
+                    HashMap<String, String> articuloBonificado = new HashMap<>();
+                    articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
+                    articuloBonificado.put("Cod", articuloB.getCodigo().split("-")[articuloB.getCodigo().split("-").length - 1]);
+                    articuloBonificado.put("CodigoArticulo", articuloB.getCodigo());
+                    articuloBonificado.put("Um", articuloB.getUnidad());
+                    articuloBonificado.put("Cantidad", String.valueOf(cantidadB)); //
+                    articuloBonificado.put("Precio", "0");
+                    articuloBonificado.put("TipoPrecio", "0");
+                    articuloBonificado.put("Descripcion",  "**" + articuloB.getNombre());
+                    articuloBonificado.put("Costo", "0");
+                    articuloBonificado.put("PorDescuento", "0");
+                    articuloBonificado.put("TipoArt", "B");
+                    articuloBonificado.put("BonificaA", "0");
+                    articuloBonificado.put("Isc", "0");
+                    articuloBonificado.put("PorcentajeIva", "0");
+                    articuloBonificado.put("Descuento", "0");
+                    articuloBonificado.put("Iva", "0");
+                    articuloBonificado.put("SubTotal", "0");
+                    articuloBonificado.put("Total", "0");
+                    articuloBonificado.put("TipoPrecio", "Bonificacion");
+                    articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
+                    articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
+                    listaArticulos.add(articuloBonificado);
+                    CodigoItemAgregado = "";
+                }
+            }
+            RefrescarGrid();
+            CalcularTotales();
+        }
+    }
+
     private void AplicarPromocionKodak() {
 
         if (variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")) {
@@ -3780,6 +3846,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                         AplicarPromocion500();
                         AplicarPromocionComboOrix();
                         AplicarPromocionTiraExhibidor();
+                        AplicarPromocionGelB();
                         AplicarPromocionCanels();
                         AplicarPromocionJaloma();
                         AplicarPromocionComboIris();
@@ -3817,6 +3884,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocion500();
                                 AplicarPromocionComboOrix();
                                 AplicarPromocionTiraExhibidor();
+                                AplicarPromocionGelB();
                                 AplicarPromocionCanels();
                                 AplicarPromocionJaloma();
                                 AplicarPromocionComboIris();
@@ -3875,6 +3943,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                         AplicarPromocion500();
                                                         AplicarPromocionComboOrix();
                                                         AplicarPromocionTiraExhibidor();
+                                                        AplicarPromocionGelB();
                                                         AplicarPromocionCanels();
                                                         AplicarPromocionJaloma();
                                                         AplicarPromocionComboIris();
@@ -3929,6 +3998,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 AplicarPromocion500();
                                 AplicarPromocionComboOrix();
                                 AplicarPromocionTiraExhibidor();
+                                AplicarPromocionGelB();
                                 AplicarPromocionCanels();
                                 AplicarPromocionJaloma();
                                 AplicarPromocionComboIris();
@@ -4004,6 +4074,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             AplicarPromocion500();
                             AplicarPromocionComboOrix();
                             AplicarPromocionTiraExhibidor();
+                            AplicarPromocionGelB();
                             AplicarPromocionCanels();
                             AplicarPromocionJaloma();
                             AplicarPromocionComboIris();
@@ -4476,6 +4547,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                       item.put("Total", df.format(total));
                  }
              }
+
 /*            HashMap<String, String> itemArticulo = listaArticulos.get(info.position);
             listaArticulos.remove(itemArticulo);
             for (int i = 0; i < listaArticulos.size() - 1; i++) {
@@ -4800,6 +4872,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     AplicarPromocion500();
                     AplicarPromocionComboOrix();
                     AplicarPromocionTiraExhibidor();
+                    AplicarPromocionGelB();
                     AplicarPromocionCanels();
                     AplicarPromocionJaloma();
                     AplicarPromocionComboIris();

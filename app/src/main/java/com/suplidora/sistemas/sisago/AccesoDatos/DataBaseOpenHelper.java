@@ -267,6 +267,11 @@ public class DataBaseOpenHelper {
                     + variables_publicas.BANCOS_COLUMN_codigo + " TEXT , "
                     + variables_publicas.BANCOS_COLUMN_nombre + " TEXT ) ");
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PROMO_UNICA_VEZ + "( "
+                    + variables_publicas.PROMO_PROMO_UNICA_VEZ_COLUMN_Cliente + " TEXT , "
+                    + variables_publicas.PROMO_PROMO_UNICA_VEZ_COLUMN_Item + " TEXT , "
+                    + variables_publicas.PROMO_PROMO_UNICA_VEZ_COLUMN_CodCV + " TEXT ) ");
+
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_SERIE_RECIBOS + "( "
                     + variables_publicas.SERIERECIBOS_COLUMN_IdSerie + " TEXT , "
                     + variables_publicas.SERIERECIBOS_COLUMN_CodVendedor + " TEXT , "
@@ -297,6 +302,7 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_INFORMES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_FACTURAS_PENDIENTES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_BANCOS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PROMO_UNICA_VEZ);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_SERIE_RECIBOS);
             onCreate(db);
         }
