@@ -20,7 +20,6 @@ import com.suplidora.sistemas.sisago.AccesoDatos.PedidosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialCanalHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.PrecioEspecialHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.DescuentoEspecialHelper;
-import com.suplidora.sistemas.sisago.AccesoDatos.PromoUnicaVezHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.UsuariosHelper;
 import com.suplidora.sistemas.sisago.AccesoDatos.VendedoresHelper;
 import com.suplidora.sistemas.sisago.Entidades.Cliente;
@@ -79,7 +78,6 @@ public class SincronizarDatos {
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
     private InformesHelper InformesH;
-    private PromoUnicaVezHelper PromoUnicaVezH;
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
 
@@ -732,12 +730,10 @@ public class SincronizarDatos {
                                                 if (SincronizarConfiguracionSistema()) {
                                                     if (ActualizarUsuario()) {
                                                         if (ObtenerBancos()) {
-                                                            if (ObtenerPromoUnicaVez()) {
-                                                                if (ObtenerSerieRecibos()) {
-                                                                    if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
-                                                                        SincronizarPedidosLocales();
-                                                                        return true;
-                                                                    }
+                                                            if (ObtenerSerieRecibos()) {
+                                                                if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
+                                                                    SincronizarPedidosLocales();
+                                                                    return true;
                                                                 }
                                                             }
                                                         }
@@ -765,7 +761,6 @@ public class SincronizarDatos {
         SincronizarPrecioEspecial();
         SincronizarPrecioEspecialCanal();
         SincronizarDescuentoEspecial();
-        ObtenerPromoUnicaVez();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
     }
@@ -1113,58 +1108,6 @@ public class SincronizarDatos {
 
         } else {
             new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-            return false;
-        }
-        //return false;
-    }
-
-    private boolean ObtenerPromoUnicaVez() {
-
-        HttpHandler sh = new HttpHandler();
-        String urlString = urlGetPromoUnicaVez;
-        String encodeUrl = "";
-        try {
-            URL Url = new URL(urlString);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String jsonStr = sh.makeServiceCall(encodeUrl);
-
-        /**********************************BANCOS**************************************/
-        if (jsonStr != null) {
-
-            try {
-                //DbOpenHelper.database.beginTransaction();
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray promounicavez = jsonObj.getJSONArray("GetPromoGelBarberListaResult");
-                if (promounicavez.length() == 0) {
-                    return false;
-                }
-                PromoUnicaVezH.EliminaPromoUnicaVez();
-                // looping through All Contacts
-
-                for (int i = 0; i < promounicavez.length(); i++) {
-                    JSONObject c = promounicavez.getJSONObject(i);
-                    PromoUnicaVezH.GuardarPromoUnicaVez(c.get("CLIENTE").toString(),c.get("Item").toString(),c.get("codcv").toString());
-                }
-                return true;
-                // DbOpenHelper.database.setTransactionSuccessful();
-            } catch (Exception ex) {
-                Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al cargar lista de clientes PromoUnca Vez,Excepcion controlada", variables_publicas.info + ex.getMessage(), "sisago@suplidora.com.ni", variables_publicas.correosErrores);
-                return false;
-            }
-
-          /*  finally {
-                DbOpenHelper.database.endTransaction();
-            }*/
-
-        } else {
-            new Funciones().SendMail("Ha ocurrido un error al cargar lista de clientes PromoUnca Vez,Respuesta nula", variables_publicas.info + urlString, "sisago@suplidora.com.ni", variables_publicas.correosErrores);
             return false;
         }
         //return false;
