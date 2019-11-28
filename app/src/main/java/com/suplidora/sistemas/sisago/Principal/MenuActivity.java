@@ -69,6 +69,7 @@ import com.suplidora.sistemas.sisago.Menu.ListaDevolucionesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaInformesFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosFragment;
 import com.suplidora.sistemas.sisago.Menu.ListaPedidosSupFragment;
+import com.suplidora.sistemas.sisago.Menu.ListaPedidovsFacturado;
 import com.suplidora.sistemas.sisago.Menu.ListaRecibosPendFragment;
 import com.suplidora.sistemas.sisago.Menu.MaestroProductoFragment;
 import com.suplidora.sistemas.sisago.Menu.MapViewFragment;
@@ -494,10 +495,17 @@ public class MenuActivity extends AppCompatActivity
                 break;
 
             case R.id.btnListadoPedidos:
-
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaPedidosFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnPedidoFacturado:
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaPedidovsFacturado());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;
