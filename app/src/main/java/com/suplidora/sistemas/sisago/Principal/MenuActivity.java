@@ -164,9 +164,9 @@ public class MenuActivity extends AppCompatActivity
             showSettingsAlert();
         }
 
-        Intent intent = new Intent(this,GPSTracker.class);
+  /*      Intent intent = new Intent(this,GPSTracker.class);
         AutoArranque ar = new AutoArranque();
-        ar.onReceive(this,intent);
+        ar.onReceive(this,intent);*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -698,8 +698,8 @@ public class MenuActivity extends AppCompatActivity
         super.onDestroy();
 /*        Intent intent = new Intent(this,GPSTracker.class);
         startService(intent);*/
-        Intent intent = new Intent(this,GPSTracker.class);
+/*        Intent intent = new Intent(this,GPSTracker.class);
         AutoArranque ar = new AutoArranque();
-        ar.onReceive(this,intent);
+        ar.onReceive(this,intent);*/
     }
   }

@@ -201,8 +201,13 @@ public class ListaPedidosSupFragment extends Fragment {
                 InputMethodManager inputManager = (InputMethodManager)
                         getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                View focusedView = getActivity().getCurrentFocus();
+                if (focusedView != null) {
+                    inputManager.hideSoftInputFromWindow(focusedView.getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }
+              /*  inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);*/
 
             }
         });
@@ -216,8 +221,11 @@ public class ListaPedidosSupFragment extends Fragment {
                 InputMethodManager inputManager = (InputMethodManager)
                         getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+                View focusedView = getActivity().getCurrentFocus();
+                if (focusedView != null) {
+                    inputManager.hideSoftInputFromWindow(focusedView.getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }
             }
         });
 
