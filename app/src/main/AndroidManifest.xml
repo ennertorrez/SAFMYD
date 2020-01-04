@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.suplidora.sistemas.sisago">
+    package="com.safi_d.sistemas.safiapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -17,27 +17,19 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/logotemp"
+        android:icon="@mipmap/logosafi"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         android:screenOrientation="portrait"
+        android:usesCleartextTraffic="true"
         android:name="android.support.multidex.MultiDexApplication">
 
-
-        <!--
-            The API key for Google Maps-based APIs is defined as a string resource.
-            (See the file "res/values/google_maps_api.xml").
-            Note that the API key is linked to the encryption key used to sign the APK.
-            You need a different API key for each encryption key, including the release key that is used to
-            sign the APK for publishing.
-            You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".Principal.Login"
+        <activity android:name="com.safi_d.sistemas.safiapp.Principal.Login"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -46,7 +38,7 @@
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             </intent-filter>
         </activity>
-        <activity android:name=".Principal.MenuActivity"
+        <activity android:name="com.safi_d.sistemas.safiapp.Principal.MenuActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -55,7 +47,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Principal.Barra_cargado">
+        <activity android:name="com.safi_d.sistemas.safiapp.Principal.Barra_cargado">
             <intent-filter>
                 <action android:name="android.intent.action.Barra_cargado" />
 
@@ -63,7 +55,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SingleMenuItemActivity">
+        <activity android:name="com.safi_d.sistemas.safiapp.SingleMenuItemActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SingleMenuItemActivity" />
 
@@ -77,7 +69,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>-->
-        <activity android:name=".Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -87,7 +79,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Clientes.ClientesNew" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Clientes.ClientesNew" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -97,7 +89,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Informes.InformesActivity" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Informes.InformesActivity" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -107,7 +99,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Informes.AgregarRecibo" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Informes.AgregarRecibo" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -116,7 +108,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Clientes.ListaVentasHistClientes" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Clientes.ListaVentasHistClientes" android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation"
         android:screenOrientation="portrait">
         <intent-filter>
@@ -125,7 +117,7 @@
             <category android:name="android.intent.category.DEFAULT" />
         </intent-filter>
         </activity>
-        <activity android:name=".Clientes.ClientesInactivosEdit" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Clientes.ClientesInactivosEdit" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -134,7 +126,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Informes.ListaDetalleInformesClientes" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Informes.ListaDetalleInformesClientes" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -143,7 +135,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".Informes.ListaFacturasMoraClientes" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.safi_d.sistemas.safiapp.Informes.ListaFacturasMoraClientes" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -152,25 +144,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <receiver android:enabled="true"
-            android:name=".Principal.AutoArranque"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".Principal.GPSTracker"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name = "android.intent.action.ACTION_OPEN_SERVICE"/>
-            </intent-filter>
-        </service>
 
         <meta-data
             android:name="com.google.android.gms.version"

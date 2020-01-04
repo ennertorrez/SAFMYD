@@ -31,73 +31,43 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingBottom="3dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/lblIdCV"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/borde_campos_pedidos"
-                        android:text="No. Clientes Varios: 00000"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="20dp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/lblNombreClienteV"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="top"
-                        android:text=""
-                        android:textColor="@color/colorPrimaryDark"
-                        android:textSize="18dp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp">
-                    <EditText
-                        android:id="@+id/txtCedulaB"
-                        android:layout_width="5dp"
-                        android:layout_height="30dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/rounded_edittext"
-                        android:hint="Cedula"
-                        android:maxLength="16"
-                        android:inputType="text"
-                        android:maxLines="1"></EditText>
-                        <Button
-                            android:id="@+id/btnBusCedCliente"
-                            android:layout_width="50dp"
-                            android:layout_height="match_parent"
-                            android:background="@mipmap/ic_search_black_48dp"
-                            android:backgroundTint="@color/colorPrimaryDark" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp">
                     <EditText
                         android:id="@+id/txtCodCliente"
-                        android:layout_width="0dp"
+                        android:layout_width="250dp"
                         android:layout_height="30dp"
                         android:layout_weight="0.79"
                         android:background="@drawable/rounded_edittext"
-                        android:hint="Codigo"
-                        android:textStyle="bold"
-                        android:textColorHint="@color/colorPrimary"
                         android:editable="false"
-                        android:maxLines="1"></EditText>
+                        android:hint="Codigo"
+                        android:maxLines="1"
+                        android:textAlignment="center"
+                        android:textColorHint="@color/colorPrimary"
+                        android:textStyle="bold"></EditText>
+
+                    <EditText
+                        android:id="@+id/txtCodLetra"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_weight="0.79"
+                        android:background="@drawable/rounded_edittext"
+                        android:editable="false"
+                        android:hint="Codigo Letra"
+                        android:maxLines="1"
+                        android:textAlignment="center"
+                        android:textColorHint="@color/Red"
+                        android:textStyle="bold"></EditText>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp">
+
                     <EditText
                         android:id="@+id/txtNombCliente"
-                        android:layout_width="271dp"
+                        android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:background="@drawable/rounded_edittext"
                         android:hint="Nombre"
@@ -106,7 +76,25 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
+                    android:layout_height="30dp">
+
+                    <EditText
+                        android:id="@+id/txtCedulaB"
+                        android:layout_width="5dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_edittext"
+                        android:hint="Cedula"
+                        android:inputType="text"
+                        android:maxLength="16"
+                        android:maxLines="1"></EditText>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="100dp">
+
                     <EditText
                         android:id="@+id/txtDirCliente"
                         android:layout_width="0dp"
@@ -115,8 +103,8 @@
                         android:background="@drawable/rounded_edittext"
                         android:hint="Direccion"
                         android:inputType="textMultiLine"
-                        android:scrollbars = "vertical"
-                        android:maxLines="4"></EditText>
+                        android:maxLines="4"
+                        android:scrollbars="vertical"></EditText>
                 </LinearLayout>
             </LinearLayout>
 
@@ -148,7 +136,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
                     <TextView
                         android:id="@+id/lblMuni"
                         android:layout_width="150dp"
@@ -167,26 +155,57 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
                     <TextView
-                        android:id="@+id/lblBarrio"
+                        android:id="@+id/lblZona"
                         android:layout_width="150dp"
                         android:layout_height="25dp"
                         android:layout_gravity="center_horizontal"
                         android:background="@drawable/borde_campos_pedidos"
-                        android:text="Barrio"
+                        android:text="Zona"
                         android:textColor="@color/colorAccent"
                         android:textSize="13dp"
                         android:textStyle="bold" />
-                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+
+                    <Spinner
+                        android:id="@+id/cboZona"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ></Spinner>
+<!--                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
                         android:id="@+id/cboBarrio"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content" />-->
 
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
+                    <TextView
+                        android:id="@+id/lblSubZona"
+                        android:layout_width="150dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:text="Sub Zona"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/cboSubZona"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ></Spinner>
+                    <!--                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                            android:id="@+id/cboBarrio"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content" />-->
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp">
                     <TextView
                         android:id="@+id/lblDiasVisit"
                         android:layout_width="150dp"
@@ -205,7 +224,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
                     <TextView
                         android:id="@+id/lblRutaCliente"
                         android:layout_width="150dp"
@@ -224,7 +243,26 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
+                    <TextView
+                        android:id="@+id/lblTipoCliente"
+                        android:layout_width="150dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_horizontal"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:text="Tipo de Cliente"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
+                    <Spinner
+                        android:id="@+id/cboTipoCliente"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        ></Spinner>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp">
                     <TextView
                         android:id="@+id/lblTipoNeg"
                         android:layout_width="150dp"
@@ -243,7 +281,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblTelefono"
                         android:layout_width="150dp"
@@ -266,7 +304,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp">
+                    android:layout_height="30dp">
                     <TextView
                         android:id="@+id/lblVendedor"
                         android:layout_width="150dp"

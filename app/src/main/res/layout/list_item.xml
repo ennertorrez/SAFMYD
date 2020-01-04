@@ -24,147 +24,96 @@
         android:layout_below="@id/Codigo" />
 
     <TextView
-        android:id="@+id/lblPrecioSuper"
-        android:layout_width="70dp"
+        android:id="@+id/lblPrecio"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:text="Super: "
+        android:text="Precio: "
         android:textColor="@color/colorAccent"
         android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
         android:gravity="right"/>
 
     <TextView
-        android:id="@+id/PrecioSuper"
+        android:id="@+id/Precio"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
-        android:layout_toRightOf="@id/lblPrecioSuper"
+        android:layout_toRightOf="@id/lblPrecio"
         android:gravity="right"
 
 
         />
 
     <TextView
-        android:id="@+id/lblPrecioDetalle"
-        android:layout_width="80dp"
+        android:id="@+id/lblUnidadCaja"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
+        android:layout_below="@id/Nombre"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/Precio"
+        android:gravity="right"
+        android:paddingBottom="2dip"
+        android:text="Unidad Pres.:"
         android:textColor="@color/colorAccent"
         android:textStyle="bold"
-        android:paddingBottom="2dip"
-        android:text="Detalle:"
-        android:layout_marginLeft="10dp"
-        android:layout_below="@id/Nombre"
-        android:layout_toRightOf="@id/PrecioSuper"
-        android:gravity="right"
 
         />
 
     <TextView
-        android:id="@+id/PrecioDetalle"
+        android:id="@+id/UnidadCaja"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
         android:layout_below="@id/Nombre"
-        android:layout_toRightOf="@id/lblPrecioDetalle"
+        android:layout_toRightOf="@id/lblUnidadCaja"
         android:gravity="right"
          />
 
-    <TextView
-        android:id="@+id/lblPrecioForaneo"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:gravity="right"
-        android:text="Foraneo:"
-        android:paddingBottom="2dip"
-        android:layout_marginLeft="10dp"
-        android:layout_below="@id/lblPrecioSuper"
-        android:layout_toRightOf="@+id/PrecioMayorista"
-        android:layout_toStartOf="@+id/PrecioDetalle" />
-
-
-
-    <TextView
-        android:id="@+id/PrecioForaneo"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:textColor="#5d5d5d"
-        android:textStyle="bold"
-        android:paddingBottom="2dip"
-        android:layout_below="@id/PrecioSuper"
-        android:gravity="right"
-        android:layout_alignEnd="@+id/PrecioDetalle"
-        android:layout_toEndOf="@+id/lblPrecioDetalle" />
-
-    <TextView
-        android:id="@+id/lblPrecioMayorista"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:paddingBottom="2dip"
-        android:text="Mayorista: "
-        android:layout_below="@id/PrecioSuper"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:id="@+id/PrecioMayorista"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:textColor="#5d5d5d"
-        android:textStyle="bold"
-        android:paddingBottom="2dip"
-        android:layout_below="@id/PrecioSuper"
-        android:layout_toRightOf="@id/lblPrecioMayorista"
-        android:gravity="right"
-      />
-
-    <TextView
-    android:id="@+id/lblPrecioForaneo2"
-    android:layout_width="70dp"
+       <TextView
+    android:id="@+id/lblPresentacion"
+    android:layout_width="90dp"
     android:layout_height="wrap_content"
     android:textColor="@color/colorAccent"
     android:textStyle="bold"
     android:gravity="right"
-    android:text="Foraneo2:"
+    android:text="Presentacion:"
     android:paddingBottom="2dip"
-    android:layout_below="@id/PrecioMayorista"
+    android:layout_below="@id/Precio"
 
     ></TextView>
 
 
     <TextView
-        android:id="@+id/PrecioForaneo2"
+        android:id="@+id/Presentacion"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:textColor="#5d5d5d"
         android:textStyle="bold"
         android:paddingBottom="2dip"
 
-        android:layout_below="@id/PrecioMayorista"
-        android:layout_toRightOf="@+id/lblPrecioForaneo2"
+        android:layout_below="@id/Precio"
+        android:layout_toRightOf="@+id/lblPresentacion"
         android:gravity="right"
 
         />
 
     <TextView
         android:id="@+id/lblExistencias"
-        android:layout_width="80dp"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimary"
         android:textStyle="bold"
         android:gravity="right"
         android:text="Existencias:"
         android:paddingBottom="2dip"
-        android:layout_below="@id/PrecioMayorista"
-        android:layout_toRightOf="@id/PrecioForaneo2"
+        android:layout_below="@id/lblUnidadCaja"
+        android:layout_toRightOf="@id/Presentacion"
         android:layout_marginLeft="10dp"
 
         ></TextView>
@@ -176,7 +125,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:paddingBottom="2dip"
-        android:layout_below="@id/PrecioMayorista"
+        android:layout_below="@id/UnidadCaja"
         android:layout_toRightOf="@+id/lblExistencias"
         android:gravity="right"
         android:textColor="@color/colorPrimary"

@@ -5,7 +5,7 @@
         <item
             android:id="@+id/btnMaestroProductos"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Maestro Productos" />
+            android:title="Listado Productos" />
         <item
             android:id="@+id/btnPedidos"
             android:icon="@drawable/ic_menu_plussign"
@@ -22,16 +22,6 @@
                     android:id="@+id/btnNuevoPedido"
                     android:icon="@drawable/ic_menu_plussign"
                     android:title="Nuevo Pedido"/>
-
-                <item
-                    android:id="@+id/btnPromociones"
-                    android:icon="@drawable/ic_menu_share"
-                    android:title="Promociones"/>
-
-                <item
-                    android:id="@+id/btnOtrasPromociones"
-                    android:icon="@drawable/ic_menu_share"
-                    android:title="Otras Promociones"/>
             </menu>
         </item>
         <item
@@ -43,7 +33,7 @@
                 <item
                     android:id="@+id/btnMaestroClientes"
                     android:icon="@drawable/ic_menu_slideshow"
-                    android:title="Maestro Clientes" />
+                    android:title="Listado Clientes" />
                 <item
                     android:id="@+id/btnNuevoCliente"
                     android:icon="@drawable/ic_menu_plussign"
@@ -54,11 +44,6 @@
                     android:title="Activar Cliente" />
             </menu>
         </item>
-        <item
-            android:id="@+id/btnMapa"
-            android:icon="@drawable/ic_menu_mapmode"
-            android:iconTint="@color/colorAccent"
-            android:title="Mapa" />
         <item
             android:id="@+id/btnRecibos"
             android:icon="@drawable/ic_menu_share"
@@ -92,19 +77,11 @@
                 android:id="@+id/btnReporteVentasAlDia"
                 android:icon="@drawable/ic_menu_share"
 
-                android:title="Reporte Pre-ventas" />
+                android:title="Reporte Pre-Ventas" />
             <item
                 android:id="@+id/btnReporteHistVentas"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Histórico de Ventas" />
-            <item
-                android:id="@+id/btnReporteDevoluciones"
-                android:icon="@drawable/ic_menu_mapmode"
-                android:title="Reporte Devoluciones" />
-            <item
-                android:id="@+id/btnReporteComisiones"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Reporte Ingresos" />
         </menu>
     </item>
 </group>

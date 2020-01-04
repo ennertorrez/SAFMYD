@@ -2,31 +2,31 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        SISAGO {
-            keyAlias 'SISAGO'
+        SAFIAPP {
+            keyAlias 'SAFIAPP'
             keyPassword '1234567'
-            storeFile file('C:/APKS/SISAGO.jks')
+            storeFile file('C:/APKS/SAFIAPP.jks')
             storePassword '1234567'
         }
     }
-    compileSdkVersion 26
+    compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId 'com.suplidora.sistemas.sisago'
+        applicationId 'com.safi_d.sistemas.safiapp'
         minSdkVersion 17
-        targetSdkVersion 26
-        versionCode 136
-        versionName "1.135"
+        targetSdkVersion 28
+        versionCode 3
+        versionName "1.2"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        signingConfig signingConfigs.SISAGO
+        signingConfig signingConfigs.SAFIAPP
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.SISAGO
+            signingConfig signingConfigs.SAFIAPP
         }
 
     }
@@ -50,12 +50,12 @@ dependencies {
     annotationProcessor  'com.google.dagger:dagger-compiler:2.11'*/
     //noinspection GradleCompatible
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:design:28.0.0'
     implementation 'com.google.android.gms:play-services:10.0.1'
-    implementation 'com.android.support:cardview-v7:26.1.0'
-    implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.googlecode.json-simple:json-simple:1.1'
     //noinspection GradleCompatible
     //compile 'com.android.support:appcompat-v7:23.3.0'

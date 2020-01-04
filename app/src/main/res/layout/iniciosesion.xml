@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5fb0c9"
+    android:background="#015d52"
     android:orientation="vertical"
     android:scrollbarAlwaysDrawVerticalTrack="true">
 
@@ -109,5 +109,5 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/user_profile_image_background"
         android:elevation="4dp"
-        android:src="@mipmap/logosuplidora145x148" />
+        android:src="@mipmap/logosafi145x148" />
 </RelativeLayout>
