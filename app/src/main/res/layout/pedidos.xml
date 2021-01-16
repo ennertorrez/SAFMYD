@@ -296,7 +296,7 @@
                     android:layout_height="35dp">
 
                     <Spinner
-                        android:id="@+id/cboUM"
+                        android:id="@+id/cboTPrecio"
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         tools:layout_height="match_parent"></Spinner>
@@ -355,7 +355,7 @@
 
                         <LinearLayout
                             android:id="@+id/layout_list_header"
-                            android:layout_width="1040dp"
+                            android:layout_width="980dp"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
@@ -395,14 +395,15 @@
 
                             <TextView
                                 android:id="@+id/lblColUM"
-                                android:layout_width="100dp"
-                                android:layout_height="wrap_content"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
                                 android:layout_gravity="top"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:gravity="center"
                                 android:text="U/M"
                                 android:textAppearance="?android:attr/textAppearanceMedium"
                                 android:textColor="#000000"
+                                android:visibility="invisible"
                                 android:typeface="monospace"/>
 
                             <TextView
@@ -496,7 +497,6 @@
                                 android:textAppearance="?android:attr/textAppearanceMedium"
                                 android:textColor="#000000"
                                 android:typeface="monospace" />
-
                             <TextView
                                 android:id="@+id/lblColTotal"
                                 android:layout_width="match_parent"
@@ -522,7 +522,7 @@
 
                             <ListView
                                 android:id="@+id/listPedido"
-                                android:layout_width="1040dp"
+                                android:layout_width="980dp"
                                 android:layout_height="125dp"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
@@ -542,7 +542,7 @@
 
                             <TextView
                                 android:id="@+id/lblFooter"
-                                android:layout_width="1020dp"
+                                android:layout_width="980dp"
                                 android:layout_height="20dp"
                                 android:background="@drawable/borde_campos_pedidos"
                                 android:text="Total items: 0"
