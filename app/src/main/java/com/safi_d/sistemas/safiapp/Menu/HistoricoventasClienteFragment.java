@@ -48,7 +48,7 @@ import com.safi_d.sistemas.safiapp.R;
 public class HistoricoventasClienteFragment extends Fragment{
     View myView;
     private String TAG = HistoricoventasClienteFragment.class.getSimpleName();
-    private String busqueda = "1";
+    private String busqueda = "";
     private String tipoBusqueda = "1";
     private ProgressDialog pDialog;
     private ListView lv;
@@ -90,21 +90,21 @@ public class HistoricoventasClienteFragment extends Fragment{
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
                 // On selecting a spinner item
-                  String text = cboMeses.getSelectedItem().toString();
+                String text = cboMeses.getSelectedItem().toString();
                 if (text.equals("1 Mes")){
-                   dias="30";
+                    dias="30";
                 }else if (text.equals("2 Meses")){
                     dias="60";
                 }else if (text.equals("3 Meses")) {
                     dias = "90";
                 }else if (text.equals("4 Meses")) {
-                     dias = "120";
+                    dias = "120";
                 }else if (text.equals("5 Meses")) {
                     dias = "150";
                 }else if (text.equals("6 Meses")) {
-                     dias = "180";
+                    dias = "180";
                 }
-               // btnBuscar.performClick();
+                // btnBuscar.performClick();
             }
 
             @Override
@@ -197,7 +197,7 @@ public class HistoricoventasClienteFragment extends Fragment{
             HttpHandler sh = new HttpHandler();
 
             // Making a request to url and getting response
-            String urlString = url + busqueda.replace(" ", "%20") + "/" + tipoBusqueda;
+            String urlString = url + busqueda.replace(" ", "%20") + "/"  + variables_publicas.usuario.getCodigo()  + "/" + tipoBusqueda;
             String jsonStr = sh.makeServiceCall(urlString);
 
             Log.e(TAG, "Response from url: " + jsonStr);
@@ -216,14 +216,10 @@ public class HistoricoventasClienteFragment extends Fragment{
                         HashMap<String, String> cliente = new HashMap<>();
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Cedula, c.getString("Cedula"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Ciudad, c.getString("Ciudad"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_CodCv, c.getString("CodCv"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoGalatea, c.getString("CodigoGalatea"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_CodigoLetra, c.getString("CodigoLetra"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Descuento, c.getString("Descuento"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_Detallista, c.getString("Detallista"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Direccion, c.getString("Direccion"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Empleado, c.getString("Empleado"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_EsClienteVarios, c.getString("EsClienteVarios"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Excento, c.getString("Excento"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_FechaCreacion, c.getString("FechaCreacion"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_FechaUltimaCompra, c.getString("FechaUltimaCompra"));
@@ -235,22 +231,11 @@ public class HistoricoventasClienteFragment extends Fragment{
                         cliente.put(variables_publicas.CLIENTES_COLUMN_IdVendedor, c.getString("IdVendedor"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_LimiteCredito, c.getString("LimiteCredito"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Nombre, c.getString("Nombre"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_NombreCliente, c.getString("NombreCliente"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_PrecioEspecial, c.getString("PrecioEspecial"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Ruc, c.getString("Ruc"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Ruta, c.getString("Ruta"));
-                        //cliente.put(variables_publicas.CLIENTES_COLUMN_RutaForanea, c.getString("RutaForanea"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Telefono, c.getString("Telefono"));
                         cliente.put(variables_publicas.CLIENTES_COLUMN_Tipo, c.getString("Tipo"));
-
-       /*                 if (c.get(variables_publicas.CLIENTES_COLUMN_EsClienteVarios).toString().equalsIgnoreCase("false")) {
-                            cliente.put("CodCv2", "");
-                            cliente.put("NombreCompleto", c.getString("NombreCliente"));
-                        } else {
-                            cliente.put("CodCv2","Cod_Cv: "+ c.getString("CodCv"));
-                            cliente.put("NombreCompleto",c.getString("Nombre")+ " / " + c.getString("NombreCliente"));
-                        }
-                        cliente.put(variables_publicas.CLIENTES_COLUMN_IdBarrio, c.getString("IdBarrio"));*/
                         cliente.put(variables_publicas.CLIENTES_COLUMN_TipoNegocio, c.getString("TipoNegocio"));
 
                         listaClientes.add(cliente);
@@ -296,8 +281,8 @@ public class HistoricoventasClienteFragment extends Fragment{
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaClientes,
-                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente, "CodigoLetra", "Nombre", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente, R.id.CodLetra, R.id.Nombre,
-                    R.id.Direccion});
+                    R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente, "CodigoLetra", "Nombre", "Ciudad",variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente, R.id.CodLetra, R.id.Nombre,
+                    R.id.Ciudad,R.id.Direccion});
 
             lv.setAdapter(adapter);
             lblFooter.setText("Clientes Encontrados: " + String.valueOf(listaClientes.size()));

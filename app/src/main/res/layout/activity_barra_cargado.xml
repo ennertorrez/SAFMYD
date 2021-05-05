@@ -24,6 +24,7 @@
         android:layout_height="150dp"
         android:max="100"
         android:layout_marginTop="50dp"
+        android:indeterminateTint="@color/colorPrimaryGreen"
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true" />
 
@@ -39,6 +40,28 @@
         android:layout_below="@+id/progressBar1"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:id="@+id/empresa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Agencia del Norte"
+        android:textColor="@color/colorPrimaryGreen"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_below="@+id/TextView01"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:id="@+id/eslogan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Líder en Bebidas"
+        android:textColor="@color/colorPrimaryGreen"
+        android:textSize="18sp"
+        android:textStyle="italic"
+        android:layout_below="@+id/empresa"
+        android:layout_centerHorizontal="true" />
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="220dp"

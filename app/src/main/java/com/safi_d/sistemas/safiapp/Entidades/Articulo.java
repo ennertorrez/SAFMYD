@@ -20,6 +20,8 @@ public class Articulo {
     String DescuentoMaximo = "";
     String Existencia="";
     String UnidadCajaVenta="";
+    String UnidadCajaVenta2="";
+    String UnidadCajaVenta3="";
     String IdProveedor="";
 
     public Articulo() {
@@ -27,7 +29,7 @@ public class Articulo {
 
     public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String precio,
                     String precio2,String precio3,String precio4,String codUM,String porIva,
-                    String descuentoMaximo, String existencia, String unidadCajaVenta,String idProveedor) {
+                    String descuentoMaximo, String existencia, String unidadCajaVenta, String unidadCajaVenta2, String unidadCajaVenta3,String idProveedor) {
         Codigo = codigo;
         Nombre = nombre;
         Costo = costo;
@@ -42,6 +44,8 @@ public class Articulo {
         DescuentoMaximo = descuentoMaximo;
         Existencia=existencia;
         UnidadCajaVenta=unidadCajaVenta;
+        UnidadCajaVenta2=unidadCajaVenta2;
+        UnidadCajaVenta3=unidadCajaVenta3;
         IdProveedor=idProveedor;
     }
 
@@ -165,6 +169,20 @@ public class Articulo {
         DescuentoMaximo = descuentoMaximo;
     }
 
+    public String getUnidadCajaVenta2() {
+        return UnidadCajaVenta2;
+    }
+
+    public void setUnidadCajaVenta2(String unidadCajaVenta2) {
+        UnidadCajaVenta2 = unidadCajaVenta2;
+    }
+    public String getUnidadCajaVenta3() {
+        return UnidadCajaVenta3;
+    }
+
+    public void setUnidadCajaVenta3(String unidadCajaVenta3) {
+        UnidadCajaVenta3 = unidadCajaVenta3;
+    }
     public String toString() {
         return this.getNombre();
     }

@@ -90,6 +90,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.ARTICULO_COLUMN_DescuentoMaximo + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_Existencia + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta + " TEXT, "
+                    + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta2 + " TEXT, "
+                    + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta3 + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_IdProveedor + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_VENDEDORES + "( "

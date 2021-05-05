@@ -64,6 +64,17 @@
             android:textSize="18dp"
             android:textStyle="bold" />
         <TextView
+            android:id="@+id/lblCantidadD"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:focusable="false"
+            android:gravity="right"
+            android:paddingLeft="2dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+        <TextView
             android:id="@+id/lblMontoP"
             android:layout_width="110dp"
             android:layout_height="match_parent"
@@ -91,7 +102,20 @@
             android:textSize="18dp"
             android:textStyle="bold"
             />
-
+        <TextView
+            android:id="@+id/lblMontoD"
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:gravity="right"
+            android:maxLines="1"
+            android:paddingLeft="2dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            />
     </LinearLayout>
 
 

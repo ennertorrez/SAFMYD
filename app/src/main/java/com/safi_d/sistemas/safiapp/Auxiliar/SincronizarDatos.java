@@ -45,11 +45,8 @@ import static com.safi_d.sistemas.safiapp.Auxiliar.Funciones.Codificar;
 
 public class SincronizarDatos {
 
-
-
     private String urlClientes = variables_publicas.direccionIp + "/ServicioClientes.svc/BuscarClientes";
     private String urlDptoMuniBarrios = variables_publicas.direccionIp + "/ServicioClientes.svc/ObtenerDptoMuniBarrios";
-   // private String urlZonas = variables_publicas.direccionIp + "/ServicioClientes.svc/GetZonas";
     private String urlRutas = variables_publicas.direccionIp + "/ServicioClientes.svc/GetRutas/";
     private String urlArticulos = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
@@ -72,7 +69,6 @@ public class SincronizarDatos {
     private PedidosHelper PedidosH;
     private PedidosDetalleHelper PedidosDetalleH;
     private CartillasBcHelper CartillasBcH;
-    //private ZonasHelper ZonasH;
     private RutasHelper RutasH;
     private CategoriasClienteHelper CategoriaH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
@@ -82,7 +78,6 @@ public class SincronizarDatos {
     private InformesHelper InformesH;
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
-    //private PreciosHelper PreciosH;
     private TPreciosHelper TPreciosH;
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -103,7 +98,6 @@ public class SincronizarDatos {
         UsuariosH = usuariosH;
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
-       // PreciosH = preciosH;
         RutasH = rutasH;
         TPreciosH = tpreciosH;
     }
@@ -131,8 +125,6 @@ public class SincronizarDatos {
         InformesH=Informesh;
         InformesDetalleH=InformesDetalleh;
         FacturasPendientesH=FacturasPendientesh;
-        //ZonasH=zonasH;
-        //PreciosH = preciosH;
         TPreciosH = tpreciosH;
         CategoriaH=categoriasH;
         RutasH =rutasH;
@@ -141,9 +133,7 @@ public class SincronizarDatos {
     public SincronizarDatos(DataBaseOpenHelper dbh , ClientesHelper Clientesh, CategoriasClienteHelper Categoriah,TPreciosHelper tpreciosH,RutasHelper rutasH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
-        //Zonash = Zonash;
         CategoriaH = Categoriah;
-        //PreciosH=preciosH;
         TPreciosH=tpreciosH;
         RutasH= rutasH;
     }
@@ -194,8 +184,10 @@ public class SincronizarDatos {
                 String DESCUENTO_MAXIMO = c.getString("DESCUENTO_MAXIMO");
                 String existencia = c.getString("Existencia");
                 String UnidadCajaVenta = c.getString("UnidadCajaVenta");
+                String UnidadCajaVenta2 = c.getString("UnidadCajaVenta2");
+                String UnidadCajaVenta3 = c.getString("UnidadCajaVenta3");
                 String IdProveedor = c.getString("IdProveedor");
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, Precio,Precio2,Precio3,Precio4,CodUM, PorIVA, DESCUENTO_MAXIMO,  existencia, UnidadCajaVenta, IdProveedor);
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, Precio,Precio2,Precio3,Precio4,CodUM, PorIVA, DESCUENTO_MAXIMO,  existencia, UnidadCajaVenta,UnidadCajaVenta2,UnidadCajaVenta3, IdProveedor);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;
@@ -844,6 +836,9 @@ public class SincronizarDatos {
         SincronizarConfiguracionSistema();
     }
 
+    public void SincronizarTablaClientes() throws JSONException {
+        SincronizarClientes();
+    }
     public boolean SincronizarPedidosLocales() {
 
         boolean guardadoOK = true;
@@ -1144,7 +1139,7 @@ public class SincronizarDatos {
 
                 for (int i = 0; i < bancos.length(); i++) {
                     JSONObject c = bancos.getJSONObject(i);
-                    InformesH.GuardarBancos(c.get("Codigo").toString(),c.get("Nombre").toString());
+                    InformesH.GuardarBancos(c.get("CODIGO").toString(),c.get("NOMBRE").toString());
                 }
                 return true;
                // DbOpenHelper.database.setTransactionSuccessful();

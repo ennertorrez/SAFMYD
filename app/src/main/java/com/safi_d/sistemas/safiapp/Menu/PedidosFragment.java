@@ -151,7 +151,7 @@ public class PedidosFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-//
+    //
     private class GetClientesPedidos extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -166,65 +166,65 @@ public class PedidosFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-                try {
-                    if(getActivity().isFinishing()) return null;
-                    DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
-                    ClientesH = new ClientesHelper(DbOpenHelper.database);
-                    switch (tipoBusqueda){
-                        case "1":
-                            listaClientes=ClientesH.BuscarClientesCodigo(busqueda);
-                            break;
-                        case  "2":
-                            listaClientes=ClientesH.BuscarClientesNombre(busqueda);
-                            break;
-                    }
-                } catch (final Exception e) {
-                    Log.e(TAG, "Json parsing error: " + e.getMessage());
-                    if(getActivity()==null) return null;
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            Toast.makeText(getActivity().getApplicationContext(),
-                                    "Json parsing error: " + e.getMessage(),
-                                    Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
+            try {
+                if(getActivity().isFinishing()) return null;
+                DbOpenHelper = new DataBaseOpenHelper(getActivity().getApplicationContext());
+                ClientesH = new ClientesHelper(DbOpenHelper.database);
+                switch (tipoBusqueda){
+                    case "1":
+                        listaClientes=ClientesH.BuscarClientesCodigo(busqueda);
+                        break;
+                    case  "2":
+                        listaClientes=ClientesH.BuscarClientesNombre(busqueda);
+                        break;
                 }
+            } catch (final Exception e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+                if(getActivity()==null) return null;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "Json parsing error: " + e.getMessage(),
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
             return null;
         }
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-           try{
-               // Dismiss the progress dialog
-               if (pDialog.isShowing())
-                   pDialog.dismiss();
-               /**
-                * Updating parsed JSON data into ListView
-                * */
-               ListAdapter adapter = new SimpleAdapter(
-                       getActivity(), listaClientes,
-                       R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodigoLetra","TipoPrecio", "Nombre", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodLetra,R.id.TipoPrecio, R.id.Nombre,
-                       R.id.Direccion});
-               if(adapter!=null){
-                   lv.setAdapter(adapter);
-               }
-               lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
-           }catch (final Exception ex){
-               if(getActivity()==null) return ;
-               getActivity().runOnUiThread(new Runnable() {
-                   @Override
-                   public void run() {
+            try{
+                // Dismiss the progress dialog
+                if (pDialog.isShowing())
+                    pDialog.dismiss();
+                /**
+                 * Updating parsed JSON data into ListView
+                 * */
+                ListAdapter adapter = new SimpleAdapter(
+                        getActivity(), listaClientes,
+                        R.layout.list_cliente, new String[]{variables_publicas.CLIENTES_COLUMN_IdCliente,"CodigoLetra","Ciudad", "Nombre", variables_publicas.CLIENTES_COLUMN_Direccion}, new int[]{R.id.IdCliente,R.id.CodLetra,R.id.Ciudad, R.id.Nombre,
+                        R.id.Direccion});
+                if(adapter!=null){
+                    lv.setAdapter(adapter);
+                }
+                lblFooter.setText("Cliente Encontrados encontrados: " + String.valueOf(listaClientes.size()));
+            }catch (final Exception ex){
+                if(getActivity()==null) return ;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                       Toast.makeText(getActivity().getApplicationContext(),
-                               "error: " + ex.getMessage(),
-                               Toast.LENGTH_LONG)
-                               .show();
-                   }
-               });
-           }
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                "error: " + ex.getMessage(),
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
         }
     }
 }

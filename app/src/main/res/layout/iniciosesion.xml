@@ -98,6 +98,30 @@
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/empresa"
+        android:layout_below="@id/layout_sesion"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="15dp"
+        android:gravity="center_horizontal"
+        android:text="Agencia del Norte"
+        android:textColor="#fff"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/lema"
+        android:layout_below="@id/empresa"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="0dp"
+        android:gravity="center_horizontal"
+        android:text="Líder en Bebidas"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:textStyle="italic" />
+        <TextView
         android:id="@+id/login_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

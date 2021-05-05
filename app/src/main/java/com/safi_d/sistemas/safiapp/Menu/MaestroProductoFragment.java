@@ -37,7 +37,7 @@ import java.util.HashMap;
 public class MaestroProductoFragment extends Fragment {
     View myView;
     private String TAG = MaestroProductoFragment.class.getSimpleName();
-    private String busqueda = "1";
+    private String busqueda = "";
     private String tipoBusqueda = "2";
     private ProgressDialog pDialog;
     private ListView lv;
@@ -53,7 +53,7 @@ public class MaestroProductoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         myView= inflater.inflate(R.layout.masterproductos_layout,container,false);
-       getActivity().setTitle("Listado de Productos");
+        getActivity().setTitle("Listado de Productos");
         lv = (ListView) myView.findViewById(R.id.list);
         btnBuscar = (Button) myView.findViewById(R.id.btnBuscar);
 
@@ -152,8 +152,8 @@ public class MaestroProductoFragment extends Fragment {
              * */
             ListAdapter adapter = new SimpleAdapter(
                     getActivity(), listaArticulos,
-                    R.layout.list_item, new String[]{"Codigo", "Nombre","Precio", "Unidad","UnidadCaja","Existencias"}, new int[]{R.id.Codigo, R.id.Nombre,
-                    R.id.Precio, R.id.Presentacion,R.id.UnidadCaja,R.id.Existencias});
+                    R.layout.list_item, new String[]{"Codigo", "Nombre","Precio"}, new int[]{R.id.Codigo, R.id.Nombre,
+                    R.id.Precio});
 
             lv.setAdapter(adapter);
             lblFooter.setText("Productos encontrados: " + String.valueOf(listaArticulos.size()));

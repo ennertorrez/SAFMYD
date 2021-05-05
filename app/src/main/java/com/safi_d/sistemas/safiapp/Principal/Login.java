@@ -21,7 +21,9 @@ import androidx.core.app.ActivityCompat;
 
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -76,12 +78,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-
-
-/**
- * Created by usuario on 20/3/2017.
- */
-
 public class Login extends Activity {
     private static final int REQUEST_READ_PHONE_STATE = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE = 0;
@@ -101,14 +97,13 @@ public class Login extends Activity {
 
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones";
+    final String urlRutasUsr = variables_publicas.direccionIp + "/ServicioClientes.svc/GetRutasUsr/";
 
     private DataBaseOpenHelper DbOpenHelper;
 
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
-    //private ZonasHelper ZonasH;
-    //private PreciosHelper PreciosH;
     private RutasHelper RutasH;
     private TPreciosHelper TPreciosH;
     private CategoriasClienteHelper CategoriaH;
@@ -151,8 +146,6 @@ public class Login extends Activity {
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         RutasH = new RutasHelper(DbOpenHelper.database);
-/*        ZonasH = new ZonasHelper(DbOpenHelper.database);
-        PreciosH = new PreciosHelper(DbOpenHelper.database);*/
         TPreciosH = new TPreciosHelper(DbOpenHelper.database);
         CategoriaH = new CategoriasClienteHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
@@ -169,6 +162,8 @@ public class Login extends Activity {
         txtPassword = (EditText) findViewById(R.id.txtPassword);
         cboRutas = (Spinner) findViewById(R.id.cboRutas);
 
+        CheckConnectivity();
+/*
         isOnline =Funciones.TestServerConectivity();
         if(isOnline){
             if (Build.VERSION.SDK_INT >= 11) {
@@ -189,6 +184,43 @@ public class Login extends Activity {
         if (!adapterRutas.isEmpty()) {
             cboRutas.setSelection(0);
         }
+*/
+        txtUsuario.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //System.out.println(s.toString() + " " + start + " " + count + " " + after);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    if(isOnline){
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            //--post GB use serial executor by default --
+                            new GetRutasUsuario().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            //--GB uses ThreadPoolExecutor by default--
+                            new GetRutasUsuario().execute();
+                        }
+                    }
+                }else {
+                    if(isOnline){
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            //--post GB use serial executor by default --
+                            new GetRutasTotal().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            //--GB uses ThreadPoolExecutor by default--
+                            new GetRutasTotal().execute();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         Usuario UltimoUsuario = UsuariosH.BuscarUltimoUsuario();
         if (UltimoUsuario != null) {
@@ -205,10 +237,11 @@ public class Login extends Activity {
             }
             txtPassword.requestFocus();
         }
+
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
         lblVersion.setText("Versión " + getCurrentVersion());
         /*NO CAMBIAR ESTA DIRECCION: VERIFICA SI ES SERVIDOR DE PRUEBAS*/
-        if (variables_publicas.direccionIp == "http://192.168.0.7:8087") {
+        if (variables_publicas.direccionIp == "http://200.62.90.235:8087") {
             lblVersion.setText("Versión " + getCurrentVersion() + " Desarrollo");
         }
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -225,8 +258,9 @@ public class Login extends Activity {
         cboRutas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapter, View v, int position, long id) {
-                iCurrentSelection = position;
-                vRuta.setIDRUTA(((Ruta) adapter.getItemAtPosition(position)).getIDRUTA());
+                vRuta = (Ruta) adapter.getItemAtPosition(position);
+                variables_publicas.rutacargada=vRuta.getIDRUTA();
+                variables_publicas.rutacargadadescripcion=vRuta.getRUTA();
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
@@ -444,7 +478,30 @@ public class Login extends Activity {
 
         return currentVersion;
     }
-
+    public class GetClientes extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            //SINCRONIZAR DATOS
+            try {
+                sd.SincronizarTablaClientes();
+            } catch (final JSONException e) {
+                Log.e(TAG, "Json parsing error: " + e.getMessage());
+//
+                variables_publicas.LoginOk = false;
+                variables_publicas.MensajeLogin = "Ha ocurrido un error al sincronizar los datos de clientes. Por favor intente nuevamente";
+                UsuariosH.EliminaUsuarios();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+        }
+    }
     //region ObtieneUsuario
     public class GetUser extends AsyncTask<Void, Void, Void> {
         @Override
@@ -644,8 +701,96 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            if (pDialog!=null && pDialog.isShowing())
-                pDialog.dismiss();
+
+            CargarComboRuta();
+            /*if (pDialog!=null && pDialog.isShowing())
+                pDialog.dismiss();*/
+        }
+    }
+    public class GetRutasUsuario extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+
+            HttpHandler sh = new HttpHandler();
+            String urlString = urlRutasUsr  + txtUsuario.getText();
+            String encodeUrl = "";
+            try {
+                URL Url = new URL(urlString);
+                URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
+                encodeUrl = uri.toURL().toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            String jsonStr = sh.makeServiceCall(encodeUrl);
+
+            Log.e(TAG, "Response from url: " + jsonStr);
+
+            if (jsonStr != null) {
+
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    JSONArray Rutas = jsonObj.getJSONArray("GetRutasUsrResult");
+                    if (Rutas.length() == 0) {
+                        return null;
+                    }
+                    RutasH.EliminaRutas();
+                    // looping through All Contacts
+
+
+                    for (int i = 0; i < Rutas.length(); i++) {
+                        JSONObject c = Rutas.getJSONObject(i);
+
+                        String idruta = c.getString("IDRUTA");
+                        String ruta = c.getString("RUTA");
+                        String vendedor = c.getString("VENDEDOR");
+
+                        RutasH.GuardarRutas(idruta, ruta, vendedor);
+                    }
+
+                } catch (final JSONException e) {
+                    Log.e(TAG, "error: " + "No se ha podido establecer contacto con el servidor");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(),
+                                    "error: " + e.getMessage(),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+                }
+            } else {
+
+                Log.e(TAG, "No se ha podido establecer contacto con el servidor");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(),
+                                "error: " + "No se ha podido establecer contacto con el servidor",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            CargarComboRuta();
+            /*if (pDialog!=null && pDialog.isShowing())
+                pDialog.dismiss();*/
         }
     }
     //region ObtieneValorConfiguracion
@@ -653,11 +798,6 @@ public class Login extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // Showing progress dialog
-          /*  pDialog = new ProgressDialog(Login.this);
-            pDialog.setMessage("Inicializando el sistema, por favor espere...");
-            pDialog.setCancelable(false);
-            pDialog.show();*/
         }
 
         @Override
@@ -720,8 +860,6 @@ public class Login extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-           /* if (pDialog.isShowing())
-                pDialog.dismiss();*/
 
             if (isOnline && variables_publicas.usuario != null && variables_publicas.Configuracion != null) {
                 try {
@@ -742,6 +880,22 @@ public class Login extends Activity {
 
 
                     } else {
+
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            //--post GB use serial executor by default --
+                            new GetUser().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            //--GB uses ThreadPoolExecutor by default--
+                            new GetUser().execute();
+                        }
+
+                        if (Build.VERSION.SDK_INT >= 11) {
+                            //--post GB use serial executor by default --
+                            new GetClientes().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+                        } else {
+                            //--GB uses ThreadPoolExecutor by default--
+                            new GetClientes().execute();
+                        }
                         variables_publicas.MensajeLogin = "";
                         variables_publicas.LoginOk = true;
                         Intent intent = new Intent("android.intent.action.Barra_cargado");
@@ -868,31 +1022,15 @@ public class Login extends Activity {
         isOnline = Funciones.TestServerConectivity();
     }
 
-    private class SincronizardorPedidos extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(Login.this);
-            pDialog.setMessage("Sincronizando pedidos locales, por favor espere...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-        }
+    private void CargarComboRuta(){
+        final List<Ruta> CRutas;
+        CRutas= RutasH.ObtenerListaRutas();
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            try{
-                sd.SincronizarPedidosLocales();
-            }catch (Exception e){
-                Log.e("Error:", e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if (pDialog.isShowing())
-                pDialog.dismiss();
+        ArrayAdapter<Ruta> adapterRutas = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, CRutas);
+        adapterRutas.setDropDownViewResource(android.R.layout.simple_list_item_checked);
+        cboRutas.setAdapter(adapterRutas);
+        if (!adapterRutas.isEmpty()) {
+            cboRutas.setSelection(0);
         }
     }
 

@@ -147,4 +147,6 @@
     <string name="msgEnviandoPedidos">Enviando Pedidos ...</string>
     <string name="msgPedidosEnviar">Pedidos a Enviar </string>
     <string name="msgPedidoEnviado">El pedido ha sido enviado. No se puede modificar.</string>
+
+
 </resources>

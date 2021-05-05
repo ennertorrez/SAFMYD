@@ -5,7 +5,7 @@
     <item
         android:id="@+id/SincronizarDatos"
         android:orderInCategory="100"
-        android:title="Sincronizar Datos"
+        android:title="Actualizar Datos"
         app:showAsAction="never" />
     <item
         android:id="@+id/CerrarSesion"

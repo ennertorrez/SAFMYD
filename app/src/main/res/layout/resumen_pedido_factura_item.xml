@@ -57,6 +57,20 @@
             android:textStyle="bold"
             />
         <TextView
+            android:id="@+id/lblDetDevolucion"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:ellipsize="end"
+            android:focusable="false"
+            android:gravity="left"
+            android:maxLines="1"
+            android:paddingLeft="2dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            />
+        <TextView
             android:id="@+id/lblDetCliente"
             android:layout_width="200dp"
             android:layout_height="match_parent"
@@ -84,6 +98,18 @@
 
         <TextView
             android:id="@+id/lblDetTotFacturado"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:focusable="false"
+            android:gravity="right"
+            android:paddingLeft="2dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/lblDetTotDevuelto"
             android:layout_width="170dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"

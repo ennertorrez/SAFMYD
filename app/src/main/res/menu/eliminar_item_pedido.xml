@@ -7,4 +7,10 @@
         android:title="Eliminar Item"
         android:icon="@mipmap/ic_delete_forever_black_24dp"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/Cantidad_Item"
+        android:orderInCategory="100"
+        android:title="Cambiar Cantidad"
+        android:icon="@mipmap/plus_add_green"
+        app:showAsAction="never" />
 </menu>

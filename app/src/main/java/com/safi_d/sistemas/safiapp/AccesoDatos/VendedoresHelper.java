@@ -201,9 +201,11 @@ public class VendedoresHelper {
     }
     public List<Vendedor> ObtenerVendedorxSup(String vCodSupervisor) {
         List<Vendedor> list = new ArrayList<Vendedor>();
-        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE "+ variables_publicas.VENDEDORES_COLUMN_codsuper +"= "+ vCodSupervisor +" ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
+//        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " WHERE "+ variables_publicas.VENDEDORES_COLUMN_codsuper +"= "+ vCodSupervisor +" ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
+        String selectQuery = "SELECT  * FROM " + variables_publicas.TABLE_VENDEDORES+ " ORDER BY "+ variables_publicas.VENDEDORES_COLUMN_NOMBRE ;
         Cursor cursor = database.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
+            list.add(new Vendedor("0","TODOS","0","RT-Todos","1","1","TODOS","1"));
             do {
                 list.add(new Vendedor(cursor.getString(cursor.getColumnIndex("CODIGO")),
                         cursor.getString(cursor.getColumnIndex("NOMBRE")),

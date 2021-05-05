@@ -150,7 +150,7 @@ public class ListaVentasHistClientes extends Activity {
                     String vProveedor = c.getString("Proveedor");
                     String vIem = c.getString("Item").split("-")[c.getString("Item").split("-").length - 1];
                     String vDescripcion = c.getString("Descripcion");
-                    String vCantidad= c.getString("Cantidad");
+                    String vCantidad= c.getString("cantidad");
                     String vTotal = c.getString("Total");
 
                     HashMap<String, String> hasArtVentas = new HashMap<>();
