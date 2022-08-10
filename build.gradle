@@ -2,11 +2,11 @@
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:7.0.1'
 
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -16,11 +16,11 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
-        //Para listar un searchView con Spinner
+        mavenCentral()
         maven { url "https://jitpack.io" }
         maven { url "https://maven.google.com" }
         maven {url "https://clojars.org/repo/"}
+        maven {url 'https://android-sdk.is.com/'}
         google()
     }
 

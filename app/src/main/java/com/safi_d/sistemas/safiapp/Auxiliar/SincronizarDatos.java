@@ -12,6 +12,7 @@ import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
+import com.safi_d.sistemas.safiapp.AccesoDatos.EscalaPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FacturasPendientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FormaPagoHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.InformesDetalleHelper;
@@ -19,6 +20,7 @@ import com.safi_d.sistemas.safiapp.AccesoDatos.InformesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
 //import com.safi_d.sistemas.safiapp.AccesoDatos.PreciosHelper;
+import com.safi_d.sistemas.safiapp.AccesoDatos.PromocionesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.RutasHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.TPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.UsuariosHelper;
@@ -52,6 +54,7 @@ public class SincronizarDatos {
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
     final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
     final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
+    final String urlPromociones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetPromociones/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
@@ -60,6 +63,7 @@ public class SincronizarDatos {
     final String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
     final String urlGetCategorias = variables_publicas.direccionIp + "/ServicioClientes.svc/GetListaCategorias";
     static final String urlPrecios = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetPreciosArticulos/1";
+    final String urlEscalaPrecios = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetEscalaPrecios";
     private String TAG = SincronizarDatos.class.getSimpleName();
     private DataBaseOpenHelper DbOpenHelper;
     private ClientesHelper ClientesH;
@@ -72,6 +76,7 @@ public class SincronizarDatos {
     private RutasHelper RutasH;
     private CategoriasClienteHelper CategoriaH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private PromocionesHelper PromocionesH;
     private FormaPagoHelper FormaPagoH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
@@ -79,18 +84,20 @@ public class SincronizarDatos {
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
     private TPreciosHelper TPreciosH;
+    private EscalaPreciosHelper EscalaPreciosH;
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
+                            CartillasBcDetalleHelper CartillasBcDetalleh,PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
                             ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH ,TPreciosHelper tpreciosH,RutasHelper rutasH) {
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH ,TPreciosHelper tpreciosH,RutasHelper rutasH,EscalaPreciosHelper escalaPreciosH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
         CartillasBcH = CatillasBch;
         CartillasBcDetalleH = CartillasBcDetalleh;
+        PromocionesH = Promocionesh;
         FormaPagoH = FormaPagoh;
         ConfigSistemasH = ConfigSistemah;
         ClientesSucH = ClientesSuch;
@@ -100,21 +107,23 @@ public class SincronizarDatos {
         PedidosDetalleH = pedidosDetalleH;
         RutasH = rutasH;
         TPreciosH = tpreciosH;
+        EscalaPreciosH = escalaPreciosH;
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
                             VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh, FormaPagoHelper FormaPagoh,
+                            CartillasBcDetalleHelper CartillasBcDetalleh,PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
                             ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
                             PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, InformesHelper Informesh,
                             InformesDetalleHelper InformesDetalleh,FacturasPendientesHelper FacturasPendientesh,
-                            CategoriasClienteHelper categoriasH,TPreciosHelper tpreciosH,RutasHelper rutasH) {
+                            CategoriasClienteHelper categoriasH,TPreciosHelper tpreciosH,RutasHelper rutasH,EscalaPreciosHelper escalaPreciosH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
         CartillasBcH = CatillasBch;
         CartillasBcDetalleH = CartillasBcDetalleh;
+        PromocionesH = Promocionesh;
         FormaPagoH = FormaPagoh;
         ConfigSistemasH = ConfigSistemah;
         ClientesSucH = ClientesSuch;
@@ -128,6 +137,7 @@ public class SincronizarDatos {
         TPreciosH = tpreciosH;
         CategoriaH=categoriasH;
         RutasH =rutasH;
+        EscalaPreciosH = escalaPreciosH;
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh , ClientesHelper Clientesh, CategoriasClienteHelper Categoriah,TPreciosHelper tpreciosH,RutasHelper rutasH) {
@@ -187,7 +197,8 @@ public class SincronizarDatos {
                 String UnidadCajaVenta2 = c.getString("UnidadCajaVenta2");
                 String UnidadCajaVenta3 = c.getString("UnidadCajaVenta3");
                 String IdProveedor = c.getString("IdProveedor");
-                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, Precio,Precio2,Precio3,Precio4,CodUM, PorIVA, DESCUENTO_MAXIMO,  existencia, UnidadCajaVenta,UnidadCajaVenta2,UnidadCajaVenta3, IdProveedor);
+                String Escala = c.getString("Escala");
+                ArticulosH.GuardarTotalArticulos(Codigo, Nombre, COSTO, UNIDAD, UnidadCaja, Precio,Precio2,Precio3,Precio4,CodUM, PorIVA, DESCUENTO_MAXIMO,  existencia, UnidadCajaVenta,UnidadCajaVenta2,UnidadCajaVenta3, IdProveedor,Escala);
             }
             DbOpenHelper.database.setTransactionSuccessful();
             return true;
@@ -281,6 +292,51 @@ public class SincronizarDatos {
        }
 
    }
+
+    private boolean SincronizarEscalaPrecios() throws JSONException {
+        HttpHandler shC = new HttpHandler();
+        String urlStringC = urlEscalaPrecios;
+        String jsonStrC = shC.makeServiceCall(urlStringC);
+
+        if (jsonStrC == null) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Escalas de Precios Combinados, Respuesta nula GET", variables_publicas.info + urlStringC, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
+            return false;
+        }
+        //Log.e(TAG, "Response from url: " + jsonStrC);
+        DbOpenHelper.database.beginTransaction();
+
+        EscalaPreciosH.EliminaEscalaPrecios();
+        JSONObject jsonObjC = new JSONObject(jsonStrC);
+        // Getting JSON Array node
+        JSONArray precios = jsonObjC.getJSONArray("GetEscalaPreciosResult");
+
+
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < precios.length(); i++) {
+                JSONObject c = precios.getJSONObject(i);
+
+                String codEscala = c.getString("CodEscala");
+                String lista = c.getString("ListaArticulos");
+                String escala1 = c.getString("Escala1");
+                String escala2 = c.getString("Escala2");
+                String escala3 = c.getString("Escala3");
+                String precio1 = c.getString("Precio1");
+                String precio2 = c.getString("Precio2");
+                String precio3 = c.getString("Precio3");
+                EscalaPreciosH.GuardarEscalaPrecios(codEscala,lista,escala1,escala2,escala3,precio1,precio2,precio3);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Escalas de Precios Combinados, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
+            return false;
+        } finally {
+            DbOpenHelper.database.endTransaction();
+        }
+
+    }
+
     private boolean SincronizarCategorias() throws JSONException {
         HttpHandler shC = new HttpHandler();
         String urlStringC = urlGetCategorias;
@@ -488,6 +544,46 @@ public class SincronizarDatos {
 
     }
 
+    public boolean SincronizarPromociones() throws JSONException {
+        HttpHandler shPromociones = new HttpHandler();
+        String urlStringPromociones= urlPromociones;
+        String jsonStrPromociones = shPromociones.makeServiceCall(urlStringPromociones);
+
+        if (jsonStrPromociones == null) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronicar CartillasBC, Respuesta nula GET", variables_publicas.info + urlStringPromociones, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
+            return false;
+        }
+
+        DbOpenHelper.database.beginTransaction();
+        PromocionesH.EliminaPromociones();
+        JSONObject jsonObjPromociones = new JSONObject(jsonStrPromociones);
+        // Getting JSON Array node
+        JSONArray promociones = jsonObjPromociones.getJSONArray("GetPromocionesResult");
+
+
+        try {
+            // looping through All Contacts
+            for (int i = 0; i < promociones.length(); i++) {
+                JSONObject c = promociones.getJSONObject(i);
+
+                String codpromo = c.getString("CodPromo");
+                String itemv = c.getString("itemV");
+                String cantv = c.getString("cantV");
+                String itemb = c.getString("itemB");
+                String cantb = c.getString("cantB");
+
+                PromocionesH.GuardarPromociones(codpromo, itemv, cantv, itemb, cantb);
+            }
+            DbOpenHelper.database.setTransactionSuccessful();
+            return true;
+        } catch (Exception ex) {
+            new Funciones().SendMail("Ha ocurrido un error al sincronicar Promociones, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
+            return false;
+        } finally {
+            DbOpenHelper.database.endTransaction();
+        }
+
+    }
    /* public boolean SincronizarZonas() throws JSONException {
         HttpHandler shZonas= new HttpHandler();
         String urlStringZonas= urlZonas;
@@ -790,24 +886,18 @@ public class SincronizarDatos {
 
         if (SincronizarArticulos()) {
              if (SincronizarClientes()) {
-                 // if (SincronizarPrecios()) {
                  if (SincronizarTPrecios()) {
-                 if (SincronizarCategorias()) {
-                     if (SincronizarVendedores()) {
-                         if (SincronizarCartillasBc()) {
-                             if (SincronizarCartillasBcDetalle()) {
-                                 if (SincronizarFormaPago()) {
-                                     if (SincronizarRutas()) {
-                                         if (SincronizarClientesSucursal()) {
-                                             if (SincronizarConfiguracionSistema()) {
-                                                 if (ActualizarUsuario()) {
-                                                     if (ObtenerBancos()) {
-                                                         if (ObtenerSerieRecibos()) {
-                                                             if (SincronizarFacturasPendientes(variables_publicas.usuario.getCodigo(), "0")) {
-                                                                 SincronizarPedidosLocales();
-                                                                 return true;
-                                                             }
-                                                         }
+                     if (SincronizarEscalaPrecios()) {
+                         if (SincronizarCategorias()) {
+                             if (SincronizarVendedores()) {
+                                 if (SincronizarPromociones()) {
+                                     if (SincronizarFormaPago()) {
+                                         if (SincronizarRutas()) {
+                                             if (SincronizarClientesSucursal()) {
+                                                 if (SincronizarConfiguracionSistema()) {
+                                                     if (ActualizarUsuario()) {
+                                                         SincronizarPedidosLocales();
+                                                         return true;
                                                      }
                                                  }
                                              }
@@ -818,8 +908,6 @@ public class SincronizarDatos {
                          }
                      }
                  }
-                 // }
-             }
             }
         }
         return false;
@@ -830,8 +918,8 @@ public class SincronizarDatos {
         SincronizarArticulos();
         SincronizarClientes();
         SincronizarRutas();
-        SincronizarCartillasBc();
-        SincronizarCartillasBcDetalle();
+        SincronizarEscalaPrecios();
+        SincronizarPromociones();
         SincronizarClientesSucursal();
         SincronizarConfiguracionSistema();
     }
@@ -897,10 +985,11 @@ public class SincronizarDatos {
                     String TasaCambio = c.getString("TasaCambio");
                     String RutaForanea = c.getString("RutaForanea");
                     String FechaActualiza = Funciones.getDatePhone();
-                    //String EsVendedor = c.getString("EsVendedor");
+                    String EsVendedor = c.getString("EsVendedor");
                     String Empresa_ID = c.getString("Empresa_ID");
+                    String AddCliente = c.getString("AddCliente");
                     UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
-                            variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza,"",Empresa_ID);
+                            variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza,EsVendedor,Empresa_ID,AddCliente);
 
                     variables_publicas.usuario = UsuariosH.BuscarUsuarios(variables_publicas.usuario.getUsuario(), Contrasenia);
                     return true;

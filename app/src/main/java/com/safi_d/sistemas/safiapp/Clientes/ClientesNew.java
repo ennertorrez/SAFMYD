@@ -1030,7 +1030,7 @@ public class ClientesNew extends Activity implements ActivityCompat.OnRequestPer
                     //It retrieves the latest version by scraping the content of current version from play store at runtime
                     Document doc2 = Jsoup
                             .connect(
-                                    "https://play.google.com/store/apps/details?id=com.safi_D.sistemas.safiapp&hl=es")
+                                    "https://play.google.com/store/apps/details?id=com.safi_d.sistemas.safiapp")
                             .get()
                             ;
 

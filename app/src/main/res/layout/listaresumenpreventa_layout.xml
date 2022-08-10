@@ -94,7 +94,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout_list_header"
-                    android:layout_width="370dp"
+                    android:layout_width="411dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
@@ -112,7 +112,7 @@
 
                     <TextView
                         android:id="@+id/lblColCantidad"
-                        android:layout_width="70dp"
+                        android:layout_width="98dp"
                         android:layout_height="match_parent"
                         android:layout_gravity="left"
                         android:background="@drawable/borde_campos_pedidos"
@@ -146,7 +146,7 @@
 
                     <ListView
                         android:id="@+id/listResumenPreventa"
-                        android:layout_width="370dp"
+                        android:layout_width="411dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"

@@ -18,7 +18,7 @@ public class UsuariosHelper {
     }
     public boolean GuardarUsuario(String Codigo, String nombre, String Usuario,
                                    String Contrasenia, String Tipo, String Ruta,
-                                      String Canal,String TasaCambio,String RutaForanea,String FechaActualiza,String EsVendedor,String Empresa_ID) {
+                                      String Canal,String TasaCambio,String RutaForanea,String FechaActualiza,String EsVendedor,String Empresa_ID,String AddCliente) {
 
         long rows =0;
         ContentValues contentValues = new ContentValues();
@@ -34,6 +34,7 @@ public class UsuariosHelper {
         contentValues.put(variables_publicas.USUARIOS_COLUMN_FechaActualiza, FechaActualiza);
         contentValues.put(variables_publicas.USUARIOS_COLUMN_EsVendedor, EsVendedor);
         contentValues.put(variables_publicas.USUARIOS_COLUMN_Empresa_ID, Empresa_ID);
+        contentValues.put(variables_publicas.USUARIOS_COLUMN_AddCliente, AddCliente);
          long inserted=database.insert(variables_publicas.TABLE_USUARIOS, null, contentValues);
         if(inserted!=-1)
             return true;
@@ -58,7 +59,8 @@ public class UsuariosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_RutaForanea)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_FechaActualiza)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_EsVendedor)),
-                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Empresa_ID))
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Empresa_ID)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_AddCliente))
                 ));
             } while (c.moveToNext());
         }
@@ -83,7 +85,8 @@ public class UsuariosHelper {
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_RutaForanea)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_FechaActualiza)),
                         c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_EsVendedor)),
-                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Empresa_ID))
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_Empresa_ID)),
+                        c.getString(c.getColumnIndex(variables_publicas.USUARIOS_COLUMN_AddCliente))
                 ));
             } while (c.moveToNext());
         }

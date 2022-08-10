@@ -17,8 +17,9 @@ public class Usuario {
     private String FechaActualiza="";
     private String EsVendedor="";
     private String Empresa_ID="";
+    private String AddCliente="";
 
-    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String rutaForanea,String fechaActualiza,String esvendedor,String empresa) {
+    public Usuario(String codigo, String nombre, String usuario, String contrasenia, String tipo, String ruta, String canal, String tasaCambio,String rutaForanea,String fechaActualiza,String esvendedor,String empresa,String addcliente) {
         Codigo = codigo;
         this.nombre = nombre;
         Usuario = usuario;
@@ -31,6 +32,7 @@ public class Usuario {
         FechaActualiza = fechaActualiza;
         EsVendedor = esvendedor;
         Empresa_ID = empresa;
+        AddCliente = addcliente;
     }
 
     public Usuario() {
@@ -135,5 +137,13 @@ public class Usuario {
 
     public void setEmpresa_ID(String empresa) {
         Empresa_ID = empresa;
+    }
+
+    public String getAddCliente() {
+        return AddCliente;
+    }
+
+    public void setAddCliente(String addCliente) {
+        AddCliente = addCliente;
     }
 }

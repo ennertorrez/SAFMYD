@@ -22,7 +22,7 @@
             android:maxLines="3"
             android:paddingLeft="2dp"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="16dp"
+            android:textSize="13dp"
             android:textStyle="bold"
             />
 

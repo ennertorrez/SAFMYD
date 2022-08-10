@@ -20,7 +20,7 @@
                         android:startColor="#00bbbbbb"
                         android:endColor="#77269ccc"
                         android:type="linear" />
-                    <size android:height="60dp"></size>
+                    <size android:height="80dp"></size>
                 </shape>
 
             </item>
@@ -28,6 +28,7 @@
             <item>
                 <bitmap
                     android:gravity="center_vertical|right"
+                    android:layout_marginBottom="10dp"
                     android:src="@drawable/quantum_ic_keyboard_arrow_down_white_36"  />
             </item>
 

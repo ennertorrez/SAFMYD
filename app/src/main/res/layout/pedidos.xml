@@ -288,8 +288,6 @@
                         android:textColor="@color/colorAccent"
                         android:textSize="15dp"
                         android:textStyle="bold" />
-
-
                 </LinearLayout>
 
                 <LinearLayout
@@ -298,9 +296,9 @@
 
                     <Spinner
                         android:id="@+id/cboTPrecio"
+                        android:layout_marginTop="3dp"
                         android:layout_width="150dp"
-                        android:layout_height="35dp"
-                        android:layout_marginBottom="1dp"></Spinner>
+                        android:layout_height="match_parent"></Spinner>
                     <EditText
                         android:id="@+id/txtCantidad"
                         android:layout_width="0dp"
@@ -308,7 +306,7 @@
                         android:layout_weight="2"
                         android:background="@drawable/rounded_edittext"
                         android:hint="Cantidad"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         tools:ignore="NestedWeights"></EditText>
 
 

@@ -45,6 +45,7 @@ import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
+import com.safi_d.sistemas.safiapp.AccesoDatos.EscalaPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FacturasPendientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FormaPagoHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.InformesDetalleHelper;
@@ -52,6 +53,7 @@ import com.safi_d.sistemas.safiapp.AccesoDatos.InformesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
 //import com.safi_d.sistemas.safiapp.AccesoDatos.PreciosHelper;
+import com.safi_d.sistemas.safiapp.AccesoDatos.PromocionesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.TPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.UsuariosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.VendedoresHelper;
@@ -109,6 +111,7 @@ public class Login extends Activity {
     private CategoriasClienteHelper CategoriaH;
     private CartillasBcHelper CartillasBcH;
     private CartillasBcDetalleHelper CartillasBcDetalleH;
+    private PromocionesHelper PromocionesH;
     private FormaPagoHelper FormaPagoH;
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
@@ -118,6 +121,7 @@ public class Login extends Activity {
     private InformesDetalleHelper InformesDetalleH;
     private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
+    private EscalaPreciosHelper EscalaPreciosH;
     private SincronizarDatos sd;
     String MsjLoging = "";
 
@@ -141,6 +145,7 @@ public class Login extends Activity {
         ClientesSucH = new ClientesSucursalHelper(DbOpenHelper.database);
         CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
         CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
+        PromocionesH = new PromocionesHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
@@ -152,17 +157,31 @@ public class Login extends Activity {
         InformesH = new InformesHelper(DbOpenHelper.database);
         InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
         FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
+        EscalaPreciosH = new EscalaPreciosHelper(DbOpenHelper.database);
 
         sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
-                CartillasBcDetalleH,
+                CartillasBcDetalleH,PromocionesH,
                 FormaPagoH,
-                ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH,CategoriaH,TPreciosH,RutasH);
+                ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH,CategoriaH,TPreciosH,RutasH,EscalaPreciosH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
         cboRutas = (Spinner) findViewById(R.id.cboRutas);
 
-        CheckConnectivity();
+
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    CheckConnectivity();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
 /*
         isOnline =Funciones.TestServerConectivity();
         if(isOnline){
@@ -241,7 +260,7 @@ public class Login extends Activity {
         TextView lblVersion = (TextView) findViewById(R.id.login_version);
         lblVersion.setText("Versión " + getCurrentVersion());
         /*NO CAMBIAR ESTA DIRECCION: VERIFICA SI ES SERVIDOR DE PRUEBAS*/
-        if (variables_publicas.direccionIp == "http://200.62.90.235:8087") {
+        if (variables_publicas.direccionIp != "http://190.212.127.107:8088") {
             lblVersion.setText("Versión " + getCurrentVersion() + " Desarrollo");
         }
         txtPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -560,11 +579,11 @@ public class Login extends Activity {
                         String TasaCambio = c.getString("TasaCambio");
                         String RutaForanea = c.getString("RutaForanea");
                         String FechaActualiza = Funciones.getDatePhone();
-                        //String EsVendedor = c.getString("EsVendedor");
-                        String EsVendedor = "";
+                        String EsVendedor = c.getString("EsVendedor");
                         String Empresa_ID = c.getString("Empresa_ID");
+                        String AddCliente = c.getString("AddCliente");
                         UsuariosH.GuardarUsuario(variables_publicas.CodigoVendedor, variables_publicas.NombreVendedor,
-                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza,EsVendedor,Empresa_ID);
+                                variables_publicas.UsuarioLogin, Contrasenia, Tipo, variables_publicas.RutaCliente, variables_publicas.Canal, TasaCambio, RutaForanea, FechaActualiza,EsVendedor,Empresa_ID,AddCliente);
 
                         variables_publicas.LoginOk = true;
                         variables_publicas.MensajeLogin = "";
@@ -964,7 +983,7 @@ public class Login extends Activity {
 
                     Document doc2 = Jsoup
                             .connect(
-                                    "https://play.google.com/store/apps/details?id=com.safi_D.sistemas.safiapp&hl=es")
+                                    "https://play.google.com/store/apps/details?id=com.safi_d.sistemas.safiapp")
                             .get()
                             ;
 

@@ -475,7 +475,7 @@ public class ListaPedidosFragment extends Fragment {
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Sincronizando datos...Por favor espere...");
             pDialog.setCancelable(false);
-            pDialog.show();
+             pDialog.show();
         }
 
 
@@ -487,9 +487,6 @@ public class ListaPedidosFragment extends Fragment {
             if(isOnline){
                 List<HashMap<String, String>> PedidosLocal = PedidosH.ObtenerPedidosLocales(fecha, "");
                 for (HashMap<String, String> item : PedidosLocal) {
-                    if (guardadoOK == false) {
-                        break;
-                    }
                     Gson gson = new Gson();
                     Vendedor vendedor = VendedoresH.ObtenerVendedor(item.get(variables_publicas.PEDIDOS_COLUMN_IdVendedor));
                     Cliente cliente = ClientesH.BuscarCliente(item.get(variables_publicas.PEDIDOS_COLUMN_IdCliente));

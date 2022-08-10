@@ -72,7 +72,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.USUARIOS_COLUMN_RutaForanea + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_FechaActualiza + " TEXT, "
                     + variables_publicas.USUARIOS_COLUMN_EsVendedor + " TEXT, "
-                    + variables_publicas.USUARIOS_COLUMN_Empresa_ID + " TEXT )");
+                    + variables_publicas.USUARIOS_COLUMN_Empresa_ID + " TEXT, "
+                    + variables_publicas.USUARIOS_COLUMN_AddCliente + " TEXT )");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ARTICULOS + "( "
 
@@ -92,7 +93,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta2 + " TEXT, "
                     + variables_publicas.ARTICULO_COLUMN_UnidadCajaVenta3 + " TEXT, "
-                    + variables_publicas.ARTICULO_COLUMN_IdProveedor + " TEXT ) ");
+                    + variables_publicas.ARTICULO_COLUMN_IdProveedor + " TEXT, "
+                    + variables_publicas.ARTICULO_COLUMN_Escala + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_VENDEDORES + "( "
                     + variables_publicas.VENDEDORES_COLUMN_CODIGO + " TEXT , "
@@ -279,6 +281,14 @@ public class DataBaseOpenHelper {
                     + variables_publicas.RUTA_COLUMN_ruta + " TEXT , "
                     + variables_publicas.RUTA_COLUMN_vendedor + " TEXT ) ");
 
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_PROMOCIONES + "( "
+                    + variables_publicas.PROMOCIONES_COLUMN_codPromo + " TEXT , "
+                    + variables_publicas.PROMOCIONES_COLUMN_itemV + " TEXT , "
+                    + variables_publicas.PROMOCIONES_COLUMN_cantV + " TEXT , "
+                    + variables_publicas.PROMOCIONES_COLUMN_itemB + " TEXT , "
+                    + variables_publicas.PROMOCIONES_COLUMN_cantB + " TEXT ) ");
+
+
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CATEGORIAS + "( "
                     + variables_publicas.CATEGORIAS_COLUMN_Cod_Cat + " TEXT , "
                     + variables_publicas.CATEGORIAS_COLUMN_Categoria + " TEXT ) ");
@@ -289,6 +299,16 @@ public class DataBaseOpenHelper {
                     + variables_publicas.SERIERECIBOS_COLUMN_nInicial + " TEXT , "
                     + variables_publicas.SERIERECIBOS_COLUMN_nFinal + " TEXT , "
                     + variables_publicas.SERIERECIBOS_COLUMN_Numero + " TEXT ) ");
+
+            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ESCALAPRECIOS + "( "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_CODESCALA + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_LISTAARTICULOS + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_ESCALA1 + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_ESCALA2 + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_ESCALA3 + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_PRECIO1 + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_PRECIO2 + " TEXT , "
+                    + variables_publicas.ESCALAPRECIOS_COLUMN_PRECIO3 + " TEXT ) ");
         }
 
         @Override
@@ -314,8 +334,10 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_BANCOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_TPRECIOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_RUTAS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PROMOCIONES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CATEGORIAS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_SERIE_RECIBOS);
+            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_ESCALAPRECIOS);
             onCreate(db);
         }
     }

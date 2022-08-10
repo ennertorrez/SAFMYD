@@ -23,13 +23,13 @@ public class Articulo {
     String UnidadCajaVenta2="";
     String UnidadCajaVenta3="";
     String IdProveedor="";
-
+    String Escala="";
     public Articulo() {
     }
 
     public Articulo(String codigo, String nombre, String costo, String unidad, String unidadCaja, String precio,
                     String precio2,String precio3,String precio4,String codUM,String porIva,
-                    String descuentoMaximo, String existencia, String unidadCajaVenta, String unidadCajaVenta2, String unidadCajaVenta3,String idProveedor) {
+                    String descuentoMaximo, String existencia, String unidadCajaVenta, String unidadCajaVenta2, String unidadCajaVenta3,String idProveedor,String escala) {
         Codigo = codigo;
         Nombre = nombre;
         Costo = costo;
@@ -47,6 +47,7 @@ public class Articulo {
         UnidadCajaVenta2=unidadCajaVenta2;
         UnidadCajaVenta3=unidadCajaVenta3;
         IdProveedor=idProveedor;
+        Escala=escala;
     }
 
     public String getCodigo() {
@@ -183,6 +184,15 @@ public class Articulo {
     public void setUnidadCajaVenta3(String unidadCajaVenta3) {
         UnidadCajaVenta3 = unidadCajaVenta3;
     }
+
+    public String getEscala() {
+        return Escala;
+    }
+
+    public void setEscala(String escala) {
+        Escala = escala;
+    }
+
     public String toString() {
         return this.getNombre();
     }

@@ -13,10 +13,10 @@ android {
     buildToolsVersion '30.0.3'
     defaultConfig {
         applicationId 'com.safi_d.sistemas.safiapp'
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 30
-        versionCode 3
-        versionName "1.2"
+        versionCode 9
+        versionName "1.8"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
@@ -32,15 +32,21 @@ android {
     }
     productFlavors {
     }
-
-        lintOptions {
-            abortOnError false
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+        checkDependencies true
+    }
 
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.volley:volley:1.2.1'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -50,22 +56,23 @@ dependencies {
     annotationProcessor  'com.google.dagger:dagger-compiler:2.11'*/
     //noinspection GradleCompatible
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.gms:play-services-ads:20.3.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.googlecode.json-simple:json-simple:1.1'
     //noinspection GradleCompatible
     //compile 'com.android.support:appcompat-v7:23.3.0'
+    //noinspection GradleCompatible
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
 
-    //compile 'com.google.android.gms:play-services-appindexing:10.0.1'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'org.jsoup:jsoup:1.10.2'
     implementation files('lib/activation.jar')
     implementation files('lib/mail.jar')
@@ -75,10 +82,7 @@ dependencies {
     implementation 'com.github.mirrajabi:search-dialog:1.2.1'
     implementation 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.toptoche.searchablespinner:searchablespinnerlibrary:1.3.1'
-    implementation 'frankiesardo:icepick:3.2.0'
-    implementation 'de.hdodenhof:circleimageview:1.3.0'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    annotationProcessor 'frankiesardo:icepick-processor:3.2.0'
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+    implementation 'com.github.DonMat:searchablespinner:v1.0.1'
+    implementation 'com.github.kenmeidearu:SearchableSpinner:1.5.5'
 }
