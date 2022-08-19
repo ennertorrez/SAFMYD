@@ -2,7 +2,6 @@ package com.safi_d.sistemas.safiapp.Auxiliar;
 
 
 import com.safi_d.sistemas.safiapp.Entidades.Configuraciones;
-import com.safi_d.sistemas.safiapp.Entidades.Informe;
 import com.safi_d.sistemas.safiapp.Entidades.Pedido;
 import com.safi_d.sistemas.safiapp.Entidades.Usuario;
 
@@ -11,7 +10,6 @@ public class variables_publicas {
     public static Usuario usuario = null;
     public static Configuraciones Configuracion = null;
     public static Pedido Pedidos = null;
-    public static Informe Informes = null;
     public static String rutacargada = "0";
     public static String rutacargadadescripcion = "";
     public static String ValorConfigServ = "";
@@ -36,7 +34,6 @@ public class variables_publicas {
     public static String FechaActual = "";
     public static String IMEI;
     public static String MensajeError;
-    public static  int CantidadItemPromoGaga;
     public static final String diasventas="Dias";
     public static final String descMeses="DescMeses";
     public static boolean vEditando = false;
@@ -52,7 +49,7 @@ public class variables_publicas {
     public static final String correosErrores = "cysnicaragua@gmail.com";
     public  static final String correoError= "cysnicaragua@gmail.com";
     //Variables BD
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 19;
     public static final String DATABASE_NAME = "Safi_D.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -63,15 +60,9 @@ public class variables_publicas {
     public static final String TABLE_VENDEDORES = "Vendedor";
     public static final String TABLE_CLIENTES_SUCURSALES = "ClientesSucursales";
     public static final String TABLE_FORMA_PAGO = "FormaPago";
-    public static final String TABLE_CARTILLAS_BC = "CartillasBC";
-    public static final String TABLE_DETALLE_CARTILLAS_BC = "DetalleCartillasBC";
     public static final String TABLE_CONFIGURACION_SISTEMA = "Configuraciones";
     public static final String TABLE_DPTOMUNIBARRIOS="DptoMuniBarrio";
-    public static final String TABLE_INFORMES="Informes";
-    public static final String TABLE_DETALLE_INFORMES="DetalleInformes";
-    public static final String TABLE_FACTURAS_PENDIENTES="FacturasPendientes";
     public static final String TABLE_BANCOS="Bancos";
-    public static final String TABLE_SERIE_RECIBOS="SerieRecibos";
     public static final String TABLE_ZONAS = "Zonas";
     public static final String TABLE_PRECIOS = "Precios";
     public static final String TABLE_TPRECIOS = "TipoPrecio";
@@ -215,29 +206,6 @@ public class variables_publicas {
     public static final String ZONAS_COLUMN_CODSUBZONA = "Cod_SubZona";
     public static final String ZONAS_COLUMN_SUBZONA = "SubZona";
 
-    public static final String CARTILLAS_BC_COLUMN_id = "id";
-    public static final String CARTILLAS_BC_COLUMN_codigo = "codigo";
-    public static final String CARTILLAS_BC_COLUMN_fechaini = "fechaini";
-    public static final String CARTILLAS_BC_COLUMN_fechafinal = "fechafinal";
-    public static final String CARTILLAS_BC_COLUMN_tipo = "tipo";
-    public static final String CARTILLAS_BC_COLUMN_aprobado = "aprobado";
-
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_id = "id";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_itemV = "itemV";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_descripcionV = "descripcionV";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_cantidad = "cantidad";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_itemB = "itemB";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_descripcionB = "descripcionB";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_cantidadB = "cantidadB";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_codigo = "codigo";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_tipo = "tipo";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_activo = "activo";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_codUMV = "codUMV";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_codUMB = "codUMB";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_unidadesV = "unidadesV";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_unidadesB = "unidadesB";
-    public static final String CARTILLAS_BC_DETALLE_COLUMN_umB = "umB";
-
     public static final String CONFIGURACION_SISTEMA_COLUMN_Id = "Id";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Sistema = "Sistema";
     public static final String CONFIGURACION_SISTEMA_COLUMN_Configuracion = "Configuracion";
@@ -249,55 +217,6 @@ public class variables_publicas {
     public static final String DPTOMUNIBARRIOS_COLUMN_Nombre_Departamento ="Nombre_Departamento";
     public static final String DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio = "Codigo_Municipio";
     public static final String DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio ="Nombre_Municipio";
-
-    public static  final String INFORMES_COLUMN_CodInforme = "CodInforme";
-    public static  final String INFORMES_COLUMN_Fecha = "Fecha";
-    public static  final String INFORMES_COLUMN_IdVendedor = "IdVendedor";
-    public static  final String INFORMES_COLUMN_Aprobada = "Aprobada";
-    public static  final String INFORMES_COLUMN_Anulada = "Anulada";
-    public static  final String INFORMES_COLUMN_Imei = "Imei";
-    public static  final String INFORMES_COLUMN_Usuario = "Usuario";
-
-    public static  final String DETALLEINFORMES_COLUMN_CodInforme = "CodInforme";
-    public static  final String DETALLEINFORMES_COLUMN_Recibo = "Recibo";
-    public static  final String DETALLEINFORMES_COLUMN_Idvendedor = "Idvendedor";
-    public static  final String DETALLEINFORMES_COLUMN_IdCliente = "IdCliente";
-    public static  final String DETALLEINFORMES_COLUMN_Factura = "Factura";
-    public static  final String DETALLEINFORMES_COLUMN_Saldo = "Saldo";
-    public static  final String DETALLEINFORMES_COLUMN_Monto = "Monto";
-    public static  final String DETALLEINFORMES_COLUMN_Abono = "Abono";
-    public static  final String DETALLEINFORMES_COLUMN_NoCheque = "NoCheque";
-    public static  final String DETALLEINFORMES_COLUMN_BancoE = "BancoE";
-    public static  final String DETALLEINFORMES_COLUMN_BancoR = "BancoR";
-    public static  final String DETALLEINFORMES_COLUMN_FechaCK = "FechaCK";
-    public static  final String DETALLEINFORMES_COLUMN_FechaDep = "FechaDep";
-    public static  final String DETALLEINFORMES_COLUMN_Efectivo = "Efectivo";
-    public static  final String DETALLEINFORMES_COLUMN_Moneda = "Moneda";
-    public static  final String DETALLEINFORMES_COLUMN_Aprobado = "Aprobado";
-    public static  final String DETALLEINFORMES_COLUMN_Posfechado = "Posfechado";
-    public static  final String DETALLEINFORMES_COLUMN_Procesado = "Procesado";
-    public static  final String DETALLEINFORMES_COLUMN_Usuario = "Usuario";
-    public static  final String DETALLEINFORMES_COLUMN_Vendedor = "Vendedor";
-    public static  final String DETALLEINFORMES_COLUMN_Cliente = "Cliente";
-    public static  final String DETALLEINFORMES_COLUMN_CodigoLetra = "CodigoLetra";
-    public static  final String DETALLEINFORMES_COLUMN_CantLetra = "CantLetra";
-    public static  final String DETALLEINFORMES_COLUMN_Observacion = "Observacion";
-    public static  final String DETALLEINFORMES_COLUMN_Concepto = "Concepto";
-    public static  final String DETALLEINFORMES_COLUMN_DepPendiente = "DepPendiente";
-
-    public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Cliente = "Cliente";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_CodigoCliente = "CodigoCliente";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Fecha = "Fecha";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_IVA = "IVA";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Tipo = "Tipo";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_SubTotal = "SubTotal";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Descuento = "Descuento";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Total = "Total";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Abono = "Abono";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Saldo = "Saldo";
-    public static  final String FACTURAS_PENDIENTES_COLUMN_Guardada = "Guardada";
 
     public static  final String BANCOS_COLUMN_codigo = "Codigo";
     public static final String  BANCOS_COLUMN_nombre ="Nombre";

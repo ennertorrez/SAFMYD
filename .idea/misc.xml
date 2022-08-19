@@ -7,11 +7,17 @@
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/drawable/spinner_background_big.xml" value="0.18" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/clientes_agregar.xml" value="0.22056159420289856" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/clientes_editar_inactivo.xml" value="0.25" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/clientesrecibos_layout.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/dialog_ok_inf_layout.xml" value="0.1921875" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/facturasclientesmora.xml" value="0.178125" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/historicoclientesmeses.xml" value="0.178125" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/informepago.xml" value="0.1921875" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/iniciosesion.xml" value="0.21920289855072464" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/list_cliente.xml" value="0.11458333333333333" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/lista_otras_promociones.xml" value="0.178125" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/lista_pedidos_facturas_layout.xml" value="0.22" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/lista_promociones.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/lista_ventas_clientes_layout.xml" value="0.1921875" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/listapedidofacturado_layout.xml" value="0.178125" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/listapedidos_layout.xml" value="0.178125" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/listaresumen_facturado.xml" value="0.25" />
@@ -22,6 +28,8 @@
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/resumen_preventa_list_item.xml" value="0.178125" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/resumenfacturado_list_item.xml" value="0.11458333333333333" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/menu/activity_main_drawer.xml" value="0.1" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/menu/informes_list_menu_context.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/menu/recibos_list_menu_context.xml" value="0.1921875" />
       </map>
     </option>
   </component>

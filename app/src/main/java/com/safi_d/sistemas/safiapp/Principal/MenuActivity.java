@@ -33,23 +33,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.text.ParseException;
 
 import android.os.Handler;
 
 import com.safi_d.sistemas.safiapp.AccesoDatos.ArticulosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.CategoriasClienteHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.EscalaPreciosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.FacturasPendientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FormaPagoHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PromocionesHelper;
@@ -60,17 +54,12 @@ import com.safi_d.sistemas.safiapp.AccesoDatos.RutasHelper;
 import com.safi_d.sistemas.safiapp.Auxiliar.Funciones;
 import com.safi_d.sistemas.safiapp.Auxiliar.SincronizarDatos;
 import com.safi_d.sistemas.safiapp.Auxiliar.variables_publicas;
-import com.safi_d.sistemas.safiapp.Informes.InformesActivity;
 import com.safi_d.sistemas.safiapp.Menu.ClientesFragment;
 import com.safi_d.sistemas.safiapp.Clientes.ClientesNew;
 import com.safi_d.sistemas.safiapp.Menu.ClientesInactivosFragment;
-import com.safi_d.sistemas.safiapp.Menu.FacturasMoraClienteFragment;
 import com.safi_d.sistemas.safiapp.Menu.HistoricoventasClienteFragment;
-import com.safi_d.sistemas.safiapp.Menu.ListaInformesFragment;
 import com.safi_d.sistemas.safiapp.Menu.ListaPedidosFragment;
 import com.safi_d.sistemas.safiapp.Menu.ListaPedidosSupFragment;
-import com.safi_d.sistemas.safiapp.Menu.ListaRecibosPendFragment;
-import com.safi_d.sistemas.safiapp.Menu.ListaPedidovsFacturado;
 import com.safi_d.sistemas.safiapp.Menu.ListaTotalFacturado;
 import com.safi_d.sistemas.safiapp.Menu.MaestroProductoFragment;
 import com.safi_d.sistemas.safiapp.Menu.PedidosFragment;
@@ -78,11 +67,6 @@ import com.safi_d.sistemas.safiapp.R;
 
 import org.json.JSONException;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.time.LocalDateTime;
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private Handler handler = new Handler();
@@ -99,17 +83,12 @@ public class MenuActivity extends AppCompatActivity
     private UsuariosHelper UsuariosH;
     private ClientesHelper ClientesH;
     private VendedoresHelper VendedoresH;
-    private CartillasBcHelper CartillasBcH;
-    private CartillasBcDetalleHelper CartillasBcDetalleH;
     private PromocionesHelper PromocionesH;
     private FormaPagoHelper FormaPagoH;
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
-    private InformesHelper InformesH;
-    private InformesDetalleHelper InformesDetalleH;
-    private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
     private RutasHelper RutasH;
     private TPreciosHelper TPreciosH;
@@ -191,25 +170,19 @@ public class MenuActivity extends AppCompatActivity
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ConfigH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         ClientesSucH = new ClientesSucursalHelper(DbOpenHelper.database);
-        CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
-        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         PromocionesH = new PromocionesHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
-        InformesH = new InformesHelper(DbOpenHelper.database);
-        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
-        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
         RutasH = new RutasHelper(DbOpenHelper.database);
         CategoriaH = new CategoriasClienteHelper(DbOpenHelper.database);
         TPreciosH = new TPreciosHelper(DbOpenHelper.database);
         EscalaPreciosH = new EscalaPreciosHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
-                CartillasBcDetalleH, PromocionesH,FormaPagoH,ConfigH, ClientesSucH,
-                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH,CategoriaH,TPreciosH,RutasH,EscalaPreciosH);
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, PromocionesH,FormaPagoH,ConfigH, ClientesSucH,
+                ArticulosH, UsuariosH, PedidoH, PedidoDetalleH,CategoriaH,TPreciosH,RutasH,EscalaPreciosH);
 
         try {
             variables_publicas.info = "***** Usuario: " + variables_publicas.usuario.getNombre() + " / IMEI: " + (variables_publicas.IMEI == null ? "null" : variables_publicas.IMEI) + " / VersionSistema: " + variables_publicas.VersionSistema + " ******** ";
@@ -217,30 +190,15 @@ public class MenuActivity extends AppCompatActivity
             Log.e("error", ex.getMessage());
             ex.printStackTrace();
         }
-
-        //navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Clientes nuevos
-        //navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(false); //Activar Clientes
-        navigationView.getMenu().getItem(3).setVisible(false); //Recibos
+        //navigationView.getMenu().getItem(2).setVisible(false);
         if (variables_publicas.usuario.getAddCliente().equalsIgnoreCase("1")){
-            navigationView.getMenu().getItem(2).setVisible(true);
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(0).setVisible(false); //Lista Clientes
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(true); //Agregar Clientes
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(false); //Activar Clientes
         }else{
-            navigationView.getMenu().getItem(2).setVisible(false);
-        }
-        navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(false); //Activar Clientes
-
-        if ((!variables_publicas.usuario.getCanal().equalsIgnoreCase("Detalle")&& variables_publicas.usuario.getTipo().equalsIgnoreCase("Vendedor")) || variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User") ) {
-            navigationView.getMenu().getItem(3).setVisible(true); //Recibos
-            if (variables_publicas.usuario.getTipo().equalsIgnoreCase("Supervisor") || variables_publicas.usuario.getTipo().equalsIgnoreCase("User")){
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(0).setVisible(false); //Agregar Recibos
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(3).setVisible(false); //Estado de cuenta
-            }else {
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(0).setVisible(true); //Agregar Recibos
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(1).setVisible(true); //Listado de Recibos
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(2).setVisible(true); //Estado de cuenta
-                navigationView.getMenu().getItem(3).getSubMenu().getItem(3).setVisible(true); //Estado de cuenta
-            }
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(0).setVisible(false); //Lista Clientes
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(1).setVisible(false); //Agregar Clientes
+            navigationView.getMenu().getItem(2).getSubMenu().getItem(2).setVisible(false); //Activar Clientes
         }
 
         IMEI = variables_publicas.IMEI;
@@ -466,42 +424,11 @@ public class MenuActivity extends AppCompatActivity
                 tran.commit();
                 break;
 
-            case R.id.btnNuevoInforme:
-                Intent newRecibo = new Intent(getApplicationContext(), InformesActivity.class);
-                startActivity(newRecibo);
-                break;
-
             case R.id.btnListadoPedidos:
 
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaPedidosFragment());
-                tran.addToBackStack(null);
-                tran.commit();
-                break;
-
-            case R.id.btnListaInforme:
-
-                fragmentManager.executePendingTransactions();
-                tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ListaInformesFragment());
-                tran.addToBackStack(null);
-                tran.commit();
-                break;
-
-            case R.id.btnReciboPend:
-
-                fragmentManager.executePendingTransactions();
-                tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new ListaRecibosPendFragment());
-                tran.addToBackStack(null);
-                tran.commit();
-                break;
-
-            case R.id.btnEstadoCta:
-                fragmentManager.executePendingTransactions();
-                tran = getFragmentManager().beginTransaction();
-                tran.add(R.id.content_frame, new FacturasMoraClienteFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

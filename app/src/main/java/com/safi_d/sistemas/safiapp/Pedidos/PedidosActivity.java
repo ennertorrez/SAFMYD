@@ -52,8 +52,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ArticulosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
@@ -186,11 +184,9 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
     private TPreciosHelper TPreciosH;
     private EscalaPreciosHelper EscalaPreciosH;
     private RutasHelper RutasH;
-    private CartillasBcDetalleHelper CartillasBcDetalleH;
     private PromocionesHelper PromocionesH;
     private PedidosDetalleHelper PedidoDetalleH;
     private ConfiguracionSistemaHelper ConfiguracionSistemaH;
-    private CartillasBcHelper CartillasBcH;
     private ConfiguracionSistemaHelper ConfigSistemaH;
     private PedidosHelper PedidoH;
     private String CodigoLetra = "";
@@ -234,8 +230,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ConfigH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         ClientesSucursalH = new ClientesSucursalHelper(DbOpenHelper.database);
-        CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
-        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         PromocionesH = new PromocionesHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
@@ -247,8 +241,7 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         ConfigSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         EscalaPreciosH = new EscalaPreciosHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
-                CartillasBcDetalleH,PromocionesH,
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, PromocionesH,
                 FormaPagoH,
                 ConfigH, ClientesSucursalH, ArticulosH, UsuariosH, PedidoH, PedidoDetalleH, TPreciosH,RutasH,EscalaPreciosH);
 
@@ -276,7 +269,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
         UsuariosH = new UsuariosHelper(DbOpenHelper.database);
         ClientesH = new ClientesHelper(DbOpenHelper.database);
         PedidoH = new PedidosHelper(DbOpenHelper.database);
-        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
         ConfiguracionSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         cboVendedor = (Spinner) findViewById(R.id.cboVendedor);
@@ -647,7 +639,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                                       for (HashMap<String, String> item : listaArticulos) {
                                                           subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
                                                       }
-                                                      //AplicarBonificacion();
                                                       ValidarPreciosEscala();
                                                       AplicarBonificacionCombinada();
                                                       RefrescarGrid();
@@ -976,7 +967,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                             for (HashMap<String, String> item : listaArticulos) {
                                 subTotalPrecioSuper += Double.parseDouble(item.get("SubTotal").replace(",", ""));
                             }
-                            //AplicarBonificacion();
                             ValidarPreciosEscala();
                             AplicarBonificacionCombinada();
                             RefrescarGrid();
@@ -1001,84 +991,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
 
     private void CheckConnectivity() {
         isOnline = Funciones.TestServerConectivity();
-    }
-
-    private void AplicarBonificacion() {
-
-
-        ArrayList<HashMap<String, String>> listaTemp = new ArrayList<HashMap<String, String>>();
-        ;
-        /*Primero eliminamos todas la bonificaciones para poder recalcular*/
-        for (int i = 0; i < listaArticulos.size(); i++) {
-            HashMap<String, String> item = listaArticulos.get(i);
-            if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
-                listaTemp.add(item);
-            }
-        }
-        listaArticulos = listaTemp;
-        for (int i = 0; i < listaArticulos.size(); i++) {
-            HashMap<String, String> itemPedidos = listaArticulos.get(i);
-            /*Esta validacion esta de mas pero alli la dejamos por si las moscas*/
-            if (itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equalsIgnoreCase("P")) {
-                HashMap<String, String> itemBonificado = CartillasBcDetalleH.BuscarBonificacion(itemPedidos.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo), "05", variables_publicas.FechaActual, itemPedidos.get("Cantidad"),itemPedidos.get("CodUM"));
-                Articulo articuloB = ArticulosH.BuscarArticulo(itemBonificado.get("itemB"));
-
-                /*Aqui validamos la bonificacion por cartillas promocionales*/
-                if (itemBonificado.size() > 0) {
-
-                    /*Es se pone para evitar error si el articulo bonificado esta desactivado*/
-                    if (articuloB != null) {
-                        boolean existe = false;
-                        for (HashMap<String, String> item : listaArticulos) {
-                            /*Si ya existe actualizamos la cantidad bonificada*/
-                            if (item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_CodigoArticulo).equals(itemBonificado.get("itemB")) && item.get(variables_publicas.PEDIDOS_DETALLE_COLUMN_TipoArt).equals("B")) {
-                                existe = true;
-                                int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
-                                item.put(variables_publicas.PEDIDOS_DETALLE_COLUMN_Cantidad, String.valueOf(((double) Double.parseDouble(item.get("Cantidad"))) + ((double) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB))))));
-                                break;
-                            }
-                        }
-                        /*Si no existe lo agregamos*/
-                        if (existe == false) {
-
-                            HashMap<String, String> articuloBonificado = new HashMap<>();
-                            articuloBonificado.put("CodigoPedido", pedido.getCodigoPedido());
-                            articuloBonificado.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-")[itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB).split("-").length - 1]);
-                            //articuloBonificado.put("Cod", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-                            articuloBonificado.put("CodigoArticulo", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB));
-                            articuloBonificado.put("Um", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_umB));
-                            int factor = (int) Math.floor(Double.parseDouble(itemPedidos.get("Cantidad")) / Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad)));
-                            articuloBonificado.put("Cantidad", String.valueOf((double) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)))));
-                            articuloBonificado.put("Precio", "0");
-                            articuloBonificado.put("Descripcion", "**" + itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB));
-                            articuloBonificado.put("CodUM", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_codUMB));
-                            articuloBonificado.put("Unidades", String.valueOf((double) (factor * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB)) * Double.parseDouble(itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_unidadesB)))));
-                            articuloBonificado.put("Costo", articuloB.getCosto());
-                            articuloBonificado.put("PorDescuento", "0");
-                            articuloBonificado.put("PorDescuentoOriginal", String.valueOf(Double.parseDouble("0")));
-                            articuloBonificado.put("TipoArt", "B");
-                            articuloBonificado.put("BonificaA", itemBonificado.get(variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV));
-                            articuloBonificado.put("PorcentajeIva", "0");
-                            articuloBonificado.put("Descuento", "0");
-                            articuloBonificado.put("Iva", "0");
-                            articuloBonificado.put("SubTotal", "0");
-                            articuloBonificado.put("Total", "0");
-                            articuloBonificado.put("TipoPrecio", "Bonificacion");
-                            articuloBonificado.put("IdProveedor", articuloB.getIdProveedor());
-                            articuloBonificado.put("UnidadCajaVenta", articuloB.getUnidadCajaVenta());
-                            articuloBonificado.put("Bodega", "01");
-                            listaArticulos.add(articuloBonificado);
-                        }
-                    }
-                    RefrescarGrid();
-                    CalcularTotales();
-                }
-            }
-
-
-        }
-
-
     }
 
     private void AplicarBonificacionCombinada() {
@@ -1930,7 +1842,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                     adapter.notifyDataSetChanged();
                     lv.setAdapter(adapter);
 
-                    //AplicarBonificacion();
                     ValidarPreciosEscala();
                     AplicarBonificacionCombinada();
                     CalcularTotales();
@@ -2053,7 +1964,6 @@ public class PedidosActivity extends Activity implements ActivityCompat.OnReques
                                 adapter.notifyDataSetChanged();
                                 lv.setAdapter(adapter);
 
-                                //AplicarBonificacion();
                                 ValidarPreciosEscala();
                                 AplicarBonificacionCombinada();
                                 CalcularTotales();

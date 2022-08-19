@@ -41,29 +41,6 @@
                     android:title="Activar Cliente" />
             </menu>
         </item>
-        <item
-            android:id="@+id/btnRecibos"
-            android:icon="@drawable/ic_menu_share"
-            android:title="Recibos" >
-            <menu>
-                <item
-                    android:id="@+id/btnNuevoInforme"
-                    android:icon="@drawable/ic_menu_share"
-                    android:title="Agregar Recibo" />
-                <item
-                    android:id="@+id/btnListaInforme"
-                    android:icon="@drawable/ic_menu_mapmode"
-                    android:title="Lista de Informes" />
-                <item
-                    android:id="@+id/btnEstadoCta"
-                    android:icon="@drawable/ic_menu_slideshow"
-                    android:title="Estado de Cuenta" />
-                <item
-                    android:id="@+id/btnReciboPend"
-                    android:icon="@drawable/ic_menu_plussign"
-                    android:title="Recibos Pendientes" />
-            </menu>
-        </item>
     <item
         android:id="@+id/btnReportes"
         android:icon="@drawable/ic_menu_share"

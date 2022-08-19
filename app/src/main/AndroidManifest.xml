@@ -92,25 +92,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.safi_d.sistemas.safiapp.Informes.InformesActivity" android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.InformesActivity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name="com.safi_d.sistemas.safiapp.Informes.AgregarRecibo" android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.AgregarRecibo" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <activity android:name="com.safi_d.sistemas.safiapp.Clientes.ListaVentasHistClientes" android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation"
         android:screenOrientation="portrait">
@@ -125,25 +106,6 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.ClientesInactivosEdit" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name="com.safi_d.sistemas.safiapp.Informes.ListaDetalleInformesClientes" android:windowSoftInputMode="stateHidden"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.ListaDetalleInformesClientes" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity android:name="com.safi_d.sistemas.safiapp.Informes.ListaFacturasMoraClientes" android:windowSoftInputMode="stateHidden"
-
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.ListaFacturasMoraClientes" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

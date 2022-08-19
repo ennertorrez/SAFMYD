@@ -140,31 +140,6 @@ public class DataBaseOpenHelper {
                     + variables_publicas.PRECIOS_COLUMN_UNIDADES + " TEXT , "
                     + variables_publicas.PRECIOS_COLUMN_MONTO + " TEXT ) ");
 
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CARTILLAS_BC + "( "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_id + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_codigo + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_fechaini + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_fechafinal + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_tipo + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_COLUMN_aprobado + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DETALLE_CARTILLAS_BC + "( "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_id + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemV + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionV + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidad + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_itemB + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_descripcionB + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_cantidadB + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_codigo + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_tipo + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_activo + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_codUMV + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_codUMB + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_unidadesV + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_unidadesB + " TEXT , "
-                    + variables_publicas.CARTILLAS_BC_DETALLE_COLUMN_umB + " TEXT) ");
-
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_CONFIGURACION_SISTEMA + "( "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Id + " TEXT , "
                     + variables_publicas.CONFIGURACION_SISTEMA_COLUMN_Sistema + " TEXT , "
@@ -216,58 +191,6 @@ public class DataBaseOpenHelper {
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Codigo_Municipio + " TEXT , "
                     + variables_publicas.DPTOMUNIBARRIOS_COLUMN_Nombre_Municipio + " TEXT ) ");
 
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_INFORMES + "( "
-                    + variables_publicas.INFORMES_COLUMN_CodInforme + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_Fecha + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_IdVendedor + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_Aprobada + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_Anulada + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_Imei + " TEXT , "
-                    + variables_publicas.INFORMES_COLUMN_Usuario + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_DETALLE_INFORMES + "( "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_CodInforme + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Recibo + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Idvendedor + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_IdCliente + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Factura + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Saldo + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Monto + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Abono + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_NoCheque + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_BancoE + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_BancoR + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_FechaCK + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_FechaDep + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Efectivo + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Moneda + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Aprobado + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Posfechado + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Procesado + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Usuario + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Vendedor + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Cliente + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_CodigoLetra + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_CantLetra + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Observacion + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_Concepto + " TEXT , "
-                    + variables_publicas.DETALLEINFORMES_COLUMN_DepPendiente + " TEXT ) ");
-
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_FACTURAS_PENDIENTES + "( "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Cliente + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Fecha + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_IVA + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Tipo + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_SubTotal + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Descuento + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo + " TEXT , "
-                    + variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada + " TEXT ) ");
-
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_BANCOS + "( "
                     + variables_publicas.BANCOS_COLUMN_codigo + " TEXT , "
                     + variables_publicas.BANCOS_COLUMN_nombre + " TEXT ) ");
@@ -293,13 +216,6 @@ public class DataBaseOpenHelper {
                     + variables_publicas.CATEGORIAS_COLUMN_Cod_Cat + " TEXT , "
                     + variables_publicas.CATEGORIAS_COLUMN_Categoria + " TEXT ) ");
 
-            db.execSQL("CREATE TABLE " + variables_publicas.TABLE_SERIE_RECIBOS + "( "
-                    + variables_publicas.SERIERECIBOS_COLUMN_IdSerie + " TEXT , "
-                    + variables_publicas.SERIERECIBOS_COLUMN_CodVendedor + " TEXT , "
-                    + variables_publicas.SERIERECIBOS_COLUMN_nInicial + " TEXT , "
-                    + variables_publicas.SERIERECIBOS_COLUMN_nFinal + " TEXT , "
-                    + variables_publicas.SERIERECIBOS_COLUMN_Numero + " TEXT ) ");
-
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_ESCALAPRECIOS + "( "
                     + variables_publicas.ESCALAPRECIOS_COLUMN_CODESCALA + " TEXT , "
                     + variables_publicas.ESCALAPRECIOS_COLUMN_LISTAARTICULOS + " TEXT , "
@@ -322,21 +238,15 @@ public class DataBaseOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_FORMA_PAGO);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_ZONAS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PRECIOS);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CARTILLAS_BC);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_CARTILLAS_BC);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CONFIGURACION_SISTEMA);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PEDIDOS_DETALLE);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DPTOMUNIBARRIOS);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_INFORMES);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_DETALLE_INFORMES);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_FACTURAS_PENDIENTES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_BANCOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_TPRECIOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_RUTAS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_PROMOCIONES);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_CATEGORIAS);
-            db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_SERIE_RECIBOS);
             db.execSQL("DROP TABLE IF EXISTS " + variables_publicas.TABLE_ESCALAPRECIOS);
             onCreate(db);
         }

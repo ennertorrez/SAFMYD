@@ -38,31 +38,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.safi_d.sistemas.safiapp.AccesoDatos.ArticulosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.CategoriasClienteHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.EscalaPreciosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.FacturasPendientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FormaPagoHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
-//import com.safi_d.sistemas.safiapp.AccesoDatos.PreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PromocionesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.TPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.UsuariosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.VendedoresHelper;
-//import com.safi_d.sistemas.safiapp.AccesoDatos.ZonasHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.RutasHelper;
 import com.safi_d.sistemas.safiapp.Auxiliar.Funciones;
 import com.safi_d.sistemas.safiapp.Auxiliar.SincronizarDatos;
 import com.safi_d.sistemas.safiapp.Auxiliar.variables_publicas;
-import com.safi_d.sistemas.safiapp.Entidades.Departamentos;
 import com.safi_d.sistemas.safiapp.Entidades.Ruta;
 import com.safi_d.sistemas.safiapp.Entidades.Usuario;
 import com.safi_d.sistemas.safiapp.HttpHandler;
@@ -109,17 +101,12 @@ public class Login extends Activity {
     private RutasHelper RutasH;
     private TPreciosHelper TPreciosH;
     private CategoriasClienteHelper CategoriaH;
-    private CartillasBcHelper CartillasBcH;
-    private CartillasBcDetalleHelper CartillasBcDetalleH;
     private PromocionesHelper PromocionesH;
     private FormaPagoHelper FormaPagoH;
     private ConfiguracionSistemaHelper ConfigH;
     private ClientesSucursalHelper ClientesSucH;
     private ArticulosHelper ArticulosH;
     private PedidosDetalleHelper PedidoDetalleH;
-    private InformesHelper InformesH;
-    private InformesDetalleHelper InformesDetalleH;
-    private FacturasPendientesHelper FacturasPendientesH;
     private PedidosHelper PedidoH;
     private EscalaPreciosHelper EscalaPreciosH;
     private SincronizarDatos sd;
@@ -143,8 +130,6 @@ public class Login extends Activity {
         VendedoresH = new VendedoresHelper(DbOpenHelper.database);
         ConfigH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
         ClientesSucH = new ClientesSucursalHelper(DbOpenHelper.database);
-        CartillasBcH = new CartillasBcHelper(DbOpenHelper.database);
-        CartillasBcDetalleH = new CartillasBcDetalleHelper(DbOpenHelper.database);
         PromocionesH = new PromocionesHelper(DbOpenHelper.database);
         FormaPagoH = new FormaPagoHelper(DbOpenHelper.database);
         ArticulosH = new ArticulosHelper(DbOpenHelper.database);
@@ -154,15 +139,11 @@ public class Login extends Activity {
         TPreciosH = new TPreciosHelper(DbOpenHelper.database);
         CategoriaH = new CategoriasClienteHelper(DbOpenHelper.database);
         PedidoDetalleH = new PedidosDetalleHelper(DbOpenHelper.database);
-        InformesH = new InformesHelper(DbOpenHelper.database);
-        InformesDetalleH = new InformesDetalleHelper(DbOpenHelper.database);
-        FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
         EscalaPreciosH = new EscalaPreciosHelper(DbOpenHelper.database);
 
-        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, CartillasBcH,
-                CartillasBcDetalleH,PromocionesH,
+        sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH,PromocionesH,
                 FormaPagoH,
-                ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH,InformesH,InformesDetalleH,FacturasPendientesH,CategoriaH,TPreciosH,RutasH,EscalaPreciosH);
+                ConfigH, ClientesSucH, ArticulosH, UsuariosH,PedidoH,PedidoDetalleH,CategoriaH,TPreciosH,RutasH,EscalaPreciosH);
 
         txtUsuario = (EditText) findViewById(R.id.txtUsuario);
         txtPassword = (EditText) findViewById(R.id.txtPassword);

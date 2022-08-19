@@ -5,27 +5,20 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ArticulosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.CartillasBcHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.CategoriasClienteHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesSucursalHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.ConfiguracionSistemaHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.EscalaPreciosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.FacturasPendientesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.FormaPagoHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.InformesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
-//import com.safi_d.sistemas.safiapp.AccesoDatos.PreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.PromocionesHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.RutasHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.TPreciosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.UsuariosHelper;
 import com.safi_d.sistemas.safiapp.AccesoDatos.VendedoresHelper;
-//import com.safi_d.sistemas.safiapp.AccesoDatos.ZonasHelper;
 import com.safi_d.sistemas.safiapp.Entidades.Cliente;
 import com.safi_d.sistemas.safiapp.Entidades.Vendedor;
 import com.safi_d.sistemas.safiapp.HttpHandler;
@@ -52,15 +45,12 @@ public class SincronizarDatos {
     private String urlRutas = variables_publicas.direccionIp + "/ServicioClientes.svc/GetRutas/";
     private String urlArticulos = variables_publicas.direccionIp + "/ServicioTotalArticulos.svc/BuscarTotalArticulo";
     final String urlVendedores = variables_publicas.direccionIp + "/ServicioPedidos.svc/ListaVendedores/";
-    final String urlCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetCartillasBC/";
-    final String urlDetalleCartillasBc = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetDetalleCartillasBC/";
     final String urlPromociones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetPromociones/";
     final String urlFormasPago = variables_publicas.direccionIp + "/ServicioPedidos.svc/FormasPago/";
     final String urlGetConfiguraciones = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetConfiguraciones/";
     final String urlGetClienteSucursales = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetClienteSucursales/";
     final String url = variables_publicas.direccionIp + "/ServicioLogin.svc/BuscarUsuario/";
     static final String urlConsultarExistencias = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerInventarioArticulo/";
-    final String urlGetFacturasPendientes = variables_publicas.direccionIp + "/ServicioRecibos.svc/SpObtieneFacturasSaldoPendiente/";
     final String urlGetCategorias = variables_publicas.direccionIp + "/ServicioClientes.svc/GetListaCategorias";
     static final String urlPrecios = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetPreciosArticulos/1";
     final String urlEscalaPrecios = variables_publicas.direccionIp + "/ServicioPedidos.svc/GetEscalaPrecios";
@@ -72,31 +62,23 @@ public class SincronizarDatos {
     private UsuariosHelper UsuariosH;
     private PedidosHelper PedidosH;
     private PedidosDetalleHelper PedidosDetalleH;
-    private CartillasBcHelper CartillasBcH;
     private RutasHelper RutasH;
     private CategoriasClienteHelper CategoriaH;
-    private CartillasBcDetalleHelper CartillasBcDetalleH;
     private PromocionesHelper PromocionesH;
     private FormaPagoHelper FormaPagoH;
     private ConfiguracionSistemaHelper ConfigSistemasH;
     private ClientesSucursalHelper ClientesSucH;
-    private InformesHelper InformesH;
-    private InformesDetalleHelper InformesDetalleH;
-    private FacturasPendientesHelper FacturasPendientesH;
     private TPreciosHelper TPreciosH;
     private EscalaPreciosHelper EscalaPreciosH;
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
-                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh,PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
+                            VendedoresHelper Vendedoresh, PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
                             ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
                             PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH ,TPreciosHelper tpreciosH,RutasHelper rutasH,EscalaPreciosHelper escalaPreciosH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
-        CartillasBcH = CatillasBch;
-        CartillasBcDetalleH = CartillasBcDetalleh;
         PromocionesH = Promocionesh;
         FormaPagoH = FormaPagoh;
         ConfigSistemasH = ConfigSistemah;
@@ -111,18 +93,14 @@ public class SincronizarDatos {
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
-                            VendedoresHelper Vendedoresh, CartillasBcHelper CatillasBch,
-                            CartillasBcDetalleHelper CartillasBcDetalleh,PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
+                            VendedoresHelper Vendedoresh, PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
                             ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH, InformesHelper Informesh,
-                            InformesDetalleHelper InformesDetalleh,FacturasPendientesHelper FacturasPendientesh,
+                            PedidosHelper pedidoH, PedidosDetalleHelper pedidosDetalleH,
                             CategoriasClienteHelper categoriasH,TPreciosHelper tpreciosH,RutasHelper rutasH,EscalaPreciosHelper escalaPreciosH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
-        CartillasBcH = CatillasBch;
-        CartillasBcDetalleH = CartillasBcDetalleh;
         PromocionesH = Promocionesh;
         FormaPagoH = FormaPagoh;
         ConfigSistemasH = ConfigSistemah;
@@ -131,9 +109,6 @@ public class SincronizarDatos {
         UsuariosH = usuariosH;
         PedidosH = pedidoH;
         PedidosDetalleH = pedidosDetalleH;
-        InformesH=Informesh;
-        InformesDetalleH=InformesDetalleh;
-        FacturasPendientesH=FacturasPendientesh;
         TPreciosH = tpreciosH;
         CategoriaH=categoriasH;
         RutasH =rutasH;
@@ -148,12 +123,9 @@ public class SincronizarDatos {
         RutasH= rutasH;
     }
 
-    public SincronizarDatos(DataBaseOpenHelper dbh, InformesHelper Informessh,InformesDetalleHelper InformesDetallesh ,ClientesHelper Clientesh, FacturasPendientesHelper FacturasPendientesh,RutasHelper rutasH) {
+    public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh, RutasHelper rutasH) {
         DbOpenHelper = dbh;
-        InformesH = Informessh;
-        InformesDetalleH = InformesDetallesh;
         ClientesH = Clientesh;
-        FacturasPendientesH = FacturasPendientesh;
         RutasH= rutasH;
     }
 
@@ -500,50 +472,6 @@ public class SincronizarDatos {
         }
 
     }
-
-    //CartillasBc
-    public boolean SincronizarCartillasBc() throws JSONException {
-        HttpHandler shCartillas = new HttpHandler();
-        String urlStringCartillas = urlCartillasBc;
-        String jsonStrCartillas = shCartillas.makeServiceCall(urlStringCartillas);
-
-        if (jsonStrCartillas == null) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronicar CartillasBC, Respuesta nula GET", variables_publicas.info + urlStringCartillas, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        }
-
-        DbOpenHelper.database.beginTransaction();
-        CartillasBcH.EliminaCartillasBc();
-        JSONObject jsonObjCartillas = new JSONObject(jsonStrCartillas);
-        // Getting JSON Array node
-        JSONArray cartillas = jsonObjCartillas.getJSONArray("GetCartillasBCResult");
-
-
-        try {
-            // looping through All Contacts
-            for (int i = 0; i < cartillas.length(); i++) {
-                JSONObject c = cartillas.getJSONObject(i);
-
-                String id = c.getString("id");
-                String codigo = c.getString("codigo");
-                String fechaini = c.getString("fechaini");
-                String fechafinal = c.getString("fechafinal");
-                String tipo = c.getString("tipo");
-                String aprobado = c.getString("aprobado");
-
-                CartillasBcH.GuardarCartillasBc(id, codigo, fechaini, fechafinal, tipo, aprobado);
-            }
-            DbOpenHelper.database.setTransactionSuccessful();
-            return true;
-        } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronicar CartillasBC, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        } finally {
-            DbOpenHelper.database.endTransaction();
-        }
-
-    }
-
     public boolean SincronizarPromociones() throws JSONException {
         HttpHandler shPromociones = new HttpHandler();
         String urlStringPromociones= urlPromociones;
@@ -663,54 +591,6 @@ public class SincronizarDatos {
        }
 
    }
-    //CartillasBcDetalle
-    public boolean SincronizarCartillasBcDetalle() throws JSONException {
-        HttpHandler shCartillasD = new HttpHandler();
-        String urlStringCartillasD = urlDetalleCartillasBc;
-        String jsonStrCartillasD = shCartillasD.makeServiceCall(urlStringCartillasD);
-
-        if (jsonStrCartillasD == null) {
-            new Funciones().SendMail("Ha ocurrido un error DetallaCartillaBC", variables_publicas.info + urlStringCartillasD, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        }
-        DbOpenHelper.database.beginTransaction();
-        CartillasBcDetalleH.EliminaCartillasBcDetalle();
-        JSONObject jsonObjCartillasD = new JSONObject(jsonStrCartillasD);
-        // Getting JSON Array node
-        JSONArray cartillasD = jsonObjCartillasD.getJSONArray("GetDetalleCartillasBCResult");
-
-
-        try {
-            // looping through All Contacts
-            for (int i = 0; i < cartillasD.length(); i++) {
-                JSONObject c = cartillasD.getJSONObject(i);
-                String id = c.getString("id");
-                String itemV = c.getString("itemV");
-                String descripcionV = c.getString("descripcionV");
-                String cantidad = c.getString("cantidad");
-                String itemB = c.getString("itemB");
-                String descripcionB = c.getString("descripcionB");
-                String cantidadB = c.getString("cantidadB");
-                String codigo = c.getString("codigo");
-                String tipo = c.getString("tipo");
-                String activo = c.getString("activo");
-                String codUMV = c.getString("CODUMV");
-                String codUMB = c.getString("CODUMB");
-                String unidadesV = c.getString("unidadesV");
-                String unidadesB = c.getString("unidadesB");
-                String umb = c.getString("UMB");
-                CartillasBcDetalleH.GuardarCartillasBcDetalle(id, itemV, descripcionV, cantidad, itemB, descripcionB, cantidadB, codigo, tipo, activo,codUMV,codUMB,unidadesV,unidadesB,umb);
-            }
-            DbOpenHelper.database.setTransactionSuccessful();
-            return true;
-        } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar DetallaCartillaBC, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        } finally {
-            DbOpenHelper.database.endTransaction();
-        }
-    }
-
     //FormaPago
     public boolean SincronizarFormaPago() throws JSONException {
         HttpHandler shFormaPago = new HttpHandler();
@@ -804,37 +684,6 @@ public class SincronizarDatos {
         } finally {
             DbOpenHelper.database.endTransaction();
         }
-    }
-
-    public String ObtenerValorConfigDatos() throws JSONException {
-        HttpHandler shConfigSistema = new HttpHandler();
-        String urlStringConfigSistema = urlGetConfiguraciones;
-        String jsonStrConfiguracionSistema = shConfigSistema.makeServiceCall(urlStringConfigSistema);
-
-        if (jsonStrConfiguracionSistema == null)
-            return null;
-
-        JSONObject jsonObjConfiguracionSistema = new JSONObject(jsonStrConfiguracionSistema);
-        JSONArray ValorConfig = jsonObjConfiguracionSistema.getJSONArray("GetConfiguracionesResult");
-
-        for (int i = 0; i < ValorConfig.length(); i++) {
-            JSONObject c = ValorConfig.getJSONObject(i);
-            String Valor = c.getString("Valor");
-            String Configuracion = c.getString("Configuracion");
-            if (Configuracion == "VersionDatos") {
-                variables_publicas.ValorConfigServ = Valor;
-            }
-            if (Configuracion == "AplicarPrecioMayoristaXCaja") {
-                variables_publicas.AplicarPrecioMayoristaXCaja = Valor;
-            }
-            if (Configuracion == "PermitirVentaDetAMayoristaXCaja") {
-                variables_publicas.PermitirVentaDetAMayoristaXCaja = Valor;
-            }
-            if (Configuracion == "lstDepartamentosForaneo1") {
-                variables_publicas.lstDepartamentosForaneo1 = Valor.split(",");
-            }
-        }
-        return jsonStrConfiguracionSistema;
     }
 
     //ClientesSucursal
@@ -1155,152 +1004,6 @@ public class SincronizarDatos {
 
     }
 
-    public static String ConsultarExistencia2(ArticulosHelper ArticulosH, String CodigoArticulo) {
-        HttpHandler sh = new HttpHandler();
-        String encodeUrl = "";
-
-        final String urlConsulta = urlConsultarExistencias + CodigoArticulo;
-
-        try {
-            URL Url = new URL(urlConsulta);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Codificar URL", variables_publicas.info + e.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            e.printStackTrace();
-            return "N/A";
-        }
-
-        String jsonExistencia = sh.makeServiceCall(encodeUrl);
-        if (jsonExistencia == null) {
-            return "0";
-        } else {
-            try {
-                JSONObject result = new JSONObject(jsonExistencia);
-                String resultState = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[0];
-                final String existencia = (String) ((String) result.get("ObtenerInventarioArticuloResult")).split(",")[1];
-                if (resultState.equals("false")) {
-
-                    new Funciones().SendMail("Ha ocurrido un error al obtener las existencias ,Respuesta false", variables_publicas.info + " --- " + existencia, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                    return "0";
-                }
-                /*Si no hubo ningun problema procedemos a actualizar las existencias locales*/
-                ArticulosH.ActualizarExistencias(CodigoArticulo, existencia);
-                return existencia;
-            } catch (Exception ex) {
-                new Funciones().SendMail("Ha ocurrido un error al obtener las existencias, Excepcion controlada ", variables_publicas.info + ex.getMessage() + " ---json: " + urlConsulta + " ---Response: " + jsonExistencia, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                Log.e("Error", ex.getMessage());
-                return "0";
-            }
-
-        }
-
-    }
-    private boolean ObtenerBancos() {
-
-        HttpHandler sh = new HttpHandler();
-        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerListaBancos";
-        String encodeUrl = "";
-        try {
-            URL Url = new URL(urlString);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String jsonStr = sh.makeServiceCall(encodeUrl);
-
-        /**********************************BANCOS**************************************/
-        if (jsonStr != null) {
-
-            try {
-                //DbOpenHelper.database.beginTransaction();
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray bancos = jsonObj.getJSONArray("ObtenerListaBancosResult");
-                if (bancos.length() == 0) {
-                    return false;
-                }
-                InformesH.EliminarBancos();
-                // looping through All Contacts
-
-                for (int i = 0; i < bancos.length(); i++) {
-                    JSONObject c = bancos.getJSONObject(i);
-                    InformesH.GuardarBancos(c.get("CODIGO").toString(),c.get("NOMBRE").toString());
-                }
-                return true;
-               // DbOpenHelper.database.setTransactionSuccessful();
-            } catch (Exception ex) {
-                Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al obtener el listado de Bancos,Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                return false;
-            }
-
-          /*  finally {
-                DbOpenHelper.database.endTransaction();
-            }*/
-
-        } else {
-            new Funciones().SendMail("Ha ocurrido un error al obtener el Listado de bancos,Respuesta nula", variables_publicas.info + urlString, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        }
-        //return false;
-    }
-
-    private boolean ObtenerSerieRecibos() {
-
-        HttpHandler sh = new HttpHandler();
-        String urlString = variables_publicas.direccionIp + "/ServicioRecibos.svc/ObtenerSerieRecibos";
-        String encodeUrl = "";
-        try {
-            URL Url = new URL(urlString);
-            URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
-            encodeUrl = uri.toURL().toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        String jsonStr = sh.makeServiceCall(encodeUrl);
-
-        /**********************************SERIE RECIBOS**************************************/
-        if (jsonStr != null) {
-
-            try {
-                //DbOpenHelper.database.beginTransaction();
-                JSONObject jsonObj = new JSONObject(jsonStr);
-                // Getting JSON Array node
-                JSONArray series = jsonObj.getJSONArray("ObtenerSerieRecibosResult");
-                if (series.length() == 0) {
-                    return false;
-                }
-                InformesH.EliminarSeries();
-                // looping through All Contacts
-
-                for (int i = 0; i < series.length(); i++) {
-                    JSONObject c = series.getJSONObject(i);
-                    InformesH.GuardarSeries(c.get("id").toString(),c.get("vendedor").toString(),c.get("ninicial").toString(),c.get("nfinal").toString(),c.get("numero").toString());
-                }
-                return true;
-                // DbOpenHelper.database.setTransactionSuccessful();
-            } catch (Exception ex) {
-                Log.e("Error", ex.getMessage());
-                new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                return false;
-            }
-
-          /*  finally {
-                DbOpenHelper.database.endTransaction();
-            }*/
-
-        } else {
-            new Funciones().SendMail("Ha ocurrido un error al obtener las Series de Recibos, Respuesta nula", variables_publicas.info + urlString, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        }
-        //return false;
-    }
-
     public static String SincronizarClientesTotal(Cliente cliente, String jsonCliente) {
         boolean Editar=false;
         if (variables_publicas.vEditando){
@@ -1403,134 +1106,7 @@ public class SincronizarDatos {
 
     }
 
-    private boolean SincronizarFacturasPendientes(String vVendedor, String vCliente) throws JSONException {
-        HttpHandler shC = new HttpHandler();
-        String urlStringC = urlGetFacturasPendientes + vVendedor + "/" + vCliente;
-        String jsonStrC = shC.makeServiceCall(urlStringC);
-
-        if (jsonStrC == null) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Facturas Pendientes, Respuesta nula GET", variables_publicas.info + urlStringC, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        }
-        //Log.e(TAG, "Response from url: " + jsonStrC);
-        DbOpenHelper.database.beginTransaction();
-
-        FacturasPendientesH.EliminaFacturasPendientes();
-        JSONObject jsonObjC = new JSONObject(jsonStrC);
-        // Getting JSON Array node
-        JSONArray articulos = jsonObjC.getJSONArray("SpObtieneFacturasSaldoPendienteResult");
-
-
-        try {
-            // looping through All Contacts
-            for (int i = 0; i < articulos.length(); i++) {
-                JSONObject c = articulos.getJSONObject(i);
-
-                String codvendedor = c.getString("codvendedor");
-                String No_Factura = c.getString("No_Factura");
-                String Cliente = c.getString("Cliente");
-                String CodigoCliente = c.getString("CodigoCliente");
-                String Fecha = c.getString("Fecha");
-                String IVA = c.getString("IVA");
-                String Tipo = c.getString("Tipo");
-                String SubTotal = c.getString("SubTotal");
-                String Descuento = c.getString("Descuento");
-                String Total = c.getString("Total");
-                String Abono = c.getString("Abono");
-                String Saldo = c.getString("Saldo");
-                String Guardada = c.getString("Guardada");
-                FacturasPendientesH.GuardarFacturasPendientes(codvendedor,Fecha, No_Factura, Cliente, CodigoCliente, IVA, Tipo, SubTotal, Descuento, Total, Abono, Saldo, Guardada);
-            }
-            DbOpenHelper.database.setTransactionSuccessful();
-            return true;
-        } catch (Exception ex) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar las Facturas Pendientes, Excepcion controlada", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return false;
-        } finally {
-            DbOpenHelper.database.endTransaction();
-        }
-
-    }
-
-    public static String SincronizarInforme(InformesHelper InformesH, InformesDetalleHelper InformesDetalleH, String vvendedor, String CodInforme, String jsonInforme, boolean Editar) {
-
-        HttpHandler sh = new HttpHandler();
-        String encodeUrl = "";
-        Gson gson = new Gson();
-        List<HashMap<String, String>> informeDetalle = InformesDetalleH.ObtenerInformeDetalle(CodInforme);
-        for (HashMap<String, String> item : informeDetalle) {
-            item.put("CodInforme", item.get("CodInforme"));
-            item.put("Recibo", item.get("Recibo"));
-            item.put("Idvendedor", item.get("Idvendedor"));
-            item.put("IdCliente", item.get("IdCliente"));
-            item.put("Factura", item.get("Factura"));
-            item.put("Saldo", item.get("Saldo").replace(",", ""));
-            item.put("Monto", item.get("Monto").replace(",", ""));
-            item.put("Abono", item.get("Abono").replace(",", ""));
-            item.put("NoCheque", item.get("NoCheque"));
-            item.put("BancoE", item.get("BancoE"));
-            item.put("BancoR", item.get("BancoR"));
-            item.put("FechaCK", item.get("FechaCK"));
-            item.put("FechaDep", item.get("FechaDep"));
-            item.put("Efectivo", item.get("Efectivo"));
-            item.put("Moneda", item.get("Moneda"));
-            item.put("Aprobado", item.get("Aprobado"));
-            item.put("Posfechado", item.get("Posfechado"));
-            item.put("Procesado", item.get("Procesado"));
-            item.put("Usuario", item.get("Usuario"));
-            item.put("Vendedor", item.get("Vendedor"));
-            item.put("Cliente", item.get("Cliente"));
-            item.put("CodigoLetra", item.get("CodigoLetra"));
-            item.put("CantLetra", item.get("CantLetra"));
-            item.put("Observacion", item.get("Observacion"));
-            item.put("Concepto", item.get("Concepto"));
-            item.put("DepPendiente", item.get("DepPendiente"));
-        }
-        String jsonInformeDetalle = gson.toJson(informeDetalle);
-        final String urlDetalle = variables_publicas.direccionIp + "/ServicioRecibos.svc/SincronizarInformeTotal/";
-        final String urlStringDetalle = urlDetalle + String.valueOf(Editar) + "/" + vvendedor + "/" + jsonInforme + "/" + jsonInformeDetalle;
-
-        HashMap<String,String> postData = new HashMap<>();
-        postData.put("Editar",String.valueOf(Editar));
-        postData.put("IdVendedor",vvendedor);
-        postData.put("informe",jsonInforme);
-        postData.put("Detalle",jsonInformeDetalle)   ;
-
-        String jsonStrInforme= sh.performPostCall(urlDetalle,postData);
-
-        //  String jsonStrPedido = sh.makeServiceCallPost(encodeUrl);
-        if (jsonStrInforme == null || jsonInforme.isEmpty()) {
-            new Funciones().SendMail("Ha ocurrido un error al sincronizar el informe, Respuesta nula POST", variables_publicas.info + urlStringDetalle, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-            return "false,Ha ocurrido un error al sincronizar el detalle del informe, Respuesta nula";
-        } else {
-            try {
-                JSONObject result = new JSONObject(jsonStrInforme);
-                String resultState = (String) ((String) result.get("SincronizarInformeTotalResult")).split(",")[0];
-                String NoInforme = (String) ((String) result.get("SincronizarInformeTotalResult")).split(",")[1];
-                if (resultState.equals("false")) {
-
-                    if (NoInforme.equalsIgnoreCase("Informe ya existe en base de datos")) {
-                        NoInforme =  ((String) result.get("SincronizarInformeTotalResult")).split(",")[1];
-                    } else {
-                        new Funciones().SendMail("Ha ocurrido un error al sincronizar el Informe ,Respuesta false", variables_publicas.info + NoInforme +" *** "+urlStringDetalle, "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                        return "false," + NoInforme;
-                    }
-                }
-                InformesH.ActualizarInforme(CodInforme, NoInforme);
-                InformesDetalleH.ActualizarCodigoInforme(CodInforme, NoInforme);
-                variables_publicas.noInforme=NoInforme;
-                return "true";
-            } catch (Exception ex) {
-                new Funciones().SendMail("Ha ocurrido un error al sincronizar el Informe, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
-                Log.e("Error", ex.getMessage());
-                return "false," + ex.getMessage() + "";
-            }
-
-        }
-
-    }
-
-       public static boolean ObtenerPedidoGuardado(String vPedido, PedidosHelper vpedidoh) {
+         public static boolean ObtenerPedidoGuardado(String vPedido, PedidosHelper vpedidoh) {
 
         HttpHandler sh = new HttpHandler();
         String urlString = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidoCabecera/" + vPedido;
