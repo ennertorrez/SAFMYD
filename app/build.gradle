@@ -2,31 +2,31 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        SAFIAPP {
-            keyAlias 'SAFIAPP'
+        SAFASUNCION {
+            keyAlias 'SAFASUNCION'
             keyPassword '1234567'
-            storeFile file('C:/APKS/SAFIAPP.jks')
+            storeFile file('C:/APKS/SAFASUNCION.jks')
             storePassword '1234567'
         }
     }
-    compileSdkVersion 30
-    buildToolsVersion '30.0.3'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
     defaultConfig {
-        applicationId 'com.safi_d.sistemas.safiapp'
+        applicationId 'com.saf.sistemas.safasuncion'
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 10
-        versionName "1.9"
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
-        signingConfig signingConfigs.SAFIAPP
+        signingConfig signingConfigs.SAFASUNCION
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.SAFIAPP
+            signingConfig signingConfigs.SAFASUNCION
         }
 
     }
@@ -36,11 +36,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
-    lintOptions {
+    lint {
         abortOnError false
-        checkReleaseBuilds false
         checkDependencies true
+        checkReleaseBuilds false
     }
+    namespace 'com.saf.sistemas.safasuncion'
 
 }
 

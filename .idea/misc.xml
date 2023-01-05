@@ -3,6 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/app-release/res/layout-v17/masterclientes_layout.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/drawable/user_profile_image_background_dos.xml" value="0.20833333333333334" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/activity_barra_cargado.xml" value="0.25" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/activity_menu.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/app_bar_main.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/clientes_agregar.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/content_main.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/iniciosesion.xml" value="0.18" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/layout/nav_header_main.xml" value="0.5714285714285714" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/activity_main.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/activity_main_drawer.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/barra_cargado.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/clientes_list_menu_context.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/clientes_opciones.xml" value="0.1921875" />
+        <entry key="..\:/Users/Enner Torrez/SAFASUNCION/app/src/main/res/menu/main.xml" value="0.1921875" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/drawable/spinner_background.xml" value="0.1046875" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/drawable/spinner_background_big.xml" value="0.18" />
         <entry key="..\:/Users/Enner Torrez/SAFIAPP/app/src/main/res/layout/clientes_agregar.xml" value="0.22056159420289856" />

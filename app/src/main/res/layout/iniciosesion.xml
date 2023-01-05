@@ -99,25 +99,26 @@
 
     <TextView
         android:id="@+id/empresa"
-        android:layout_below="@id/layout_sesion"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/layout_sesion"
         android:layout_marginBottom="0dp"
         android:layout_marginTop="15dp"
         android:gravity="center_horizontal"
-        android:text="Agencia del Norte"
+        android:text="Miscelánea Asunción"
         android:textColor="#fff"
         android:textSize="26sp"
         android:textStyle="bold" />
+
     <TextView
         android:id="@+id/lema"
-        android:layout_below="@id/empresa"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/empresa"
         android:layout_marginBottom="15dp"
         android:layout_marginTop="0dp"
         android:gravity="center_horizontal"
-        android:text="Líder en Bebidas"
+        android:text="El Rama"
         android:textColor="#fff"
         android:textSize="20sp"
         android:textStyle="italic" />
@@ -141,7 +142,7 @@
         android:layout_below="@+id/login_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:background="@drawable/user_profile_image_background"
+        android:background="@drawable/user_profile_image_background_dos"
         android:elevation="4dp"
-        android:src="@mipmap/logosafi145x148" />
+        android:src="@mipmap/logosafasuncion1482" />
 </RelativeLayout>

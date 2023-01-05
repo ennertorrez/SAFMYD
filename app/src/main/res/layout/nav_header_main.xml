@@ -25,7 +25,7 @@
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/accentColor"
         android:scaleType="centerCrop"
-        android:src="@drawable/logoanorte"
+        android:src="@drawable/logoasuncion"
         app:civ_border_width="1dp"
         app:civ_border_color="@android:color/white" />
 

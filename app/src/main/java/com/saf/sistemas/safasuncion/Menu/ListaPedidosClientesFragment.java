@@ -1,4 +1,4 @@
-package com.safi_d.sistemas.safiapp.Menu;
+package com.saf.sistemas.safasuncion.Menu;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -31,19 +30,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.safi_d.sistemas.safiapp.AccesoDatos.ClientesHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.DataBaseOpenHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosDetalleHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.PedidosHelper;
-import com.safi_d.sistemas.safiapp.AccesoDatos.VendedoresHelper;
-import com.safi_d.sistemas.safiapp.Auxiliar.Funciones;
-import com.safi_d.sistemas.safiapp.Auxiliar.SincronizarDatos;
-import com.safi_d.sistemas.safiapp.Auxiliar.variables_publicas;
-import com.safi_d.sistemas.safiapp.Entidades.Cliente;
-import com.safi_d.sistemas.safiapp.Entidades.Vendedor;
-import com.safi_d.sistemas.safiapp.HttpHandler;
-import com.safi_d.sistemas.safiapp.Pedidos.PedidosActivity;
-import com.safi_d.sistemas.safiapp.R;
+import com.saf.sistemas.safasuncion.AccesoDatos.ClientesHelper;
+import com.saf.sistemas.safasuncion.AccesoDatos.DataBaseOpenHelper;
+import com.saf.sistemas.safasuncion.AccesoDatos.PedidosDetalleHelper;
+import com.saf.sistemas.safasuncion.AccesoDatos.PedidosHelper;
+import com.saf.sistemas.safasuncion.AccesoDatos.VendedoresHelper;
+import com.saf.sistemas.safasuncion.Auxiliar.Funciones;
+import com.saf.sistemas.safasuncion.Auxiliar.SincronizarDatos;
+import com.saf.sistemas.safasuncion.Auxiliar.variables_publicas;
+import com.saf.sistemas.safasuncion.Entidades.Cliente;
+import com.saf.sistemas.safasuncion.Entidades.Vendedor;
+import com.saf.sistemas.safasuncion.HttpHandler;
+import com.saf.sistemas.safasuncion.Pedidos.PedidosActivity;
+import com.saf.sistemas.safasuncion.Pedidos.PedidosCliente;
+import com.saf.sistemas.safasuncion.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,7 +60,9 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
-public class ListaPedidosFragment extends Fragment {
+import androidx.annotation.Nullable;
+
+public class ListaPedidosClientesFragment extends Fragment {
     View myView;
     private DataBaseOpenHelper DbOpenHelper;
     private PedidosHelper PedidosH;
@@ -84,7 +86,7 @@ public class ListaPedidosFragment extends Fragment {
     private SimpleAdapter adapter;
     public static ArrayList<HashMap<String, String>> listapedidos;
     public Calendar myCalendar = Calendar.getInstance();
-    final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosVendedor";
+    final String urlPedidosVendedor = variables_publicas.direccionIp + "/ServicioPedidos.svc/ObtenerPedidosCliente";
     private String jsonAnulaPedido;
     private String IdPedido;
     private boolean guardadoOK = true;
@@ -95,7 +97,7 @@ public class ListaPedidosFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        myView = inflater.inflate(R.layout.listapedidos_layout, container, false);
+        myView = inflater.inflate(R.layout.listapedidoscliente_layout, container, false);
         df = new DecimalFormat("#0.00");
         DecimalFormatSymbols fmts = new DecimalFormatSymbols();
         fmts.setGroupingSeparator(',');
@@ -165,7 +167,7 @@ public class ListaPedidosFragment extends Fragment {
 
         try{
 
-                new GetListaPedidos().execute();
+            new ListaPedidosClientesFragment.GetListaPedidos().execute();
 
 
         }catch (Exception e){
@@ -176,7 +178,7 @@ public class ListaPedidosFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                    SincronizarPedido();
+                SincronizarPedido();
 
 
             }
@@ -194,7 +196,7 @@ public class ListaPedidosFragment extends Fragment {
     }
 
     private void CheckConnectivity() {
-        isOnline =Funciones.TestServerConectivity();
+        isOnline = Funciones.TestServerConectivity();
     }
 
     private void CargarPedidos() {
@@ -204,7 +206,7 @@ public class ListaPedidosFragment extends Fragment {
 
         inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
         busqueda = txtBusqueda.getText().toString();
-        new GetListaPedidos().execute();
+        new ListaPedidosClientesFragment.GetListaPedidos().execute();
     }
 
     private void ActualizarFooter() {
@@ -237,7 +239,7 @@ public class ListaPedidosFragment extends Fragment {
 
     private boolean SincronizarPedido() {
         try {
-            new SincronizardorPedidos().execute();
+            new ListaPedidosClientesFragment.SincronizardorPedidos().execute();
         } catch (Exception ex) {
             Funciones.MensajeAviso(getActivity().getApplicationContext(), ex.getMessage());
         }
@@ -249,7 +251,7 @@ public class ListaPedidosFragment extends Fragment {
 
         jsonAnulaPedido = gson.toJson(pedido);
         try {
-            new AnulaPedido().execute();
+            new ListaPedidosClientesFragment.AnulaPedido().execute();
         } catch (Exception ex) {
             Funciones.MensajeAviso(getActivity().getApplicationContext(), ex.getMessage());
         }
@@ -358,7 +360,7 @@ public class ListaPedidosFragment extends Fragment {
             }
             adapter = new SimpleAdapter(
                     getActivity(), listapedidos,
-                    R.layout.list_pedidos_guardados, new String[]{"Factura", "Estado",
+                    R.layout.list_pedidos_clientes_guardados, new String[]{"Factura", "Estado",
                     "NombreCliente", "FormaPago", "Fecha", variables_publicas.PEDIDOS_COLUMN_CodigoPedido, variables_publicas.PEDIDOS_COLUMN_Subtotal},
                     new int[]{R.id.Factura, R.id.Estado, R.id.Cliente, R.id.CondicionPago, R.id.Fecha,
                             R.id.CodigoPedido, R.id.TotalPedido}) {
@@ -413,7 +415,7 @@ public class ListaPedidosFragment extends Fragment {
         String encodeUrl = "";
         HttpHandler sh = new HttpHandler();
         busqueda = busqueda.isEmpty() ? "%" : busqueda;
-        String urlString = urlPedidosVendedor + "/" + CodigoVendedor + "/" + fecha + "/" + busqueda + "/" + Empresa;
+        String urlString = urlPedidosVendedor + "/" + variables_publicas.usuario.getCodigo() + "/" + fecha + "/" + variables_publicas.usuario.getUsuario() + "/" + Empresa;
         try {
             URL Url = new URL(urlString);
             URI uri = new URI(Url.getProtocol(), Url.getUserInfo(), Url.getHost(), Url.getPort(), Url.getPath(), Url.getQuery(), Url.getRef());
@@ -432,7 +434,7 @@ public class ListaPedidosFragment extends Fragment {
 
                 JSONObject jsonObj = new JSONObject(jsonStr);
                 // Getting JSON Array node
-                JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosVendedorResult");
+                JSONArray Pedidos = jsonObj.getJSONArray("ObtenerPedidosClienteResult");
 
                 for (int i = 0; i < Pedidos.length(); i++) {
                     JSONObject c = Pedidos.getJSONObject(i);
@@ -475,7 +477,7 @@ public class ListaPedidosFragment extends Fragment {
             pDialog = new ProgressDialog(getActivity());
             pDialog.setMessage("Sincronizando datos...Por favor espere...");
             pDialog.setCancelable(false);
-             pDialog.show();
+            pDialog.show();
         }
 
 
@@ -681,7 +683,7 @@ public class ListaPedidosFragment extends Fragment {
                 tv.setEnabled(true);
             }
             if (obj.get("Estado").equalsIgnoreCase("ANULADO") || !obj.get("Factura").equalsIgnoreCase(""))
-                 //   || (obj.get("Estado").equalsIgnoreCase("APROBADO")) )
+            //   || (obj.get("Estado").equalsIgnoreCase("APROBADO")) )
             {
                 //Ponemos el boton Editar en falso
                 ((MenuItem) menu.getItem(0)).setEnabled(false);
@@ -710,7 +712,7 @@ public class ListaPedidosFragment extends Fragment {
                     inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                     busqueda = txtBusqueda.getText().toString();
 
-                        new GetListaPedidos().execute().get();
+                    new ListaPedidosClientesFragment.GetListaPedidos().execute().get();
 
 
                     ActualizarFooter();
@@ -773,7 +775,7 @@ public class ListaPedidosFragment extends Fragment {
                     inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                     busqueda = txtBusqueda.getText().toString();
                     try {
-                        new GetListaPedidos().execute().get();
+                        new ListaPedidosClientesFragment.GetListaPedidos().execute().get();
                     } catch (Exception e) {
 
                     }
@@ -799,7 +801,7 @@ public class ListaPedidosFragment extends Fragment {
                             Cliente cliente = ClientesH.BuscarCliente(IdCliente);
                             String Nombre = cliente.getNombre();
                             // Starting new intent
-                            Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+                            Intent in = new Intent(getActivity().getApplicationContext(), PedidosCliente.class);
 
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                             in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
@@ -822,7 +824,7 @@ public class ListaPedidosFragment extends Fragment {
                     inputMethodManager.hideSoftInputFromWindow(txtBusqueda.getWindowToken(), 0);
                     busqueda = txtBusqueda.getText().toString();
                     try {
-                        new GetListaPedidos().execute().get();
+                        new ListaPedidosClientesFragment.GetListaPedidos().execute().get();
                     } catch (Exception e) {
 
                     }
@@ -849,7 +851,7 @@ public class ListaPedidosFragment extends Fragment {
                     Cliente cliente = ClientesH.BuscarCliente(IdCliente);
                     String Nombre = cliente.getNombre();
                     // Starting new intent
-                    Intent in = new Intent(getActivity().getApplicationContext(), PedidosActivity.class);
+                    Intent in = new Intent(getActivity().getApplicationContext(), PedidosCliente.class);
 
                     in.putExtra(variables_publicas.CLIENTES_COLUMN_IdCliente, IdCliente);
                     in.putExtra(variables_publicas.CLIENTES_COLUMN_Nombre, Nombre);
