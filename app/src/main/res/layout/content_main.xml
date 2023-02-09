@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
 
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.saf.sistemas.safasuncion.Principal.MenuActivity"
+    tools:context="com.saf.sistemas.safcafenorteno.Principal.MenuActivity"
     tools:showIn="@layout/app_bar_main">
 
     <FrameLayout
@@ -18,10 +18,11 @@
 
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_marginTop="50dp"
-            android:layout_height="350dp"
-            android:background="@mipmap/logoma" />
+            android:layout_width="360dp"
+            android:layout_height="411dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="110dp"
+            android:background="@mipmap/logocen" />
 
     </FrameLayout>
 

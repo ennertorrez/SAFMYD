@@ -31,6 +31,22 @@
             </menu>
         </item>
         <item
+            android:id="@+id/btnFacturacion"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Facturación" >
+            <menu>
+                <item
+                    android:id="@+id/btnFacturar"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="Facturar" />
+                <item
+                    android:id="@+id/btnListadoFacturas"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Listado Facturas" />
+
+            </menu>
+        </item>
+        <item
             android:id="@+id/btnClientes"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Clientes" >
@@ -47,6 +63,22 @@
                     android:id="@+id/btnActivarCliente"
                     android:icon="@drawable/ic_menu_share"
                     android:title="Activar Cliente" />
+            </menu>
+        </item>
+        <item
+            android:id="@+id/btnPagos"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Pagos" >
+            <menu>
+                <item
+                    android:id="@+id/btnRecibos"
+                    android:icon="@drawable/ic_menu_slideshow"
+                    android:title="Nuevo Pago" />
+                <item
+                    android:id="@+id/btnListadoPagos"
+                    android:icon="@drawable/ic_menu_plussign"
+                    android:title="Listado Pagos" />
+
             </menu>
         </item>
     <item
@@ -71,5 +103,10 @@
                 android:title="Reporte Facturacion" />
         </menu>
     </item>
+        <item
+            android:id="@+id/btnConfImpresora"
+            android:icon="@drawable/ic_menu_mapmode"
+            android:iconTint="@color/colorAccent"
+            android:title="Conf. Impresora" />
 </group>
 </menu>

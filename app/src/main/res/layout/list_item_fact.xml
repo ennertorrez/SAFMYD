@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+        android:id="@+id/Codigo"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/lblPrecio"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Precio: "
+        android:textColor="@color/colorAccent"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:layout_toRightOf="@id/Codigo"
+        android:gravity="right"/>
+
+    <TextView
+        android:id="@+id/Precio"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:layout_toRightOf="@id/lblPrecio"
+        android:gravity="right"
+        />
+    <TextView
+        android:id="@+id/lblExistencia"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Exist: "
+        android:textColor="@color/colorAccent"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:layout_toRightOf="@id/Precio"
+        android:gravity="right"/>
+
+    <TextView
+        android:id="@+id/Existencia"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:textColor="#5d5d5d"
+        android:textStyle="bold"
+        android:paddingBottom="2dip"
+        android:paddingTop="6dip"
+        android:layout_toRightOf="@id/lblExistencia"
+        android:gravity="right"
+        />
+    <CheckBox android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text=""
+        android:clickable="false"
+        android:focusable="false" />
+    <TextView
+        android:id="@+id/Nombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="2dip"
+        android:textColor="@color/colorAccent"
+        android:layout_below="@id/Codigo" />
+
+
+</RelativeLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/itemEditarFactura"
+        android:orderInCategory="100"
+        android:title="Editar Factura"
+        android:icon="@mipmap/ic_check_circle_black_48dp"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/itemAnularFactura"
+        android:orderInCategory="100"
+        android:title="Anular Factura"
+        android:icon="@mipmap/ic_delete_forever_black_24dp"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/itemVerFactura"
+        android:orderInCategory="100"
+        android:title="Ver Factura"
+        android:icon="@mipmap/ic_search_black_48dp"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/itemImprimir"
+        android:orderInCategory="100"
+        android:title="Imprimir Factura"
+        android:icon="@mipmap/ic_search_black_48dp"
+        app:showAsAction="never" />
+
+</menu>

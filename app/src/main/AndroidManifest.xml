@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
@@ -9,6 +15,11 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="fractal5.mythirdapp.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -16,10 +27,11 @@
      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.Manifest.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/logosafasuncion148"
+        android:icon="@mipmap/logoelnorteno"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
@@ -31,7 +43,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name="com.saf.sistemas.safasuncion.Principal.Login"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Principal.Login"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -41,7 +53,7 @@
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             </intent-filter>
         </activity>
-        <activity android:name="com.saf.sistemas.safasuncion.Principal.MenuActivity"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Principal.MenuActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -51,7 +63,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.saf.sistemas.safasuncion.Principal.Barra_cargado"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Principal.Barra_cargado"
             android:exported="true">
 
             <intent-filter>
@@ -61,7 +73,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.saf.sistemas.safasuncion.SingleMenuItemActivity"
+        <activity android:name="com.saf.sistemas.safcafenorteno.SingleMenuItemActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SingleMenuItemActivity" />
@@ -76,7 +88,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>-->
-        <activity android:name="com.saf.sistemas.safasuncion.Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -86,7 +98,27 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.saf.sistemas.safasuncion.Pedidos.PedidosCliente" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Pedidos.FacturasActivity" android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.FacturasActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Pedidos.Pagos" android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.Pagos" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.saf.sistemas.safcafenorteno.Pedidos.PedidosCliente" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -96,7 +128,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.saf.sistemas.safasuncion.Clientes.ClientesNew" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Clientes.ClientesNew" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -107,7 +139,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.saf.sistemas.safasuncion.Clientes.ListaVentasHistClientes" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Clientes.ListaVentasHistClientes" android:windowSoftInputMode="stateHidden"
         android:configChanges="orientation"
         android:screenOrientation="portrait"
             android:exported="true">
@@ -117,7 +149,7 @@
             <category android:name="android.intent.category.DEFAULT" />
         </intent-filter>
         </activity>
-        <activity android:name="com.saf.sistemas.safasuncion.Clientes.ClientesInactivosEdit" android:windowSoftInputMode="stateHidden"
+        <activity android:name="com.saf.sistemas.safcafenorteno.Clientes.ClientesInactivosEdit" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:exported="true">
@@ -133,7 +165,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-1160350010547604~1531086517" />
+            android:value="ca-app-pub-8683642160618405~7008356350" />
     </application>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

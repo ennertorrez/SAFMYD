@@ -87,7 +87,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Rl2"
-        android:layout_above="@+id/Rl4"
         android:orientation="vertical">
         <ListView
             android:id="@+id/list"
@@ -100,27 +99,6 @@
 
         </ListView>
     </RelativeLayout>
-
-    <!--<RelativeLayout
-            android:id="@+id/Rl4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/lblFooter"
-            android:orientation="vertical">
-            <Button
-                android:id="@+id/btnOKProducto"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="6dp"
-                android:background="#6ec543"
-                android:text="Aceptar"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:layout_marginBottom="6dp"
-                />
-        </RelativeLayout>-->
 
     <TextView
         android:id="@+id/lblFooter"

@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
 
-    tools:context=".Pedidos.PedidosActivity">
+    tools:context=".Pedidos.PedidosCliente">
 
     <ScrollView
         android:id="@+id/scrollView1"

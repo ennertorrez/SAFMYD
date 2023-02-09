@@ -2,17 +2,17 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        SAFASUNCION {
-            keyAlias 'SAFASUNCION'
+        SAFCAFENORTENO {
+            keyAlias 'SAFELNORTENO'
             keyPassword '1234567'
-            storeFile file('C:/APKS/SAFASUNCION.jks')
+            storeFile file('C:/APKS/SAFELNORTENO.jks')
             storePassword '1234567'
         }
     }
     compileSdkVersion 31
     buildToolsVersion '31.0.0'
     defaultConfig {
-        applicationId 'com.saf.sistemas.safasuncion'
+        applicationId 'com.saf.sistemas.safcafenorteno'
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
@@ -20,13 +20,13 @@ android {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
-        signingConfig signingConfigs.SAFASUNCION
+        signingConfig signingConfigs.SAFCAFENORTENO
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.SAFASUNCION
+            signingConfig signingConfigs.SAFCAFENORTENO
         }
 
     }
@@ -41,7 +41,7 @@ android {
         checkDependencies true
         checkReleaseBuilds false
     }
-    namespace 'com.saf.sistemas.safasuncion'
+    namespace 'com.saf.sistemas.safcafenorteno'
 
 }
 
@@ -64,6 +64,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.googlecode.json-simple:json-simple:1.1'
+    implementation 'androidx.work:work-runtime:2.7.1'
     //noinspection GradleCompatible
     //compile 'com.android.support:appcompat-v7:23.3.0'
     //noinspection GradleCompatible
