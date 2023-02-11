@@ -81,13 +81,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-   <!--     <activity android:name=".ConsultaArticuloActivity">
+        <activity android:name=".Pedidos.ListaFacturasMoraClientes" android:windowSoftInputMode="stateHidden"
+            android:configChanges="orientation"
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.ConsultaArticuloActivity" />
+                <action android:name="android.intent.action.ListaFacturasMoraClientes" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>-->
+        </activity>
         <activity android:name="com.saf.sistemas.safcafenorteno.Pedidos.PedidosActivity" android:windowSoftInputMode="stateHidden"
             android:configChanges="orientation"
             android:screenOrientation="portrait"

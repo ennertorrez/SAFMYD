@@ -18,6 +18,7 @@ public class Recibos {
     String Usuario ="";
     String Impresion ="";
 
+    String Guardado ="";
     public Recibos() {
     }
     public Recibos(String serie,
@@ -35,7 +36,8 @@ public class Recibos {
                    String idcliente,
                    String saldo,
                    String usuario,
-                   String impresion
+                   String impresion,
+                   String guardado
                    ) {
         Serie = serie;
         Recibo = recibo;
@@ -53,6 +55,7 @@ public class Recibos {
         Saldo = saldo;
         Usuario = usuario;
         Impresion = impresion;
+        Guardado = guardado;
     }
         public String getSerie(){return Serie;}
         public String getRecibo() {return Recibo;}
@@ -71,6 +74,8 @@ public class Recibos {
         public String getUsuario() {  return Usuario;     }
         public String getImpresion() {  return Impresion;     }
 
+        public String getGuardado() {  return Guardado;     }
+
         public void setSerie(String serie) { Serie=serie;     }
         public void setRecibo(String recibo) { Recibo=recibo;     }
         public void setFactura(String factura) { Factura=factura;     }
@@ -88,6 +93,6 @@ public class Recibos {
         public void setUsuario(String usuario) { Usuario=usuario;     }
         public void setImpresion(String impresion) { Impresion=impresion;     }
 
-
+    public void setGuardado(String guardado) { Guardado=guardado;     }
 
 }

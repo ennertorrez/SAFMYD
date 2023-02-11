@@ -36,7 +36,8 @@ public class RecibosHelper
                                  String IdCliente,
                                  String Saldo,
                                  String Usuario,
-                                 String Impresion
+                                 String Impresion,
+                                 String Guardado
                                  ) {
         long rows = 0;
         ContentValues contentValues = new ContentValues();
@@ -56,6 +57,7 @@ public class RecibosHelper
         contentValues.put(variables_publicas.RECIBOS_COLUMN_Saldo, Saldo);
         contentValues.put(variables_publicas.RECIBOS_COLUMN_Usuario, Usuario);
         contentValues.put(variables_publicas.RECIBOS_COLUMN_Impresion, Impresion);
+        contentValues.put(variables_publicas.RECIBOS_COLUMN_Guardado, Guardado);
 
         long rowInserted=database.insert(variables_publicas.TABLE_RECIBOS, null, contentValues);
         if(rowInserted != -1)
@@ -92,7 +94,36 @@ public class RecibosHelper
                 detalle.put(variables_publicas.RECIBOS_COLUMN_Saldo, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Saldo)));
                 detalle.put(variables_publicas.RECIBOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Usuario)));
                 detalle.put(variables_publicas.RECIBOS_COLUMN_Impresion, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Impresion)));
-
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Guardado, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Guardado)));
+                lst.add(detalle);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+    @SuppressLint("Range")
+    public List<HashMap<String, String>> ObtenerRecibosSincronizar(String Recibo, String Serie) {
+        List<HashMap<String,String>> lst= new ArrayList<>();
+        String selectQuery="SELECT  * FROM " + variables_publicas.TABLE_RECIBOS + " WHERE " + variables_publicas.RECIBOS_COLUMN_Recibo + " = "+ Recibo +" AND " + variables_publicas.RECIBOS_COLUMN_Serie + " = '"+ Serie +"' ";
+        Cursor c = database.rawQuery(selectQuery,null);
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> detalle = new HashMap<>();
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Serie, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Serie)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Recibo, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Recibo)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_IdVendedor, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_IdVendedor)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_IdCliente, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_IdCliente)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Factura, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Factura)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Saldo, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Saldo)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Monto, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Monto)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Abono, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Abono)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_NoCheque, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_NoCheque)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_BancoR, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_BancoR)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Fecha, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Fecha)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Moneda, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Moneda)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Usuario, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Usuario)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_TipoPago, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_TipoPago)));
+                detalle.put(variables_publicas.RECIBOS_COLUMN_Concepto, c.getString(c.getColumnIndex(variables_publicas.RECIBOS_COLUMN_Concepto)));
                 lst.add(detalle);
             } while (c.moveToNext());
         }
@@ -108,6 +139,17 @@ public class RecibosHelper
         else
             return false;
     }
+
+    public boolean ActualizarReciboGuardado(String Serie, String Recibo,String estado ) {
+        ContentValues con = new ContentValues();
+        con.put(variables_publicas.RECIBOS_COLUMN_Guardado, estado);
+        long rowsUpdated = database.update(variables_publicas.TABLE_RECIBOS, con,  variables_publicas.RECIBOS_COLUMN_Recibo + "= '" + Recibo + "'AND "+ variables_publicas.RECIBOS_COLUMN_Serie + "= '" + Serie + "' ", null);
+        if (rowsUpdated != -1)
+            return true;
+        else
+            return false;
+    }
+
     @SuppressLint("Range")
     public ArrayList<HashMap<String, String>> ObtenerRecibo(String CodigoRecibo, String Serie) {
 
@@ -245,6 +287,72 @@ public class RecibosHelper
         }
         c.close();
         return vnombre;
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<HashMap<String, String>> ObtenerRecibosLocales(String Fecha, String Fecha2, String recibo,String serie) {
+
+        String selectQuery = "SELECT D.codigo Recibo,D.Serie,D.ReciboI as ReciboI,D.cliente Cliente,D.fech Fecha,group_concat(D.fact) as Facturas,printf(\"%.2f\",SUM(D.total)) Monto,D.Est Status FROM "+
+                "(SELECT I."+ variables_publicas.RECIBOS_COLUMN_Serie +" as Serie, I."+ variables_publicas.RECIBOS_COLUMN_Recibo +" " +
+                "codigo, "+ variables_publicas.RECIBOS_COLUMN_Serie +"||substr('00000'||"+ variables_publicas.RECIBOS_COLUMN_Recibo +", -5, 5) as ReciboI,DI."+ variables_publicas.CLIENTES_COLUMN_Nombre +" cliente,DATE(I."+ variables_publicas.RECIBOS_COLUMN_Fecha +") as fech," +
+                "I."+ variables_publicas.RECIBOS_COLUMN_Factura +" fact,printf(\"%.2f\",SUM(I." + variables_publicas.RECIBOS_COLUMN_Abono + ")) total,case when I." + variables_publicas.RECIBOS_COLUMN_Guardado + " = 'true' then 'APLICADO' when I." + variables_publicas.RECIBOS_COLUMN_Guardado + " = 'anulado' then 'ANULADO' else 'NO ENVIADO' end as Est  " +
+                "FROM "+ variables_publicas.TABLE_RECIBOS +" I INNER JOIN "+ variables_publicas.TABLE_CLIENTES +" DI ON I."+ variables_publicas.RECIBOS_COLUMN_IdCliente +"=DI."+ variables_publicas.CLIENTES_COLUMN_IdCliente +" " +
+                "WHERE I."+ variables_publicas.RECIBOS_COLUMN_Guardado +" in('false','anulado') and (DATE(I." + variables_publicas.RECIBOS_COLUMN_Fecha + ") BETWEEN DATE('" + Fecha + "')  AND DATE('" + Fecha2 + "')) AND I." + variables_publicas.RECIBOS_COLUMN_Recibo + " LIKE '%" + recibo + "%' " +
+                "AND I." + variables_publicas.RECIBOS_COLUMN_Serie + " = '" + serie  + "' GROUP BY I." + variables_publicas.RECIBOS_COLUMN_Recibo + ",DI."+ variables_publicas.CLIENTES_COLUMN_Nombre +",DATE(I."+ variables_publicas.RECIBOS_COLUMN_Fecha +"),I."+ variables_publicas.RECIBOS_COLUMN_Factura +") D "+
+                "GROUP BY  D.codigo,D.Serie,D.ReciboI,D.cliente,D.fech,D.Est;";
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> informes = new HashMap<>();
+                informes.put("Recibo", c.getString(c.getColumnIndex("Recibo")));
+                informes.put("ReciboI", c.getString(c.getColumnIndex("ReciboI")));
+                informes.put("Serie", c.getString(c.getColumnIndex("Serie")));
+                informes.put("Cliente", c.getString(c.getColumnIndex("Cliente")));
+                informes.put("Fecha", c.getString(c.getColumnIndex("Fecha")));
+                informes.put("Facturas", c.getString(c.getColumnIndex("Facturas")));
+                informes.put("Monto", c.getString(c.getColumnIndex("Monto")));
+                informes.put("Estado", c.getString(c.getColumnIndex("Status")));
+                lst.add(informes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<HashMap<String, String>> ObtenerRecibosLocalesTodos(String Fecha, String Fecha2, String serie) {
+
+        String selectQuery = "SELECT D.codigo Recibo,D.Serie,D.ReciboI as ReciboI,D.cliente Cliente,D.fech Fecha,group_concat(D.fact) as Facturas,printf(\"%.2f\",SUM(D.total)) Monto,D.Est Status FROM "+
+                "(SELECT I."+ variables_publicas.RECIBOS_COLUMN_Serie +" as Serie, I."+ variables_publicas.RECIBOS_COLUMN_Recibo +" " +
+                "codigo, "+ variables_publicas.RECIBOS_COLUMN_Serie +"||substr('00000'||"+ variables_publicas.RECIBOS_COLUMN_Recibo +", -5, 5) as ReciboI,DI."+ variables_publicas.CLIENTES_COLUMN_Nombre +" cliente,DATE(I."+ variables_publicas.RECIBOS_COLUMN_Fecha +") as fech," +
+                "I."+ variables_publicas.RECIBOS_COLUMN_Factura +" fact,printf(\"%.2f\",SUM(I." + variables_publicas.RECIBOS_COLUMN_Abono + ")) total,case when I." + variables_publicas.RECIBOS_COLUMN_Guardado + " = 'true' then 'APLICADO' when I." + variables_publicas.RECIBOS_COLUMN_Guardado + " = 'anulado' then 'ANULADO' else 'NO ENVIADO' end as Est " +
+                "FROM "+ variables_publicas.TABLE_RECIBOS +" I INNER JOIN "+ variables_publicas.TABLE_CLIENTES +" DI ON I."+ variables_publicas.RECIBOS_COLUMN_IdCliente +"=DI."+ variables_publicas.CLIENTES_COLUMN_IdCliente +" " +
+                "WHERE  (DATE(I." + variables_publicas.RECIBOS_COLUMN_Fecha + ") BETWEEN DATE('" + Fecha + "')  AND DATE('" + Fecha2 + "'))  " +
+                "AND I." + variables_publicas.RECIBOS_COLUMN_Serie + " = '" + serie  + "' GROUP BY I." + variables_publicas.RECIBOS_COLUMN_Recibo + ",DI."+ variables_publicas.CLIENTES_COLUMN_Nombre +",DATE(I."+ variables_publicas.RECIBOS_COLUMN_Fecha +"),I."+ variables_publicas.RECIBOS_COLUMN_Factura +") D "+
+                "GROUP BY  D.codigo,D.Serie,D.ReciboI,D.cliente,D.fech,D.Est;";
+
+        Cursor c = database.rawQuery(selectQuery, null);
+
+        ArrayList<HashMap<String, String>> lst = new ArrayList<HashMap<String, String>>();
+        if (c.moveToFirst()) {
+            do {
+                HashMap<String, String> informes = new HashMap<>();
+                informes.put("Recibo", c.getString(c.getColumnIndex("Recibo")));
+                informes.put("ReciboI", c.getString(c.getColumnIndex("ReciboI")));
+                informes.put("Serie", c.getString(c.getColumnIndex("Serie")));
+                informes.put("Cliente", c.getString(c.getColumnIndex("Cliente")));
+                informes.put("Fecha", c.getString(c.getColumnIndex("Fecha")));
+                informes.put("Facturas", c.getString(c.getColumnIndex("Facturas")));
+                informes.put("Monto", c.getString(c.getColumnIndex("Monto")));
+                informes.put("Estado", c.getString(c.getColumnIndex("Status")));
+                lst.add(informes);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return lst;
     }
     public String ObtenerSerieRuta(String idRuta) {
 

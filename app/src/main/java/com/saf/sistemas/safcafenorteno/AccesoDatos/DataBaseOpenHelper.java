@@ -301,7 +301,8 @@ public class DataBaseOpenHelper {
                     + variables_publicas.RECIBOS_COLUMN_IdCliente + " TEXT , "
                     + variables_publicas.RECIBOS_COLUMN_Saldo+ " TEXT , "
                     + variables_publicas.RECIBOS_COLUMN_Usuario + " TEXT , "
-                    + variables_publicas.RECIBOS_COLUMN_Impresion + " TEXT ) ");
+                    + variables_publicas.RECIBOS_COLUMN_Impresion + " TEXT , "
+                    + variables_publicas.RECIBOS_COLUMN_Guardado + " TEXT ) ");
 
             db.execSQL("CREATE TABLE " + variables_publicas.TABLE_IMPRESORA + "( "
                     + variables_publicas.IMPRESORA_COLUMN_nombre + " TEXT , "

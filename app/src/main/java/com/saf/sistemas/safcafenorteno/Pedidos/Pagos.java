@@ -1275,7 +1275,7 @@ public class Pagos extends Activity {
 
             saved=RecibosH.GuardarRecibo(Recibo.getSerie(),Recibo.getRecibo(),Recibo.getFactura(),Recibo.getFecha(),Recibo.getMonto(),Recibo.getNoCheque(),
                     Recibo.getBancoR(),Recibo.getAbono(),Recibo.getMoneda(),Recibo.getTipoPago(),Recibo.getConcepto(),Recibo.getIdVendedor(),Recibo.getIdCliente(),
-                    Recibo.getSaldo(),Recibo.getUsuario(),Recibo.getImpresion());
+                    Recibo.getSaldo(),Recibo.getUsuario(),Recibo.getImpresion(),"false");
             FacturasPendientesH.ActualizarFacturasPendientes(Recibo.getFactura(),"true", Double.parseDouble(Recibo.getSaldo()),Double.parseDouble(Recibo.getAbono()));
 
             if (!saved) {
@@ -1289,11 +1289,11 @@ public class Pagos extends Activity {
         vConceptoCancela=vConceptoCancela.replaceAll(",$", "");
 
         if (vConceptoCancela.equals("") && !vConceptoAbono.equals("")){
-            vConcepto= "ABONO A FACTURA(s) " + vConceptoAbono;
+            vConcepto= "ABONO A FACTURA(s): " + vConceptoAbono;
         }else if(!vConceptoCancela.equals("") && vConceptoAbono.equals("")){
-            vConcepto= "CANCELACION DE FACTURA(s) " + vConceptoCancela;
+            vConcepto= "CANCELACION DE FACTURA(s): " + vConceptoCancela;
         }else{
-            vConcepto="CANCELACION DE FACTURA(s) " + vConceptoCancela + " Y ABONO A FACTURA(s) "+vConceptoAbono;
+            vConcepto="CANCELACION DE FACTURA(s): " + vConceptoCancela + " Y ABONO A FACTURA(s): "+vConceptoAbono;
         }
         RecibosH.ActualizarConceptoRecibo(vSerie,Recibo.getRecibo(),vConcepto);
         return true;

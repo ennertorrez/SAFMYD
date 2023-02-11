@@ -53,7 +53,7 @@ public class variables_publicas {
     public static final String correosErrores = "cysnicaragua@gmail.com";
     public  static final String correoError= "cysnicaragua@gmail.com";
     //Variables BD
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "Safi_CAFENORTENO.db";
     //Variables TB
     public static final String TABLE_ARTICULOS = "Articulos";
@@ -335,6 +335,7 @@ public class variables_publicas {
     public static  final String RECIBOS_COLUMN_Saldo = "Saldo";
     public static  final String RECIBOS_COLUMN_Usuario = "Usuario";
     public static  final String RECIBOS_COLUMN_Impresion= "Impresion"; //Si es 1 es el original, si es 2 es copia, si es 0 No se ha impreso.
+    public static  final String RECIBOS_COLUMN_Guardado= "Guardado"; // Si es true guardada ya en server si es falsa es local
 
     public static  final String FACTURAS_PENDIENTES_COLUMN_codvendedor = "codvendedor";
     public static  final String FACTURAS_PENDIENTES_COLUMN_No_Factura = "No_Factura";

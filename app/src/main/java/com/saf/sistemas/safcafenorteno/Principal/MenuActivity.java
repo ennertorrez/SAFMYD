@@ -69,7 +69,9 @@ import com.saf.sistemas.safcafenorteno.Menu.ListaPedidosSupFragment;
 import com.saf.sistemas.safcafenorteno.Menu.ListaTotalFacturado;
 import com.saf.sistemas.safcafenorteno.Menu.MaestroProductoFragment;
 import com.saf.sistemas.safcafenorteno.Menu.PedidosFragment;
+import com.saf.sistemas.safcafenorteno.Pedidos.FacturasMoraClienteFragment;
 import com.saf.sistemas.safcafenorteno.Pedidos.ImprimirActivity;
+import com.saf.sistemas.safcafenorteno.Pedidos.ListaPagosFragment;
 import com.saf.sistemas.safcafenorteno.Pedidos.Pagos;
 import com.saf.sistemas.safcafenorteno.Pedidos.PedidosCliente;
 import com.saf.sistemas.safcafenorteno.R;
@@ -467,6 +469,14 @@ public class MenuActivity extends AppCompatActivity
                 tran.commit();
                 break;
 
+            case R.id.btnEstadoCta:
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new FacturasMoraClienteFragment());
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
             case R.id.btnListadoPedidos:
 
                 fragmentManager.executePendingTransactions();
@@ -551,6 +561,14 @@ public class MenuActivity extends AppCompatActivity
                 fragmentManager.executePendingTransactions();
                 tran = getFragmentManager().beginTransaction();
                 tran.add(R.id.content_frame, new ListaTotalFacturado() );
+                tran.addToBackStack(null);
+                tran.commit();
+                break;
+
+            case R.id.btnListadoPagos:
+                fragmentManager.executePendingTransactions();
+                tran = getFragmentManager().beginTransaction();
+                tran.add(R.id.content_frame, new ListaPagosFragment());
                 tran.addToBackStack(null);
                 tran.commit();
                 break;

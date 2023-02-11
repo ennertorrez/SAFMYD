@@ -53,6 +53,34 @@ public class FacturasPendientesHelper {
         database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
     }
 
+    public boolean GuardarFacturasPendientes2(String vendedor,
+                                          String fecha,
+                                          String factura,
+                                          String idcliente,
+                                          String total,
+                                          String abono,
+                                          String saldo,
+                                          String ruta,
+                                          String guardada
+    ) {
+        long rows = 0;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_codvendedor, vendedor);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_No_Factura, factura);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_CodigoCliente, idcliente);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Fecha, fecha);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Total, total);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Abono, abono);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Saldo, saldo);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Ruta, ruta);
+        contentValues.put(variables_publicas.FACTURAS_PENDIENTES_COLUMN_Guardada, guardada);
+
+        long rowInserted =database.insert(variables_publicas.TABLE_FACTURAS_PENDIENTES, null, contentValues);
+
+        if (rowInserted != -1)
+            return true;
+        else return false;
+    }
 
     @SuppressLint("Range")
     public List<HashMap<String, String>> ObtenerFacturasPendientes(String vRuta, String vCliente) {
@@ -249,7 +277,7 @@ public class FacturasPendientesHelper {
                 for (int i = 0; i < articulos.length(); i++) {
                     JSONObject c = articulos.getJSONObject(i);
                     String codvendedor = c.getString("codvendedor");
-                    String No_Factura = c.getString("No Factura");
+                    String No_Factura = c.getString("No_Factura");
                     String CodigoCliente = c.getString("CodigoCliente");
                     String Fecha = c.getString("Fecha");
                     String Total = c.getString("Total");

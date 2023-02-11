@@ -65,7 +65,7 @@ public class VendedoresHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
 
-            list.add(new Vendedor("999","TODOS","1","RT-Todos","1","1","TODOS","1"));
+            //list.add(new Vendedor("999","TODOS","1","RT-Todos","1","1","TODOS","1"));
             do {
                 list.add(new Vendedor(cursor.getString(cursor.getColumnIndex("CODIGO")),
                         cursor.getString(cursor.getColumnIndex("NOMBRE")),

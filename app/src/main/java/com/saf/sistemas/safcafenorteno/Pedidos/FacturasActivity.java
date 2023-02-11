@@ -60,6 +60,7 @@ import com.saf.sistemas.safcafenorteno.AccesoDatos.DataBaseOpenHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.EscalaPreciosHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.FacturasHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.FacturasLineasHelper;
+import com.saf.sistemas.safcafenorteno.AccesoDatos.FacturasPendientesHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.FormaPagoHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.PromocionesHelper;
 import com.saf.sistemas.safcafenorteno.AccesoDatos.RecibosHelper;
@@ -179,6 +180,7 @@ import java.util.regex.Pattern;
         private Factura factura;
         private DataBaseOpenHelper DbOpenHelper;
         private VendedoresHelper VendedoresH;
+        private FacturasPendientesHelper FacturasPendientesH;
         private ClientesSucursalHelper ClientesSucursalH;
         private FormaPagoHelper FormaPagoH;
         private ArticulosHelper ArticulosH;
@@ -241,10 +243,11 @@ import java.util.regex.Pattern;
             EscalaPreciosH = new EscalaPreciosHelper(DbOpenHelper.database);
             RecibosH = new RecibosHelper(DbOpenHelper.database);
             ConfiguracionSistemaH = new ConfiguracionSistemaHelper(DbOpenHelper.database);
+            FacturasPendientesH = new FacturasPendientesHelper(DbOpenHelper.database);
 
             sd = new SincronizarDatos(DbOpenHelper, ClientesH, VendedoresH, PromocionesH,
                     FormaPagoH,
-                    ConfiguracionSistemaH, ClientesSucursalH, ArticulosH, UsuariosH, FacturasH, FacturasLineasH, TPreciosH,RutasH,EscalaPreciosH,RecibosH);
+                    ConfiguracionSistemaH, ClientesSucursalH, ArticulosH, UsuariosH, FacturasH, FacturasLineasH, TPreciosH,RutasH,EscalaPreciosH,RecibosH,FacturasPendientesH);
 
 
             ValidarUltimaVersion();
@@ -1311,6 +1314,8 @@ import java.util.regex.Pattern;
             if (!saved) {
                 MensajeAviso("Ha Ocurrido un error al guardar los datos");
                 return false;
+            }else {
+                saved=FacturasPendientesH.GuardarFacturasPendientes2(factura.getVendedor(),factura.getFecha(), factura.getFactura(), factura.getCliente(),factura.getTotal(), "0", factura.getTotal(),factura.getRuta(), "false");
             }
             //Guardamos el detalle de la factura
             for (HashMap<String, String> item : listaArticulos) {

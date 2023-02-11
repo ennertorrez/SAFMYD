@@ -110,7 +110,7 @@ public class SincronizarDatos {
                             VendedoresHelper Vendedoresh, PromocionesHelper Promocionesh, FormaPagoHelper FormaPagoh,
                             ConfiguracionSistemaHelper ConfigSistemah,
                             ClientesSucursalHelper ClientesSuch, ArticulosHelper Articulosh, UsuariosHelper usuariosH,
-                            FacturasHelper facturasH, FacturasLineasHelper facturasLineasH , TPreciosHelper tpreciosH, RutasHelper rutasH, EscalaPreciosHelper escalaPreciosH,RecibosHelper recibosH) {
+                            FacturasHelper facturasH, FacturasLineasHelper facturasLineasH , TPreciosHelper tpreciosH, RutasHelper rutasH, EscalaPreciosHelper escalaPreciosH,RecibosHelper recibosH, FacturasPendientesHelper facturasPendientesH) {
         DbOpenHelper = dbh;
         ClientesH = Clientesh;
         VendedoresH = Vendedoresh;
@@ -126,6 +126,7 @@ public class SincronizarDatos {
         TPreciosH = tpreciosH;
         EscalaPreciosH = escalaPreciosH;
         RecibosH = recibosH;
+        FacturasPendientesH = facturasPendientesH;
     }
 
     public SincronizarDatos(DataBaseOpenHelper dbh, ClientesHelper Clientesh,
@@ -1511,7 +1512,7 @@ public class SincronizarDatos {
         Gson gson = new Gson();
         String reciboi=vSerie + String.format("%05d",Integer.parseInt(vRecibo));
 
-        List<HashMap<String, String>> reciboDetalle = RecibosH.ObtenerRecibos(vRecibo,vSerie);
+        List<HashMap<String, String>> reciboDetalle = RecibosH.ObtenerRecibosSincronizar(vRecibo,vSerie);
         for (HashMap<String, String> item : reciboDetalle) {
             item.put("Serie", item.get("Serie"));
             item.put("Recibo", item.get("Recibo"));
@@ -1523,11 +1524,11 @@ public class SincronizarDatos {
             item.put("Abono", item.get("Abono").replace(",", ""));
             item.put("NoCheque", item.get("NoCheque"));
             item.put("BancoR", item.get("BancoR"));
-            item.put("Fecha", item.get("FechaDep"));
+            item.put("Fecha", item.get("Fecha"));
             item.put("Moneda", item.get("Moneda"));
-            item.put("Concepto", item.get("Concepto"));
             item.put("Usuario", item.get("Usuario"));
             item.put("TipoPago", item.get("TipoPago"));
+            item.put("Concepto", item.get("Concepto"));
         }
         String jsonReciboDetalle = gson.toJson(reciboDetalle);
         final String urlDetalle = variables_publicas.direccionIp + "/ServicioRecibos.svc/SincronizarReciboTotal/";
@@ -1558,9 +1559,7 @@ public class SincronizarDatos {
                         return "false," + NoRecibo;
                     }
                 }
-/*                RecibosH.ActualizarInforme(CodInforme, NoInforme);
-                InformesDetalleH.ActualizarCodigoInformeN(CodInforme, NoInforme);
-                variables_publicas.noInforme=NoInforme;*/
+               RecibosH.ActualizarReciboGuardado(vSerie, vRecibo,"true");
                 return "true";
             } catch (Exception ex) {
                 new Funciones().SendMail("Ha ocurrido un error al sincronizar el Recibo, Excepcion controlada ", variables_publicas.info + ex.getMessage(), "dlunasistemas@gmail.com", variables_publicas.correosErrores);
