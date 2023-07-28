@@ -9,5 +9,25 @@
         android:icon="@mipmap/ic_check_circle_black_48dp"
         app:showAsAction="never"
         />
-
+    <item
+        android:id="@+id/itemGeolocalizacion"
+        android:orderInCategory="100"
+        android:title="Localizar Cliente"
+        android:icon="@mipmap/ic_check_circle_black_48dp"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/itemVenta"
+        android:orderInCategory="100"
+        android:title="Realizar Venta"
+        android:icon="@mipmap/ic_check_circle_black_48dp"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/itemVisita"
+        android:orderInCategory="100"
+        android:title="Visita sin Venta"
+        android:icon="@mipmap/ic_check_circle_black_48dp"
+        app:showAsAction="never"
+        />
     </menu>

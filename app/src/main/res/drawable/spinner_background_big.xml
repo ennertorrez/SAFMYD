@@ -3,7 +3,7 @@
     <item>
         <layer-list>
 
-            <item android:height="35dp">
+            <item android:height="40dp">
 
                 <shape>
                     <solid android:color="@color/colorPrimaryGreen"></solid>
@@ -28,7 +28,7 @@
             <item>
                 <bitmap
                     android:gravity="center_vertical|right"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="5dp"
                     android:src="@drawable/quantum_ic_keyboard_arrow_down_white_36"  />
             </item>
 

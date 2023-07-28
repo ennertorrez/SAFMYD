@@ -105,7 +105,7 @@
         android:layout_marginBottom="0dp"
         android:layout_marginTop="15dp"
         android:gravity="center_horizontal"
-        android:text="Café El Norteño"
+        android:text="Distribuidora MyD"
         android:textColor="#fff"
         android:textSize="26sp"
         android:textStyle="bold" />
@@ -144,5 +144,5 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/user_profile_image_background_dos"
         android:elevation="4dp"
-        android:src="@mipmap/logoelnorteno" />
+        android:src="@mipmap/logomydprininicio" />
 </RelativeLayout>

@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -30,6 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:paddingTop="5dp"
                 android:paddingBottom="3dp">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -113,6 +115,28 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp">
+                    <TextView
+                        android:id="@+id/lblClienteAnterior"
+                        android:layout_width="150dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
+                        android:paddingStart="5dp"
+                        android:background="@drawable/borde_campos_pedidos"
+                        android:text="Cliente Anterior"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="13dp"
+                        android:textStyle="bold" />
+                    <com.kenmeidearu.searchablespinnerlibrary.SearchableSpinner
+                        android:id="@+id/cboCteAnterior"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_vertical"/>
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -120,8 +144,10 @@
                     <TextView
                         android:id="@+id/lblDpto"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Departamento"
                         android:textColor="@color/colorAccent"
@@ -131,17 +157,21 @@
                         android:id="@+id/cboDpto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
 
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblMuni"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Municipio"
                         android:textColor="@color/colorAccent"
@@ -151,66 +181,21 @@
                         android:id="@+id/cboMun"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
- <!--               <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp">
-                    <TextView
-                        android:id="@+id/lblZona"
-                        android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/borde_campos_pedidos"
-                        android:text="Zona"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="13dp"
-                        android:textStyle="bold" />
 
-                    <Spinner
-                        android:id="@+id/cboZona"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        ></Spinner>
-&lt;!&ndash;                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-                        android:id="@+id/cboBarrio"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />&ndash;&gt;
-
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp">
-                    <TextView
-                        android:id="@+id/lblSubZona"
-                        android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/borde_campos_pedidos"
-                        android:text="Sub Zona"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="13dp"
-                        android:textStyle="bold" />
-
-                    <Spinner
-                        android:id="@+id/cboSubZona"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        ></Spinner>
-                    &lt;!&ndash;                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-                                            android:id="@+id/cboBarrio"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content" />&ndash;&gt;
-
-                </LinearLayout>
  -->               <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblDiasVisit"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Dias de Visita"
                         android:textColor="@color/colorAccent"
@@ -220,16 +205,20 @@
                         android:id="@+id/cboDiasVisita"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblRutaCliente"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Ruta"
                         android:textColor="@color/colorAccent"
@@ -239,16 +228,20 @@
                         android:id="@+id/cboRutaCliente"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblTipoCliente"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Tipo de Cliente"
                         android:textColor="@color/colorAccent"
@@ -258,16 +251,20 @@
                         android:id="@+id/cboTipoCliente"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblTipoNeg"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Tipo de Negocio"
                         android:textColor="@color/colorAccent"
@@ -277,6 +274,8 @@
                         android:id="@+id/cboTipoNeg"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
                 <LinearLayout
@@ -285,8 +284,10 @@
                     <TextView
                         android:id="@+id/lblTelefono"
                         android:layout_width="150dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Telefono"
                         android:textColor="@color/colorAccent"
@@ -295,8 +296,8 @@
                     <EditText
                         android:id="@+id/txtTelefono"
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
-                        android:layout_weight="0.66"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="1dp"
                         android:background="@drawable/rounded_edittext"
                         android:hint="Telefono"
                         android:inputType="number"
@@ -304,12 +305,14 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="30dp">
+                    android:layout_height="35dp">
                     <TextView
                         android:id="@+id/lblVendedor"
                         android:layout_width="150dp"
-                        android:layout_height="25dp"
-                        android:layout_gravity="center_horizontal"
+                        android:layout_height="match_parent"
+                        android:paddingStart="5dp"
+                        android:layout_gravity="left"
+                        android:gravity="center_vertical"
                         android:background="@drawable/borde_campos_pedidos"
                         android:text="Vendedor"
                         android:textColor="@color/colorAccent"
@@ -319,6 +322,8 @@
                         android:id="@+id/cboVendedor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="2dp"
                         ></Spinner>
                 </LinearLayout>
                 <RelativeLayout
@@ -338,10 +343,11 @@
                         android:id="@+id/btnCancelarCli"
                         android:layout_width="50dp"
                         android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
                         android:background="@mipmap/ic_cancel_black_48dp"
                         android:backgroundTint="#ff0000"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentEnd="true" />
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </RelativeLayout>
             </LinearLayout>
 

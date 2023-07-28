@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/itemVerDetalle"
+        android:orderInCategory="100"
+        android:title="Ver Visitas"
+        android:icon="@mipmap/ic_check_circle_black_48dp"
+        app:showAsAction="never"
+        />
+</menu>

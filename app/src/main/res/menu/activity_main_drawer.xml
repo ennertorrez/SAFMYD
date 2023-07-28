@@ -4,7 +4,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/btnMaestroProductos"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_date_range_black_24dp"
             android:title="Listado Productos" />
         <item
             android:id="@+id/btnPedidos"
@@ -32,8 +32,8 @@
         </item>
         <item
             android:id="@+id/btnFacturacion"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Facturación" >
+            android:icon="@drawable/ic_menu_mapmode"
+            android:title="Facturación">
             <menu>
                 <item
                     android:id="@+id/btnFacturar"
@@ -71,8 +71,8 @@
         </item>
         <item
             android:id="@+id/btnPagos"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Pagos" >
+            android:icon="@drawable/ic_menu_send"
+            android:title="Pagos">
             <menu>
                 <item
                     android:id="@+id/btnRecibos"
@@ -105,6 +105,12 @@
                 android:icon="@drawable/ic_menu_plussign"
 
                 android:title="Reporte Facturacion" />
+
+            <item
+                android:id="@+id/btnCumplimiento"
+                android:icon="@drawable/ic_menu_mapmode"
+                android:title="Cumplimiento" />
+
         </menu>
     </item>
         <item

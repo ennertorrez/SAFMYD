@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name = "com.saf.sistemas.safcafenorteno.PopupListFragment"
+    android:name = "com.saf.sistemas.safmyd.PopupListFragment"
     android:background="@color/White"
    >
     <RelativeLayout
@@ -19,10 +19,11 @@
          />
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/Rl1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginTop="1dp"
         android:layout_below="@+id/RlHeader">
 
         <RadioGroup
@@ -48,16 +49,14 @@
                 android:layout_height="wrap_content"
                 android:text="Nombre" />
         </RadioGroup>
-
-        <!---   <Button
-               android:id="@+id/btnAgregarCliente"
-               android:layout_width="48dp"
-               android:layout_height="wrap_content"
-               android:background="@mipmap/plus_add_green"
-               android:layout_alignParentRight="true"
-               android:onClick="AgregarCliente" />-->
-
-       </RelativeLayout>
+        <Spinner
+            android:id="@+id/cboDiasVisita"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            ></Spinner>
+       </LinearLayout>
 
        <RelativeLayout
            android:id="@+id/Rl2"

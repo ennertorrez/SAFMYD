@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/White">
+
+        <RelativeLayout
+            android:id="@+id/Rl1F"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <EditText
+                android:id="@+id/txtFecha"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/borde_campos_pedidos"
+                android:cursorVisible="false"
+                android:drawableRight="@drawable/ic_date_range_black_24dp"
+                android:focusableInTouchMode="false"
+                android:orientation="horizontal"
+                android:paddingBottom="10dp"
+                android:text="Fecha"
+                android:textAlignment="center"
+                android:textColor="@color/colorAccent"
+                android:textSize="20dp"
+                android:textStyle="bold"></EditText>
+
+            <Button
+                android:id="@+id/btnBuscar"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/places_ic_search"
+                android:backgroundTint="@color/colorPrimaryDark"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/RlfooterF"
+            android:layout_below="@+id/Rl1F"
+            android:orientation="vertical">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/layout_list_headerF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lblColDia"
+                            android:layout_width="110dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:paddingLeft="0dp"
+                            android:text="Dia"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+
+                        <TextView
+                            android:id="@+id/lblColFecha"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="left"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Fecha"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+
+                        <TextView
+                            android:id="@+id/lblColRuta"
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Ruta"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColVendedor"
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Vendedor"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColTotalClientes"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Clientes"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColClientesVenta"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Con Venta"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColClientesNoVenta"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Sin Venta"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColClientesNoVisita"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Sin Visitar"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColTotalVenta"
+                            android:layout_width="130dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Total"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColEficiencia"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="center"
+                            android:text="Eficiencia"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColIdRuta"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="right"
+                            android:text=""
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                        <TextView
+                            android:id="@+id/lblColIdVendedor"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top"
+                            android:background="@drawable/borde_campos_pedidos"
+                            android:gravity="right"
+                            android:text=""
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="#000000"
+                            android:typeface="monospace" />
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/grouplayout_listaF"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/layout_list_headerF"
+                        android:orientation="vertical">
+
+                        <ListView
+                            android:id="@+id/listResumenCumpliento"
+                            android:layout_width="1240dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:scrollbars="vertical" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/RlfooterF"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+
+            <TextView
+                android:id="@+id/lblFooterCantidadF"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text="Cantidad: 0"
+                android:textColor="@color/White"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/lblFooterSubtotalF"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:gravity="right"
+                android:text="Total: C$0.00"
+                android:textColor="@color/White"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
